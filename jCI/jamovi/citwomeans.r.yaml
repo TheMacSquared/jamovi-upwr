@@ -1,0 +1,56 @@
+---
+name: citwomeans
+title: CI dla roznicy srednich (dwie proby)
+jrs: '1.1'
+
+items:
+    - name: table
+      title: Przedzial ufnosci dla roznicy srednich
+      type: Table
+      rows: 1
+      clearWith:
+        - dep
+        - group
+        - ciWidth
+      columns:
+        - name: var
+          title: Zmienna
+          type: text
+
+        - name: group1
+          title: Grupa 1
+          type: text
+
+        - name: group2
+          title: Grupa 2
+          type: text
+
+        - name: estimate
+          title: Roznica srednich
+          type: number
+
+        - name: se
+          title: SE
+          type: number
+
+        - name: lower
+          title: Dolna granica
+          type: number
+
+        - name: upper
+          title: Gorna granica
+          type: number
+
+    - name: plot
+      title: ''
+      type: Image
+      visible: (showPlot)
+      width: 450
+      height: 350
+      renderFun: .ciPlot
+      clearWith:
+        - dep
+        - group
+        - ciWidth
+
+...

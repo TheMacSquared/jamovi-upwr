@@ -1,0 +1,79 @@
+---
+name: permtestpaired
+title: Test permutacyjny - proby sparowane
+menuGroup: Testy permutacyjne
+version: '1.0.0'
+jas: '1.2'
+
+completeWhenFilled: true
+
+options:
+    - name: data
+      type: Data
+      description:
+          R: dane w postaci ramki danych
+
+    - name: var1
+      title: Pomiar 1
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      description:
+          R: pierwsza zmienna (pomiar 1)
+
+    - name: var2
+      title: Pomiar 2
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      description:
+          R: druga zmienna (pomiar 2)
+
+    - name: hypothesis
+      title: Hipoteza alternatywna
+      type: List
+      options:
+        - name: twoSided
+          title: "Pomiar 1 ≠ Pomiar 2"
+        - name: greater
+          title: "Pomiar 1 > Pomiar 2"
+        - name: less
+          title: "Pomiar 1 < Pomiar 2"
+      default: twoSided
+      description:
+          R: "'twoSided' (domyslnie), 'greater' lub 'less'"
+
+    - name: nPerm
+      title: Liczba permutacji
+      type: Integer
+      default: 10000
+      min: 100
+      max: 100000
+      description:
+          R: liczba losowych permutacji
+
+    - name: seed
+      title: Ziarno generatora
+      type: Integer
+      default: 0
+      description:
+          R: ziarno generatora liczb losowych; 0 = brak ustawiania ziarna
+
+    - name: exact
+      title: Test dokladny
+      type: Bool
+      default: false
+      description:
+          R: TRUE - wylicz wszystkie permutacje
+
+    - name: showPlot
+      title: Wykres rozkladu permutacyjnego
+      type: Bool
+      default: true
+      description:
+          R: TRUE - pokaz histogram rozkladu permutacyjnego
+...

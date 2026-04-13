@@ -1,0 +1,41 @@
+---
+name:  bootConvergence
+title: "Zbieżność bootstrapu"
+jrs:   '1.1'
+
+items:
+    - name: convTable
+      title: "Wpływ liczby B na przedział ufności"
+      type: Table
+      clearWith:
+          - dep
+          - ciWidth
+          - seed
+      columns:
+          - name: b
+            title: B
+            type: integer
+          - name: seBoot
+            title: "Błąd std. bootstrap"
+            type: number
+          - name: ciLower
+            title: "Dolna granica PU"
+            type: number
+          - name: ciUpper
+            title: "Górna granica PU"
+            type: number
+          - name: ciWidth
+            title: "Szerokość PU"
+            type: number
+
+    - name: plots
+      title: "Zbieżność przedziału ufności"
+      type: Image
+      width: 550
+      height: 400
+      clearWith:
+          - dep
+          - ciWidth
+          - seed
+      renderFun: .plot
+...

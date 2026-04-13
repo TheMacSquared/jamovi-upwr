@@ -1,0 +1,67 @@
+---
+name:  bootPaired
+title: "Bootstrapowy PU dla prób zależnych"
+jrs:   '1.1'
+
+items:
+    - name: testTable
+      title: "Bootstrapowy PU dla różnicy średnich (próby zależne)"
+      type: Table
+      clearWith:
+          - pair1
+          - pair2
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      columns:
+          - name: meanDiff
+            title: "Średnia różnic"
+            type: number
+          - name: seBoot
+            title: "Błąd std. bootstrap"
+            type: number
+          - name: ciLower
+            title: "Dolna granica PU"
+            type: number
+          - name: ciUpper
+            title: "Górna granica PU"
+            type: number
+          - name: n
+            title: N
+            type: integer
+
+    - name: descTable
+      title: "Statystyki opisowe"
+      type: Table
+      clearWith:
+          - pair1
+          - pair2
+      columns:
+          - name: var
+            title: Zmienna
+            type: text
+          - name: n
+            title: N
+            type: integer
+          - name: mean
+            title: "Średnia"
+            type: number
+          - name: sd
+            title: "Odch. std."
+            type: number
+
+    - name: plots
+      title: "Rozkład bootstrapowy"
+      type: Image
+      width: 500
+      height: 350
+      clearWith:
+          - pair1
+          - pair2
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      renderFun: .plot
+...

@@ -1,0 +1,51 @@
+---
+name:  bootMedian
+title: "Bootstrapowy przedział ufności dla mediany"
+jrs:   '1.1'
+
+items:
+    - name: medianTable
+      title: "Bootstrapowy przedział ufności dla mediany"
+      type: Table
+      rows: (dep)
+      clearWith:
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      columns:
+          - name: var
+            title: Zmienna
+            type: text
+          - name: median
+            title: Mediana
+            type: number
+          - name: seBoot
+            title: "Błąd std. bootstrap"
+            type: number
+          - name: ciLower
+            title: "Dolna granica PU"
+            type: number
+          - name: ciUpper
+            title: "Górna granica PU"
+            type: number
+          - name: n
+            title: N
+            type: integer
+
+    - name: plots
+      title: "Rozkład bootstrapowy"
+      type: Array
+      items: (dep)
+      clearWith:
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      template:
+          title: "Rozkład bootstrapowy — $key"
+          type: Image
+          width: 500
+          height: 350
+          renderFun: .plot
+...

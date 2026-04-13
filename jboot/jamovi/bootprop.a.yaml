@@ -1,0 +1,56 @@
+---
+name:  bootProp
+title: "Bootstrapowy przedział ufności dla proporcji"
+menuGroup: jboot
+version: '0.1.0'
+jas: '1.2'
+
+description:
+    R:
+        usage: >
+            Bootstrapowy przedział ufności dla proporcji.
+
+options:
+    - name: data
+      type: Data
+
+    - name: var
+      title: Zmienna
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+
+    - name: nBoot
+      title: Liczba prób bootstrapowych
+      type: Integer
+      default: 1000
+      min: 100
+      max: 100000
+
+    - name: ciWidth
+      title: Poziom ufności (%)
+      type: Number
+      default: 95
+      min: 50
+      max: 99.9
+
+    - name: seed
+      title: "Ziarno losowości (0 = losowe)"
+      type: Integer
+      default: 0
+      min: 0
+      max: 999999
+
+    - name: ciMethod
+      title: "Metoda przedziału ufności"
+      type: List
+      options:
+        - name: perc
+          title: Percentylowy
+        - name: bca
+          title: "BCa (skorygowany)"
+        - name: basic
+          title: "Bazowy (basic)"
+      default: perc
+...

@@ -1,0 +1,98 @@
+---
+name:  bootCorr
+title: "Bootstrapowy przedział ufności dla korelacji"
+jrs:   '1.1'
+
+items:
+    - name: corrTable
+      title: "Bootstrapowe przedziały ufności dla korelacji"
+      type: Table
+      clearWith:
+          - vars
+          - nBoot
+          - ciWidth
+          - method
+          - seed
+          - ciMethod
+      columns:
+          - name: var1
+            title: Zmienna 1
+            type: text
+          - name: var2
+            title: Zmienna 2
+            type: text
+          - name: r
+            title: Korelacja
+            type: number
+            format: zto
+          - name: seBoot
+            title: "Błąd std. bootstrap"
+            type: number
+          - name: ciLower
+            title: "Dolna granica PU"
+            type: number
+            format: zto
+          - name: ciUpper
+            title: "Górna granica PU"
+            type: number
+            format: zto
+          - name: n
+            title: N
+            type: integer
+
+    - name: classicalTable
+      title: "Test klasyczny (test korelacji)"
+      type: Table
+      visible: (showClassical)
+      clearWith:
+          - vars
+          - nBoot
+          - ciWidth
+          - method
+      columns:
+          - name: var1
+            title: Zmienna 1
+            type: text
+          - name: var2
+            title: Zmienna 2
+            type: text
+          - name: r
+            title: Korelacja
+            type: number
+            format: zto
+          - name: t
+            title: "Statystyka t"
+            type: number
+          - name: df
+            title: df
+            type: number
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+          - name: ciLowerClass
+            title: "Dolna granica PU"
+            type: number
+            format: zto
+          - name: ciUpperClass
+            title: "Górna granica PU"
+            type: number
+            format: zto
+
+    - name: plots
+      title: "Rozkłady bootstrapowe"
+      type: Array
+      clearWith:
+          - vars
+          - nBoot
+          - ciWidth
+          - method
+          - seed
+          - ciMethod
+      template:
+          title: "Rozkład bootstrapowy — $key"
+          type: Image
+          width: 500
+          height: 350
+          renderFun: .plot
+...

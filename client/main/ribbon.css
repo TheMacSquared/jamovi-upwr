@@ -115,7 +115,7 @@ body.windows.electron .jmv-ribbon-appmenu {
 
 .jmv-ribbon-appmenu:hover {
     color: #EEEEEE ;
-    background-color: #4675B1 ;
+    background-color: #9A2A40 ;
 }
 
 @media (forced-colors: active) {
@@ -126,17 +126,17 @@ body.windows.electron .jmv-ribbon-appmenu {
 
 .jmv-ribbon-fullscreen:hover {
     color: #EEEEEE ;
-    background-color: #4675B1 ;
+    background-color: #9A2A40 ;
 }
 
 .jmv-ribbon-tab:hover {
     color: #EEEEEE ;
-    background-color: #4675B1 ;
+    background-color: #9A2A40 ;
 }
 
 .jmv-ribbon-tab.selected {
     background-color : #F0F0F0 ;
-    color: #3E6DA9 ;
+    color: #832034 ;
 }
 
 .jmv-ribbon-tab[data-tabname="file"] {

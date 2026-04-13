@@ -1,0 +1,56 @@
+---
+name:  bootExplore
+title: "Eksploracja bootstrapu krok po kroku"
+jrs:   '1.1'
+
+items:
+    - name: origTable
+      title: "Dane oryginalne — podsumowanie"
+      type: Table
+      clearWith:
+          - dep
+      columns:
+          - name: stat
+            title: "Statystyka"
+            type: text
+          - name: value
+            title: "Wartość"
+            type: number
+
+    - name: samplesTable
+      title: "Próby bootstrapowe"
+      type: Table
+      clearWith:
+          - dep
+          - nBoot
+          - seed
+      columns:
+          - name: sample
+            title: "Nr próby"
+            type: integer
+          - name: indices
+            title: "Wylosowane indeksy"
+            type: text
+          - name: values
+            title: "Wylosowane wartości"
+            type: text
+          - name: mean
+            title: "Średnia"
+            type: number
+
+    - name: summaryTable
+      title: "Podsumowanie bootstrapu"
+      type: Table
+      clearWith:
+          - dep
+          - nBoot
+          - seed
+          - ciWidth
+      columns:
+          - name: stat
+            title: "Statystyka"
+            type: text
+          - name: value
+            title: "Wartość"
+            type: number
+...

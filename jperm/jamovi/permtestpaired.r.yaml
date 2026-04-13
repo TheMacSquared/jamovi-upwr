@@ -1,0 +1,55 @@
+---
+name: permtestpaired
+title: Test permutacyjny - proby sparowane
+jrs: '1.1'
+
+items:
+    - name: table
+      title: Test permutacyjny - proby sparowane
+      type: Table
+      rows: 1
+      clearWith:
+        - var1
+        - var2
+        - nPerm
+        - seed
+        - hypothesis
+        - exact
+      columns:
+        - name: var1
+          title: Pomiar 1
+          type: text
+
+        - name: var2
+          title: Pomiar 2
+          type: text
+
+        - name: stat
+          title: Statystyka obserwowana
+          type: number
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+        - name: nPerm
+          title: Liczba permutacji
+          type: integer
+
+    - name: plot
+      title: Rozklad permutacyjny
+      type: Image
+      visible: (showPlot)
+      width: 550
+      height: 400
+      renderFun: .permPlot
+      clearWith:
+        - var1
+        - var2
+        - nPerm
+        - seed
+        - hypothesis
+        - exact
+
+...

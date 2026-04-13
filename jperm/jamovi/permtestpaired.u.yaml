@@ -1,0 +1,79 @@
+title: Test permutacyjny - proby sparowane
+name: permtestpaired
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    suggested:
+      - continuous
+    permitted:
+      - numeric
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Pomiar 1
+        children:
+          - type: VariablesListBox
+            name: var1
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Pomiar 2
+        children:
+          - type: VariablesListBox
+            name: var2
+            isTarget: true
+            maxItemCount: 1
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Hipoteza
+            children:
+              - type: RadioButton
+                name: hypothesis_twoSided
+                optionName: hypothesis
+                optionPart: twoSided
+              - type: RadioButton
+                name: hypothesis_greater
+                optionName: hypothesis
+                optionPart: greater
+              - type: RadioButton
+                name: hypothesis_less
+                optionName: hypothesis
+                optionPart: less
+          - type: Label
+            label: Opcje permutacji
+            children:
+              - type: TextBox
+                name: nPerm
+                label: Liczba permutacji
+                format: number
+              - type: TextBox
+                name: seed
+                label: Ziarno generatora (0 = losowe)
+                format: number
+              - type: CheckBox
+                name: exact
+                label: Test dokladny (wszystkie permutacje)
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wykresy
+            children:
+              - type: CheckBox
+                name: showPlot
+                label: Rozklad permutacyjny

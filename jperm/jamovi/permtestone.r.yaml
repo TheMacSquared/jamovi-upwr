@@ -1,0 +1,51 @@
+---
+name: permtestone
+title: Test permutacyjny - jedna proba
+jrs: '1.1'
+
+items:
+    - name: table
+      title: Test permutacyjny - jedna proba
+      type: Table
+      rows: 1
+      clearWith:
+        - dep
+        - mu
+        - nPerm
+        - seed
+        - hypothesis
+        - exact
+      columns:
+        - name: var
+          title: Zmienna
+          type: text
+
+        - name: stat
+          title: Statystyka obserwowana
+          type: number
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+        - name: nPerm
+          title: Liczba permutacji
+          type: integer
+
+    - name: plot
+      title: Rozklad permutacyjny
+      type: Image
+      visible: (showPlot)
+      width: 550
+      height: 400
+      renderFun: .permPlot
+      clearWith:
+        - dep
+        - mu
+        - nPerm
+        - seed
+        - hypothesis
+        - exact
+
+...

@@ -1,0 +1,80 @@
+---
+name:  bootTest2
+title: "Bootstrapowe porównanie dwóch grup"
+menuGroup: jboot
+version: '0.1.0'
+jas: '1.2'
+
+description:
+    R:
+        usage: >
+            Bootstrapowy przedział ufności dla różnicy średnich
+            między dwiema niezależnymi grupami.
+
+options:
+    - name: data
+      type: Data
+
+    - name: dep
+      title: Zmienne zależne
+      type: Variables
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: group
+      title: Zmienna grupująca
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+
+    - name: group1Level
+      title: Grupa 1
+      type: Level
+      variable: (group)
+
+    - name: group2Level
+      title: Grupa 2
+      type: Level
+      variable: (group)
+
+    - name: nBoot
+      title: Liczba prób bootstrapowych
+      type: Integer
+      default: 1000
+      min: 100
+      max: 100000
+
+    - name: ciWidth
+      title: Poziom ufności (%)
+      type: Number
+      default: 95
+      min: 50
+      max: 99.9
+
+    - name: showClassical
+      title: "Pokaż wynik testu klasycznego"
+      type: Bool
+      default: false
+
+    - name: seed
+      title: "Ziarno losowości (0 = losowe)"
+      type: Integer
+      default: 0
+      min: 0
+      max: 999999
+
+    - name: ciMethod
+      title: "Metoda przedziału ufności"
+      type: List
+      options:
+        - name: perc
+          title: Percentylowy
+        - name: bca
+          title: "BCa (skorygowany)"
+        - name: basic
+          title: "Bazowy (basic)"
+      default: perc
+...

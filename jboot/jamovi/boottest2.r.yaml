@@ -1,0 +1,118 @@
+---
+name:  bootTest2
+title: "Bootstrapowe porównanie dwóch grup"
+jrs:   '1.1'
+
+items:
+    - name: testTable
+      title: "Bootstrapowy PU dla różnicy średnich"
+      type: Table
+      rows: (dep)
+      clearWith:
+          - group
+          - group1Level
+          - group2Level
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      columns:
+          - name: var
+            title: Zmienna
+            type: text
+          - name: meanDiff
+            title: "Różnica średnich"
+            type: number
+          - name: seBoot
+            title: "Błąd std. bootstrap"
+            type: number
+          - name: ciLower
+            title: "Dolna granica PU"
+            type: number
+          - name: ciUpper
+            title: "Górna granica PU"
+            type: number
+          - name: n1
+            title: "N (Grupa 1)"
+            type: integer
+          - name: n2
+            title: "N (Grupa 2)"
+            type: integer
+
+    - name: descTable
+      title: "Statystyki opisowe"
+      type: Table
+      clearWith:
+          - dep
+          - group
+          - seed
+          - ciMethod
+      columns:
+          - name: var
+            title: Zmienna
+            type: text
+            combineBelow: true
+          - name: group
+            title: Grupa
+            type: text
+          - name: n
+            title: N
+            type: integer
+          - name: mean
+            title: "Średnia"
+            type: number
+          - name: sd
+            title: Odch. std.
+            type: number
+
+    - name: classicalTable
+      title: "Test klasyczny (t-test dla dwóch prób)"
+      type: Table
+      visible: (showClassical)
+      rows: (dep)
+      clearWith:
+          - group
+          - group1Level
+          - group2Level
+          - nBoot
+          - ciWidth
+      columns:
+          - name: var
+            title: Zmienna
+            type: text
+          - name: t
+            title: "Statystyka t"
+            type: number
+          - name: df
+            title: df
+            type: number
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+          - name: ciLowerClass
+            title: "Dolna granica PU"
+            type: number
+          - name: ciUpperClass
+            title: "Górna granica PU"
+            type: number
+
+    - name: plots
+      title: "Rozkład bootstrapowy"
+      type: Array
+      items: (dep)
+      clearWith:
+          - group
+          - group1Level
+          - group2Level
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      template:
+          title: "Rozkład bootstrapowy — $key"
+          type: Image
+          width: 500
+          height: 350
+          renderFun: .plot
+...

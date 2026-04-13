@@ -118,7 +118,7 @@
 .silky-bs-header {
     display: flex ;
     height: 100px;
-    background-color: #3E6DA9 ;
+    background-color: #832034 ;
 }
 
 .silky-bs-logo {
@@ -246,7 +246,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
     padding-bottom: 8px;
     padding-inline-start: 8px;
     font-weight: bold;
-    color: #3E6DA9;
+    color: #832034;
     font-size: 105%;
     /*font-weight: 500;*/
 
@@ -870,7 +870,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
     /*margin-top: 6px ;
     margin-bottom: 6px ;*/
     margin-inline-start: 0px ;
-    color: #3E6DA9 ;
+    color: #832034 ;
     flex: 0 1 auto;
     padding: 0px;
     position: relative;
@@ -884,7 +884,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
     border-style: solid;
     border-width: 1px;
     margin-inline-start: 0px ;
-    color: #3E6DA9 ;
+    color: #832034 ;
     flex: 0 1 auto;
     background-image: url('../assets/bs-check-items.svg');
     background-repeat: no-repeat;

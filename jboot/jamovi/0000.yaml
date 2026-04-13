@@ -1,0 +1,84 @@
+---
+title: Bootstrap Inference
+name: jboot
+version: 0.2.0
+jms: '1.0'
+authors:
+  - Maciej Dzikowski
+description: >
+  Metody bootstrapowe do wnioskowania statystycznego: przedziały ufności dla
+  średnich, proporcji, korelacji i porównań między grupami. Nieparametryczna
+  alternatywa dla klasycznych testów parametrycznych.
+analyses:
+  - title: "Bootstrapowy przedział ufności dla średniej"
+    name: bootCI
+    ns: jboot
+    menuGroup: jboot
+    menuTitle: "Przedział ufności dla średniej"
+    category: analyses
+  - title: "Bootstrapowy przedział ufności dla mediany"
+    name: bootMedian
+    ns: jboot
+    menuGroup: jboot
+    menuTitle: "Przedział ufności dla mediany"
+    category: analyses
+  - title: "Bootstrapowy PU dla średniej uciętej"
+    name: bootTrimmed
+    ns: jboot
+    menuGroup: jboot
+    menuTitle: "PU dla średniej uciętej"
+    category: analyses
+  - title: "Bootstrapowe porównanie dwóch grup"
+    name: bootTest2
+    ns: jboot
+    menuGroup: jboot
+    menuTitle: "Porównanie dwóch grup"
+    category: analyses
+  - title: "Bootstrapowy PU dla prób zależnych"
+    name: bootPaired
+    ns: jboot
+    menuGroup: jboot
+    menuTitle: "Próby zależne (parowe)"
+    category: analyses
+  - title: "Bootstrapowy przedział ufności dla korelacji"
+    name: bootCorr
+    ns: jboot
+    menuGroup: jboot
+    menuTitle: "Przedział ufności dla korelacji"
+    category: analyses
+  - title: "Bootstrapowy PU dla współczynnika regresji"
+    name: bootRegression
+    ns: jboot
+    menuGroup: jboot
+    menuTitle: "PU dla regresji"
+    category: analyses
+  - title: "Bootstrapowy przedział ufności dla proporcji"
+    name: bootProp
+    ns: jboot
+    menuGroup: jboot
+    menuTitle: "Przedział ufności dla proporcji"
+    category: analyses
+  - title: "Bootstrapowe PU per grupa"
+    name: bootMultiGroup
+    ns: jboot
+    menuGroup: jboot
+    menuTitle: "PU per grupa"
+    category: analyses
+  - title: "Eksploracja bootstrapu krok po kroku"
+    name: bootExplore
+    ns: jboot
+    menuGroup: jboot
+    menuSubgroup: Dydaktyka
+    menuTitle: "Eksploracja krok po kroku"
+    category: analyses
+  - title: "Zbieżność bootstrapu"
+    name: bootConvergence
+    ns: jboot
+    menuGroup: jboot
+    menuSubgroup: Dydaktyka
+    menuTitle: "Zbieżność (wpływ B)"
+    category: analyses
+usesNative: true
+minApp: 1.0.8
+
+...

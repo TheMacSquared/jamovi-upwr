@@ -1,0 +1,57 @@
+---
+title: Przedzialy ufnosci
+name: jCI
+version: 0.1.0
+jms: '1.0'
+authors:
+  - statUPWr Team
+maintainer: statUPWr Team <statupwr@upwr.edu.pl>
+description: >
+  Przedzialy ufnosci dla srednich, proporcji i korelacji.
+analyses:
+  - title: CI dla sredniej (jedna proba)
+    name: cionemean
+    ns: jCI
+    menuGroup: Przedzialy ufnosci
+    menuTitle: Srednia (jedna proba)
+    menuSubgroup: Srednie
+    category: analyses
+  - title: CI dla roznicy srednich (dwie proby)
+    name: citwomeans
+    ns: jCI
+    menuGroup: Przedzialy ufnosci
+    menuTitle: Roznica srednich (dwie proby)
+    menuSubgroup: Srednie
+    category: analyses
+  - title: CI dla srednich (proby sparowane)
+    name: cipairedmeans
+    ns: jCI
+    menuGroup: Przedzialy ufnosci
+    menuTitle: Srednie (proby sparowane)
+    menuSubgroup: Srednie
+    category: analyses
+  - title: CI dla proporcji
+    name: ciproportion
+    ns: jCI
+    menuGroup: Przedzialy ufnosci
+    menuTitle: Proporcja
+    menuSubgroup: Proporcje
+    category: analyses
+  - title: CI dla roznicy proporcji
+    name: cidiffprop
+    ns: jCI
+    menuGroup: Przedzialy ufnosci
+    menuTitle: Roznica proporcji
+    menuSubgroup: Proporcje
+    category: analyses
+  - title: CI dla korelacji
+    name: cicorrelation
+    ns: jCI
+    menuGroup: Przedzialy ufnosci
+    menuTitle: Korelacja
+    category: analyses
+usesNative: true
+minApp: 1.0.8
+index: 11
+
+...

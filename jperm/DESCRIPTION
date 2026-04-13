@@ -1,0 +1,15 @@
+Package: jperm
+Type: Package
+Title: Testy permutacyjne dla jamovi
+Version: 0.1.0
+Author: statUPWr Team
+Maintainer: statUPWr Team <statupwr@upwr.edu.pl>
+Description: Testy permutacyjne dla jednej proby, dwoch prob niezaleznych
+    i prob sparowanych. Modul dydaktyczny wykorzystujacy czyste permutacje
+    w R (sample/replicate) bez zewnetrznych pakietow statystycznych.
+License: GPL (>= 2)
+Encoding: UTF-8
+Imports:
+    jmvcore (>= 2.4.2),
+    R6,
+    ggplot2

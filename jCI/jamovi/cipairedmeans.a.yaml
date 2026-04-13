@@ -1,0 +1,41 @@
+---
+name: cipairedmeans
+title: CI dla srednich (proby sparowane)
+menuGroup: Przedzialy ufnosci
+version: '1.0.0'
+jas: '1.2'
+
+completeWhenFilled: true
+
+options:
+    - name: data
+      type: Data
+
+    - name: var1
+      title: Pomiar 1
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: var2
+      title: Pomiar 2
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: ciWidth
+      title: Poziom ufnosci
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+
+    - name: showPlot
+      title: Wykres
+      type: Bool
+      default: true
+...

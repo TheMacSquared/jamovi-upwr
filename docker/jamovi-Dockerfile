@@ -178,6 +178,23 @@ COPY $JAMOVI_ROOT/plots/ /tmp/source/plots
 WORKDIR /tmp/source/plots
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
+COPY $JAMOVI_ROOT/jperm/ /tmp/source/jperm
+WORKDIR /tmp/source/jperm
+RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
+
+COPY $JAMOVI_ROOT/jCI/ /tmp/source/jCI
+WORKDIR /tmp/source/jCI
+RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
+
+COPY $JAMOVI_ROOT/jboot/ /tmp/source/jboot
+WORKDIR /tmp/source/jboot
+RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends git
+RUN git clone --depth 1 https://github.com/Mrihs/distrACTION.git /tmp/source/distrACTION
+WORKDIR /tmp/source/distrACTION
+RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
+
 
 ##### I18N #####
 

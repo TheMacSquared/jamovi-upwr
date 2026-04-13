@@ -1,0 +1,75 @@
+---
+name:  bootRegression
+title: "Bootstrapowy PU dla współczynnika regresji"
+jrs:   '1.1'
+
+items:
+    - name: coefTable
+      title: "Bootstrapowy PU dla współczynników regresji"
+      type: Table
+      clearWith:
+          - dep
+          - pred
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      columns:
+          - name: term
+            title: "Składnik"
+            type: text
+          - name: estimate
+            title: "Estymacja"
+            type: number
+          - name: seBoot
+            title: "Błąd std. bootstrap"
+            type: number
+          - name: ciLower
+            title: "Dolna granica PU"
+            type: number
+          - name: ciUpper
+            title: "Górna granica PU"
+            type: number
+
+    - name: fitTable
+      title: "Dopasowanie modelu"
+      type: Table
+      clearWith:
+          - dep
+          - pred
+      columns:
+          - name: stat
+            title: "Statystyka"
+            type: text
+          - name: value
+            title: "Wartość"
+            type: number
+
+    - name: plots
+      title: "Rozkład bootstrapowy nachyleń"
+      type: Image
+      width: 500
+      height: 350
+      clearWith:
+          - dep
+          - pred
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      renderFun: .plot
+
+    - name: scatterPlot
+      title: "Wykres regresji z bootstrapowym przedziałem ufności"
+      type: Image
+      width: 550
+      height: 400
+      clearWith:
+          - dep
+          - pred
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      renderFun: .plotScatter
+...

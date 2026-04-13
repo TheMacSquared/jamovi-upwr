@@ -1,0 +1,58 @@
+title: CI dla srednich (proby sparowane)
+name: cipairedmeans
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    suggested:
+      - continuous
+    permitted:
+      - numeric
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Pomiar 1
+        children:
+          - type: VariablesListBox
+            name: var1
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Pomiar 2
+        children:
+          - type: VariablesListBox
+            name: var2
+            isTarget: true
+            maxItemCount: 1
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Opcje
+            children:
+              - type: TextBox
+                name: ciWidth
+                label: Poziom ufnosci
+                suffix: '%'
+                format: number
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wykresy
+            children:
+              - type: CheckBox
+                name: showPlot
+                label: Error bar plot

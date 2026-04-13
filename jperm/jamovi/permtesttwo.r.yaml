@@ -1,0 +1,59 @@
+---
+name: permtesttwo
+title: Test permutacyjny - dwie proby niezalezne
+jrs: '1.1'
+
+items:
+    - name: table
+      title: Test permutacyjny - dwie proby niezalezne
+      type: Table
+      rows: 1
+      clearWith:
+        - dep
+        - group
+        - nPerm
+        - seed
+        - hypothesis
+        - exact
+      columns:
+        - name: var
+          title: Zmienna
+          type: text
+
+        - name: group1
+          title: Grupa 1
+          type: text
+
+        - name: group2
+          title: Grupa 2
+          type: text
+
+        - name: stat
+          title: Statystyka obserwowana
+          type: number
+
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+        - name: nPerm
+          title: Liczba permutacji
+          type: integer
+
+    - name: plot
+      title: Rozklad permutacyjny
+      type: Image
+      visible: (showPlot)
+      width: 550
+      height: 400
+      renderFun: .permPlot
+      clearWith:
+        - dep
+        - group
+        - nPerm
+        - seed
+        - hypothesis
+        - exact
+
+...

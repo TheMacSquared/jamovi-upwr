@@ -1,0 +1,64 @@
+---
+name: cidiffprop
+title: CI dla roznicy proporcji
+jrs: '1.1'
+
+items:
+    - name: table
+      title: Przedzial ufnosci dla roznicy proporcji
+      type: Table
+      rows: 1
+      clearWith:
+        - dep
+        - group
+        - level
+        - method
+        - ciWidth
+      columns:
+        - name: var
+          title: Zmienna
+          type: text
+
+        - name: group1
+          title: Grupa 1
+          type: text
+
+        - name: group2
+          title: Grupa 2
+          type: text
+
+        - name: p1
+          title: "p\u0302\u2081"
+          type: number
+
+        - name: p2
+          title: "p\u0302\u2082"
+          type: number
+
+        - name: estimate
+          title: Roznica
+          type: number
+
+        - name: lower
+          title: Dolna granica
+          type: number
+
+        - name: upper
+          title: Gorna granica
+          type: number
+
+    - name: plot
+      title: ''
+      type: Image
+      visible: (showPlot)
+      width: 450
+      height: 350
+      renderFun: .ciPlot
+      clearWith:
+        - dep
+        - group
+        - level
+        - method
+        - ciWidth
+
+...

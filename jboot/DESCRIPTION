@@ -1,0 +1,11 @@
+Package: jboot
+Type: Package
+Title: Wnioskowanie Bootstrapowe dla jamovi
+Version: 0.2.0
+Author: Maciej Dzikowski
+Maintainer: Maciej Dzikowski <email@example.com>
+Description: Metody bootstrapowe do wnioskowania statystycznego w jamovi.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: jmvcore (>= 1.0.0), R6, boot, ggplot2

@@ -1,0 +1,58 @@
+---
+name: ciproportion
+title: CI dla proporcji
+jrs: '1.1'
+
+items:
+    - name: table
+      title: Przedzial ufnosci dla proporcji
+      type: Table
+      rows: 1
+      clearWith:
+        - dep
+        - level
+        - method
+        - ciWidth
+      columns:
+        - name: var
+          title: Zmienna
+          type: text
+
+        - name: level
+          title: Poziom
+          type: text
+
+        - name: count
+          title: Liczebnosc
+          type: integer
+
+        - name: total
+          title: N
+          type: integer
+
+        - name: estimate
+          title: Proporcja
+          type: number
+
+        - name: lower
+          title: Dolna granica
+          type: number
+
+        - name: upper
+          title: Gorna granica
+          type: number
+
+    - name: plot
+      title: ''
+      type: Image
+      visible: (showPlot)
+      width: 450
+      height: 350
+      renderFun: .ciPlot
+      clearWith:
+        - dep
+        - level
+        - method
+        - ciWidth
+
+...

@@ -1,0 +1,54 @@
+---
+name:  bootProp
+title: "Bootstrapowy przedział ufności dla proporcji"
+jrs:   '1.1'
+
+items:
+    - name: propTable
+      title: "Bootstrapowe przedziały ufności dla proporcji"
+      type: Table
+      clearWith:
+          - var
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      columns:
+          - name: level
+            title: Poziom
+            type: text
+          - name: count
+            title: Liczebność
+            type: integer
+          - name: prop
+            title: Proporcja
+            type: number
+            format: zto
+          - name: seBoot
+            title: "Błąd std. bootstrap"
+            type: number
+          - name: ciLower
+            title: "Dolna granica PU"
+            type: number
+            format: zto
+          - name: ciUpper
+            title: "Górna granica PU"
+            type: number
+            format: zto
+
+    - name: plots
+      title: "Rozkłady bootstrapowe"
+      type: Array
+      clearWith:
+          - var
+          - nBoot
+          - ciWidth
+          - seed
+          - ciMethod
+      template:
+          title: "Rozkład bootstrapowy — $key"
+          type: Image
+          width: 500
+          height: 350
+          renderFun: .plot
+...

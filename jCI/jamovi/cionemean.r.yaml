@@ -1,0 +1,46 @@
+---
+name: cionemean
+title: CI dla sredniej (jedna proba)
+jrs: '1.1'
+
+items:
+    - name: table
+      title: Przedzial ufnosci dla sredniej
+      type: Table
+      rows: 1
+      clearWith:
+        - dep
+        - ciWidth
+      columns:
+        - name: var
+          title: Zmienna
+          type: text
+
+        - name: estimate
+          title: Srednia
+          type: number
+
+        - name: se
+          title: SE
+          type: number
+
+        - name: lower
+          title: Dolna granica
+          type: number
+
+        - name: upper
+          title: Gorna granica
+          type: number
+
+    - name: plot
+      title: ''
+      type: Image
+      visible: (showPlot)
+      width: 450
+      height: 350
+      renderFun: .ciPlot
+      clearWith:
+        - dep
+        - ciWidth
+
+...

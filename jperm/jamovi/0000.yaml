@@ -1,0 +1,41 @@
+---
+title: Testy permutacyjne
+name: jperm
+version: 0.1.0
+jms: '1.0'
+authors:
+  - statUPWr Team
+maintainer: statUPWr Team <statupwr@upwr.edu.pl>
+description: >
+  Modul dydaktyczny z testami permutacyjnymi dla jednej proby,
+  dwoch prob niezaleznych i prob sparowanych.
+analyses:
+  - title: Test permutacyjny - jedna proba
+    name: permtestone
+    ns: jperm
+    menuGroup: Testy permutacyjne
+    menuTitle: Jedna proba
+    description: >
+      Test permutacyjny dla sredniej jednej proby.
+    category: analyses
+  - title: Test permutacyjny - dwie proby niezalezne
+    name: permtesttwo
+    ns: jperm
+    menuGroup: Testy permutacyjne
+    menuTitle: Dwie proby niezalezne
+    description: >
+      Test permutacyjny na roznice srednich dwoch prob niezaleznych.
+    category: analyses
+  - title: Test permutacyjny - proby sparowane
+    name: permtestpaired
+    ns: jperm
+    menuGroup: Testy permutacyjne
+    menuTitle: Proby sparowane
+    description: >
+      Test permutacyjny na roznice srednich prob sparowanych.
+    category: analyses
+usesNative: true
+minApp: 1.0.8
+index: 10
+
+...

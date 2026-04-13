@@ -1,0 +1,66 @@
+---
+name:  bootPaired
+title: "Bootstrapowy PU dla prób zależnych"
+menuGroup: jboot
+version: '0.1.0'
+jas: '1.2'
+
+description:
+    R:
+        usage: >
+            Bootstrapowy przedział ufności dla różnicy średnich
+            w próbach zależnych (parowych).
+
+options:
+    - name: data
+      type: Data
+
+    - name: pair1
+      title: "Zmienna 1 (przed / warunek A)"
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: pair2
+      title: "Zmienna 2 (po / warunek B)"
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: nBoot
+      title: "Liczba prób bootstrapowych"
+      type: Integer
+      default: 1000
+      min: 100
+      max: 100000
+
+    - name: ciWidth
+      title: "Poziom ufności (%)"
+      type: Number
+      default: 95
+      min: 50
+      max: 99.9
+
+    - name: seed
+      title: "Ziarno losowości (0 = losowe)"
+      type: Integer
+      default: 0
+      min: 0
+      max: 999999
+
+    - name: ciMethod
+      title: "Metoda przedziału ufności"
+      type: List
+      options:
+        - name: perc
+          title: Percentylowy
+        - name: bca
+          title: "BCa (skorygowany)"
+        - name: basic
+          title: "Bazowy (basic)"
+      default: perc
+...
