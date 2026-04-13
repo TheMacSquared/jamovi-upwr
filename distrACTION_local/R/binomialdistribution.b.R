@@ -108,14 +108,14 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         Density <- dbinom(x, DP1, DP2)
         if(DistributionFunction=="TRUE"){ 
           # Calculation of the quantile
-          DistributionResult1 <- pbinom(XValue, DP1, DP2)
+          DistributionResult1 <- pbinom(floor(XValue), DP1, DP2)
           if(DistributionFunctionType=="interval"|DistributionFunctionType=="higher"){
-            DistributionResult1 <- pbinom(XValue-1, DP1, DP2)}
+            DistributionResult1 <- pbinom(ceiling(XValue)-1, DP1, DP2)}
           # The quantile is saved as another variable
           DistributionResult <- DistributionResult1
           if(DistributionFunctionType == "interval"){
             # In case of two x-values, the second quantile is calculated too
-            DistributionResult2 <- pbinom(XValue2, DP1, DP2)
+            DistributionResult2 <- pbinom(floor(XValue2), DP1, DP2)
             # The result is the difference between the two quantiles
             DistributionResult <- DistributionResult2-DistributionResult1}}
         if(QuantileFunction=="TRUE"){

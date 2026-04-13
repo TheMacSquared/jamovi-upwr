@@ -1,6 +1,6 @@
-GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
-  "GeometricDistributionClass",
-  inherit = GeometricDistributionBase,
+PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
+  "PoissonDistributionClass",
+  inherit = PoissonDistributionBase,
   private = list(
 
     .run = function() {
@@ -12,10 +12,10 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       XValue <- self$options$x1
       Quantile <- self$options$p
       XValue2 <- self$options$x2
-      DP1 <- self$options$dp1  # probability of success
+      DP1 <- self$options$dp1  # lambda
 
       LowerTail <- 0
-      UpperTail <- qgeom(0.999, DP1)
+      UpperTail <- qpois(0.999, DP1)
       if (UpperTail < 5) UpperTail <- 5
       N <- UpperTail + 1
       Columnames <- c("X", "Prob")
@@ -25,13 +25,13 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           LowerQuantile <- ((1 - Quantile) / 2)
           HigherQuantile <- LowerQuantile + Quantile}}
 
-      InputLabel1 <- paste("Probability = ", DP1, sep = "")
+      InputLabel1 <- paste("\u03BB = ", DP1, sep = "")
       DistributionFunctionTypeLabel <- ""
       QuantileFunctionTypeLabel <- ""
       if (DistributionFunctionType == "lower")
-        DistributionFunctionTypeLabel <- "Mode: P(X ≤ x1)"
+        DistributionFunctionTypeLabel <- "Mode: P(X \u2264 x1)"
       if (DistributionFunctionType == "higher")
-        DistributionFunctionTypeLabel <- "Mode: P(X ≥ x1)"
+        DistributionFunctionTypeLabel <- "Mode: P(X \u2265 x1)"
       if (DistributionFunctionType == "interval")
         DistributionFunctionTypeLabel <- paste("Mode: x2 = ", XValue2, sep = "")
       if (DistributionFunctionType == "is")
@@ -47,30 +47,29 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         DistributionFunctionColumn = paste("x1 = ", XValue, sep = ""),
         QuantileFunctionColumn = paste("p = ", Quantile, sep = "")))
 
-      # Discrete: integer sequence
       x <- seq(LowerTail, UpperTail, by = 1)
-      Density <- dgeom(x, DP1)
+      Density <- dpois(x, DP1)
 
       if(DistributionFunction == "TRUE"){
         if (DistributionFunctionType == "is"){
-          DistributionResult <- dgeom(XValue, DP1)
+          DistributionResult <- dpois(XValue, DP1)
         } else {
-          DistributionResult1 <- pgeom(floor(XValue), DP1)
+          DistributionResult1 <- ppois(floor(XValue), DP1)
           if (DistributionFunctionType == "interval" || DistributionFunctionType == "higher")
-            DistributionResult1 <- pgeom(ceiling(XValue) - 1, DP1)
+            DistributionResult1 <- ppois(ceiling(XValue) - 1, DP1)
           DistributionResult <- DistributionResult1
           if (DistributionFunctionType == "interval"){
-            DistributionResult2 <- pgeom(floor(XValue2), DP1)
+            DistributionResult2 <- ppois(floor(XValue2), DP1)
             DistributionResult <- DistributionResult2 - DistributionResult1}
           if (DistributionFunctionType == "higher")
             DistributionResult <- 1 - DistributionResult}}
 
       if(QuantileFunction == "TRUE"){
         if (QuantileFunctionType == "cumulative")
-          QuantileResult <- qgeom(Quantile, DP1)
+          QuantileResult <- qpois(Quantile, DP1)
         if (QuantileFunctionType == "central"){
-          QuantileResult <- qgeom(LowerQuantile, DP1)
-          QuantileResult2 <- qgeom(HigherQuantile, DP1)}}
+          QuantileResult <- qpois(LowerQuantile, DP1)
+          QuantileResult2 <- qpois(HigherQuantile, DP1)}}
 
       OutputLabel11 <- ""
       OutputLabel12 <- ""
@@ -81,8 +80,8 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         OutputLabel11 <- paste("P = ", DistributionResult, sep = "")}
 
       if(QuantileFunction == "TRUE"){
-        if (QuantileFunctionType == "cumulative") {
-          OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")}
+        if (QuantileFunctionType == "cumulative")
+          OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")
         if (QuantileFunctionType == "central") {
           OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")
           OutputLabel22 <- paste("x2 = ", QuantileResult2, sep = "")}}
@@ -96,11 +95,9 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           DistributionResultColumn = "",
           QuantileResultColumn = OutputLabel22))
 
-      # Plot data for discrete distribution
       Datas <- data.frame(x, Density)
       colnames(Datas) <- Columnames
 
-      # Color vector for bars
       BarColors <- rep("grey", length(x))
       if (DistributionFunction == "TRUE") {
         if (DistributionFunctionType == "is")
@@ -124,17 +121,16 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       if(QuantileFunction == "TRUE"){
         if(QuantileFunctionType == "cumulative"){
-          HigherSegment <- qgeom(Quantile, DP1)
+          HigherSegment <- qpois(Quantile, DP1)
           HigherSegmentLength <- max(Datas$Prob) * 0.8
           LowerSegment <- HigherSegment
           LowerSegmentLength <- HigherSegmentLength}
         if(QuantileFunctionType == "central"){
-          LowerSegment <- qgeom(LowerQuantile, DP1)
+          LowerSegment <- qpois(LowerQuantile, DP1)
           LowerSegmentLength <- max(Datas$Prob) * 0.8
-          HigherSegment <- qgeom(HigherQuantile, DP1)
+          HigherSegment <- qpois(HigherQuantile, DP1)
           HigherSegmentLength <- max(Datas$Prob) * 0.8}}
 
-      # Pack data for plot
       PlotDataset <- list(
         Datas = Datas,
         BarColors = BarColors,

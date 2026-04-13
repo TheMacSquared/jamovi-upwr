@@ -52,6 +52,12 @@ analyses:
     menuGroup: distrACTION
     menuTitle: Binomial Distribution
     menuSubgroup: Discrete distributions
+  - title: Poisson Distribution
+    name: PoissonDistribution
+    ns: distrACTION
+    menuGroup: distrACTION
+    menuTitle: Poisson Distribution
+    menuSubgroup: Discrete distributions
   - title: Geometric Distribution
     name: GeometricDistribution
     ns: distrACTION
