@@ -190,8 +190,7 @@ COPY $JAMOVI_ROOT/jboot/ /tmp/source/jboot
 WORKDIR /tmp/source/jboot
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends git
-RUN git clone --depth 1 https://github.com/Mrihs/distrACTION.git /tmp/source/distrACTION
+COPY $JAMOVI_ROOT/distrACTION_local/ /tmp/source/distrACTION
 WORKDIR /tmp/source/distrACTION
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
