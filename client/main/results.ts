@@ -94,40 +94,9 @@ export class ResultsView extends HTMLElement {
     }
 
     showWelcome() {
-
-        const iframe = document.createElement('iframe');
-        iframe.classList.add('jmv-welcome-iframe');
-        iframe.sandbox = 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox';
-        // hidden to begin with, only show if successful
-        iframe.style.display = 'none';
-
-        this.welcome = document.createElement('div');
-        this.welcome.classList.add('jmv-welcome-panel');
-        this.welcome.setAttribute('role', 'none');
-
-        this.welcome.appendChild(iframe);
-        this.appendChild(this.welcome);
-
-        host.version.then((version) => {
-            iframe.src = `https://www.jamovi.org/welcome/?v=${ version }&p=${ host.os }&plan=${ localStorage.getItem("plan") }`;
-        });
-
-        const messageHandler = (event) => {
-            // wait for a ready message from the iframe's content
-            // only a successful load of the page will lead to this
-            // anything else, i.e. a 500 will not be made visible
-            if (event.source === iframe.contentWindow
-                    && event.data.status === 'ready') {
-                iframe.style.display = null;
-                window.removeEventListener('message', messageHandler);
-            }
-        };
-        window.addEventListener('message', messageHandler);
-
-        this.hidePlaceHolder();
-
+        // statUPWr: keep our logo placeholder visible instead of loading jamovi.org welcome
         this.model.analyses().once('analysisCreated', (event) => {
-            this.hideWelcome();
+            this.hidePlaceHolder();
         });
     }
 

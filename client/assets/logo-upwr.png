@@ -1,0 +1,42 @@
+<!doctype html><html lang="en"><head><title>Błąd</title><link rel="stylesheet" href="/.within.website/x/xess/xess.min.css?cachebuster=1.24.0"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex,nofollow"><style>
+        body,
+        html {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .centered-div {
+            text-align: center;
+        }
+
+        #status {
+            font-variant-numeric: tabular-nums;
+        }
+
+        #progress {
+          display: none;
+          width: 90%;
+          width: min(20rem, 90%);
+          height: 2rem;
+          border-radius: 1rem;
+          overflow: hidden;
+          margin: 1rem 0 2rem;
+					outline-offset: 2px;
+					outline: #b16286 solid 4px;
+				}
+
+        .bar-inner {
+            background-color: #b16286;
+            height: 100%;
+            width: 0;
+            transition: width 0.25s ease-in;
+        }
+    	</style><link rel="stylesheet" href="/.within.website/x/cmd/anubis/static/css/custom.css"><script id="anubis_version" type="application/json">"1.24.0"
+</script><script id="anubis_challenge" type="application/json">null
+</script><script id="anubis_base_prefix" type="application/json">""
+</script><script id="anubis_public_url" type="application/json">""
+</script></head><body id="top"><script type="ignore"><a href="/.within.website/x/cmd/anubis/api/honeypot/226082dd-de6b-4aca-91a1-707cadd53077/init">Don't click me</a></script><main><h1 id="title" class="centered-div">Błąd</h1><div class="centered-div"><img id="image" alt="Sad Anubis" style="width:100%;max-width:256px;" src="/.within.website/x/cmd/anubis/static/img/reject.webp?cacheBuster=1.24.0"><p>Access Denied: error code 3a3709781fbcf44c.</p><p><a href="/">Go home</a></p></div><footer><div class="centered-div"><p>Protected by <a href="https://anubis.techaro.lol/docs/admin/botstopper">BotStopper</a> From <a href="https://techaro.lol">Techaro</a>. Made with ❤️ in 🇨🇦.</p></div></footer></main></body></html>

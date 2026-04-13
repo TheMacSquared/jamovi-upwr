@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls jmv/jamovi/descriptives*)",
+      "Bash(ls jmv/R/descriptives*)",
+      "Bash(docker --version)",
+      "Bash(docker compose:*)",
+      "Bash(docker.exe --version)",
+      "Bash(docker.exe compose:*)",
+      "Bash(wsl.exe --list --verbose)",
+      "Bash(\"/c/Program Files/Docker/Docker/resources/bin/docker.exe\" --version)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/Docker/Docker/resources/bin\")",
+      "Bash(ls \"D:/CCTest/jamovi-upwr/jmv/jamovi/proptestn\"* \"D:/CCTest/jamovi-upwr/jmv/jamovi/proptest2\"*)",
+      "Bash(xargs grep:*)",
+      "Bash(find \"D:/CCTest/jamovi-upwr/client\" -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" \\\\\\) -exec grep -l \"splash\\\\|logo-v\\\\|welcome.*page\\\\|blank.*page\" {} \\\\;)",
+      "Bash(xargs ls:*)",
+      "Bash(grep -n \"icon-info-box\\\\|icon-version\\\\|jmv-welcome\" \"D:/CCTest/jamovi-upwr/client/main/\"*.css)",
+      "WebFetch(domain:upwr.edu.pl)",
+      "Bash(curl -L -o \"D:/CCTest/jamovi-upwr/client/assets/logo-upwr.png\" \"https://upwr.edu.pl/themes/developer/images/logo-horizontal-pl.png\")",
+      "Bash(curl -L -o \"D:/CCTest/jamovi-upwr/client/assets/logo-upwr.png\" \"https://upload.wikimedia.org/wikipedia/commons/thumb/3/thirty/UPWr_logo.svg/1200px-UPWr_logo.svg.png\")",
+      "Bash(docker exec:*)",
+      "Bash(export MSYS_NO_PATHCONV=1)",
+      "Bash(base64 -w0 \"D:/CCTest/jamovi-upwr/client/assets/upwr-logotyp-pl-poziomy.png\")"
+    ]
+  }
+}
