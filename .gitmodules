@@ -1,6 +1,6 @@
 [submodule "jmv"]
 	path = jmv
-	url = https://github.com/jamovi/jmv.git
+	url = https://github.com/TheMacSquared/jmv.git
 [submodule "jamovi-readstat"]
 	path = readstat
 	url = https://github.com/jamovi/jamovi-readstat.git
