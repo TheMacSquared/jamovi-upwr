@@ -28,6 +28,16 @@ options:
       permitted:
         - factor
 
+    - name: level1
+      title: Grupa 1
+      type: Level
+      variable: (group)
+
+    - name: level2
+      title: Grupa 2
+      type: Level
+      variable: (group)
+
     - name: ciWidth
       title: Poziom ufnosci
       type: Number

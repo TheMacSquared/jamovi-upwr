@@ -35,9 +35,17 @@ children:
           - type: Label
             label: Opcje
             children:
-              - type: ComboBox
+              - type: LevelSelector
                 name: level
                 label: Poziom sukcesu
+              - type: LevelSelector
+                name: groupLevel1
+                label: Grupa 1
+                enable: (group)
+              - type: LevelSelector
+                name: groupLevel2
+                label: Grupa 2
+                enable: (group)
               - type: ComboBox
                 name: method
                 label: Metoda

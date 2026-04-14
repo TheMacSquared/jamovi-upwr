@@ -1,6 +1,6 @@
 ---
 name:  bootCorr
-title: "Bootstrapowy przedział ufności dla korelacji"
+title: "Bootstrapowy CI dla korelacji"
 jrs:   '1.1'
 
 items:
@@ -29,11 +29,11 @@ items:
             title: "Błąd std. bootstrap"
             type: number
           - name: ciLower
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
             format: zto
           - name: ciUpper
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
             format: zto
           - name: n
@@ -71,11 +71,11 @@ items:
             type: number
             format: zto,pvalue
           - name: ciLowerClass
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
             format: zto
           - name: ciUpperClass
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
             format: zto
 

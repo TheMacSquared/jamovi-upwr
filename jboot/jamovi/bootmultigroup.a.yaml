@@ -1,6 +1,6 @@
 ---
 name:  bootMultiGroup
-title: "Bootstrapowe PU per grupa"
+title: "Bootstrapowe CI per grupa"
 menuGroup: jboot
 version: '0.1.0'
 jas: '1.2'
@@ -51,7 +51,7 @@ options:
       max: 999999
 
     - name: ciMethod
-      title: "Metoda przedziału ufności"
+      title: "Metoda CI"
       type: List
       options:
         - name: perc

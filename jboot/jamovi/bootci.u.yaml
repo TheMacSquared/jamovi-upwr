@@ -1,4 +1,4 @@
-title: Bootstrapowy przedzial ufnosci dla sredniej
+title: Bootstrapowy CI dla miary centralnej
 name: bootCI
 jus: '3.0'
 stage: 0
@@ -17,6 +17,15 @@ children:
   - type: LayoutBox
     margin: large
     children:
+      - type: ComboBox
+        name: stat
+      - type: TextBox
+        name: trimProp
+        format: number
+        enable: (stat:trimmed)
+  - type: LayoutBox
+    margin: large
+    children:
       - type: TextBox
         name: nBoot
         format: number
@@ -31,6 +40,7 @@ children:
     children:
       - type: CheckBox
         name: showClassical
+        enable: (stat:mean)
   - type: LayoutBox
     margin: large
     children:

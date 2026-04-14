@@ -49,6 +49,7 @@ analyses:
     ns: jCI
     menuGroup: Przedzialy ufnosci
     menuTitle: Korelacja
+    menuSubgroup: Korelacja i regresja
     category: analyses
 usesNative: true
 minApp: 1.0.8

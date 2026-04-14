@@ -1,11 +1,11 @@
 ---
 name:  bootTrimmed
-title: "Bootstrapowy PU dla średniej uciętej"
+title: "Bootstrapowy CI dla średniej uciętej"
 jrs:   '1.1'
 
 items:
     - name: trimTable
-      title: "Bootstrapowy PU dla średniej uciętej"
+      title: "Bootstrapowy CI dla średniej uciętej"
       type: Table
       rows: (dep)
       clearWith:
@@ -28,10 +28,10 @@ items:
             title: "Błąd std. bootstrap"
             type: number
           - name: ciLower
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
           - name: ciUpper
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
           - name: n
             title: N

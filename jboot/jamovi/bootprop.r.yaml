@@ -1,6 +1,6 @@
 ---
 name:  bootProp
-title: "Bootstrapowy przedział ufności dla proporcji"
+title: "Bootstrapowy CI dla proporcji"
 jrs:   '1.1'
 
 items:
@@ -28,11 +28,11 @@ items:
             title: "Błąd std. bootstrap"
             type: number
           - name: ciLower
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
             format: zto
           - name: ciUpper
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
             format: zto
 

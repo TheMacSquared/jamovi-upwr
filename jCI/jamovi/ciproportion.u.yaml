@@ -28,7 +28,7 @@ children:
           - type: Label
             label: Opcje
             children:
-              - type: ComboBox
+              - type: LevelSelector
                 name: level
                 label: Poziom sukcesu
               - type: ComboBox

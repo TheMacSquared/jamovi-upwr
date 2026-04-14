@@ -1,15 +1,16 @@
 ---
 name:  bootExplore
-title: "Eksploracja bootstrapu krok po kroku"
+title: "Jak działa bootstrap"
 menuGroup: jboot
 menuSubgroup: Dydaktyka
-version: '0.1.0'
+version: '0.2.0'
 jas: '1.2'
 
 description:
     R:
         usage: >
-            Krokowa eksploracja procesu bootstrapu dla celów dydaktycznych.
+            Dydaktyczna analiza procesu bootstrapu: eksploracja krok po kroku
+            oraz zbieżność CI przy rosnącej liczbie prób B.
 
 options:
     - name: data
@@ -24,7 +25,7 @@ options:
         - numeric
 
     - name: nBoot
-      title: "Liczba prób bootstrapowych"
+      title: "Liczba prób bootstrapowych (dla eksploracji)"
       type: Integer
       default: 10
       min: 1
@@ -43,4 +44,9 @@ options:
       default: 42
       min: 1
       max: 999999
+
+    - name: showConvergence
+      title: "Pokaż zbieżność (wpływ liczby B)"
+      type: Bool
+      default: false
 ...

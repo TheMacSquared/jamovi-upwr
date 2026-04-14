@@ -100,7 +100,7 @@ bootCorrClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
             }
 
             methodLabel <- ifelse(method == "pearson", "Pearsona", "Spearmana")
-            table$setNote("boot", paste0("Bootstrapowy PU dla korelacji ", methodLabel, " (metoda: ", ciMethodLabel(ciMethod), "); B = ", nBoot))
+            table$setNote("boot", paste0("Bootstrapowy CI dla korelacji ", methodLabel, " (metoda: ", ciMethodLabel(ciMethod), "); B = ", nBoot))
 
             private$.bootData <- bootDataList
         },
@@ -137,7 +137,7 @@ bootCorrClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                 ggplot2::labs(
                     x = paste0("Bootstrapowe korelacje (", label, ")"),
                     y = "Częstość",
-                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice PU") +
+                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
                 ggtheme
 
             print(plot)

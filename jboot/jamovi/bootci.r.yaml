@@ -1,11 +1,11 @@
 ---
 name:  bootCI
-title: "Bootstrapowy przedział ufności dla średniej"
+title: "Bootstrapowy CI dla miary centralnej"
 jrs:   '1.1'
 
 items:
     - name: ciTable
-      title: "Bootstrapowy przedział ufności dla średniej"
+      title: "Bootstrapowy CI dla miary centralnej"
       type: Table
       rows: (dep)
       clearWith:
@@ -13,21 +13,23 @@ items:
           - ciWidth
           - seed
           - ciMethod
+          - stat
+          - trimProp
       columns:
           - name: var
             title: Zmienna
             type: text
           - name: mean
-            title: "Średnia"
+            title: "Estymata"
             type: number
           - name: seBoot
             title: "Błąd std. bootstrap"
             type: number
           - name: ciLower
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
           - name: ciUpper
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
           - name: bias
             title: "Obciążenie"
@@ -39,11 +41,12 @@ items:
     - name: classicalTable
       title: "Test klasyczny (t-test dla jednej próbki)"
       type: Table
-      visible: (showClassical)
+      visible: (showClassical && stat:mean)
       rows: (dep)
       clearWith:
           - nBoot
           - ciWidth
+          - stat
       columns:
           - name: var
             title: Zmienna
@@ -59,10 +62,10 @@ items:
             type: number
             format: zto,pvalue
           - name: ciLowerClass
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
           - name: ciUpperClass
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
 
     - name: plots
@@ -74,6 +77,8 @@ items:
           - ciWidth
           - seed
           - ciMethod
+          - stat
+          - trimProp
       template:
           title: "Rozkład bootstrapowy — $key"
           type: Image

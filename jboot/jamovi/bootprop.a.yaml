@@ -1,6 +1,6 @@
 ---
 name:  bootProp
-title: "Bootstrapowy przedział ufności dla proporcji"
+title: "Bootstrapowy CI dla proporcji"
 menuGroup: jboot
 version: '0.1.0'
 jas: '1.2'
@@ -8,7 +8,7 @@ jas: '1.2'
 description:
     R:
         usage: >
-            Bootstrapowy przedział ufności dla proporcji.
+            Bootstrapowy CI dla proporcji.
 
 options:
     - name: data
@@ -43,7 +43,7 @@ options:
       max: 999999
 
     - name: ciMethod
-      title: "Metoda przedziału ufności"
+      title: "Metoda CI"
       type: List
       options:
         - name: perc

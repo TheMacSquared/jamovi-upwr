@@ -5,7 +5,7 @@ jrs:   '1.1'
 
 items:
     - name: convTable
-      title: "Wpływ liczby B na przedział ufności"
+      title: "Wpływ liczby B na CI"
       type: Table
       clearWith:
           - dep
@@ -19,17 +19,17 @@ items:
             title: "Błąd std. bootstrap"
             type: number
           - name: ciLower
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
           - name: ciUpper
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
           - name: ciWidth
-            title: "Szerokość PU"
+            title: "Szerokość CI"
             type: number
 
     - name: plots
-      title: "Zbieżność przedziału ufności"
+      title: "Zbieżność CI"
       type: Image
       width: 550
       height: 400

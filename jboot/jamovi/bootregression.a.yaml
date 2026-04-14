@@ -1,6 +1,6 @@
 ---
 name:  bootRegression
-title: "Bootstrapowy PU dla współczynnika regresji"
+title: "Bootstrapowy CI dla współczynnika regresji"
 menuGroup: jboot
 version: '0.1.0'
 jas: '1.2'
@@ -8,7 +8,7 @@ jas: '1.2'
 description:
     R:
         usage: >
-            Bootstrapowy przedział ufności dla współczynnika regresji liniowej.
+            Bootstrapowy CI dla współczynnika regresji liniowej.
 
 options:
     - name: data
@@ -52,7 +52,7 @@ options:
       max: 999999
 
     - name: ciMethod
-      title: "Metoda przedziału ufności"
+      title: "Metoda CI"
       type: List
       options:
         - name: perc

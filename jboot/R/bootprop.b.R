@@ -64,7 +64,7 @@ bootPropClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
             }
 
             table$setNote("boot",
-                paste0("Bootstrapowy PU dla proporcji (metoda: ", ciMethodLabel(ciMethod), "); B = ", nBoot))
+                paste0("Bootstrapowy CI dla proporcji (metoda: ", ciMethodLabel(ciMethod), "); B = ", nBoot))
 
             # Store bootstrap results for plots
             private$.bootData <- bootDataList
@@ -101,7 +101,7 @@ bootPropClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                 ggplot2::labs(
                     x = paste0("Bootstrapowe proporcje (", lvl, ")"),
                     y = "Częstość",
-                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice PU") +
+                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
                 ggtheme
 
             print(plot)

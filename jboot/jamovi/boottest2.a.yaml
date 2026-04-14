@@ -8,7 +8,7 @@ jas: '1.2'
 description:
     R:
         usage: >
-            Bootstrapowy przedział ufności dla różnicy średnich
+            Bootstrapowy CI dla różnicy średnich
             między dwiema niezależnymi grupami.
 
 options:
@@ -67,7 +67,7 @@ options:
       max: 999999
 
     - name: ciMethod
-      title: "Metoda przedziału ufności"
+      title: "Metoda CI"
       type: List
       options:
         - name: perc

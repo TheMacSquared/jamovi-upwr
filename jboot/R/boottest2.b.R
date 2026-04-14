@@ -128,7 +128,7 @@ bootTest2Class <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
             }
 
             testTable$setNote("boot", paste0(
-                "Bootstrapowy PU dla różnicy średnich (metoda: ", ciMethodLabel(ciMethod), ", ",
+                "Bootstrapowy CI dla różnicy średnich (metoda: ", ciMethodLabel(ciMethod), ", ",
                 levels[1], " \u2212 ", levels[2], "); B = ", nBoot))
 
             private$.bootData <- bootDataList
@@ -165,7 +165,7 @@ bootTest2Class <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                 ggplot2::labs(
                     x = paste0("Bootstrapowe różnice średnich (", depName, ")"),
                     y = "Częstość",
-                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice PU") +
+                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
                 ggtheme
 
             print(plot)

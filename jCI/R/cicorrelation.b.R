@@ -46,15 +46,19 @@ cicorrelationClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
                     ", transformacja Fishera Z)"))
 
             self$results$plot$setState(list(
-                label = paste0(var1Name, " ~ ", var2Name),
-                estimate = r, lower = lower, upper = upper
+                var1Name = var1Name, var2Name = var2Name,
+                x1 = x1, x2 = x2,
+                estimate = r, lower = lower, upper = upper,
+                ciWidth = self$options$ciWidth,
+                method = method
             ))
         },
         .ciPlot = function(image, ggtheme, theme, ...) {
             if (is.null(image$state))
                 return(FALSE)
             s <- image$state
-            buildCIPlot(s$label, s$estimate, s$lower, s$upper, ggtheme, theme)
+            buildCorrelationPlot(s$x1, s$x2, s$var1Name, s$var2Name,
+                s$estimate, s$lower, s$upper, s$ciWidth, s$method, ggtheme, theme)
         }
     )
 )

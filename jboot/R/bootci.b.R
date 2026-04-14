@@ -13,6 +13,20 @@ bootCIClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
             ciWidth <- self$options$ciWidth / 100
             alpha   <- 1 - ciWidth
             ciMethod <- self$options$ciMethod
+            stat    <- self$options$stat
+            trimProp <- self$options$trimProp
+
+            # Select statistic function based on `stat` option
+            bootFun <- switch(stat,
+                mean    = function(data, i) mean(data[i]),
+                median  = function(data, i) median(data[i]),
+                trimmed = function(data, i) mean(data[i], trim = trimProp)
+            )
+            statLabel <- switch(stat,
+                mean = "\u015brednia",
+                median = "Mediana",
+                trimmed = paste0("\u015arednia uci\u0119ta (trim = ", trimProp, ")")
+            )
 
             table <- self$results$ciTable
             bootDataList <- list()
@@ -30,7 +44,6 @@ bootCIClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                     next
                 }
 
-                bootFun <- function(data, i) mean(data[i])
                 setSeedIfNeeded(self$options$seed)
                 bootResult <- boot::boot(data=column, statistic=bootFun, R=nBoot)
 
@@ -53,7 +66,7 @@ bootCIClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                     reps = reps, obs = bootResult$t0,
                     ciLower = ciLower, ciUpper = ciUpper)
 
-                if (self$options$showClassical) {
+                if (self$options$showClassical && stat == "mean") {
                     tResult <- t.test(column, conf.level = ciWidth)
                     classTable <- self$results$classicalTable
                     classTable$setRow(rowKey=depName, values=list(
@@ -67,8 +80,9 @@ bootCIClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                 }
             }
 
+            table$setNote("stat", paste0("Miara centralna: ", statLabel))
             table$setNote("boot",
-                paste0("Bootstrapowy PU (metoda: ", ciMethodLabel(ciMethod), "); B = ", nBoot))
+                paste0("Bootstrapowy CI (metoda: ", ciMethodLabel(ciMethod), "); B = ", nBoot))
 
             private$.bootData <- bootDataList
         },
@@ -104,7 +118,7 @@ bootCIClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                 ggplot2::labs(
                     x = paste0("Bootstrapowe średnie (", depName, ")"),
                     y = "Częstość",
-                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice PU") +
+                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
                 ggtheme
 
             print(plot)

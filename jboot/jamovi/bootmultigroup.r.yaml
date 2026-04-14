@@ -1,6 +1,6 @@
 ---
 name:  bootMultiGroup
-title: "Bootstrapowe PU per grupa"
+title: "Bootstrapowe CI per grupa"
 jrs:   '1.1'
 
 items:
@@ -32,10 +32,10 @@ items:
             title: "Błąd std. bootstrap"
             type: number
           - name: ciLower
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
           - name: ciUpper
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
 
     - name: plots

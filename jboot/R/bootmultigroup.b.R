@@ -75,7 +75,7 @@ bootMultiGroupClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Clas
                 bootDataList[[depName]] <- groupReps
             }
 
-            table$setNote("boot", paste0("Bootstrapowe PU per grupa (metoda: ", ciMethodLabel(ciMethod), "); B = ", nBoot, ". Niepokrywające się PU sugerują istotną różnicę."))
+            table$setNote("boot", paste0("Bootstrapowe CI per grupa (metoda: ", ciMethodLabel(ciMethod), "); B = ", nBoot, ". Niepokrywające się CI sugerują istotną różnicę."))
 
             private$.bootData  <- bootDataList
             private$.groupName <- groupName

@@ -35,6 +35,14 @@ children:
           - type: Label
             label: Opcje
             children:
+              - type: LevelSelector
+                name: level1
+                label: Grupa 1
+                enable: (group)
+              - type: LevelSelector
+                name: level2
+                label: Grupa 2
+                enable: (group)
               - type: TextBox
                 name: ciWidth
                 label: Poziom ufnosci

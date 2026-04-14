@@ -7,76 +7,64 @@ authors:
   - Maciej Dzikowski
 description: >
   Metody bootstrapowe do wnioskowania statystycznego: przedziały ufności dla
-  średnich, proporcji, korelacji i porównań między grupami. Nieparametryczna
-  alternatywa dla klasycznych testów parametrycznych.
+  miar centralnych, proporcji, korelacji i porównań między grupami.
+  Nieparametryczna alternatywa dla klasycznych testów parametrycznych.
 analyses:
-  - title: "Bootstrapowy przedział ufności dla średniej"
+  - title: "Bootstrapowy CI dla miary centralnej"
     name: bootCI
     ns: jboot
     menuGroup: Bootstrap
-    menuTitle: "Przedział ufności dla średniej"
-    category: analyses
-  - title: "Bootstrapowy przedział ufności dla mediany"
-    name: bootMedian
-    ns: jboot
-    menuGroup: Bootstrap
-    menuTitle: "Przedział ufności dla mediany"
-    category: analyses
-  - title: "Bootstrapowy PU dla średniej uciętej"
-    name: bootTrimmed
-    ns: jboot
-    menuGroup: Bootstrap
-    menuTitle: "PU dla średniej uciętej"
+    menuSubgroup: Średnie
+    menuTitle: "CI dla miary centralnej"
     category: analyses
   - title: "Bootstrapowe porównanie dwóch grup"
     name: bootTest2
     ns: jboot
     menuGroup: Bootstrap
+    menuSubgroup: Średnie
     menuTitle: "Porównanie dwóch grup"
     category: analyses
-  - title: "Bootstrapowy PU dla prób zależnych"
+  - title: "Bootstrapowy CI dla prób zależnych"
     name: bootPaired
     ns: jboot
     menuGroup: Bootstrap
+    menuSubgroup: Średnie
     menuTitle: "Próby zależne (parowe)"
     category: analyses
-  - title: "Bootstrapowy przedział ufności dla korelacji"
-    name: bootCorr
-    ns: jboot
-    menuGroup: Bootstrap
-    menuTitle: "Przedział ufności dla korelacji"
-    category: analyses
-  - title: "Bootstrapowy PU dla współczynnika regresji"
-    name: bootRegression
-    ns: jboot
-    menuGroup: Bootstrap
-    menuTitle: "PU dla regresji"
-    category: analyses
-  - title: "Bootstrapowy przedział ufności dla proporcji"
-    name: bootProp
-    ns: jboot
-    menuGroup: Bootstrap
-    menuTitle: "Przedział ufności dla proporcji"
-    category: analyses
-  - title: "Bootstrapowe PU per grupa"
+  - title: "Bootstrapowe CI per grupa"
     name: bootMultiGroup
     ns: jboot
     menuGroup: Bootstrap
-    menuTitle: "PU per grupa"
+    menuSubgroup: Średnie
+    menuTitle: "CI per grupa"
     category: analyses
-  - title: "Eksploracja bootstrapu krok po kroku"
+  - title: "Bootstrapowy CI dla proporcji"
+    name: bootProp
+    ns: jboot
+    menuGroup: Bootstrap
+    menuSubgroup: Proporcje
+    menuTitle: "CI dla proporcji"
+    category: analyses
+  - title: "Bootstrapowy CI dla korelacji"
+    name: bootCorr
+    ns: jboot
+    menuGroup: Bootstrap
+    menuSubgroup: Korelacja i regresja
+    menuTitle: "CI dla korelacji"
+    category: analyses
+  - title: "Bootstrapowy CI dla współczynnika regresji"
+    name: bootRegression
+    ns: jboot
+    menuGroup: Bootstrap
+    menuSubgroup: Korelacja i regresja
+    menuTitle: "CI dla regresji"
+    category: analyses
+  - title: "Jak działa bootstrap"
     name: bootExplore
     ns: jboot
     menuGroup: Bootstrap
     menuSubgroup: Dydaktyka
-    menuTitle: "Eksploracja krok po kroku"
-    category: analyses
-  - title: "Zbieżność bootstrapu"
-    name: bootConvergence
-    ns: jboot
-    menuGroup: Bootstrap
-    menuSubgroup: Dydaktyka
-    menuTitle: "Zbieżność (wpływ B)"
+    menuTitle: "Jak działa bootstrap"
     category: analyses
 usesNative: true
 minApp: 1.0.8

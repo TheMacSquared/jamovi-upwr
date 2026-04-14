@@ -1,11 +1,11 @@
 ---
 name:  bootPaired
-title: "Bootstrapowy PU dla prób zależnych"
+title: "Bootstrapowy CI dla prób zależnych"
 jrs:   '1.1'
 
 items:
     - name: testTable
-      title: "Bootstrapowy PU dla różnicy średnich (próby zależne)"
+      title: "Bootstrapowy CI dla różnicy średnich (próby zależne)"
       type: Table
       clearWith:
           - pair1
@@ -22,10 +22,10 @@ items:
             title: "Błąd std. bootstrap"
             type: number
           - name: ciLower
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
           - name: ciUpper
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
           - name: n
             title: N

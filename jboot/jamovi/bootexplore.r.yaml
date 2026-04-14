@@ -1,6 +1,6 @@
 ---
 name:  bootExplore
-title: "Eksploracja bootstrapu krok po kroku"
+title: "Jak działa bootstrap"
 jrs:   '1.1'
 
 items:
@@ -53,4 +53,41 @@ items:
           - name: value
             title: "Wartość"
             type: number
+
+    - name: convTable
+      title: "Wpływ liczby B na CI"
+      type: Table
+      visible: (showConvergence)
+      clearWith:
+          - dep
+          - ciWidth
+          - seed
+      columns:
+          - name: b
+            title: B
+            type: integer
+          - name: seBoot
+            title: "Błąd std. bootstrap"
+            type: number
+          - name: ciLower
+            title: "Dolna granica CI"
+            type: number
+          - name: ciUpper
+            title: "Górna granica CI"
+            type: number
+          - name: ciWidthV
+            title: "Szerokość CI"
+            type: number
+
+    - name: convPlot
+      title: "Zbieżność CI"
+      type: Image
+      visible: (showConvergence)
+      width: 550
+      height: 400
+      clearWith:
+          - dep
+          - ciWidth
+          - seed
+      renderFun: .convPlot
 ...

@@ -51,7 +51,7 @@ bootMedianClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
             }
 
             table$setNote("boot", paste0(
-                "Bootstrapowy PU dla mediany (metoda: ",
+                "Bootstrapowy CI dla mediany (metoda: ",
                 ciMethodLabel(ciMethod), "); B = ", nBoot))
 
             private$.bootData <- bootDataList
@@ -84,7 +84,7 @@ bootMedianClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                 ggplot2::labs(
                     x = paste0("Bootstrapowe mediany (", depName, ")"),
                     y = "Częstość",
-                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice PU") +
+                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
                 ggtheme
 
             print(plot)

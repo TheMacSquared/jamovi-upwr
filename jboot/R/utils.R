@@ -55,6 +55,6 @@ bootHistPlot <- function(reps, obs, ciLower, ciUpper, xlab, ggtheme) {
         ggplot2::labs(
             x = xlab,
             y = "Częstość",
-            subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice PU") +
+            subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
         ggtheme
 }

@@ -33,14 +33,16 @@ cionemeanClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 paste0(self$options$ciWidth, "% CI (t-Studenta, df=", n - 1, ")"))
 
             self$results$plot$setState(list(
-                label = dep, estimate = est, lower = lower, upper = upper
+                label = dep, x = x,
+                estimate = est, lower = lower, upper = upper,
+                ciWidth = self$options$ciWidth
             ))
         },
         .ciPlot = function(image, ggtheme, theme, ...) {
             if (is.null(image$state))
                 return(FALSE)
             s <- image$state
-            buildCIPlot(s$label, s$estimate, s$lower, s$upper, ggtheme, theme)
+            buildMeanCIPlot(s$label, s$x, s$estimate, s$lower, s$upper, s$ciWidth, ggtheme, theme)
         }
     )
 )

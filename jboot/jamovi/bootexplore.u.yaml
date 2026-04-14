@@ -1,4 +1,4 @@
-title: Eksploracja bootstrapu krok po kroku
+title: Jak działa bootstrap
 name: bootExplore
 jus: '3.0'
 stage: 0
@@ -33,3 +33,8 @@ children:
       - type: TextBox
         name: seed
         format: number
+  - type: LayoutBox
+    margin: large
+    children:
+      - type: CheckBox
+        name: showConvergence

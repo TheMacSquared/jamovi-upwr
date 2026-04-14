@@ -49,7 +49,7 @@ bootConvergenceClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Cla
             }
 
             table$setNote("info", paste0(
-                "Percentylowy PU (", self$options$ciWidth,
+                "Percentylowy CI (", self$options$ciWidth,
                 "%); ziarno = ", seed))
 
             private$.plotData <- plotData
@@ -76,7 +76,7 @@ bootConvergenceClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Cla
                 ggplot2::scale_x_log10(breaks = pd$b) +
                 ggplot2::labs(
                     x = "Liczba prób bootstrapowych (B)",
-                    y = "Granice przedziału ufności",
+                    y = "Granice CI",
                     color = "") +
                 ggtheme
 

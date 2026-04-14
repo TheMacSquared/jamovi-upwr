@@ -1,6 +1,6 @@
 ---
 name:  bootPaired
-title: "Bootstrapowy PU dla prób zależnych"
+title: "Bootstrapowy CI dla prób zależnych"
 menuGroup: jboot
 version: '0.1.0'
 jas: '1.2'
@@ -8,7 +8,7 @@ jas: '1.2'
 description:
     R:
         usage: >
-            Bootstrapowy przedział ufności dla różnicy średnich
+            Bootstrapowy CI dla różnicy średnich
             w próbach zależnych (parowych).
 
 options:
@@ -53,7 +53,7 @@ options:
       max: 999999
 
     - name: ciMethod
-      title: "Metoda przedziału ufności"
+      title: "Metoda CI"
       type: List
       options:
         - name: perc

@@ -53,7 +53,7 @@ bootTrimmedClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
             }
 
             table$setNote("boot", paste0(
-                "Bootstrapowy PU dla średniej uciętej (",
+                "Bootstrapowy CI dla średniej uciętej (",
                 trimProp * 100, "%, metoda: ",
                 ciMethodLabel(ciMethod), "); B = ", nBoot))
 
@@ -86,7 +86,7 @@ bootTrimmedClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                 ggplot2::labs(
                     x = paste0("Bootstrapowe średnie ucięte (", depName, ")"),
                     y = "Częstość",
-                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice PU") +
+                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
                 ggtheme
 
             print(plot)

@@ -5,7 +5,7 @@ jrs:   '1.1'
 
 items:
     - name: testTable
-      title: "Bootstrapowy PU dla różnicy średnich"
+      title: "Bootstrapowy CI dla różnicy średnich"
       type: Table
       rows: (dep)
       clearWith:
@@ -27,10 +27,10 @@ items:
             title: "Błąd std. bootstrap"
             type: number
           - name: ciLower
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
           - name: ciUpper
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
           - name: n1
             title: "N (Grupa 1)"
@@ -91,10 +91,10 @@ items:
             type: number
             format: zto,pvalue
           - name: ciLowerClass
-            title: "Dolna granica PU"
+            title: "Dolna granica CI"
             type: number
           - name: ciUpperClass
-            title: "Górna granica PU"
+            title: "Górna granica CI"
             type: number
 
     - name: plots

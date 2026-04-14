@@ -1,6 +1,6 @@
 ---
 name:  bootTrimmed
-title: "Bootstrapowy PU dla średniej uciętej"
+title: "Bootstrapowy CI dla średniej uciętej"
 menuGroup: jboot
 version: '0.1.0'
 jas: '1.2'
@@ -8,7 +8,7 @@ jas: '1.2'
 description:
     R:
         usage: >
-            Bootstrapowy przedział ufności dla średniej uciętej (trimmed mean).
+            Bootstrapowy CI dla średniej uciętej (trimmed mean).
 
 options:
     - name: data
@@ -51,7 +51,7 @@ options:
       max: 999999
 
     - name: ciMethod
-      title: "Metoda przedziału ufności"
+      title: "Metoda CI"
       type: List
       options:
         - name: perc

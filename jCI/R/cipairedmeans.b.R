@@ -41,14 +41,18 @@ cipairedmeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
 
             self$results$plot$setState(list(
                 label = paste0(var1Name, " - ", var2Name),
-                estimate = est, lower = lower, upper = upper
+                x = d,
+                estimate = est, lower = lower, upper = upper,
+                ciWidth = self$options$ciWidth,
+                refLine = 0
             ))
         },
         .ciPlot = function(image, ggtheme, theme, ...) {
             if (is.null(image$state))
                 return(FALSE)
             s <- image$state
-            buildCIPlot(s$label, s$estimate, s$lower, s$upper, ggtheme, theme)
+            buildMeanCIPlot(s$label, s$x, s$estimate, s$lower, s$upper, s$ciWidth,
+                ggtheme, theme, refLine = s$refLine)
         }
     )
 )

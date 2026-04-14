@@ -1,4 +1,4 @@
-title: Bootstrapowy PU dla wspolczynnika regresji
+title: Bootstrapowy CI dla wspolczynnika regresji
 name: bootRegression
 jus: '3.0'
 stage: 0

@@ -73,7 +73,7 @@ bootRegressionClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Clas
             ))
 
             coefTable$setNote("boot", paste0(
-                "Bootstrapowy PU (metoda: ", ciMethodLabel(ciMethod),
+                "Bootstrapowy CI (metoda: ", ciMethodLabel(ciMethod),
                 "); B = ", nBoot))
 
             # Fit table
@@ -123,7 +123,7 @@ bootRegressionClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Clas
                 ggplot2::labs(
                     x = "Bootstrapowe nachylenia (slope)",
                     y = "Częstość",
-                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice PU") +
+                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
                 ggtheme
 
             print(plot)
@@ -173,7 +173,7 @@ bootRegressionClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Clas
                     x = predName,
                     y = depName,
                     subtitle = paste0("Czerwona linia = regresja obserwowana | ",
-                        "Niebieskie pasmo = bootstrapowy PU (",
+                        "Niebieskie pasmo = bootstrapowy CI (",
                         round(sd$ciWidth * 100), "%)")) +
                 ggtheme
 
