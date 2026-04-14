@@ -8,11 +8,8 @@
     opacity: 1;
     visibility: visible;
     position: absolute;
-    width: 400px;
-    top: 40%;
-    inset-inline-start: 50%;
-    margin-top: -25px;
-    margin-inline-start: -200px;
+    bottom: 40px;
+    inset-inline-end: 60px;
     z-index: 200;
 }
 

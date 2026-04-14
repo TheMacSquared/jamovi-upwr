@@ -1069,6 +1069,7 @@ ready(async() => {
                 break;
             // ... then show the welcome screen
             resultsView.showWelcome();
+            welcomeShown = true;
         }
     }
     if ( ! welcomeShown)

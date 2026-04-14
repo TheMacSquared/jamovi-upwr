@@ -20,7 +20,12 @@
       "Bash(curl -L -o \"D:/CCTest/jamovi-upwr/client/assets/logo-upwr.png\" \"https://upload.wikimedia.org/wikipedia/commons/thumb/3/thirty/UPWr_logo.svg/1200px-UPWr_logo.svg.png\")",
       "Bash(docker exec:*)",
       "Bash(export MSYS_NO_PATHCONV=1)",
-      "Bash(base64 -w0 \"D:/CCTest/jamovi-upwr/client/assets/upwr-logotyp-pl-poziomy.png\")"
+      "Bash(base64 -w0 \"D:/CCTest/jamovi-upwr/client/assets/upwr-logotyp-pl-poziomy.png\")",
+      "Bash(find jamovi:*)",
+      "Bash(ls -la \"D:/CCTest/jamovi-upwr/.git/index\"*)",
+      "Bash(fuser \"D:/CCTest/jamovi-upwr/.git/index.lock\")",
+      "Bash(ps -W)",
+      "Bash(tasklist.exe)"
     ]
   }
 }
