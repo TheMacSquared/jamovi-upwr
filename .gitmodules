@@ -10,4 +10,4 @@
 	branch = main
 [submodule "plots"]
 	path = plots
-	url = https://github.com/jamovi/jmvplots.git
+	url = https://github.com/TheMacSquared/jmvplots.git
