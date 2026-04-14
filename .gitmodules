@@ -3,10 +3,10 @@
 	url = https://github.com/TheMacSquared/jmv.git
 [submodule "jamovi-readstat"]
 	path = readstat
-	url = https://github.com/jamovi/jamovi-readstat.git
+	url = https://github.com/TheMacSquared/jamovi-readstat.git
 [submodule "i18n"]
 	path = i18n
-	url = https://github.com/jamovi/jamovi-i18n.git
+	url = https://github.com/TheMacSquared/jamovi-i18n.git
 	branch = main
 [submodule "plots"]
 	path = plots
