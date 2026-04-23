@@ -7,13 +7,18 @@ items:
     - name: table
       title: Przedzial ufnosci dla sredniej
       type: Table
-      rows: 1
+      rows: -1
       clearWith:
         - dep
         - ciWidth
+        - group
       columns:
         - name: var
           title: Zmienna
+          type: text
+
+        - name: grp
+          title: Grupa
           type: text
 
         - name: estimate
@@ -36,11 +41,12 @@ items:
       title: ''
       type: Image
       visible: (showPlot)
-      width: 450
-      height: 350
+      width: 600
+      height: 450
       renderFun: .ciPlot
       clearWith:
         - dep
         - ciWidth
+        - group
 
 ...

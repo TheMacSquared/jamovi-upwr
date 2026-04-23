@@ -26,6 +26,15 @@ options:
       max: 99.9
       default: 95
 
+    - name: group
+      title: Zmienna grupujaca
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
     - name: showPlot
       title: Wykres
       type: Bool

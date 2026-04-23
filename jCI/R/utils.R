@@ -51,6 +51,77 @@ ciDiffProportion <- function(x1, n1, x2, n2, ciWidth, method) {
     return(list(lower = lower, upper = upper))
 }
 
+#' Plot for grouped mean CI: raw data + mean point + CI for multiple groups
+#'
+#' @param label character, variable name
+#' @param groups list where each element is a named group with x, estimate, lower, upper, n
+#' @param ciWidth confidence level (percentage, e.g. 95)
+#' @param ggtheme jamovi theme
+#' @param theme jamovi theme colors
+buildGroupedMeanCIPlot <- function(label, groups, ciWidth, ggtheme, theme) {
+    groupNames <- names(groups)
+
+    # Combine raw data from all groups
+    rawList <- list()
+    ciData <- list()
+
+    for (g in groupNames) {
+        rawList[[g]] <- data.frame(
+            group = g,
+            y = groups[[g]]$x
+        )
+        ciData[[g]] <- data.frame(
+            group = g,
+            est = groups[[g]]$estimate,
+            lower = groups[[g]]$lower,
+            upper = groups[[g]]$upper
+        )
+    }
+
+    rawDF <- do.call(rbind, rawList)
+    rownames(rawDF) <- NULL
+    rawDF$group <- factor(rawDF$group, levels = groupNames)
+
+    ciDF <- do.call(rbind, ciData)
+    rownames(ciDF) <- NULL
+    ciDF$group <- factor(ciDF$group, levels = groupNames)
+
+    p <- ggplot2::ggplot(rawDF, ggplot2::aes(x = group, y = y)) +
+        # Jittered raw data
+        ggplot2::geom_jitter(
+            width = 0.15, height = 0,
+            alpha = 0.4,
+            size = 2,
+            color = theme$color[1]
+        ) +
+        # CI error bars
+        ggplot2::geom_errorbar(
+            data = ciDF,
+            ggplot2::aes(x = group, ymin = lower, ymax = upper, y = est),
+            width = 0.3,
+            linewidth = 1.2,
+            color = "firebrick",
+            inherit.aes = FALSE
+        ) +
+        # Mean points
+        ggplot2::geom_point(
+            data = ciDF,
+            ggplot2::aes(x = group, y = est),
+            shape = 18,
+            size = 6,
+            color = "firebrick",
+            inherit.aes = FALSE
+        ) +
+        ggplot2::labs(
+            x = NULL,
+            y = label,
+            subtitle = paste0(ciWidth, "% przedział ufności dla średniej")
+        ) +
+        ggtheme
+
+    return(p)
+}
+
 #' Plot for single/paired mean CI: raw data + mean point + CI
 #'
 #' @param label character, label for x-axis (variable name or difference name)
