@@ -94,7 +94,7 @@ export class ResultsView extends HTMLElement {
     }
 
     showWelcome() {
-        // statUPWr: keep our logo placeholder visible instead of loading jamovi.org welcome
+        // jUPWR: keep our logo placeholder visible instead of loading jamovi.org welcome
         this.model.analyses().once('analysisCreated', (event) => {
             this.hidePlaceHolder();
         });
