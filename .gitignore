@@ -31,3 +31,8 @@ __pycache__
 /server/jamovi/hydra/
 /modules/
 /bin/
+
+# jamovi-compiler build artifacts
+*.jmo
+**/build/
+**/R/*.h.R
