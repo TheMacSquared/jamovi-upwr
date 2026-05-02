@@ -1,42 +1,42 @@
 ---
 name:  FDistribution
-title: F-Distribution
+title: Rozkład F
 jrs:   '1.1'
 
 items:
     - name: Inputs
-      title: Input values
+      title: Dane wejściowe
       type: Table
       rows: 3
       columns:
         - name: ParametersColumn
-          title: Parameters
+          title: Parametry
           type: text
         - name: DistributionFunctionColumn
-          title: "'Compute probability'"
+          title: "'Oblicz prawdopodobieństwo'"
           type: text
           visible: (DistributionFunction)
         - name: QuantileFunctionColumn
-          title: "'Compute quantile'"
+          title: "'Oblicz kwantyl'"
           type: text
           visible: (QuantileFunction)
 
     - name: Outputs
-      title: "Results"
+      title: "Wyniki"
       type: Table
       rows: 1
       columns:
         - name: DistributionResultColumn
-          title: Probability
+          title: Prawdopodobieństwo
           type: text
           visible: (DistributionFunction)
         - name: QuantileResultColumn
-          title: Quantile
+          title: Kwantyl
           type: text
           visible: (QuantileFunction)
           
     - name: MomentsTable
-      title: Moments
+      title: Momenty
       type: Table
       rows: 0
       columns:
@@ -44,10 +44,10 @@ items:
           title: ""
           type: text
         - name: FormulaColumn
-          title: Formula
+          title: Wzór
           type: text
         - name: ValueColumn
-          title: Value
+          title: Wartość
           type: text
 
     - name: plot

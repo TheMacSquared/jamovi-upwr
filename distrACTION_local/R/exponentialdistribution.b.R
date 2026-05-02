@@ -24,19 +24,19 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           LowerQuantile <- ((1 - Quantile) / 2)
           HigherQuantile <- LowerQuantile + Quantile}}
 
-      InputLabel1 <- paste("Rate (λ) = ", DP1, sep = "")
+      InputLabel1 <- paste("Intensywność (λ) = ", DP1, sep = "")
       DistributionFunctionTypeLabel <- ""
       QuantileFunctionTypeLabel <- ""
       if (DistributionFunctionType == "lower")
-        DistributionFunctionTypeLabel <- "Mode: P(X ≤ x1)"
+        DistributionFunctionTypeLabel <- "Tryb: P(X ≤ x1)"
       if (DistributionFunctionType == "interval")
-        DistributionFunctionTypeLabel <- paste("Mode: x2 = ", XValue2, sep = "")
+        DistributionFunctionTypeLabel <- paste("Tryb: x2 = ", XValue2, sep = "")
       if (DistributionFunctionType == "higher")
-        DistributionFunctionTypeLabel <- "Mode: P(X ≥ x1)"
+        DistributionFunctionTypeLabel <- "Tryb: P(X ≥ x1)"
       if (QuantileFunctionType == "cumulative")
-        QuantileFunctionTypeLabel <- "cumulative mode"
+        QuantileFunctionTypeLabel <- "tryb kumulatywny"
       if (QuantileFunctionType == "central")
-        QuantileFunctionTypeLabel <- "central mode"
+        QuantileFunctionTypeLabel <- "tryb centralny"
 
       Inputs <- self$results$Inputs
       Inputs$setRow(rowNo = 1, values = list(
@@ -132,7 +132,7 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       QuantileAlphaLow <- 1
       QuantileAlphaHigh <- 1
-      QuantileLabel <- "Quantile"
+      QuantileLabel <- "Kwantyl"
       Textsize <- 16
       AxisSegments <- pretty(c(LowerTail, UpperTail), n = 8)
       HigherSegment <- NA
@@ -172,10 +172,10 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       image$setState(Dataset)
 
       if(((DistributionFunction == "TRUE") & (DistributionFunctionType == "interval")) & (XValue >= XValue2)){
-        Inputs$setError("x2 must be greater than x1.")
+        Inputs$setError("x2 musi być większe od x1.")
         Outputs$setVisible(visible = FALSE)}
       if(XValue < 0 & DistributionFunction == "TRUE"){
-        Inputs$setError("x1 must be >= 0 for exponential distribution.")
+        Inputs$setError("x1 musi być ≥ 0 dla rozkładu wykładniczego.")
         Outputs$setVisible(visible = FALSE)}},
 
     .plot = function(image, ...) {

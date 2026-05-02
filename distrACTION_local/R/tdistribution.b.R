@@ -80,15 +80,15 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         QuantileFunctionTypeLabel <- ""
         # Label for the selected type of distribution function
         if (DistributionFunctionType=="lower"){
-          DistributionFunctionTypeLabel <- "Mode: P(X ≤ x1)"}
+          DistributionFunctionTypeLabel <- "Tryb: P(X ≤ x1)"}
         if (DistributionFunctionType=="interval"){
-          DistributionFunctionTypeLabel <- paste("Mode: x2 = ", XValue2, sep = "")}
+          DistributionFunctionTypeLabel <- paste("Tryb: x2 = ", XValue2, sep = "")}
         if (DistributionFunctionType=="higher"){
-          DistributionFunctionTypeLabel <- "Mode: P(X ≥ x1)"}
+          DistributionFunctionTypeLabel <- "Tryb: P(X ≥ x1)"}
         if (QuantileFunctionType=="cumulative") {
-          QuantileFunctionTypeLabel <- "cumulative mode"}      
+          QuantileFunctionTypeLabel <- "tryb kumulatywny"}      
         if (QuantileFunctionType=="central") {
-          QuantileFunctionTypeLabel <- "central mode"}
+          QuantileFunctionTypeLabel <- "tryb centralny"}
         
         
         ##### 1.1.4) Inputs table ######
@@ -186,7 +186,7 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
               MeanFormula <- "E[X] = λ√(df/2)·Γ((df−1)/2)/Γ(df/2)"
               MeanVal <- if (DP1 > 1) {
                 as.character(round(DP2 * sqrt(DP1/2) * gamma((DP1-1)/2) / gamma(DP1/2), 4))
-              } else "undefined (df ≤ 1)"
+              } else "nieokreślone (df ≤ 1)"
             }
             MomentsTable$addRow(rowKey = "mean", values = list(
               MomentColumn = "E[X]",
@@ -197,13 +197,13 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           if (ShowVariance) {
             if (DP2 == 0) {
               VarFormula <- "Var[X] = df / (df − 2)"
-              VarVal <- if (DP1 > 2) as.character(round(DP1 / (DP1 - 2), 4)) else "undefined (df ≤ 2)"
+              VarVal <- if (DP1 > 2) as.character(round(DP1 / (DP1 - 2), 4)) else "nieokreślone (df ≤ 2)"
             } else {
               VarFormula <- "Var[X] = df(1+λ²)/(df−2) − [E[X]]²"
               VarVal <- if (DP1 > 2) {
                 EX <- if (DP1 > 1) DP2 * sqrt(DP1/2) * gamma((DP1-1)/2) / gamma(DP1/2) else 0
                 as.character(round(DP1 * (1 + DP2^2) / (DP1 - 2) - EX^2, 4))
-              } else "undefined (df ≤ 2)"
+              } else "nieokreślone (df ≤ 2)"
             }
             MomentsTable$addRow(rowKey = "var", values = list(
               MomentColumn = "Var[X]",
@@ -248,7 +248,7 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # The transcparency of the upper quantile segment is defined
         QuantileAlphaHigh <- 1
         # The text for the quantiles legend is defined
-        QuantileLabel <- "Quantile"
+        QuantileLabel <- "Kwantyl"
         # The size of the legends text is defined
         Textsize <- 16
         # The lowest segment of the x-axis is defined
@@ -296,14 +296,14 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           # Changes are done if the quantile is outside the x-axis
           if(QuantileFunctionType=="cumulative"){
             if(HighLineCheck>HigherAxisSegment){
-              QuantileLabel <- "Quantile out of range"
+              QuantileLabel <- "Kwantyl poza zakresem"
               QuantileAlphaLow <- 0
               QuantileAlphaHigh <- 0
               Textsize <- 10
               HigherSegment <- HigherAxisSegment
               LowerSegment <- HigherAxisSegment}
             if(HighLineCheck<LowerAxisSegment){
-              QuantileLabel <- "Quantile out of range"
+              QuantileLabel <- "Kwantyl poza zakresem"
               QuantileAlphaLow <- 0
               QuantileAlphaHigh <- 0
               Textsize <- 10
@@ -311,17 +311,17 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
               LowerSegment <- HigherAxisSegment}}
           if(QuantileFunctionType=="central"){
             if(HighLineCheck>HigherAxisSegment){
-              QuantileLabel <- "(Upper) Quantile out of range"
+              QuantileLabel <- "(Górny) kwantyl poza zakresem"
               QuantileAlphaHigh <- 0
               Textsize <- 10
               HigherSegment <- HigherAxisSegment}
             if(LowLineCheck<LowerAxisSegment){
-              QuantileLabel <- "(Lower) Quantile out of range"
+              QuantileLabel <- "(Dolny) kwantyl poza zakresem"
               QuantileAlphaLow <- 0
               Textsize <- 10
               LowerSegment <- LowerAxisSegment}
             if((LowLineCheck<LowerAxisSegment)&(HighLineCheck>HigherAxisSegment)){
-              QuantileLabel <- "Quantile out of range"
+              QuantileLabel <- "Kwantyl poza zakresem"
               QuantileAlphaHigh <- 0
               QuantileAlphaLow <- 0
               Textsize <- 10
@@ -352,7 +352,7 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         ###### 1.4) Error Messages #####
         #Error if XValue≥XValue2
         if(((DistributionFunction=="TRUE") & (DistributionFunctionType=="interval"))&(XValue>=XValue2)){
-          Inputs$setError("x2 must be greater than x1. ")
+          Inputs$setError("x2 musi być większe od x1.")
           Outputs$setVisible(visible=FALSE)}},
       
       
@@ -421,7 +421,7 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         if (DistributionFunction=="TRUE") {
           Plot <- Plot+
             # The area of the searched interval is marked
-            geom_area(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Area)"))+
+            geom_area(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Pole)"))+
             # Set the colors of the legend
             scale_fill_manual(values = Color)}
           

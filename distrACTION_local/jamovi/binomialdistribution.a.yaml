@@ -1,37 +1,37 @@
 ---
 name:  BinomialDistribution
-title: Binomial Distribution
+title: Rozkład dwumianowy
 menuGroup: distrACTION
-menuSubgroup: Discrete distributions
+menuSubgroup: Rozkłady dyskretne
 version: '1.0.0'
 jas: '1.2'
 
 options:
-    - title: Compute probability
+    - title: Oblicz prawdopodobieństwo
       name: DistributionFunction
       type: Bool
       default: FALSE
 
 
-    - title: Compute quantile(s)
+    - title: Oblicz kwantyl(e)
       name: QuantileFunction
       type: Bool
       default: FALSE
-      
+
 
     - name: QuantileFunctionType
-      title: Mode for Quantiles
+      title: Tryb kwantyli
       type: List
-      options: 
-        - title: central interval quantiles
+      options:
+        - title: kwantyle przedziału centralnego
           name: central
-        - title: cumulative quantile
+        - title: kwantyl kumulatywny
           name: cumulative
       default: central
 
 
     - name: DistributionFunctionType
-      title: Mode for Distribution
+      title: Tryb dystrybuanty
       type: List
       options:
         - title: P(X ≤ x1)
@@ -62,21 +62,21 @@ options:
       default: 1
 
     - name: dp1
-      title: Size =
+      title: n =
       type: Number
       default: 10
 
     - name: dp2
-      title: Probability =
+      title: Prawdopodb. =
       type: Number
       default: 0.5
 
-    - title: Show expected value E[X]
+    - title: Pokaż wartość oczekiwaną E[X]
       name: showMean
       type: Bool
       default: FALSE
 
-    - title: Show variance Var[X]
+    - title: Pokaż wariancję Var[X]
       name: showVariance
       type: Bool
       default: FALSE

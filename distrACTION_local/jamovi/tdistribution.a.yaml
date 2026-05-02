@@ -1,38 +1,38 @@
 ---
 name:  TDistribution
-title: T-Distribution
+title: Rozkład t
 menuGroup: distrACTION
-menuSubgroup: Continuous distributions
+menuSubgroup: Rozkłady ciągłe
 version: '1.0.0'
 jas: '1.2'
 
 
 options:
-    - title: Compute probability
+    - title: Oblicz prawdopodobieństwo
       name: DistributionFunction
       type: Bool
       default: FALSE
 
 
-    - title: Compute quantile(s)
+    - title: Oblicz kwantyl(e)
       name: QuantileFunction
       type: Bool
       default: FALSE
-      
+
 
     - name: QuantileFunctionType
-      title: Mode for Quantiles
+      title: Tryb kwantyli
       type: List
-      options: 
-        - title: central interval quantiles
+      options:
+        - title: kwantyle przedziału centralnego
           name: central
-        - title: cumulative quantile
+        - title: kwantyl kumulatywny
           name: cumulative
       default: central
 
 
     - name: DistributionFunctionType
-      title: Mode for Distribution
+      title: Tryb dystrybuanty
       type: List
       options:
         - title: P(X ≤ x1)
@@ -64,18 +64,18 @@ options:
       type: Number
       min: 1
       default: 1
-      
+
     - name: dp2
       title: λ =
       type: Number
       default: 0
 
-    - title: Show expected value E[X]
+    - title: Pokaż wartość oczekiwaną E[X]
       name: showMean
       type: Bool
       default: FALSE
 
-    - title: Show variance Var[X]
+    - title: Pokaż wariancję Var[X]
       name: showVariance
       type: Bool
       default: FALSE

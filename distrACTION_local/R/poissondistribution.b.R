@@ -29,17 +29,17 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       DistributionFunctionTypeLabel <- ""
       QuantileFunctionTypeLabel <- ""
       if (DistributionFunctionType == "lower")
-        DistributionFunctionTypeLabel <- "Mode: P(X \u2264 x1)"
+        DistributionFunctionTypeLabel <- "Tryb: P(X \u2264 x1)"
       if (DistributionFunctionType == "higher")
-        DistributionFunctionTypeLabel <- "Mode: P(X \u2265 x1)"
+        DistributionFunctionTypeLabel <- "Tryb: P(X \u2265 x1)"
       if (DistributionFunctionType == "interval")
-        DistributionFunctionTypeLabel <- paste("Mode: x2 = ", XValue2, sep = "")
+        DistributionFunctionTypeLabel <- paste("Tryb: x2 = ", XValue2, sep = "")
       if (DistributionFunctionType == "is")
-        DistributionFunctionTypeLabel <- "Mode: P(X = x1)"
+        DistributionFunctionTypeLabel <- "Tryb: P(X = x1)"
       if (QuantileFunctionType == "cumulative")
-        QuantileFunctionTypeLabel <- "cumulative mode"
+        QuantileFunctionTypeLabel <- "tryb kumulatywny"
       if (QuantileFunctionType == "central")
-        QuantileFunctionTypeLabel <- "central mode"
+        QuantileFunctionTypeLabel <- "tryb centralny"
 
       Inputs <- self$results$Inputs
       Inputs$setRow(rowNo = 1, values = list(
@@ -135,7 +135,7 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       QuantileAlphaLow <- 1
       QuantileAlphaHigh <- 1
-      QuantileLabel <- "Quantile"
+      QuantileLabel <- "Kwantyl"
       Textsize <- 16
       HigherSegment <- NA
       LowerSegment <- NA
@@ -170,7 +170,7 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       image$setState(PlotDataset)
 
       if(((DistributionFunction == "TRUE") & (DistributionFunctionType == "interval")) & (XValue >= XValue2)){
-        Inputs$setError("x2 must be greater than x1.")
+        Inputs$setError("x2 musi być większe od x1.")
         Outputs$setVisible(visible = FALSE)}},
 
     .plot = function(image, ...) {

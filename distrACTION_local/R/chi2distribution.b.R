@@ -53,11 +53,11 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         QuantileFunctionTypeLabel <- ""
         # Label for the selected type of distribution function
         if (DistributionFunctionType=="lower"){
-          DistributionFunctionTypeLabel <- "Mode: P(X ≤ x1)"}
+          DistributionFunctionTypeLabel <- "Tryb: P(X ≤ x1)"}
         if (DistributionFunctionType=="interval"){
-          DistributionFunctionTypeLabel <- paste("Mode: x2 = ", XValue2, sep = "")}
+          DistributionFunctionTypeLabel <- paste("Tryb: x2 = ", XValue2, sep = "")}
         if (DistributionFunctionType=="higher"){
-          DistributionFunctionTypeLabel <- "Mode: P(X ≥ x1)"}
+          DistributionFunctionTypeLabel <- "Tryb: P(X ≥ x1)"}
         if (QuantileFunction=="TRUE") {
           QuantileFunctionTypeLabel <- ""}      
 
@@ -185,7 +185,7 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # The transcparency of the upper quantile segment is defined
         QuantileAlphaHigh <- 1
         # The text for the quantiles legend is defined
-        QuantileLabel <- "Quantile"
+        QuantileLabel <- "Kwantyl"
         # The size of the legends text is defined
         Textsize <- 16
         # The lowest segment of the x-axis is defined
@@ -225,14 +225,14 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           HighLineCheck <- qchisq(Quantile, DP1, DP2)
           # Changes are done if the quantile is outside the x-axis
           if(HighLineCheck>HigherAxisSegment){
-            QuantileLabel <- "Quantile out of range"
+            QuantileLabel <- "Kwantyl poza zakresem"
             QuantileAlphaLow <- 0
             QuantileAlphaHigh <- 0
             Textsize <- 10
             HigherSegment <- HigherAxisSegment
             LowerSegment <- HigherAxisSegment}
           if(HighLineCheck<LowerAxisSegment){
-            QuantileLabel <- "Quantile out of range"
+            QuantileLabel <- "Kwantyl poza zakresem"
             QuantileAlphaLow <- 0
             QuantileAlphaHigh <- 0
             Textsize <- 10
@@ -263,7 +263,7 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         ###### 1.4) Error Messages #####
         #Error if XValue≥XValue2
         if(((DistributionFunction=="TRUE") & (DistributionFunctionType=="interval"))&(XValue>=XValue2)){
-          Inputs$setError("x2 must be greater than x1. ")
+          Inputs$setError("x2 musi być większe od x1.")
           Outputs$setVisible(visible=FALSE)}},
       
       
@@ -333,7 +333,7 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         if (DistributionFunction=="TRUE") {
           Plot <- Plot+
             # The area of the searched interval is marked
-            geom_area(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Area)"))+
+            geom_area(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Pole)"))+
             # Set the colors of the legend
             scale_fill_manual(values = Color)}
         

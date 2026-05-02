@@ -1,26 +1,26 @@
 ---
 name:  Chi2Distribution
-title: χ2-Distribution
+title: Rozkład χ²
 menuGroup: distrACTION
-menuSubgroup: Continuous distributions
+menuSubgroup: Rozkłady ciągłe
 version: '1.0.0'
 jas: '1.2'
 
 options:
-    - title: Compute probability
+    - title: Oblicz prawdopodobieństwo
       name: DistributionFunction
       type: Bool
       default: FALSE
 
 
-    - title: Compute quantile
+    - title: Oblicz kwantyl
       name: QuantileFunction
       type: Bool
       default: FALSE
-    
+
 
     - name: DistributionFunctionType
-      title: Mode for Distribution
+      title: Tryb dystrybuanty
       type: List
       options:
         - title: P(X ≤ x1)
@@ -59,12 +59,12 @@ options:
       type: Number
       default: 0
 
-    - title: Show expected value E[X]
+    - title: Pokaż wartość oczekiwaną E[X]
       name: showMean
       type: Bool
       default: FALSE
 
-    - title: Show variance Var[X]
+    - title: Pokaż wariancję Var[X]
       name: showVariance
       type: Bool
       default: FALSE

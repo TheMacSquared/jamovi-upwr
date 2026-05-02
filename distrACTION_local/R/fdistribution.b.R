@@ -58,11 +58,11 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         QuantileFunctionTypeLabel <- ""
         # Label for the selected type of distribution function
         if (DistributionFunctionType=="lower"){
-          DistributionFunctionTypeLabel <- "Mode: P(X ≤ x1)"}
+          DistributionFunctionTypeLabel <- "Tryb: P(X ≤ x1)"}
         if (DistributionFunctionType=="interval"){
-          DistributionFunctionTypeLabel <- paste("Mode: x2 = ", XValue2, sep = "")}
+          DistributionFunctionTypeLabel <- paste("Tryb: x2 = ", XValue2, sep = "")}
         if (DistributionFunctionType=="higher"){
-          DistributionFunctionTypeLabel <- "Mode: P(X ≥ x1)"}
+          DistributionFunctionTypeLabel <- "Tryb: P(X ≥ x1)"}
         if (QuantileFunction=="TRUE") {
           QuantileFunctionTypeLabel <- ""}      
 
@@ -149,7 +149,7 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           if (ShowMean) {
             MeanVal <- if (DP2 > 2) {
               as.character(round(DP2 * (DP1 + DP3) / (DP1 * (DP2 - 2)), 4))
-            } else "undefined (df₂ ≤ 2)"
+            } else "nieokreślone (df₂ ≤ 2)"
             MomentsTable$addRow(rowKey = "mean", values = list(
               MomentColumn = "E[X]",
               FormulaColumn = "E[X] = df₂(df₁+λ) / [df₁(df₂−2)]",
@@ -161,7 +161,7 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
               as.character(round(
                 2 * (DP2/DP1)^2 * ((DP1+DP3)^2 + (DP1+2*DP3)*(DP2-2)) / ((DP2-2)^2*(DP2-4)),
                 4))
-            } else "undefined (df₂ ≤ 4)"
+            } else "nieokreślone (df₂ ≤ 4)"
             MomentsTable$addRow(rowKey = "var", values = list(
               MomentColumn = "Var[X]",
               FormulaColumn = "Var[X] = 2(df₂/df₁)²[(df₁+λ)²+(df₁+2λ)(df₂−2)] / [(df₂−2)²(df₂−4)]",
@@ -208,7 +208,7 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # The transcparency of the upper quantile segment is defined
         QuantileAlphaHigh <- 1
         # The text for the quantiles legend is defined
-        QuantileLabel <- "Quantile"
+        QuantileLabel <- "Kwantyl"
         # The size of the legends text is defined
         Textsize <- 16
         # The lowest segment of the x-axis is defined
@@ -247,14 +247,14 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           HighLineCheck <- qf(Quantile, DP1, DP2, DP3)
           # Changes are done if the quantile is outside the x-axis
           if(HighLineCheck>HigherAxisSegment){
-            QuantileLabel <- "Quantile out of range"
+            QuantileLabel <- "Kwantyl poza zakresem"
             QuantileAlphaLow <- 0
             QuantileAlphaHigh <- 0
             Textsize <- 10
             HigherSegment <- LowerAxisSegment
             LowerSegment <- HigherAxisSegment}
           if(HighLineCheck<LowerAxisSegment){
-            QuantileLabel <- "Quantile out of range"
+            QuantileLabel <- "Kwantyl poza zakresem"
             QuantileAlphaLow <- 0
             QuantileAlphaHigh <- 0
             Textsize <- 10
@@ -285,7 +285,7 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         ###### 1.4) Error Messages #####
         #Error if XValue≥XValue2
         if(((DistributionFunction=="TRUE") & (DistributionFunctionType=="interval"))&(XValue>=XValue2)){
-          Inputs$setError("x2 must be greater than x1. ")
+          Inputs$setError("x2 musi być większe od x1.")
           Outputs$setVisible(visible=FALSE)}},
       
       
@@ -355,7 +355,7 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         if (DistributionFunction=="TRUE") {
           Plot <- Plot+
             # The area of the searched interval is marked
-            geom_area(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Area)"))+
+            geom_area(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Pole)"))+
             # Set the colors of the legend
             scale_fill_manual(values = Color)}
         

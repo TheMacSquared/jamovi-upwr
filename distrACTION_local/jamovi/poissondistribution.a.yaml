@@ -1,34 +1,34 @@
 ---
 name:  PoissonDistribution
-title: Poisson Distribution
+title: Rozkład Poissona
 menuGroup: distrACTION
-menuSubgroup: Discrete distributions
+menuSubgroup: Rozkłady dyskretne
 version: '1.0.0'
 jas: '1.2'
 
 options:
-    - title: Compute probability
+    - title: Oblicz prawdopodobieństwo
       name: DistributionFunction
       type: Bool
       default: FALSE
 
-    - title: Compute quantile(s)
+    - title: Oblicz kwantyl(e)
       name: QuantileFunction
       type: Bool
       default: FALSE
 
     - name: QuantileFunctionType
-      title: Mode for Quantiles
+      title: Tryb kwantyli
       type: List
       options:
-        - title: central interval quantiles
+        - title: kwantyle przedziału centralnego
           name: central
-        - title: cumulative quantile
+        - title: kwantyl kumulatywny
           name: cumulative
       default: central
 
     - name: DistributionFunctionType
-      title: Mode for Distribution
+      title: Tryb dystrybuanty
       type: List
       options:
         - title: P(X ≤ x1)
@@ -64,12 +64,12 @@ options:
       default: 3
       min: 0.0001
 
-    - title: Show expected value E[X]
+    - title: Pokaż wartość oczekiwaną E[X]
       name: showMean
       type: Bool
       default: FALSE
 
-    - title: Show variance Var[X]
+    - title: Pokaż wariancję Var[X]
       name: showVariance
       type: Bool
       default: FALSE

@@ -1,11 +1,11 @@
-title: F-Distribution
+title: Rozkład F
 name: FDistribution
 jus: '2.0'
 stage: 0
 compilerMode: tame
 children:
   - type: Label
-    label: Parameters
+    label: Parametry
     children:
       - type: TextBox
         name: dp1
@@ -17,7 +17,7 @@ children:
         name: dp3
         format: number
   - type: Label
-    label: Function
+    label: Funkcja
     children:
       - type: LayoutBox
         style: inline
@@ -67,7 +67,7 @@ children:
                 format: number
                 enable: (QuantileFunction)
   - type: Label
-    label: Moments
+    label: Momenty
     children:
       - type: CheckBox
         name: showMean

@@ -1,7 +1,6 @@
 ---
 title: >-
-  distrACTION - Quantiles and Probabilities of Continuous and Discrete
-  Distributions
+  distrACTION - Kwantyle i prawdopodobieństwa rozkładów ciągłych i dyskretnych
 name: distrACTION
 version: 1.0.0
 jms: '1.0'
@@ -12,57 +11,56 @@ maintainer: The package maintainer <michael.rihs@psy.unibe.ch>
 date: '2018-10-02'
 type: R
 description: >-
-  A tool for calculating and plotting the cumulative distribution function (CDF)
-  and the quantile function (Inverse CDF) for a number of discrete and
-  continuous distributions.
+  Narzędzie do obliczania i wizualizacji dystrybuanty (CDF) oraz funkcji
+  kwantylowej (odwrotna CDF) dla wybranych rozkładów dyskretnych i ciągłych.
 analyses:
-  - title: Normal Distribution
+  - title: Rozkład normalny
     name: Normaldistribution
     ns: distrACTION
     menuGroup: distrACTION
-    menuTitle: Normal Distribution
-    menuSubgroup: Continuous distributions
-  - title: T-Distribution
+    menuTitle: Rozkład normalny
+    menuSubgroup: Rozkłady ciągłe
+  - title: Rozkład t
     name: TDistribution
     ns: distrACTION
     menuGroup: distrACTION
-    menuTitle: T-Distribution
-    menuSubgroup: Continuous distributions
-  - title: χ2-Distribution
+    menuTitle: Rozkład t
+    menuSubgroup: Rozkłady ciągłe
+  - title: Rozkład χ²
     name: Chi2Distribution
     ns: distrACTION
     menuGroup: distrACTION
-    menuTitle: χ2-Distribution
-    menuSubgroup: Continuous distributions
-  - title: F-Distribution
+    menuTitle: Rozkład χ²
+    menuSubgroup: Rozkłady ciągłe
+  - title: Rozkład F
     name: FDistribution
     ns: distrACTION
     menuGroup: distrACTION
-    menuTitle: F-Distribution
-    menuSubgroup: Continuous distributions
-  - title: Exponential Distribution
+    menuTitle: Rozkład F
+    menuSubgroup: Rozkłady ciągłe
+  - title: Rozkład wykładniczy
     name: ExponentialDistribution
     ns: distrACTION
     menuGroup: distrACTION
-    menuTitle: Exponential Distribution
-    menuSubgroup: Continuous distributions
-  - title: Binomial Distribution
+    menuTitle: Rozkład wykładniczy
+    menuSubgroup: Rozkłady ciągłe
+  - title: Rozkład dwumianowy
     name: BinomialDistribution
     ns: distrACTION
     menuGroup: distrACTION
-    menuTitle: Binomial Distribution
-    menuSubgroup: Discrete distributions
-  - title: Poisson Distribution
+    menuTitle: Rozkład dwumianowy
+    menuSubgroup: Rozkłady dyskretne
+  - title: Rozkład Poissona
     name: PoissonDistribution
     ns: distrACTION
     menuGroup: distrACTION
-    menuTitle: Poisson Distribution
-    menuSubgroup: Discrete distributions
-  - title: Geometric Distribution
+    menuTitle: Rozkład Poissona
+    menuSubgroup: Rozkłady dyskretne
+  - title: Rozkład geometryczny
     name: GeometricDistribution
     ns: distrACTION
     menuGroup: distrACTION
-    menuTitle: Geometric Distribution
-    menuSubgroup: Discrete distributions
+    menuTitle: Rozkład geometryczny
+    menuSubgroup: Rozkłady dyskretne
 
 ...

@@ -58,23 +58,23 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         
         ##### 1.1.3) Label setting ##### 
         # Label for the distribution parameters
-        InputLabel1 <- "Size = "
-        InputLabel2 <- "Prob. = "
+        InputLabel1 <- "n = "
+        InputLabel2 <- "p = "
         DistributionFunctionTypeLabel <- ""
         QuantileFunctionTypeLabel <- ""
         # Label for the selected type of distribution function
         if (DistributionFunctionType=="is"){
-          DistributionFunctionTypeLabel <- "Mode: P(X = x1)"}
+          DistributionFunctionTypeLabel <- "Tryb: P(X = x1)"}
         if (DistributionFunctionType=="lower"){
-          DistributionFunctionTypeLabel <- "Mode: P(X ≤ x1)"}
+          DistributionFunctionTypeLabel <- "Tryb: P(X ≤ x1)"}
         if (DistributionFunctionType=="interval"){
-          DistributionFunctionTypeLabel <- paste("Mode: x2 = ", XValue2, sep = "")}
+          DistributionFunctionTypeLabel <- paste("Tryb: x2 = ", XValue2, sep = "")}
         if (DistributionFunctionType=="higher"){
-          DistributionFunctionTypeLabel <- "Mode: P(X ≥ x1)"}
+          DistributionFunctionTypeLabel <- "Tryb: P(X ≥ x1)"}
         if (QuantileFunctionType=="cumulative") {
-          QuantileFunctionTypeLabel <- "cumulative mode"}      
+          QuantileFunctionTypeLabel <- "tryb kumulatywny"}      
         if (QuantileFunctionType=="central") {
-          QuantileFunctionTypeLabel <- "central mode"}
+          QuantileFunctionTypeLabel <- "tryb centralny"}
         
 
         ##### 1.1.4) Inputs table ######
@@ -223,7 +223,7 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # The transcparency of the upper quantile segment is defined
         QuantileAlphaHigh <- 1
         # The text for the quantiles legend is defined
-        QuantileLabel <- "Quantile"
+        QuantileLabel <- "Kwantyl"
         # The size of the legends text is defined
         Textsize <- 16
         # The lowest segment of the x-axis is defined
@@ -272,14 +272,14 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           # Changes are done if the quantile is outside the x-axis
           if(QuantileFunctionType=="cumulative"){
             if(HighLineCheck>HigherAxisSegment){
-              QuantileLabel <- "Quantile out of range"
+              QuantileLabel <- "Kwantyl poza zakresem"
               QuantAlphaLow <- 0
               QuantAlphaHigh <- 0
               Textsize <- 10
               HigherSegment <- HigherAxisSegment
               LowerSegment <- HigherAxisSegment}
             if(HighLineCheck<LowerAxisSegment){
-              QuantileLabel <- "Quantile out of range"
+              QuantileLabel <- "Kwantyl poza zakresem"
               QuantAlphaLow <- 0
               QuantAlphaHigh <- 0
               Textsize <- 10
@@ -287,17 +287,17 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
               LowerSegment <- HigherAxisSegment}}
           if(QuantileFunctionType=="central"){
             if(HighLineCheck>HigherAxisSegment){
-              QuantileLabel <- "(Upper) Quantile out of range"
+              QuantileLabel <- "(Górny) kwantyl poza zakresem"
               QuantAlphaHigh <- 0
               Textsize <- 10
               HigherSegment <- HigherAxisSegment}
             if(LowLineCheck<LowerAxisSegment){
-              QuantileLabel <- "(Lower) Quantile out of range"
+              QuantileLabel <- "(Dolny) kwantyl poza zakresem"
               QuantAlphaLow <- 0
               Textsize <- 10
               LowerSegment <- LowerAxisSegment}
             if((LowLineCheck<LowerAxisSegment)&(HighLineCheck>HigherAxisSegment)){
-              QuantileLabel <- "Quantile out of range"
+              QuantileLabel <- "Kwantyl poza zakresem"
               QuantAlphaHigh <- 0
               QuantAlphaLow <- 0
               Textsize <- 10
@@ -329,7 +329,7 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         ###### 1.4) Error Messages #####
         #Error if XValue≥XValue2
         if(((DistributionFunction=="TRUE") & (DistributionFunctionType=="interval"))&(XValue>=XValue2)){
-          Inputs$setError("x2 must be greater than x1. ")
+          Inputs$setError("x2 musi być większe od x1.")
           Outputs$setVisible(visible=FALSE)}},
       
       
@@ -401,7 +401,7 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         if (DistributionFunction=="TRUE") {
           Plot <- Plot+
             # The area of the searched interval is marked
-            geom_col(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Area)"))+
+            geom_col(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Pole)"))+
             # Set the colors of the legend
             scale_fill_manual(values = Color)}
         
