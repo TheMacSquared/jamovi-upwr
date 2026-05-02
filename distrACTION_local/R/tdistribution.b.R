@@ -172,6 +172,50 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             QuantileResultColumn=OutputSummary[2,2]))}
         
         
+        ###### 1.X) Moments ######
+        ShowMean <- self$options$showMean
+        ShowVariance <- self$options$showVariance
+        MomentsTable <- self$results$MomentsTable
+        if (ShowMean || ShowVariance) {
+          MomentsTable$setVisible(visible = TRUE)
+          if (ShowMean) {
+            if (DP2 == 0) {
+              MeanFormula <- "E[X] = 0"
+              MeanVal <- "0"
+            } else {
+              MeanFormula <- "E[X] = λ√(df/2)·Γ((df−1)/2)/Γ(df/2)"
+              MeanVal <- if (DP1 > 1) {
+                as.character(round(DP2 * sqrt(DP1/2) * gamma((DP1-1)/2) / gamma(DP1/2), 4))
+              } else "undefined (df ≤ 1)"
+            }
+            MomentsTable$addRow(rowKey = "mean", values = list(
+              MomentColumn = "E[X]",
+              FormulaColumn = MeanFormula,
+              ValueColumn = MeanVal
+            ))
+          }
+          if (ShowVariance) {
+            if (DP2 == 0) {
+              VarFormula <- "Var[X] = df / (df − 2)"
+              VarVal <- if (DP1 > 2) as.character(round(DP1 / (DP1 - 2), 4)) else "undefined (df ≤ 2)"
+            } else {
+              VarFormula <- "Var[X] = df(1+λ²)/(df−2) − [E[X]]²"
+              VarVal <- if (DP1 > 2) {
+                EX <- if (DP1 > 1) DP2 * sqrt(DP1/2) * gamma((DP1-1)/2) / gamma(DP1/2) else 0
+                as.character(round(DP1 * (1 + DP2^2) / (DP1 - 2) - EX^2, 4))
+              } else "undefined (df ≤ 2)"
+            }
+            MomentsTable$addRow(rowKey = "var", values = list(
+              MomentColumn = "Var[X]",
+              FormulaColumn = VarFormula,
+              ValueColumn = VarVal
+            ))
+          }
+        } else {
+          MomentsTable$setVisible(visible = FALSE)
+        }
+
+
         ###### 1.3) Plot preparation ######
         ##### 1.3.1) Data packing #####
         # The results are combined in a Dataframe

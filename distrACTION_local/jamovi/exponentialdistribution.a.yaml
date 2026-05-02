@@ -61,4 +61,14 @@ options:
       type: Number
       default: 1
       min: 0.0001
+
+    - title: Show expected value E[X]
+      name: showMean
+      type: Bool
+      default: FALSE
+
+    - title: Show variance Var[X]
+      name: showVariance
+      type: Bool
+      default: FALSE
 ...

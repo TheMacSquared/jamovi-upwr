@@ -70,3 +70,10 @@ children:
                 optionName: QuantileFunctionType
                 optionPart: central
                 enable: (QuantileFunction)
+  - type: Label
+    label: Moments
+    children:
+      - type: CheckBox
+        name: showMean
+      - type: CheckBox
+        name: showVariance

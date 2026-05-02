@@ -35,6 +35,21 @@ items:
           type: text
           visible: (QuantileFunction)
           
+    - name: MomentsTable
+      title: Moments
+      type: Table
+      rows: 0
+      columns:
+        - name: MomentColumn
+          title: ""
+          type: text
+        - name: FormulaColumn
+          title: Formula
+          type: text
+        - name: ValueColumn
+          title: Value
+          type: text
+
     - name: plot
       title: ""
       type:  Image

@@ -163,6 +163,31 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             QuantileResultColumn=OutputSummary[2,2]))}
         
         
+        ###### 1.X) Moments ######
+        ShowMean <- self$options$showMean
+        ShowVariance <- self$options$showVariance
+        MomentsTable <- self$results$MomentsTable
+        if (ShowMean || ShowVariance) {
+          MomentsTable$setVisible(visible = TRUE)
+          if (ShowMean) {
+            MomentsTable$addRow(rowKey = "mean", values = list(
+              MomentColumn = "E[X]",
+              FormulaColumn = "E[X] = n · p",
+              ValueColumn = as.character(round(DP1 * DP2, 4))
+            ))
+          }
+          if (ShowVariance) {
+            MomentsTable$addRow(rowKey = "var", values = list(
+              MomentColumn = "Var[X]",
+              FormulaColumn = "Var[X] = n · p · (1 − p)",
+              ValueColumn = as.character(round(DP1 * DP2 * (1 - DP2), 4))
+            ))
+          }
+        } else {
+          MomentsTable$setVisible(visible = FALSE)
+        }
+
+
         ###### 1.3) Plot preparation ######
         ##### 1.3.1) Data packing #####
         # The results are combined in a Dataframe

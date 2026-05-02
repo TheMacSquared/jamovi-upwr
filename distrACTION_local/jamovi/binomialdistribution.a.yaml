@@ -70,4 +70,14 @@ options:
       title: Probability =
       type: Number
       default: 0.5
+
+    - title: Show expected value E[X]
+      name: showMean
+      type: Bool
+      default: FALSE
+
+    - title: Show variance Var[X]
+      name: showVariance
+      type: Bool
+      default: FALSE
 ...

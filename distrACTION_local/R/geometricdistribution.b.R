@@ -96,6 +96,29 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           DistributionResultColumn = "",
           QuantileResultColumn = OutputLabel22))
 
+      ShowMean <- self$options$showMean
+      ShowVariance <- self$options$showVariance
+      MomentsTable <- self$results$MomentsTable
+      if (ShowMean || ShowVariance) {
+        MomentsTable$setVisible(visible = TRUE)
+        if (ShowMean) {
+          MomentsTable$addRow(rowKey = "mean", values = list(
+            MomentColumn = "E[X]",
+            FormulaColumn = "E[X] = (1 − p) / p",
+            ValueColumn = as.character(round((1 - DP1) / DP1, 4))
+          ))
+        }
+        if (ShowVariance) {
+          MomentsTable$addRow(rowKey = "var", values = list(
+            MomentColumn = "Var[X]",
+            FormulaColumn = "Var[X] = (1 − p) / p²",
+            ValueColumn = as.character(round((1 - DP1) / DP1^2, 4))
+          ))
+        }
+      } else {
+        MomentsTable$setVisible(visible = FALSE)
+      }
+
       # Plot data for discrete distribution
       Datas <- data.frame(x, Density)
       colnames(Datas) <- Columnames

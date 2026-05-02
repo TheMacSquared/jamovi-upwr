@@ -140,6 +140,39 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           QuantileResultColumn=OutputSummary[1,2]))    
 
         
+        ###### 1.X) Moments ######
+        ShowMean <- self$options$showMean
+        ShowVariance <- self$options$showVariance
+        MomentsTable <- self$results$MomentsTable
+        if (ShowMean || ShowVariance) {
+          MomentsTable$setVisible(visible = TRUE)
+          if (ShowMean) {
+            MeanVal <- if (DP2 > 2) {
+              as.character(round(DP2 * (DP1 + DP3) / (DP1 * (DP2 - 2)), 4))
+            } else "undefined (df₂ ≤ 2)"
+            MomentsTable$addRow(rowKey = "mean", values = list(
+              MomentColumn = "E[X]",
+              FormulaColumn = "E[X] = df₂(df₁+λ) / [df₁(df₂−2)]",
+              ValueColumn = MeanVal
+            ))
+          }
+          if (ShowVariance) {
+            VarVal <- if (DP2 > 4) {
+              as.character(round(
+                2 * (DP2/DP1)^2 * ((DP1+DP3)^2 + (DP1+2*DP3)*(DP2-2)) / ((DP2-2)^2*(DP2-4)),
+                4))
+            } else "undefined (df₂ ≤ 4)"
+            MomentsTable$addRow(rowKey = "var", values = list(
+              MomentColumn = "Var[X]",
+              FormulaColumn = "Var[X] = 2(df₂/df₁)²[(df₁+λ)²+(df₁+2λ)(df₂−2)] / [(df₂−2)²(df₂−4)]",
+              ValueColumn = VarVal
+            ))
+          }
+        } else {
+          MomentsTable$setVisible(visible = FALSE)
+        }
+
+
         ###### 1.3) Plot preparation ######
         ##### 1.3.1) Data packing #####
         # The results are combined in a Dataframe

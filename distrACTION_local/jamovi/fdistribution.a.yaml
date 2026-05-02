@@ -59,8 +59,17 @@ options:
       default: 10
       
     - name: dp3
-      title: λ = 
+      title: λ =
       type: Number
       default: 0
-      
+
+    - title: Show expected value E[X]
+      name: showMean
+      type: Bool
+      default: FALSE
+
+    - title: Show variance Var[X]
+      name: showVariance
+      type: Bool
+      default: FALSE
 ...
