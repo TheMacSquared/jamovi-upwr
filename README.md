@@ -43,7 +43,7 @@ docker compose --profile dev up
 ```
 jamovi/          # aplikacja (Electron + Python + C++)
 jmv/             # moduł analityczny R (submoduł)
-distrACTION_local/  # moduł rozkładów (lokalny)
+jdistrACTION/       # moduł rozkładów — fork distrACTION
 jboot/           # moduł bootstrap (submoduł)
 jperm/           # moduł testów permutacyjnych (submoduł)
 jCI/             # moduł przedziałów ufności (submoduł)
