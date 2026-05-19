@@ -52,8 +52,13 @@ permtestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cl
             )
             table$setNote("hyp", hypNote)
 
-            if (exact)
+            if (isTRUE(attr(permDist, "exact")))
                 table$setNote("exact", "Test dokladny (wszystkie permutacje)")
+            else if (exact)
+                table$setNote("exact", paste0(
+                    "Test dokladny niedostepny dla tej liczby par; ",
+                    "uzyto przyblizenia Monte Carlo."
+                ))
 
             self$results$plot$setState(list(
                 permDist = permDist,

@@ -43,6 +43,7 @@ permDistOneSample <- function(x, mu0, nPerm, seed, exact) {
             signs <- ifelse(bits == 1, 1, -1)
             permDist[i] <- mean(signs * centered)
         }
+        attr(permDist, "exact") <- TRUE
         return(permDist)
     }
 
@@ -54,6 +55,7 @@ permDistOneSample <- function(x, mu0, nPerm, seed, exact) {
         mean(signs * centered)
     })
 
+    attr(permDist, "exact") <- FALSE
     return(permDist)
 }
 
@@ -80,6 +82,7 @@ permDistTwoSample <- function(x, group, nPerm, seed, exact) {
             idx1 <- combos[, i]
             permDist[i] <- mean(x[idx1]) - mean(x[-idx1])
         }
+        attr(permDist, "exact") <- TRUE
         return(permDist)
     }
 
@@ -91,6 +94,7 @@ permDistTwoSample <- function(x, group, nPerm, seed, exact) {
         mean(x[shuffled == levs[1]]) - mean(x[shuffled == levs[2]])
     })
 
+    attr(permDist, "exact") <- FALSE
     return(permDist)
 }
 
