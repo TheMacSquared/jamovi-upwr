@@ -1,6 +1,7 @@
 'use strict';
 import { HTMLElementCreator as HTML }  from './htmlelementcreator';
 import upwrLogo from '../assets/upwr-logotyp-pl-poziomy.png';
+import { JUPWR_VERSION } from './jupwr';
 
 class jamoviIcon {
     el: HTMLElement;
@@ -9,7 +10,7 @@ class jamoviIcon {
         this.el = HTML.parse(`<div class="icon-info-box">
             <div class="icon-version" style="flex-direction: column; align-items: center; gap: 16px;">
                 <img src="${upwrLogo}" style="height: 80px;" alt="UPWr">
-                <div class="version-text">jUPWR 1.0 <span style="font-size: 0.8em; color: #BBBBBB;">(jamovi ${this.cleanVersion(version)})</span></div>
+                <div class="version-text">jUPWR ${JUPWR_VERSION} <span style="font-size: 0.8em; color: #BBBBBB;">(jamovi ${this.cleanVersion(version)})</span></div>
             </div>
         </div>`);
     }

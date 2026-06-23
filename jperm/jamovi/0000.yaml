@@ -4,8 +4,8 @@ name: jperm
 version: 0.1.0
 jms: '1.0'
 authors:
-  - statUPWr Team
-maintainer: statUPWr Team <statupwr@upwr.edu.pl>
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 description: >
   Modul dydaktyczny z testami permutacyjnymi dla jednej proby,
   dwoch prob niezaleznych i prob sparowanych.

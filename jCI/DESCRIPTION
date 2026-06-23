@@ -2,8 +2,8 @@ Package: jCI
 Type: Package
 Title: Przedzialy ufnosci dla jamovi
 Version: 0.1.0
-Author: statUPWr Team
-Maintainer: statUPWr Team <statupwr@upwr.edu.pl>
+Author: jUPWR Team
+Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 Description: Przedzialy ufnosci dla srednich, proporcji i korelacji.
     Modul dydaktyczny laczacy wszystkie metody CI w jednym miejscu.
 License: GPL (>= 2)
