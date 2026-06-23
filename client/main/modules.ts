@@ -121,6 +121,7 @@ export class ModulesBase extends EventMap<IModulesModel> {
         install.then(() => {
             this.set('status', 'done');
         }, error => {
+            this.set('status', 'done');
             throw error;
         }, progress => {
             this.set('progress', progress);
@@ -263,12 +264,23 @@ export class ModulesBase extends EventMap<IModulesModel> {
                 });
             }
 
-            /*if (alreadyExists)
-                module = currentModule;
-            else */if (alreadyExists === false && this.create) 
+            if (alreadyExists === false && this.create) 
                 this.create(module);
 
             modules.push(module);
+        }
+
+        if (this instanceof Modules) {
+            for (let module of modules) {
+                let avMods = this._available.attributes.modules;
+                for (let avMod of avMods) {
+                    if (avMod.name === module.name) {
+                        module.url = avMod.path;
+                        module.ops = this._determineOps(module, avMod);
+                        break;
+                    }
+                }
+            }
         }
 
         this.set('message', message);
@@ -503,7 +515,8 @@ class Module {
                             return await response.json() as I18nData;
                         }
                         catch (e) {
-                            throw new ModuleCorruptError();
+                            return null;
+                            //throw new ModuleCorruptError();
                         }
                     }
                     else {

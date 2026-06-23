@@ -36,6 +36,7 @@ const ARGS = [
     { name: 'skip-remotes', type: Boolean },
     { name: 'skip-deps', type: Boolean },
     { name: 'i18n', type: String },
+    { name: 'i18n-repo', type: String },
     { name: 'create', type: String },
     { name: 'update', type: String },
     { name: 'verbose', type: Boolean },
@@ -128,17 +129,13 @@ try {
             Usage: jmc --i18n path  --create code`;
         }
         else if (args.create) {
-            let code = args.create.toLowerCase();
-            if (code === 'catalog')
-                code = 'c';
+            let code = args.create;
             i18n.create(code, defDir, srcDir, args.verbose);
         }
         else if (args.update === null || args.update) {
             let code = null;
             if (args.update) {
-                code = args.update.toLowerCase();
-                if (code === 'catalog')
-                    code = 'c';
+                code = args.update;
             }
             i18n.update(code, defDir, srcDir, args.verbose);
         }
@@ -278,7 +275,7 @@ try {
     let packageInfo;
 
     if (utils.exists(packageInfoPath)) {
-        let content = fs.readFileSync(packageInfoPath);
+        let content = fs.readFileSync(packageInfoPath, 'utf-8');
         packageInfo = yaml.load(content);
         if ('jms' in packageInfo) {
             if (packageInfo.jms !== '1.0')
@@ -324,7 +321,7 @@ try {
 
     let refs = undefined;
     if (utils.exists(refsPath)) {
-        let content = fs.readFileSync(refsPath);
+        let content = fs.readFileSync(refsPath, 'utf-8');
         refs = yaml.load(content).refs;
     }
 
@@ -366,6 +363,24 @@ try {
         fs.mkdirSync(yamlOutDir);
     i18nOutDir = path.join(srcDir, 'inst/i18n');
     fs.emptyDirSync(i18nOutDir);
+
+    if (args['i18n-repo']) {
+        let i18nRepoDir = path.resolve(args['i18n-repo']);
+        let i18nRepoModDir = path.join(i18nRepoDir, packageInfo.name);
+        let i18nDestDir = path.join(defDir, 'i18n');
+        if (utils.exists(i18nRepoModDir)) {
+            if ( ! utils.exists(i18nDestDir))
+                fs.mkdirSync(i18nDestDir, { recursive: true });
+            let poFiles = fs.readdirSync(i18nRepoModDir).filter(f => f.endsWith('.po'));
+            for (let poFile of poFiles) {
+                let dest = path.join(i18nDestDir, poFile);
+                if ( ! utils.exists(dest)) {
+                    fs.copySync(path.join(i18nRepoModDir, poFile), dest);
+                    console.log(`copied from i18n repo: ${poFile}`);
+                }
+            }
+        }
+    }
 
     if (isBuilding || isInstallingTo) {
         let i18nDir = path.join(defDir, 'i18n');

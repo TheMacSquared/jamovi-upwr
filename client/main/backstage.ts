@@ -13,7 +13,7 @@ import host from './host';
 import type { IShowDialogOptions, IDialogProviderResult } from './host';
 import ActionHub from './actionhub';
 import { s6e } from '../common/utils';
-import focusLoop, { IShortcutTokenOptions } from '../common/focusloop';
+import interactionManager, { keyTips, type IKeyTipTokenOptions, type FocusLoop } from '../common/interactionmanager';
 import selectionLoop from '../common/selectionloop';
 
 import { UserFacingError, CancelledError } from './errors';
@@ -23,6 +23,7 @@ import { IOpenOptions, ISaveOptions, IImportOptions, IBrowseOptions } from './ba
 import { FSEntryListModel, FSEntryListView, FSItemType } from './backstage/fsentry';
 
 import type { WDType, BackstagePanelView } from './backstage/fsentry';
+import type { IPlace } from './backstage/types';
 
 import { FSEntryBrowserView } from './backstage/fsentrybrowserview';
 import { HTMLElementCreator as HTML }  from '../common/htmlelementcreator';
@@ -32,25 +33,20 @@ function isUrl(s) {
     return s.startsWith('https://') || s.startsWith('http://');
 }
 
-import { OneDriveView } from './backstage/onedrive';
+import { extras } from './backstage/extras';
 import { EventMap, EventDistributor } from '../common/eventmap';
 import { IBackstageSupport } from './instance';
 import SelectionLoop from '../common/selectionloop';
 
-interface IPlace {
-    name: string,
-    title: string,
-    shortcutKey: string,
-    model?: FSEntryListModel,
-    view?: BackstagePanelView,
-    action?: () => any;
-    separator?: boolean;
-}
+type BackstageActivateOptions = {
+    withMouse?: boolean;
+};
+
 
 interface IOp {
     name: string,
     title: string,
-    shortcutKey: string,
+    keyTipKey: string,
     places?: IPlace[],
     action?: () => any
 }
@@ -91,9 +87,6 @@ export class BackstageModel extends EventMap<IBackstageModel> {
     _pcExportListModel: FSEntryListModel;
     _deviceExportListModel: FSEntryListModel;
     _dialogExportListModel: FSEntryListModel;
-    _oneDriveOpenModel: FSEntryListModel;
-    _oneDriveSaveModel: FSEntryListModel;
-
     _savePromiseResolve: () => void
     _dialogPath: string;
     _opHasChanged: boolean;
@@ -203,8 +196,8 @@ export class BackstageModel extends EventMap<IBackstageModel> {
         this._deviceSaveListModel.fileExtensions = [ { extensions: ['omv'], description: _('jamovi file {ext}', { ext: '(.omv)' }) } ];
         this._deviceSaveListModel.on('dataSetOpenRequested', this.tryOpen, this);
 
-        if (OneDriveView)
-            // for now the defined-ness of OneDriveView indicates the cloud version
+        const mode = this.instance.settings().getSetting('mode', 'normal');
+        if (mode === 'cloud')
             this._deviceSaveListModel.on('dataSetSaveRequested', this.tryExport, this);
         else
             this._deviceSaveListModel.on('dataSetSaveRequested', this.trySave, this);
@@ -270,37 +263,7 @@ export class BackstageModel extends EventMap<IBackstageModel> {
         this._dialogExportListModel.on('browseRequested', this.dialogBrowse, this);
         this.addToWorkingDirData(this._dialogExportListModel);
 
-        if (OneDriveView) {
-            this._oneDriveOpenModel = new FSEntryListModel();
-            this._oneDriveOpenModel.clickProcess = 'open';
-            this._oneDriveOpenModel.attributes.wdType = 'onedrive';
-            this._oneDriveOpenModel.attributes.extensions = false;
-            this._oneDriveOpenModel.on('dataSetOpenRequested', this.tryOpen, this);
-            this._oneDriveOpenModel.on('cancel', () => { this.set('activated', false); });
-            this._oneDriveOpenModel.fileExtensions = [
-                '.omv', '.omt', '.csv', '.tsv', '.txt', '.json', '.ods', '.xlsx', '.sav', '.zsav', '.por',
-                '.rdata', '.rds', '.dta', '.sas7bdat', '.xpt', '.jasp'];
-
-            this._oneDriveSaveModel = new FSEntryListModel();
-            this._oneDriveSaveModel.clickProcess = 'save';
-            this._oneDriveSaveModel.attributes.wdType = 'onedrive';
-            this._oneDriveSaveModel.attributes.extensions = false;
-            this._oneDriveSaveModel.fileExtensions = [ { extensions: ['omv'], description: _('jamovi file {ext}', { ext: '(.omv)' }) } ];
-            this._oneDriveSaveModel.on('dataSetSaveRequested', this.trySave, this);
-            this._oneDriveOpenModel.on('cancel', () => { this.set('activated', false); });
-            this._oneDriveSaveModel.fileExtensions = [];
-
-            this._oneDriveSaveModel.on('change:suggestedPath', event => {
-                let dirPath = this._oneDriveSaveModel.get('suggestedPath');
-                this.instance.settings().setSetting('onedriveWorkingDir', dirPath);
-                this._oneDriveOpenModel.set('suggestedPath', dirPath);
-            });
-            this.instance.settings().on('change:onedriveWorkingDir', (event) => {
-                this._oneDriveSaveModel.set('suggestedPath', this.instance.settings().getSetting('onedriveWorkingDir', ''));
-            });
-
-        }
-
+        extras.init(this);
 
         this._savePromiseResolve = null;
 
@@ -348,7 +311,7 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                 {
                     name: type,
                     title: options.title,
-                    shortcutKey: '1',
+                    keyTipKey: '1',
                     places: [
                         /*{
                             name: 'thispc', title: 'jamovi Cloud', separator: true, model: this._pcExportListModel, view: FSEntryBrowserView,
@@ -357,7 +320,7 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                             }
                         },*/
                         {
-                            name: 'thisdevice', title: _('Download'), shortcutKey: 'd', model: this._dialogExportListModel, view: new FSEntryBrowserView(this._dialogExportListModel),
+                            name: 'thisdevice', title: _('Download'), keyTipKey: 'd', model: this._dialogExportListModel, view: new FSEntryBrowserView(this._dialogExportListModel),
                             action: () => {
                                 this._dialogExportListModel.set('suggestedPath', this.instance.get('title'));
                             }
@@ -371,10 +334,10 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                 {
                     name: type,
                     title: options.title,
-                    shortcutKey: '1',
+                    keyTipKey: '1',
                     places: [
                         {
-                            name: 'thispc', title: _('This PC'),  shortcutKey: 'd', model: this._dialogExportListModel, view: new FSEntryBrowserView(this._dialogExportListModel),
+                            name: 'thispc', title: _('This PC'),  keyTipKey: 'd', model: this._dialogExportListModel, view: new FSEntryBrowserView(this._dialogExportListModel),
                             action: () => {
                                 let filePath = this._determineSavePath('main');
                                 this._dialogExportListModel.set('suggestedPath', filePath);
@@ -414,17 +377,17 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                 {
                     name: 'new',
                     title: _('New'),
-                    shortcutKey: 'n',
+                    keyTipKey: 'n',
                     action: () => { this.requestOpen(); }
                 },
                 {
                     name: 'open',
                     title: _('Open'),
-                    shortcutKey: 'o',
+                    keyTipKey: 'o',
                     places: [
-                        ...OneDriveView ? [{ name: 'onedrive', title: _('One Drive'), shortcutKey: 'o', model: this._oneDriveOpenModel, view: new OneDriveView(this._oneDriveOpenModel), }] : [],
-                        { name: 'examples', title: _('Data Library'), shortcutKey: 'l', model: this._examplesListModel, view: new FSEntryBrowserView(this._examplesListModel) },
-                        { name: 'thisdevice', title: _('This Device'), shortcutKey: 'd', action: () => { this.tryBrowse({ list: this._pcListModel.fileExtensions, type: 'open' }); } },
+                        ...extras.getOpenPlaces(),
+                        { name: 'examples', title: _('Data Library'), keyTipKey: 'l', model: this._examplesListModel, view: new FSEntryBrowserView(this._examplesListModel) },
+                        { name: 'thisdevice', title: _('This Device'), keyTipKey: 'd', action: () => { this.tryBrowse({ list: this._pcListModel.fileExtensions, type: 'open' }); } },
                     ]
                 },
                 // {
@@ -438,7 +401,7 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                 {
                     name: 'save',
                     title: _('Save'),
-                    shortcutKey: 's',
+                    keyTipKey: 's',
                     action: async () => {
                         try {
                             await this.requestSave();
@@ -454,16 +417,11 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                 {
                     name: 'saveAs',
                     title: _('Save As'),
-                    shortcutKey: 'a',
+                    keyTipKey: 'a',
                     places: [
-                        ...OneDriveView ? [{
-                            name: 'onedrive', title: _('One Drive'), shortcutKey: 'o', model: this._oneDriveSaveModel, view: new OneDriveView(this._oneDriveSaveModel),
-                            action: () => {
-                                this._oneDriveSaveModel.set('suggestedTitle', this.instance.get('title') + '.omv');
-                            }
-                        }] : [],
+                        ...extras.getSaveAsPlaces(),
                         {
-                            name: 'thisdevice', title: _('Download'), shortcutKey: 'd', model: this._deviceSaveListModel, view: new FSEntryBrowserView(this._deviceSaveListModel),
+                            name: 'thisdevice', title: _('Download'), keyTipKey: 'd', model: this._deviceSaveListModel, view: new FSEntryBrowserView(this._deviceSaveListModel),
                             action: () => {
                                 this._deviceSaveListModel.set('suggestedPath', this.instance.get('title'));
                             }
@@ -473,10 +431,10 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                 {
                     name: 'export',
                     title: _('Export'),
-                    shortcutKey: 'e',
+                    keyTipKey: 'e',
                     places: [
                         {
-                            name: 'thisdevice', title: _('Download'), shortcutKey: 'd', model: this._deviceExportListModel, view: new FSEntryBrowserView(this._deviceExportListModel),
+                            name: 'thisdevice', title: _('Download'), keyTipKey: 'd', model: this._deviceExportListModel, view: new FSEntryBrowserView(this._deviceExportListModel),
                             action: () => {
                                 this._deviceExportListModel.set('suggestedPath', this.instance.get('title'));
                             }
@@ -490,13 +448,13 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                 {
                     name: 'new',
                     title: _('New'),
-                    shortcutKey: 'n',
+                    keyTipKey: 'n',
                     action: () => { this.requestOpen(); }
                 },
                 {
                     name: 'open',
                     title: _('Open'),
-                    shortcutKey: 'o',
+                    keyTipKey: 'o',
                     action: () => {
                         let place = this.instance.settings().getSetting('openPlace', 'thispc');
                         if (place === 'thispc') {
@@ -509,14 +467,14 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                             this.attributes.place = place;
                     },
                     places: [
-                        { name: 'thispc', title: _('This PC'), shortcutKey: 'p', model: this._pcListModel, view: new FSEntryBrowserView(this._pcListModel) },
-                        { name: 'examples', title: _('Data Library'), shortcutKey: 'l', model: this._examplesListModel, view: new FSEntryBrowserView(this._examplesListModel) },
+                        { name: 'thispc', title: _('This PC'), keyTipKey: 'p', model: this._pcListModel, view: new FSEntryBrowserView(this._pcListModel) },
+                        { name: 'examples', title: _('Data Library'), keyTipKey: 'l', model: this._examplesListModel, view: new FSEntryBrowserView(this._examplesListModel) },
                     ]
                 },
                 {
                     name: 'import',
                     title: _('Special Import'),
-                    shortcutKey: 'i',
+                    keyTipKey: 'i',
                     action: () => {
                         let place = this.instance.settings().getSetting('openPlace', 'thispc');
                         if (place === 'thispc') {
@@ -529,13 +487,13 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                             this.attributes.place = place;
                     },
                     places: [
-                        { name: 'thispc', title: _('This PC'), shortcutKey: 'p', model: this._pcImportListModel, view: new FSEntryBrowserView(this._pcImportListModel) }
+                        { name: 'thispc', title: _('This PC'), keyTipKey: 'p', model: this._pcImportListModel, view: new FSEntryBrowserView(this._pcImportListModel) }
                     ]
                 },
                 {
                     name: 'save',
                     title: _('Save'),
-                    shortcutKey: 's',
+                    keyTipKey: 's',
                     action: async () => {
                         try {
                             await this.requestSave();
@@ -551,23 +509,23 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                 {
                     name: 'saveAs',
                     title: _('Save As'),
-                    shortcutKey: 'a',
+                    keyTipKey: 'a',
                     action: () => {
                         let filePath = this._determineSavePath('main');
                         this._pcSaveListModel.set('suggestedPath', filePath);
                         return this.setCurrentDirectory('main', path.dirname(filePath));
                     },
                     places: [
-                        { name: 'thispc', title: _('This PC'), shortcutKey: 'p', separator: true, model: this._pcSaveListModel, view: new FSEntryBrowserView(this._pcSaveListModel) },
+                        { name: 'thispc', title: _('This PC'), keyTipKey: 'p', separator: true, model: this._pcSaveListModel, view: new FSEntryBrowserView(this._pcSaveListModel) },
                     ]
                 },
                 {
                     name: 'export',
                     title: _('Export'),
-                    shortcutKey: 'e',
+                    keyTipKey: 'e',
                     places: [
                         {
-                            name: 'thispc', title: _('This PC'), shortcutKey: 'p', separator: true, model: this._pcExportListModel, view: new FSEntryBrowserView(this._pcExportListModel),
+                            name: 'thispc', title: _('This PC'), keyTipKey: 'p', separator: true, model: this._pcExportListModel, view: new FSEntryBrowserView(this._pcExportListModel),
                             action: () => {
                                 let filePath = this._determineSavePath('main');
                                 this._pcExportListModel.set('suggestedPath', this.instance.get('title'));
@@ -1081,21 +1039,24 @@ export class BackstageModel extends EventMap<IBackstageModel> {
         return prom;
     }
 
-    setSavingState(saving) {
+    setSavingState(saving: boolean) {
         let $button = document.querySelector<HTMLElement>('.silky-bs-fslist-browser-save-button');
-        if ( ! $button)
-            return;
-
-        let $saveIcon = $button.querySelector<HTMLElement>('.silky-bs-flist-save-icon');
+        let $saveIcon;
+        if ($button)
+            $saveIcon = $button.querySelector<HTMLElement>('.silky-bs-flist-save-icon');
         if (saving) {
             tarp.show('saving', false, 0, 299);
-            $button.classList.add('disabled-div');
-            $saveIcon.classList.add('saving-file');
+            if ($button)
+                $button.classList.add('disabled-div');
+            if ($saveIcon)
+                $saveIcon.classList.add('saving-file');
         }
         else {
             tarp.hide('saving');
-            $button.classList.remove('disabled-div');
-            $saveIcon.classList.remove('saving-file');
+            if ($button)
+                $button.classList.remove('disabled-div');
+            if ($saveIcon)
+                $saveIcon.classList.remove('saving-file');
         }
     }
 
@@ -1190,6 +1151,8 @@ export class BackstageView  extends EventDistributor {
     menuSelection: SelectionLoop;
     activeStateChanging: boolean;
     deactivating: boolean;
+    activateLoopTimeout: number | undefined;
+    loop: FocusLoop;
 
     constructor(model: BackstageModel) {
         super();
@@ -1209,9 +1172,10 @@ export class BackstageView  extends EventDistributor {
         this.main = new BackstageChoices(this.model, this );
         this.main.classList.add('silky-bs-main');
 
-        let focusToken = focusLoop.addFocusLoop(this, { exitSelector: '.jmv-ribbon-tab[data-tabname="file"]', level: 1, modal: true, allowKeyPaths: true, exitKeys: ['Escape'] } );
-        focusToken.on('focusleave', (event) => {
-            if (focusLoop.focusMode === 'shortcuts' && focusLoop.shortcutPath.startsWith('F') && focusLoop.shortcutPath.length > 1)
+        this.loop = interactionManager.registerLoop(this, { exitSelector: '.jmv-ribbon-tab[data-tabname="file"]', level: 1, modal: true, allowKeyPaths: true, exitKeys: ['Escape'] } );
+        this.loop.on('deactivate', (event) => {
+            let keyTipPath = keyTips.getCurrentPath();
+            if (event.canCancel && interactionManager.getMode() === 'keyTips' && keyTipPath.startsWith('F') && keyTipPath.length > 1)
                 event.cancel = true;
             else
                 this.deactivate();
@@ -1305,7 +1269,7 @@ export class BackstageView  extends EventDistributor {
         html += '<div class="silky-bs-op silky-bs-op-panel" role="presentation">';
         html += '    <div class="silky-bs-header">';
         html += '        <div class="silky-bs-back">';
-        html += `            <div  role="menuitem" aria-label="${_('Close file menu')}" class="silky-bs-back-button bs-menu-list-item bs-menu-action" tabindex="-1" shortcut-key="B"><div></div></div>`;
+        html += `            <div  role="menuitem" aria-label="${_('Close file menu')}" class="silky-bs-back-button bs-menu-list-item bs-menu-action" tabindex="-1" keytip-key="B"><div></div></div>`;
         html += '        </div>';
         html += '        <div class="silky-bs-logo"></div>';
         html += '    </div>';
@@ -1314,10 +1278,10 @@ export class BackstageView  extends EventDistributor {
         this.opPanel = HTML.parse(html);
 
         let backButton = this.opPanel.querySelector<HTMLElement>('.silky-bs-back-button');
-        let stcOptions: IShortcutTokenOptions = { key: 'Escape', path: 'F', action: event => this.deactivate(), label: backButton.getAttribute('aria-label') };
-        //if (params.shortcutPosition)
-        //    stcOptions.position = params.shortcutPosition;
-        focusLoop.applyShortcutOptions(backButton, stcOptions);
+        let keyTipOptions: IKeyTipTokenOptions = { key: 'Escape', path: 'F', action: event => this.deactivate(), label: backButton.getAttribute('aria-label') };
+        //if (params.keyTipPosition)
+        //    keyTipOptions.position = params.keyTipPosition;
+        keyTips.register(backButton, keyTipOptions);
 
         this.append(this.opPanel);
 
@@ -1344,15 +1308,15 @@ export class BackstageView  extends EventDistributor {
             if (selected)
                 currentOp = op;
 
-            let labelId = focusLoop.getNextAriaElementId('label');
+            let labelId = interactionManager.nextAriaId('label');
             let opElement = HTML.parse(`<div class="silky-bs-menu-item" data-op="${s6e(op.name)}-item" role="none"></div>`);
             let opTitle = HTML.parse(`<div id="${labelId}" class="silky-bs-op-button bs-menu-list-item" role="menuitem" tabindex="-1" data-op="${s6e(op.name)}">${ s6e(op.title) }</div>`);
             opElement.append(opTitle)
             if (op.action)
                 opTitle.classList.add('bs-menu-action');
-            if (op.shortcutKey) {
-                focusLoop.applyShortcutOptions(opTitle, {
-                    key: op.shortcutKey.toUpperCase(),
+            if (op.keyTipKey) {
+                keyTips.register(opTitle, {
+                    key: op.keyTipKey.toUpperCase(),
                     path: 'F',
                     action: this.clickOp.bind(this),
                     position: { x: '9%', y: '27%' },
@@ -1369,10 +1333,10 @@ export class BackstageView  extends EventDistributor {
                     let opPlace = HTML.parse(`<div class="silky-bs-op-place bs-menu-list-item" ignore-focus-size tabindex="-1" data-op="${s6e(op.name)}" data-place="${ s6e(place.name) }" role="menuitem" aria-label="${ s6e(place.title) }">${ s6e(place.title) }</div>`);
                     if (place.action)
                         opPlace.classList.add('bs-menu-action');
-                    if (place.shortcutKey) {
-                        focusLoop.applyShortcutOptions(opPlace, {
-                            key: place.shortcutKey.toUpperCase(),
-                            path: `F${op.shortcutKey.split('-')[0].toUpperCase()}`,
+                    if (place.keyTipKey) {
+                        keyTips.register(opPlace, {
+                            key: place.keyTipKey.toUpperCase(),
+                            path: `F${op.keyTipKey.split('-')[0].toUpperCase()}`,
                             action: this.clickPlace.bind(this),
                             position: { x: '12%', y: '25%' },
                             label: s6e(place.title)
@@ -1388,10 +1352,11 @@ export class BackstageView  extends EventDistributor {
         }
         this.opPanel.append(opList);
 
-        if ( ! OneDriveView) {
+        const mode = this.model.instance.settings().getSetting('mode', 'normal');
+        if (mode !== 'cloud') {
             this.opPanel.append(HTML.parse('<div class="silky-bs-op-separator"></div>'));
 
-            let recentsLabelId = focusLoop.getNextAriaElementId('label');
+            let recentsLabelId = interactionManager.nextAriaId('label');
             let opElement = HTML.parse(`<div class="silky-bs-op-recents-main" role="group" aria-label="${'Recently opened files'}"></div>`);
             if (this.model.get('dialogMode'))
                 opElement.style.display = 'none';
@@ -1410,7 +1375,7 @@ export class BackstageView  extends EventDistributor {
 
             let items = recentsList.querySelectorAll<HTMLElement>('.silky-bs-fslist-entry');
             for (let item of items) {
-                item.addEventListener('shortcut-action', (event) => {
+                item.addEventListener('keytip-action', (event) => {
                     this.clickRecent(event);
                 });
             }
@@ -1422,7 +1387,8 @@ export class BackstageView  extends EventDistributor {
         this._opChanged();
     }
 
-    activate(fromMouse=false) {
+    activate(options: BackstageActivateOptions = {}) {
+        const withMouse = options.withMouse === true;
         this.activeStateChanging = true;
         this.classList.add('activated');
 
@@ -1438,8 +1404,12 @@ export class BackstageView  extends EventDistributor {
 
         this.menuSelection.selectElement(this.opPanel.querySelector('.silky-bs-back-button'), false, true);
 
-        setTimeout(() => {
-            focusLoop.enterFocusLoop(this, { withMouse: fromMouse });
+        this.clearActivateLoopTimeout();
+        this.activateLoopTimeout = window.setTimeout(() => {
+            this.activateLoopTimeout = undefined;
+            if (this.model.get('activated') === false || !this.classList.contains('activated'))
+                return;
+            this.loop.activate({ withMouse });
             // fix chrome render issue - force redraw
             this.opPanel.style.zIndex = '1';
         }, 200);
@@ -1453,6 +1423,7 @@ export class BackstageView  extends EventDistributor {
         this.opPanel.style.zIndex = 'auto';
         this.deactivating = true;
         this.activeStateChanging = true;
+        this.clearActivateLoopTimeout();
 
         tarp.hide('backstage');
         this.classList.remove('activated');
@@ -1470,19 +1441,28 @@ export class BackstageView  extends EventDistributor {
         document.getElementById('main').setAttribute('aria-hidden', 'false');
         document.querySelector('.jmv-ribbon-tab.file-tab').setAttribute('aria-expanded', 'false');
 
-
-        focusLoop.leaveFocusLoop(this, fromMouse);
         if (fromMouse)
-            focusLoop.setFocusMode('default');
+            keyTips.clearCurrentPath();
+
+        this.loop.deactivate({ source: fromMouse ? 'mouse' : 'programmatic' });
+        if (fromMouse)
+            interactionManager.setMode('default');
 
         this.deactivating = false;
         this.activeStateChanging = false;
     }
 
+    clearActivateLoopTimeout() {
+        if (this.activateLoopTimeout !== undefined) {
+            clearTimeout(this.activateLoopTimeout);
+            this.activateLoopTimeout = undefined;
+        }
+    }
+
     _activationChanged() {
         if ( ! this.activeStateChanging) {
             if (this.model.get('activated'))
-                this.activate(true);
+                this.activate({ withMouse: true });
             else
                 this.deactivate(true);
         }
@@ -1582,7 +1562,7 @@ export class BackstageView  extends EventDistributor {
             this.classList.remove('activated-sub');
 
         setTimeout(() => {
-            focusLoop.updateShortcuts({ silent: true });
+            keyTips.update({ silent: true });
         }, 200);
     }
 }
@@ -1639,14 +1619,14 @@ export class BackstageChoices extends EventDistributor {
             else
                 this.parent.style.width = '';
 
-            if (this.current.setShortcutPath) {
+            if (this.current.setKeyTipPath) {
                 let op = this.model.getCurrentOp();
-                let shortcutPath = 'F' + op.shortcutKey.toUpperCase();
-                if (place.shortcutKey)
-                    shortcutPath += place.shortcutKey.toUpperCase();
-                this.current.setShortcutPath(shortcutPath);
+                let keyTipPath = 'F' + op.keyTipKey.toUpperCase();
+                if (place.keyTipKey)
+                    keyTipPath += place.keyTipKey.toUpperCase();
+                this.current.setKeyTipPath(keyTipPath);
                 if (op.places.length === 1)
-                    focusLoop.updateShortcuts( { shortcutPath: shortcutPath });
+                    keyTips.update( { keyTipPath: keyTipPath });
             }
 
             setTimeout(() => {

@@ -1,4 +1,3 @@
-tornado
 Cython
 PyYAML
 numpy==2.1.1
@@ -9,8 +8,10 @@ nanomsg
 openpyxl
 pyexcel-ezodf
 aiohttp
+cryptography
 protobuf
 loguru
 certifi
 pytest
 pytest_asyncio
+cryptography

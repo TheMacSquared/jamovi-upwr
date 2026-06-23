@@ -34,9 +34,9 @@ interface CreateAnalysisOptions {
 
 import { parse as parseJsonLines } from './utils/jsonlines';
 import { ISaveOptions } from './backstage/fsentry';
-import Q from 'q';
 import Coms, { QQ } from './coms';
 import { ResultsView } from './results';
+import MsgDialog from '../common/msgdialog';
 
 export interface IInstanceOpenOptions {
     path?: string,
@@ -543,11 +543,13 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
             } catch (e) {
 
                 if (e instanceof FileExistsError && ! options.overwrite) {
-                    const response = window.confirm(_(`The file '{filename}' already exists. Overwrite this file?`, { filename }));
-                    if (response) {
-                        options.overwrite = true;
-                        retrying = true;
-                    }
+                    let msg = _(`The file '{filename}' already exists. Overwrite this file?`, { filename });
+                    await MsgDialog.show(msg, {cancel: _('Cancel'), ok: _('OK')}).then((result) => {
+                        if (result.action === 'ok') {
+                            options.overwrite = true;
+                            retrying = true;
+                        }
+                    });
                 }
                 else if (e instanceof UserFacingError) {
                     this._notify({ message: e.message, cause: e.cause, type: 'error' });

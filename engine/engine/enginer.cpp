@@ -34,6 +34,22 @@ using namespace jamovi::coms;
 
 RInside *EngineR::_rInside = NULL;
 
+static bool isSafeIdentifier(const std::string &s)
+{
+    if (s.empty())
+        return false;
+    for (unsigned char c : s) {
+        if ( ! isalnum(c) && c != '_')
+            return false;
+    }
+    return true;
+}
+
+static bool isTruthy(const char *value)
+{
+    return value != NULL && std::string(value) == "1";
+}
+
 EngineR::EngineR()
 {
     this->initR();
@@ -93,6 +109,9 @@ void EngineR::run(AnalysisRequest &analysis)
         sendResults(ana, COMPLETE);
         return;
     }
+
+    if ( ! isSafeIdentifier(analysis.name()))
+        throw std::invalid_argument("Invalid analysis name: '" + analysis.name() + "'");
 
     stringstream ss;
     ss.str("");
@@ -261,7 +280,8 @@ void EngineR::sendResults(Rcpp::Environment &ana, bool complete)
 
 void EngineR::setLibPaths(const std::string &moduleName)
 {
-    stringstream ss;
+    if ( ! isSafeIdentifier(moduleName))
+        throw std::invalid_argument("Invalid module name: '" + moduleName + "'");
 
     char *cPath;
     string path;
@@ -280,23 +300,40 @@ void EngineR::setLibPaths(const std::string &moduleName)
 
     boost::algorithm::split(moduleR, path, boost::algorithm::is_any_of(PATH_DELIM), boost::algorithm::token_compress_on);
 
-    ss << "base::.libPaths(c(";
+    bool suppressUserModules = isTruthy(boost::nowide::getenv("JAMOVI_SUPPRESS_USER_MODULES"));
 
-    ss << "'" << Dirs::appDataDir(true) << "/modules/" << moduleName << "/R'";
+    vector<string> libPaths;
 
-    for (auto path : moduleR)
+    // pass the real (long) UTF-8 paths to R. modern R (UCRT, >= 4.2) handles
+    // international characters in paths natively, so we no longer munge these
+    // into 8.3 'blah~1' short paths
+    if ( ! suppressUserModules)
+        libPaths.push_back(Dirs::appDataDir() + "/modules/" + moduleName + "/R");
+
+    for (auto &p : moduleR)
     {
-        ss << ",'" << makeAbsolute(path) << "/" << moduleName << "/R'";
-        ss << ",'" << makeAbsolute(path) << "/jmv/R'";
-        ss << ",'" << makeAbsolute(path) << "/base/R'";
+        string base = makeAbsolute(p);
+        libPaths.push_back(base + "/" + moduleName + "/R");
+        libPaths.push_back(base + "/jmv/R");
+        libPaths.push_back(base + "/base/R");
     }
 
-    for (auto path : sysR)
-        ss << ",'" << makeAbsolute(path) << "'";
+    for (auto &p : sysR)
+        libPaths.push_back(makeAbsolute(p));
 
-    ss << "))\n";
+    // build the character vector with its encoding explicitly marked UTF-8,
+    // otherwise R may reinterpret the bytes in the native code page and fail
+    // to find directories that contain international characters
+    Rcpp::CharacterVector paths(libPaths.size());
+    for (size_t i = 0; i < libPaths.size(); i++)
+    {
+        Rcpp::String s(libPaths[i]);
+        s.set_encoding(CE_UTF8);
+        paths[i] = s;
+    }
 
-    _rInside->parseEvalQNT(ss.str());
+    Rcpp::Function setLibPathsInR = _rInside->parseEvalNT("base::.libPaths");
+    setLibPathsInR(paths);
 }
 
 SEXP EngineR::checkpoint(SEXP results)
@@ -435,58 +472,49 @@ void EngineR::initR()
 
     if (pandoc != NULL)
     {
-        stringstream ss;
-        ss << "Sys.setenv(RSTUDIO_PANDOC='" << pandoc << "')\n";
-        _rInside->parseEvalQNT(ss.str());
+        Rcpp::Function sysSetenv = _rInside->parseEvalNT("Sys.setenv");
+        sysSetenv(Rcpp::Named("RSTUDIO_PANDOC", std::string(pandoc)));
     }
 
-    // override .libPaths(), the R version munges international characters
-    // and wrecks those short blah~1 type paths
+    // define lockFunctions helper for locking down R functions
     _rInside->parseEvalQNT(""
-        "base <- base::.getNamespace('base')\n"
-        "base::unlockBinding('.libPaths', base)\n"
-        ".lib.loc <- base$.libPaths()\n"
-        "base$.libPaths <- function (new)\n"
-        "{\n"
-        "    if ( ! missing(new)) {\n"
-        "        paths <- c(new, .Library.site, .Library)\n"
-        "        paths <- paths[dir.exists(paths)]\n"
-        "        .lib.loc <<- unique(paths)\n"
-        "    } else .lib.loc\n"
+        "lockFunctions <- function(package, names) {\n"
+        "    ns <- base::.getNamespace(package)\n"
+        "    for (name in names) {\n"
+        "        if (base::exists(name, envir = ns, inherits = FALSE)) {\n"
+        "            base::unlockBinding(name, ns)\n"
+        "            local({\n"
+        "                n <- name\n"
+        "                ns[[n]] <- function(...)\n"
+        "                    stop(paste0(n, '() is not permitted in jamovi R'), call. = FALSE)\n"
+        "            })\n"
+        "            base::lockBinding(name, ns)\n"
+        "        }\n"
+        "    }\n"
         "}\n"
-        "base::lockBinding('.libPaths', base)\n"
-
-        "utils <- base::.getNamespace('utils')\n"
-        "base::unlockBinding('install.packages', utils)\n"
-        "base::unlockBinding('update.packages', utils)\n"
-        "base::unlockBinding('download.packages', utils)\n"
-        "base::unlockBinding('remove.packages', utils)\n"
-
-        "utils$install.packages <- function(...)"
-        "{\n"
-        "    stop('You cannot install packages into the jamovi R', call.=FALSE)\n"
-        "}\n"
-
-        "utils$update.packages <- function(...)"
-        "{\n"
-        "    stop('You cannot update packages in the jamovi R', call.=FALSE)\n"
-        "}\n"
-
-        "utils$download.packages <- function(...)"
-        "{\n"
-        "    stop('You cannot download packages with the jamovi R', call.=FALSE)\n"
-        "}\n"
-
-        "utils$remove.packages <- function(...)"
-        "{\n"
-        "    stop('You cannot remove packages in the jamovi R', call.=FALSE)\n"
-        "}\n"
-
-        "base::lockBinding('install.packages', utils)\n"
-        "base::lockBinding('update.packages', utils)\n"
-        "base::lockBinding('download.packages', utils)\n"
-        "base::lockBinding('remove.packages', utils)\n"
     );
+
+    // lock down package management functions
+    _rInside->parseEvalQNT(""
+        "lockFunctions('utils', c(\n"
+        "    'install.packages',\n"
+        "    'update.packages',\n"
+        "    'download.packages',\n"
+        "    'remove.packages'))\n");
+
+    if (isTruthy(boost::nowide::getenv("JAMOVI_EXTRA_LOCKDOWN")))
+    {
+        _rInside->parseEvalQNT(""
+            "lockFunctions('base', c(\n"
+            "    'source',\n"
+            "    'library',\n"
+            "    'system',\n"
+            "    'system2',\n"
+            "    'shell',\n"
+            "    'shell.exec',\n"
+            "    'download.file',\n"
+            "    'url'))\n");
+    }
 
     setLibPaths("jmv");
 
@@ -506,6 +534,27 @@ void EngineR::initR()
 
     // preload jmv
     _rInside->parseEvalQNT("suppressPackageStartupMessages(requireNamespace('jmv'))");
+
+    // preload jmvcore for formula validation
+    _rInside->parseEvalQNT("suppressPackageStartupMessages(requireNamespace('jmvcore'))");
+
+    // override as.formula to automatically validate formulas for security
+    _rInside->parseEvalQNT(""
+        "stats <- base::.getNamespace('stats')\n"
+        "original_as.formula <- stats::as.formula\n"
+        "base::options(`.__jmv.original_as.formula` = original_as.formula)\n"
+        "base::unlockBinding('as.formula', stats)\n"
+        "stats$as.formula <- local({\n"
+        "    function(object, env = parent.frame())\n"
+        "    {\n"
+        "        fmla <- original_as.formula(object, env)\n"
+        "        if (exists('validateSafeFormula', envir = asNamespace('jmvcore')))\n"
+        "            jmvcore::validateSafeFormula(fmla)\n"
+        "        return(fmla)\n"
+        "    }\n"
+        "})\n"
+        "base::lockBinding('as.formula', stats)\n"
+    );
 }
 
 string EngineR::makeAbsolute(const string &paths)

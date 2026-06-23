@@ -9,11 +9,12 @@ import Markjs from 'mark.js';
 import Notify from '../notification';
 import Version from '../utils/version';
 import ProgressStream from '../utils/progressstream';
-import _focusLoop from '../../common/focusloop';
+import interactionManager from '../../common/interactionmanager';
 import selectionLoop from '../../common/selectionloop';
 import { ModulesBase } from '../modules';
 import Settings from '../settings';
 import { HTMLElementCreator as HTML }  from '../../common/htmlelementcreator';
+import MsgDialog from '../../common/msgdialog';
 
 type ModulePageOptions = {
     settings: Settings;
@@ -41,6 +42,7 @@ class PageModules extends HTMLElement {
 
     constructor(model: ModulePageOptions) {
         super();
+
         this.model = model;
 
         this._uninstallClicked = this._uninstallClicked.bind(this);
@@ -77,7 +79,7 @@ class PageModules extends HTMLElement {
         this.$content = HTML.parse(`<div class="jmv-store-content" aria-label="${_('Modules')}"></div>`);
         this.$body.append(this.$content);
         this.$body.append(HTML.parse('<div class="jmv-store-loading"></div>'));
-        let progressLabelId = _focusLoop.getNextAriaElementId('label');
+        let progressLabelId = interactionManager.nextAriaId('label');
         const $installing = HTML.parse(`<div class="jmv-store-installing" role="progressbar" aria-labelledby="${progressLabelId}" aria-valuenow="0"><h2 id="${progressLabelId}">Installing</h2><div class="jmv-store-progress"><div class="jmv-store-progress-bar"></div></div><div class="jmv-store-installing-description">Installing module</div><!--button class="jmv-store-cancel">Cancel</button--></div>`);
         this.$body.append($installing);
         this.$error   = HTML.parse('<div class="jmv-store-error" aria-hidden="true" style="display:none;"><h2 class="jmv-store-error-message"></h2><div class="jmv-store-error-cause"></div><button class="jmv-store-error-retry">Retry</button></div>');
@@ -126,9 +128,9 @@ class PageModules extends HTMLElement {
                 this.$error.setAttribute('aria-hidden', 'false');
                 this.$error.style.display = '';
 
-                _focusLoop.speakMessage(_('Library error'));
-                _focusLoop.speakMessage(error.cause);
-                _focusLoop.speakMessage(error.message);
+                interactionManager.announce(_('Library error'));
+                interactionManager.announce(error.cause);
+                interactionManager.announce(error.message);
 
                 $errorMessage.textContent = error.message;
                 $errorCause.textContent  = error.cause;
@@ -220,25 +222,25 @@ class PageModules extends HTMLElement {
             searchType = 'plots';
             searchValue = searchValue.substring(6).trim();
         }
-        
+
         this.marker.unmark({
             done: () => {
-                
+
                     switch (searchType) {
                         case 'module':
                             if (searchValue != '') {
                                 this.querySelectorAll('.jmv-store-module').forEach(el => {el.classList.remove('hide-module')});
-                                this.querySelectorAll<HTMLElement>('.jmv-store-module').forEach(el => { 
+                                this.querySelectorAll<HTMLElement>('.jmv-store-module').forEach(el => {
                                     if (el.dataset['name'].toLowerCase().startsWith(searchValue) === false)
-                                        el.classList.add('hide-module') 
+                                        el.classList.add('hide-module')
                                 });
                             }
                             break;
                         case 'plots':
                             this.querySelectorAll('.jmv-store-module').forEach(el => {el.classList.add('hide-module')});
-                            this.querySelectorAll<HTMLElement>('.jmv-store-module[data-has-plots="true"]').forEach(el => { 
+                            this.querySelectorAll<HTMLElement>('.jmv-store-module[data-has-plots="true"]').forEach(el => {
                                 if (el.dataset['name'].toLowerCase().startsWith(searchValue))
-                                    el.classList.remove('hide-module') 
+                                    el.classList.remove('hide-module')
                             });
                             break;
                         default:
@@ -292,7 +294,7 @@ class PageModules extends HTMLElement {
             if (module.name !== module.title)
                 moduleLabel = `${ module.name } - ${ moduleLabel }`;
 
-            let labelId = _focusLoop.getNextAriaElementId('label');
+            let labelId = interactionManager.nextAriaId('label');
 
             const hasPlots = module.category === 'plots';
 
@@ -386,7 +388,7 @@ class PageModules extends HTMLElement {
                 $module.classList.remove('to-be-removed');
                 $module.outerHTML = html;
             }
-            $module = this.$content.querySelector(`.jmv-store-module[data-name="${ module.name }"]`); 
+            $module = this.$content.querySelector(`.jmv-store-module[data-name="${ module.name }"]`);
             $module.addEventListener('keydown', this._moduleKeyDown);
             $module.addEventListener('keyup', this._moduleEnter);  // must be key up otherwise the internal buttons are clicked on key up after focus is moved
 
@@ -432,7 +434,7 @@ class PageModules extends HTMLElement {
                 event.stopPropagation();
             }
         }
-        
+
     }
 
     _moduleKeyDown(event) {
@@ -459,7 +461,7 @@ class PageModules extends HTMLElement {
     }
 
     _install(path: string, name: string) {
-        _focusLoop.speakMessage(_('Installing {module}', { module: name }));
+        interactionManager.announce(_('Installing {module}', { module: name }));
         return this.modules.install(path)
             .then(() => {
                 this._notify({
@@ -480,13 +482,16 @@ class PageModules extends HTMLElement {
             });
     }
 
-    _uninstallClicked(event: MouseEvent) {
+    async _uninstallClicked(event: MouseEvent) {
         if (event.target instanceof HTMLElement) {
             let $target = event.target;
             let moduleName = $target.getAttribute('data-name');
-            let response = window.confirm(_('Really uninstall {m}?', {m:moduleName}));
-            if (response)
-                this._uninstall(moduleName);
+          
+            let msg = _('Really uninstall {m}?', {m:moduleName});
+            await MsgDialog.show(msg, {cancel: _('Cancel'), ok: _('OK')}).then((result) => {
+                if (result.action === 'ok') 
+                    this._uninstall(moduleName);
+            });
         }
     }
 

@@ -3,7 +3,7 @@
 import Annotations from './annotations';
 
 import Elem, { CollectionView, View as Element, ElementData, ElementModel } from './element';
-import _focusLoop from '../common/focusloop';
+import interactionManager from '../common/interactionmanager';
 import { AnalysisStatus, IElement } from './create';
 import { HTMLElementCreator as HTML }  from '../common/htmlelementcreator';
 import { Item } from './itemtracker';
@@ -62,9 +62,9 @@ export class View extends CollectionView<Model> {
             this.hcTag = `</h${ this.level + 1 }>`;
 
             this.classList.add('jmv-results-group');
-            
 
-            let labelId = _focusLoop.getNextAriaElementId('label');
+
+            let labelId = interactionManager.nextAriaId('label');
 
             this.setAttribute('aria-labelledby', labelId);
 
@@ -138,8 +138,10 @@ export class View extends CollectionView<Model> {
         }
         else {
             let heading = Annotations.getControl(this.address(), 'heading');
-            if (heading && heading instanceof Heading)
+            if (heading && heading instanceof Heading) {
+                heading.originalHeading = this.model.attributes.title;
                 heading.update();
+            }
         }
 
         let childOfSelectList = false;
@@ -189,7 +191,7 @@ export class View extends CollectionView<Model> {
 
             current = this._includeBreak(current, childAddress);
 
-            if ((! child.hasAnnotations || child.hasAnnotations()) && element.name) 
+            if ((! child.hasAnnotations || child.hasAnnotations()) && element.name)
                 current = this._includeAnnotation(current, childAddress, child, false, this.createElementTitle(element));
         }
 
@@ -207,7 +209,7 @@ export class View extends CollectionView<Model> {
             case 'image':
                 return _('Annotation for image {name}', {name: element.title });
             default:
-                return _('Annotation for item {name}', {name: element.title }); 
+                return _('Annotation for item {name}', {name: element.title });
         }
     }
 
