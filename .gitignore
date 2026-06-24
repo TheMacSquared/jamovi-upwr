@@ -36,3 +36,7 @@ __pycache__
 *.jmo
 **/build/
 **/R/*.h.R
+
+# build artifacts (native packaging)
+/engine/jamovi-engine
+/server/jamovi.egg-info/
