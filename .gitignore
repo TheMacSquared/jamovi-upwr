@@ -39,4 +39,5 @@ __pycache__
 
 # build artifacts (native packaging)
 /engine/jamovi-engine
+/engine/jamovi-engine.exe
 /server/jamovi.egg-info/
