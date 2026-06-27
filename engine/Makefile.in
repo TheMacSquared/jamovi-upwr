@@ -74,20 +74,22 @@ else
 	BINDIR ?= bin
 	R_HOME ?= $(SRCDIR)/../../../Frameworks/R
 	BASE_MODULE_PATH ?= $(SRCDIR)/../../modules/base/R
-	LDFLAGS +=	-L$(SRCDIR)/../../lib \
-				-L$(SRCDIR)/../../lib/libgcc \
+	LDFLAGS +=	-L$(BOOST_LIBDIR) \
+				-L$(NANOMSG_DIR)/lib \
+				-L$(PROTOBUF_DIR)/lib \
 				-L$(R_HOME)/bin/x64 \
 				-L$(BASE_MODULE_PATH)/RInside/lib/x64 \
-				-lboost_filesystem-mgw8-mt-x64-1_79 \
-				-lboost_system-mgw8-mt-x64-1_79 \
-				-lboost_nowide-mgw8-mt-x64-1_79
+				-lboost_filesystem \
+				-lboost_system \
+				-lboost_nowide \
+				-lboost_atomic
 
 	# _WIN32_WINNT is for SHGetKnownFolderPath
 
 	CXXFLAGS +=	-DUNICODE \
 				"-D_WIN32_WINNT=_WIN32_WINNT_VISTA" \
 				"-DWIN32_LEAN_AND_MEAN" \
-				"-fpermissive"
+				"-fpermissive" -std=gnu++17
 
 	# embed the manifest that sets the process active code page to UTF-8
 	WINRES = engine/jamovi-engine.res.o
@@ -103,7 +105,7 @@ INCLUDES += \
 	-I$(BASE_MODULE_PATH)/Rcpp/include \
 	-I/usr/share/R/include
 
-LDFLAGS += -lR -lnanomsg -lprotobuf -lRInside
+LDFLAGS += -lR -lnanomsg -lprotobuf -lRInside $(EXTRA_LIBS)
 
 ABS_SRCS  = $(wildcard $(SRCDIR)/engine/*.cpp)
 ABS_SRCS += $(wildcard $(SRCDIR)/engine/**/*.cpp)
