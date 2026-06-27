@@ -160,11 +160,23 @@ try {
     let platName;
 
     if (process.platform === 'win32') {
-        let exe = installer.find(args.home);
-        let bin  = path.dirname(exe);
-        let home = path.dirname(bin);
-        let rHome = path.join(home, 'Frameworks', 'R');
-        let rExe  = path.join(rHome, 'bin', 'x64', 'R.exe');
+        let home, rHome, rExe;
+        if (args.rhome) {
+            // native (dockerless) build: compile against an explicit R, no
+            // installed jamovi required (mirrors the linux/--rhome branch)
+            rHome = path.resolve(args.rhome);
+            rExe  = path.join(rHome, 'bin', 'x64', 'R.exe');
+            if ( ! utils.exists(rExe))
+                rExe = path.join(rHome, 'bin', 'R.exe');
+            home = args.home ? path.resolve(args.home) : path.dirname(path.dirname(rHome));
+        }
+        else {
+            let exe = installer.find(args.home);
+            let bin  = path.dirname(exe);
+            home = path.dirname(bin);
+            rHome = path.join(home, 'Frameworks', 'R');
+            rExe  = path.join(rHome, 'bin', 'x64', 'R.exe');
+        }
         let rLibs = `${ path.join(home, 'Resources', 'modules', 'base', 'R')}`;
         paths = { home, rHome, rExe, rLibs };
         platName = 'win64';

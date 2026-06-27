@@ -644,4 +644,13 @@ export default {
         base_packages: R450base,
         jmv_packages: R450jmv,
     },
+    '4.6.0': {  // jUPWR: native build against R 4.6 (reuses 4.5.0 package sets)
+        mran_url: (process.platform === 'linux' ? undefined : 'https://repo.jamovi.org/cran/2025-05-25,https://packagemanager.posit.co/cran/2025-05-25'),
+        arch_urls : (process.platform !== 'linux' ? undefined : {
+            arm64: 'https://repo.jamovi.org/cran-linux/2025-05-25/arm64,https://packagemanager.posit.co/cran/2025-05-25',
+            x64:   'https://repo.jamovi.org/cran-linux/2025-05-25/x64,https://packagemanager.posit.co/cran/2025-05-25',
+        }),
+        base_packages: R450base,
+        jmv_packages: R450jmv,
+    },
 };
