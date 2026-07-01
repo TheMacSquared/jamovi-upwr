@@ -1,4 +1,4 @@
-; jUPWR.nsi — installer NSIS (per-user, bez admina) dla natywnego buildu Windows.
+; jUPWR.nsi - installer NSIS (per-user, bez admina) dla natywnego buildu Windows.
 ; Budowanie (z katalogu packaging\scripts\windows\):
 ;   makensis jUPWR.nsi
 ;   makensis /DVERSION=0.5.1 jUPWR.nsi      ; nadpisanie wersji
@@ -20,7 +20,7 @@ SetCompressor /SOLID lzma
 Unicode true
 Icon "${ICON}"
 UninstallIcon "${ICON}"
-BrandingText "${APPNAME} ${VERSION} — ${COMPANY}"
+BrandingText "${APPNAME} ${VERSION} - ${COMPANY}"
 
 Page directory
 Page instfiles
@@ -44,9 +44,9 @@ Function .onInit
 
 haveVersion:
     MessageBox MB_ICONQUESTION|MB_YESNO \
-        "Wykryto istniejącą instalację ${APPNAME} $ExistingVersion.$\r$\n$\r$\nOdinstalować ją przed instalacją ${APPNAME} ${VERSION}?" \
+        "Wykryto istniejaca instalacje ${APPNAME} $ExistingVersion.$\r$\n$\r$\nOdinstalowac ja przed instalacja ${APPNAME} ${VERSION}?" \
         IDYES uninstallExisting
-    Abort "Instalacja przerwana. Odinstaluj poprzednią wersję ${APPNAME} albo uruchom instalator ponownie i potwierdź odinstalowanie."
+    Abort "Instalacja przerwana. Odinstaluj poprzednia wersje ${APPNAME} albo uruchom instalator ponownie i potwierdz odinstalowanie."
 
 uninstallExisting:
     IfFileExists $ExistingUninstaller 0 missingUninstaller
@@ -55,11 +55,11 @@ uninstallExisting:
     ExecWait '"$ExistingUninstallerCopy" /S' $UninstallResult
     Delete $ExistingUninstallerCopy
     IntCmp $UninstallResult 0 done
-    Abort "Nie udało się odinstalować poprzedniej wersji ${APPNAME}. Kod błędu: $UninstallResult"
+    Abort "Nie udalo sie odinstalowac poprzedniej wersji ${APPNAME}. Kod bledu: $UninstallResult"
 
 missingUninstaller:
     MessageBox MB_ICONEXCLAMATION|MB_OK \
-        "Wykryto wpis poprzedniej instalacji ${APPNAME}, ale nie znaleziono pliku odinstalowania:$\r$\n$ExistingUninstaller$\r$\n$\r$\nInstalator będzie kontynuował i nadpisze istniejące pliki."
+        "Wykryto wpis poprzedniej instalacji ${APPNAME}, ale nie znaleziono pliku odinstalowania:$\r$\n$ExistingUninstaller$\r$\n$\r$\nInstalator bedzie kontynuowal i nadpisze istniejace pliki."
 
 done:
 FunctionEnd
@@ -74,7 +74,7 @@ Section "install"
     CreateShortcut  "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\bin\${APPNAME}.exe" "" "$INSTDIR\app-icon.ico"
     CreateShortcut  "$DESKTOP\${APPNAME}.lnk"               "$INSTDIR\bin\${APPNAME}.exe" "" "$INSTDIR\app-icon.ico"
 
-    ; rejestr — wpis w "Dodaj/usun programy"
+    ; rejestr - wpis w "Dodaj/usun programy"
     WriteRegStr   HKCU "${UNINST_KEY}" "DisplayName"     "${APPNAME} ${VERSION}"
     WriteRegStr   HKCU "${UNINST_KEY}" "DisplayVersion"  "${VERSION}"
     WriteRegStr   HKCU "${UNINST_KEY}" "Publisher"       "${COMPANY}"
@@ -84,7 +84,7 @@ Section "install"
     WriteRegDWORD HKCU "${UNINST_KEY}" "NoModify" 1
     WriteRegDWORD HKCU "${UNINST_KEY}" "NoRepair" 1
 
-    ; skojarzenie .omv (opcjonalne) — odkomentuj, jesli potrzebne
+    ; skojarzenie .omv (opcjonalne) - odkomentuj, jesli potrzebne
     ; WriteRegStr HKCU "Software\Classes\.omv" "" "jUPWR.Dataset"
 
     WriteUninstaller "$INSTDIR\uninstall.exe"
