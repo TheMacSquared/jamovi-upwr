@@ -3,7 +3,7 @@ name:  Chi2Distribution
 title: Rozkład χ²
 menuGroup: distrACTION
 menuSubgroup: Rozkłady ciągłe
-version: '1.0.0'
+version: '1.0.1'
 jas: '1.2'
 
 options:

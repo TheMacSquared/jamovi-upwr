@@ -17,6 +17,8 @@ const ini = require('./ini');
 const tmp = require('./tmp');
 
 app.allowRendererProcessReuse = true;
+app.setName('jUPWR');
+app.setPath('userData', path.join(app.getPath('appData'), 'jUPWR'));
 
 // required to hide the application menu on linux
 // https://github.com/electron/electron/issues/16521

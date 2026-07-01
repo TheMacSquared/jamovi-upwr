@@ -3,7 +3,7 @@ name:  GeometricDistribution
 title: Rozkład geometryczny
 menuGroup: distrACTION
 menuSubgroup: Rozkłady dyskretne
-version: '1.0.0'
+version: '1.0.1'
 jas: '1.2'
 
 options:

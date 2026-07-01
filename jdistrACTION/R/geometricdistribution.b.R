@@ -213,7 +213,7 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       }
 
       Plot <- Plot +
-        theme(legend.text = element_text(size = state$Textsize))
+        theme(legend.text = element_text(size = as.numeric(state$Textsize)))
 
       print(Plot)
       TRUE}))

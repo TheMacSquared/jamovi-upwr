@@ -32,7 +32,7 @@ PLIST="$APP/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleName $APP_NAME" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleName string $APP_NAME" "$PLIST"
 /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $APP_NAME" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string $APP_NAME" "$PLIST"
 /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier pl.upwr.jupwr" "$PLIST" 2>/dev/null || true
-# wersja jUPWR (0.5.0), nie bazowego jamovi
+# wersja jUPWR (0.5.1), nie bazowego jamovi
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $JUPWR_VERSION" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $JUPWR_VERSION" "$PLIST"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $JUPWR_VERSION" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $JUPWR_VERSION" "$PLIST"
 

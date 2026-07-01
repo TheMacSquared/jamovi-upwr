@@ -1,5 +1,5 @@
 
-const APP_NAME = 'jamovi';
+const APP_NAME = 'jUPWR';
 
 
 let dialogProvider;

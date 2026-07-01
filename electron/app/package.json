@@ -1,6 +1,6 @@
 {
-  "name": "jamovi",
-  "productName": "jamovi",
+  "name": "jupwr",
+  "productName": "jUPWR",
   "main": "main.js",
   "repository": {
     "type": "git",

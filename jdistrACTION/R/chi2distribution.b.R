@@ -294,7 +294,7 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # The text for the quantiles legend 
         QuantileLabel <- Dataset[7,4]
         # The textsize of the legend
-        Textsize <- Dataset[8,4]
+        Textsize <- as.numeric(Dataset[8,4])
         # The x-axis labels
         AxisSegments <- as.numeric(Dataset[,5])
         AxisSegments <- na.omit(AxisSegments)

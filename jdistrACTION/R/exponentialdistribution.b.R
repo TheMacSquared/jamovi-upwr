@@ -189,7 +189,7 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       QuantileAlphaLow <- as.numeric(Dataset[5, 4])
       QuantileAlphaHigh <- as.numeric(Dataset[6, 4])
       QuantileLabel <- Dataset[7, 4]
-      Textsize <- Dataset[8, 4]
+      Textsize <- as.numeric(Dataset[8, 4])
       AxisSegments <- as.numeric(Dataset[, 5])
       AxisSegments <- na.omit(AxisSegments)
 
