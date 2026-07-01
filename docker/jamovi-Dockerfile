@@ -116,6 +116,9 @@ COPY $JAMOVI_ROOT/server/jamovi/server/jamovi.proto /tmp/source/server/jamovi/se
 
 WORKDIR /tmp/source/engine
 
+RUN protoc --proto_path=/tmp/source/server/jamovi/server \
+    --cpp_out=/tmp/source/engine \
+    /tmp/source/server/jamovi/server/jamovi.proto
 RUN bash configure --rhome=$R_HOME \
     --base-module-path=$R_HOME/library \
     --rpath=$R_HOME/library/RInside/lib \

@@ -243,9 +243,44 @@ if (-not (Test-Path "$srv\nanomsg")) {
 }
 # patch bind/connect str->bytes
 $nmInit = "$srv\nanomsg\__init__.py"; $c = Get-Content $nmInit -Raw
-$c = $c -replace "(def bind\(self, address\):.*?raise ValueError\(.+?\)\r?\n)", "`$1        if isinstance(address, str):`r`n            address = address.encode('utf-8')`r`n"
-$c = $c -replace "(def connect\(self, address\):.*?raise ValueError\(.+?\)\r?\n)", "`$1        if isinstance(address, str):`r`n            address = address.encode('utf-8')`r`n"
+$c = $c.Replace(
+@"
+    def bind(self, address):
+        """Add a local endpoint to the socket"""
+        if self.uses_nanoconfig:
+            raise ValueError("Nanoconfig address must be sole endpoint")
+        endpoint_id = _nn_check_positive_rtn(
+"@,
+@"
+    def bind(self, address):
+        """Add a local endpoint to the socket"""
+        if self.uses_nanoconfig:
+            raise ValueError("Nanoconfig address must be sole endpoint")
+        if isinstance(address, str):
+            address = address.encode('utf-8')
+        endpoint_id = _nn_check_positive_rtn(
+"@)
+$c = $c.Replace(
+@"
+    def connect(self, address):
+        """Add a remote endpoint to the socket"""
+        if self.uses_nanoconfig:
+            raise ValueError("Nanoconfig address must be sole endpoint")
+        endpoint_id = _nn_check_positive_rtn(
+"@,
+@"
+    def connect(self, address):
+        """Add a remote endpoint to the socket"""
+        if self.uses_nanoconfig:
+            raise ValueError("Nanoconfig address must be sole endpoint")
+        if isinstance(address, str):
+            address = address.encode('utf-8')
+        endpoint_id = _nn_check_positive_rtn(
+"@)
 [System.IO.File]::WriteAllText($nmInit, $c)
+if ((Select-String -Path $nmInit -Pattern "address = address.encode\('utf-8'\)").Count -lt 2) {
+    throw "nanomsg python binding patch failed: bind/connect still accept str addresses"
+}
 # patch nanoconfig opcjonalny
 $ctInit = "$srv\_nanomsg_ctypes\__init__.py"
 (Get-Content $ctInit -Raw).Replace('except OSError:','except (OSError, AttributeError):') | Set-Content $ctInit -NoNewline

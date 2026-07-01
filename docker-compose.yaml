@@ -8,7 +8,7 @@ services:
       - donotstart
 
   jamovi: &base
-    image: jamovi/jamovi:2.7.6
+    image: jupwr/jupwr:0.5.1
     container_name: jamovi
     profiles: [main]
     build:
@@ -29,9 +29,9 @@ services:
         # for security, jamovi runs across 3 origins
         #
         # # separate by port
-        JAMOVI_HOST_A: '127.0.0.1:41337'
-        JAMOVI_HOST_B: '127.0.0.1:41338'
-        JAMOVI_HOST_C: '127.0.0.1:41339'
+        JAMOVI_HOST_A: 'localhost:41337'
+        JAMOVI_HOST_B: 'localhost:41338'
+        JAMOVI_HOST_C: 'localhost:41339'
 
         # separate by host (RECOMMENDED)
         # JAMOVI_HOST_A: 'jamovi.127.0.0.1.nip.io:41337'
@@ -51,7 +51,7 @@ services:
         JAMOVI_ACCESS_KEY: ''
 
     volumes:
-      - $HOME/Documents:/root/Documents
+      - ${USERPROFILE:-${HOME}}/Documents:/root/Documents
 
   jamovi-dev:
     <<: *base

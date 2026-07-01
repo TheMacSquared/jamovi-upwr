@@ -1,4 +1,4 @@
-# CLAUDE.md — jamovi fork (jUPWR)
+# AGENTS.md — jamovi fork (jUPWR)
 
 ## Projekt
 Zmodyfikowana dystrybucja jamovi na potrzeby dydaktyki statystyki
