@@ -29,6 +29,41 @@ UninstPage instfiles
 
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}"
 
+Var ExistingUninstaller
+Var ExistingVersion
+Var ExistingUninstallerCopy
+Var UninstallResult
+
+Function .onInit
+    ReadRegStr $ExistingUninstaller HKCU "${UNINST_KEY}" "UninstallString"
+    StrCmp $ExistingUninstaller "" done
+
+    ReadRegStr $ExistingVersion HKCU "${UNINST_KEY}" "DisplayVersion"
+    StrCmp $ExistingVersion "" 0 haveVersion
+    StrCpy $ExistingVersion "nieznana"
+
+haveVersion:
+    MessageBox MB_ICONQUESTION|MB_YESNO \
+        "Wykryto istniejącą instalację ${APPNAME} $ExistingVersion.$\r$\n$\r$\nOdinstalować ją przed instalacją ${APPNAME} ${VERSION}?" \
+        IDYES uninstallExisting
+    Abort "Instalacja przerwana. Odinstaluj poprzednią wersję ${APPNAME} albo uruchom instalator ponownie i potwierdź odinstalowanie."
+
+uninstallExisting:
+    IfFileExists $ExistingUninstaller 0 missingUninstaller
+    StrCpy $ExistingUninstallerCopy "$TEMP\${APPNAME}-previous-uninstall.exe"
+    CopyFiles /SILENT $ExistingUninstaller $ExistingUninstallerCopy
+    ExecWait '"$ExistingUninstallerCopy" /S' $UninstallResult
+    Delete $ExistingUninstallerCopy
+    IntCmp $UninstallResult 0 done
+    Abort "Nie udało się odinstalować poprzedniej wersji ${APPNAME}. Kod błędu: $UninstallResult"
+
+missingUninstaller:
+    MessageBox MB_ICONEXCLAMATION|MB_OK \
+        "Wykryto wpis poprzedniej instalacji ${APPNAME}, ale nie znaleziono pliku odinstalowania:$\r$\n$ExistingUninstaller$\r$\n$\r$\nInstalator będzie kontynuował i nadpisze istniejące pliki."
+
+done:
+FunctionEnd
+
 Section "install"
     SetOutPath "$INSTDIR"
     File /r "${PAYLOAD}\*.*"
