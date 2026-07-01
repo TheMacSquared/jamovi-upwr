@@ -102,7 +102,9 @@ if (-not (Test-Path "$Deps\nanomsg\lib\libnanomsg.dll.a")) {
     $nm = "$Scratch\nanomsg-1.2"
     if (-not (Test-Path "$nm\CMakeLists.txt")) {
         Invoke-WebRequest $NanomsgUrl -OutFile "$Scratch\nanomsg.tar.gz" -MaximumRedirection 10
-        & tar -xzf "$Scratch\nanomsg.tar.gz" -C $Scratch
+        Push-Location $Scratch
+        & tar -xzf "nanomsg.tar.gz" -C .
+        Pop-Location
     }
     Use-Mingw
     New-Item -ItemType Directory -Force -Path "$nm\build" | Out-Null
@@ -206,7 +208,9 @@ Info "OK silnik"
 Step "Python + core + server"
 if (-not (Test-Path "$Payload\python\python.exe")) {
     if (-not (Test-Path "$Scratch\pbs.tar.gz")) { Invoke-WebRequest $PbsUrl -OutFile "$Scratch\pbs.tar.gz" -MaximumRedirection 10 }
-    & tar -xzf "$Scratch\pbs.tar.gz" -C $Scratch    # -> $Scratch\python
+    Push-Location $Scratch
+    & tar -xzf "pbs.tar.gz" -C .    # -> $Scratch\python
+    Pop-Location
     Copy-Item "$Scratch\python" "$Payload\python" -Recurse -Force
 }
 $Py = "$Payload\python\python.exe"
@@ -231,7 +235,9 @@ if (-not (Test-Path "$srv\nanomsg")) {
     $meta = Invoke-RestMethod "https://pypi.org/pypi/nanomsg/1.0/json"
     $url = ($meta.urls | Where-Object packagetype -eq 'sdist').url
     Invoke-WebRequest $url -OutFile "$Scratch\nanomsg-py.tar.gz" -MaximumRedirection 10
-    & tar -xzf "$Scratch\nanomsg-py.tar.gz" -C $Scratch
+    Push-Location $Scratch
+    & tar -xzf "nanomsg-py.tar.gz" -C .
+    Pop-Location
     $root = (Get-ChildItem $Scratch -Directory | Where-Object Name -like 'nanomsg-1.0*' | Select-Object -First 1).FullName
     foreach ($p in 'nanomsg','nanomsg_wrappers','_nanomsg_ctypes') { Copy-Item "$root\$p" "$srv\$p" -Recurse -Force }
 }
@@ -261,6 +267,7 @@ if (Test-Path $fmt) {
 # ---------------------------------------------------------------------------
 Step "Montaz bundla"
 $AppDir = "$Dist\$AppName"; $Bin = "$AppDir\bin"
+if (Test-Path $AppDir) { Remove-Item $AppDir -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $Bin,"$AppDir\Frameworks","$AppDir\Resources\i18n" | Out-Null
 # Electron
 if (-not (Test-Path "$Scratch\electron.zip")) { Invoke-WebRequest "https://github.com/electron/electron/releases/download/v$ElectronVer/electron-v$ElectronVer-win32-x64.zip" -OutFile "$Scratch\electron.zip" -MaximumRedirection 10 }
