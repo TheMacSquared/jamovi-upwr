@@ -1,7 +1,7 @@
 ---
 name:  bootCI
 title: "Bootstrapowy CI dla miary centralnej"
-menuGroup: jboot
+menuGroup: Bootstrap
 version: '0.2.0'
 jas: '1.2'
 

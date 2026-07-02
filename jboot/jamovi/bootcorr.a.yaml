@@ -1,7 +1,7 @@
 ---
 name:  bootCorr
 title: "Bootstrapowy CI dla korelacji"
-menuGroup: jboot
+menuGroup: Bootstrap
 version: '0.1.0'
 jas: '1.2'
 

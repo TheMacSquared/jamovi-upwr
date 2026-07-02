@@ -1,7 +1,7 @@
 ---
 name:  bootExplore
 title: "Jak działa bootstrap"
-menuGroup: jboot
+menuGroup: Bootstrap
 menuSubgroup: Dydaktyka
 version: '0.2.0'
 jas: '1.2'

@@ -1,7 +1,7 @@
 ---
 name:  bootTrimmed
 title: "Bootstrapowy CI dla średniej uciętej"
-menuGroup: jboot
+menuGroup: Bootstrap
 version: '0.1.0'
 jas: '1.2'
 

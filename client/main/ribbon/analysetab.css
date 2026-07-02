@@ -74,7 +74,8 @@
     background-image: url("../../assets/analysis-statkat.svg");
 }
 
-.jmv-ribbon-button[data-name="distraction"] .jmv-ribbon-button-icon {
+.jmv-ribbon-button[data-name="distraction"] .jmv-ribbon-button-icon,
+.jmv-ribbon-button[data-name="rozkłady"] .jmv-ribbon-button-icon {
     background-image: url("../../assets/analysis-distraction.svg");
 }
 

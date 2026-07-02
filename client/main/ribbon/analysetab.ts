@@ -148,8 +148,31 @@ export class AnalyseTab extends RibbonTab {
             }
         }
 
+        const groupOrder: { [key: string]: number } = {
+            'Exploration': 10,
+            'Rozkłady': 20,
+            'Przedzialy ufnosci': 30,
+            'Przedziały ufności': 30,
+            'T-Tests': 40,
+            'ANOVA': 50,
+            'Regression': 60,
+            'Frequencies': 70,
+            'Factor': 80,
+            'Testy permutacyjne': 90,
+            'Bootstrap': 100
+        };
+
+        let groupNames = Object.keys(menus);
+        groupNames.sort((a, b) => {
+            let aOrder = groupOrder[a] ?? 1000;
+            let bOrder = groupOrder[b] ?? 1000;
+            if (aOrder !== bOrder)
+                return aOrder - bOrder;
+            return 0;
+        });
+
         let shortcutIndex = 1;
-        for (let groupName in menus) {
+        for (let groupName of groupNames) {
             let menu = menus[groupName];
 
             let flattened = [ ];

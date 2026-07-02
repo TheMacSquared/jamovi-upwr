@@ -1,7 +1,7 @@
 ---
 name:  bootTest2
 title: "Bootstrapowe porównanie dwóch grup"
-menuGroup: jboot
+menuGroup: Bootstrap
 version: '0.1.0'
 jas: '1.2'
 

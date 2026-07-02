@@ -1,7 +1,7 @@
 ---
 name:  bootConvergence
 title: "Zbieżność bootstrapu"
-menuGroup: jboot
+menuGroup: Bootstrap
 menuSubgroup: Dydaktyka
 version: '0.1.0'
 jas: '1.2'

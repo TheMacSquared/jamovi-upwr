@@ -1,7 +1,7 @@
 ---
 name:  bootMedian
 title: "Bootstrapowy CI dla mediany"
-menuGroup: jboot
+menuGroup: Bootstrap
 version: '0.1.0'
 jas: '1.2'
 

@@ -1,7 +1,7 @@
 ---
 name:  TDistribution
 title: Rozkład t
-menuGroup: distrACTION
+menuGroup: Rozkłady
 menuSubgroup: Rozkłady ciągłe
 version: '1.0.1'
 jas: '1.2'

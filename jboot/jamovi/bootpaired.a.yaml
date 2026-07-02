@@ -1,7 +1,7 @@
 ---
 name:  bootPaired
 title: "Bootstrapowy CI dla prób zależnych"
-menuGroup: jboot
+menuGroup: Bootstrap
 version: '0.1.0'
 jas: '1.2'
 

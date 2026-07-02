@@ -17,49 +17,49 @@ analyses:
   - title: Rozkład normalny
     name: Normaldistribution
     ns: distrACTION
-    menuGroup: distrACTION
+    menuGroup: Rozkłady
     menuTitle: Rozkład normalny
     menuSubgroup: Rozkłady ciągłe
   - title: Rozkład t
     name: TDistribution
     ns: distrACTION
-    menuGroup: distrACTION
+    menuGroup: Rozkłady
     menuTitle: Rozkład t
     menuSubgroup: Rozkłady ciągłe
   - title: Rozkład χ²
     name: Chi2Distribution
     ns: distrACTION
-    menuGroup: distrACTION
+    menuGroup: Rozkłady
     menuTitle: Rozkład χ²
     menuSubgroup: Rozkłady ciągłe
   - title: Rozkład F
     name: FDistribution
     ns: distrACTION
-    menuGroup: distrACTION
+    menuGroup: Rozkłady
     menuTitle: Rozkład F
     menuSubgroup: Rozkłady ciągłe
   - title: Rozkład wykładniczy
     name: ExponentialDistribution
     ns: distrACTION
-    menuGroup: distrACTION
+    menuGroup: Rozkłady
     menuTitle: Rozkład wykładniczy
     menuSubgroup: Rozkłady ciągłe
   - title: Rozkład dwumianowy
     name: BinomialDistribution
     ns: distrACTION
-    menuGroup: distrACTION
+    menuGroup: Rozkłady
     menuTitle: Rozkład dwumianowy
     menuSubgroup: Rozkłady dyskretne
   - title: Rozkład Poissona
     name: PoissonDistribution
     ns: distrACTION
-    menuGroup: distrACTION
+    menuGroup: Rozkłady
     menuTitle: Rozkład Poissona
     menuSubgroup: Rozkłady dyskretne
   - title: Rozkład geometryczny
     name: GeometricDistribution
     ns: distrACTION
-    menuGroup: distrACTION
+    menuGroup: Rozkłady
     menuTitle: Rozkład geometryczny
     menuSubgroup: Rozkłady dyskretne
 

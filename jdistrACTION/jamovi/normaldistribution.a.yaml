@@ -1,7 +1,7 @@
 ---
 name:  Normaldistribution
 title: Rozkład normalny
-menuGroup: distrACTION
+menuGroup: Rozkłady
 menuSubgroup: Rozkłady ciągłe
 version: '1.0.1'
 jas: '1.2'

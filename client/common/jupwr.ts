@@ -6,4 +6,4 @@
 //   MAJOR — curriculum-defining / breaking changes
 //   MINOR — new modules or features
 //   PATCH — fixes
-export const JUPWR_VERSION = '0.5.1';
+export const JUPWR_VERSION = '0.5.2';

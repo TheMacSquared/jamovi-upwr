@@ -1,7 +1,7 @@
 ---
 name:  PoissonDistribution
 title: Rozkład Poissona
-menuGroup: distrACTION
+menuGroup: Rozkłady
 menuSubgroup: Rozkłady dyskretne
 version: '1.0.1'
 jas: '1.2'

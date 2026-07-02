@@ -1,7 +1,7 @@
 ---
 name:  bootProp
 title: "Bootstrapowy CI dla proporcji"
-menuGroup: jboot
+menuGroup: Bootstrap
 version: '0.1.0'
 jas: '1.2'
 
