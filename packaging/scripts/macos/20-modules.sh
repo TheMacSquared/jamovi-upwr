@@ -36,6 +36,15 @@ RP_SRC="$BUILD_DIR/RProtoBuf-src.tar.gz"
 log "Instalacja jmvcore do $BASE_R (RProtoBuf obecny → RProtoBuf_serialize zostanie zapieczony) ..."
 R_LIBS="$BASE_R" R CMD INSTALL "$REPO_ROOT/jmvcore" --library="$BASE_R"
 
+# === Dodatkowe zależności CRAN dla modułu plots (scatr): ridgeline -> ggridges, hexbin -> hexbin ===
+# jmc uruchamia R CMD INSTALL z R_LIBS_SITE/R_LIBS_USER ograniczonym do base/R (patrz
+# jamovi-compiler/compilerr.js), więc systemowa biblioteka R.framework NIE jest widoczna mimo
+# --skip-deps. Bez tego kroku instalacja modułu 'plots' pada z "dependency 'hexbin' is not
+# available for package 'scatr'" i moduł scatr w ogóle się nie buduje (brak R/ w payloadzie).
+log "Instalacja zależności ridge/hexbin (ggridges, hexbin) do $BASE_R ..."
+"$R_HOME_SYS/bin/R" -e "install.packages(c('ggridges', 'hexbin'), repos='https://cloud.r-project.org', lib='$BASE_R')" \
+  || die "Nie udało się zainstalować ggridges/hexbin — moduł plots (scatr) nie zbuduje się poprawnie!"
+
 # Moduły w kolejności jak w docker/jamovi-Dockerfile.
 # R znajduje zależności w $R_HOME_SYS/library (systemowy R), jmvcore w base/R.
 MODULES=(jmv plots jperm jCI jboot jdistrACTION)
@@ -51,7 +60,8 @@ done
 
 log "Zainstalowane moduły:"
 ls "$PAYLOAD/modules"
-for m in jmv jCI; do
+for m in jmv jCI scatr; do
     [ -d "$PAYLOAD/modules/$m" ] || die "Moduł $m nie zainstalowany!"
+    [ -d "$PAYLOAD/modules/$m/R" ] || die "Moduł $m nie ma zainstalowanego pakietu R (brak modules/$m/R) — silnik nie znajdzie analiz!"
 done
 log "OK — moduły zbudowane."

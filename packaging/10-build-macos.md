@@ -82,6 +82,19 @@ systemowego R — tak jak w Dockerze pochodzą z obrazu `jamovi-deps`. Moduł `p
 jmvplots) instaluje się pod nazwą **`scatr`**. Zainstalowane: `jmv, scatr, jperm, jCI, jboot,
 distrACTION` + `base` (jmvcore).
 
+### Pułapka: `jmc` izoluje `R_LIBS` — zależności modułu trzeba doinstalować do `base/R`
+
+`jamovi-compiler/compilerr.js` ustawia przy `R CMD INSTALL` modułu `R_LIBS_SITE=<--rlibs>` i
+`R_LIBS_USER=notthere`, więc **systemowa biblioteka R.framework jest niewidoczna**, mimo że
+`00-prereqs.sh` każe doinstalować tam brakujące pakiety. Dla modułu `plots` (ridge/hexbin) to
+oznacza, że `ggridges`/`hexbin` muszą trafić do `stage/jamovi/modules/base/R` (obok `jmvcore`),
+nie do systemowego R — inaczej `jmc --install plots` pada z `dependency 'hexbin' is not available
+for package 'scatr'`, a moduł `scatr` buduje się bez katalogu `R/` (silnik potem zgłasza `nie ma
+pakietu o nazwie 'scatr'` przy pierwszym użyciu wykresu). `20-modules.sh` robi to automatycznie
+przed instalacją modułów i sam sprawdza na końcu, że każdy zainstalowany moduł ma `modules/<m>/R`.
+Przy dodawaniu kolejnego modułu z zależnościami spoza `00-prereqs.sh`/systemowego R — dopisz
+analogiczny `install.packages(..., lib=$BASE_R)` w `20-modules.sh`.
+
 ---
 
 ## Silnik C++ (Faza E) — `40-engine.sh` — NAJTRUDNIEJSZE
