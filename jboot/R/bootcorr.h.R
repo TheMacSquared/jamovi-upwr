@@ -104,7 +104,7 @@ bootCorrResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             super$initialize(
                 options=options,
                 name="",
-                title="Bootstrapowy przedzial ufnosci dla korelacji")
+                title="Bootstrapowy CI dla korelacji")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="corrTable",
@@ -136,12 +136,12 @@ bootCorrResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number", 
                         `format`="zto"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number", 
                         `format`="zto"),
                     list(
@@ -187,12 +187,12 @@ bootCorrResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `format`="zto,pvalue"),
                     list(
                         `name`="ciLowerClass", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number", 
                         `format`="zto"),
                     list(
                         `name`="ciUpperClass", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number", 
                         `format`="zto"))))
             self$add(jmvcore::Array$new(
@@ -234,13 +234,13 @@ bootCorrBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 weightsSupport = 'auto')
         }))
 
-#' Bootstrapowy przedzial ufnosci dla korelacji
+#' Bootstrapowy CI dla korelacji
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Bootstrapowy przedzial ufnosci dla korelacji Pearsona lub Spearmana.
+#' Bootstrapowy CI dla korelacji Pearsona lub Spearmana.
 #'}
 #' @param data .
 #' @param vars .

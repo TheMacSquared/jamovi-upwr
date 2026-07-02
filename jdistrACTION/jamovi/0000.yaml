@@ -1,6 +1,5 @@
 ---
-title: >-
-  distrACTION - Kwantyle i prawdopodobieństwa rozkładów ciągłych i dyskretnych
+title: distrACTION - Kwantyle i prawdopodobieństwa rozkładów ciągłych i dyskretnych
 name: distrACTION
 version: 1.0.1
 jms: '1.0'
@@ -20,47 +19,57 @@ analyses:
     menuGroup: Rozkłady
     menuTitle: Rozkład normalny
     menuSubgroup: Rozkłady ciągłe
+    category: analyses
   - title: Rozkład t
     name: TDistribution
     ns: distrACTION
     menuGroup: Rozkłady
     menuTitle: Rozkład t
     menuSubgroup: Rozkłady ciągłe
+    category: analyses
   - title: Rozkład χ²
     name: Chi2Distribution
     ns: distrACTION
     menuGroup: Rozkłady
     menuTitle: Rozkład χ²
     menuSubgroup: Rozkłady ciągłe
+    category: analyses
   - title: Rozkład F
     name: FDistribution
     ns: distrACTION
     menuGroup: Rozkłady
     menuTitle: Rozkład F
     menuSubgroup: Rozkłady ciągłe
+    category: analyses
   - title: Rozkład wykładniczy
     name: ExponentialDistribution
     ns: distrACTION
     menuGroup: Rozkłady
     menuTitle: Rozkład wykładniczy
     menuSubgroup: Rozkłady ciągłe
+    category: analyses
   - title: Rozkład dwumianowy
     name: BinomialDistribution
     ns: distrACTION
     menuGroup: Rozkłady
     menuTitle: Rozkład dwumianowy
     menuSubgroup: Rozkłady dyskretne
+    category: analyses
   - title: Rozkład Poissona
     name: PoissonDistribution
     ns: distrACTION
     menuGroup: Rozkłady
     menuTitle: Rozkład Poissona
     menuSubgroup: Rozkłady dyskretne
+    category: analyses
   - title: Rozkład geometryczny
     name: GeometricDistribution
     ns: distrACTION
     menuGroup: Rozkłady
     menuTitle: Rozkład geometryczny
     menuSubgroup: Rozkłady dyskretne
+    category: analyses
+usesNative: true
+minApp: 1.0.8
 
 ...

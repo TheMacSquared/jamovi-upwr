@@ -94,7 +94,7 @@ bootMultiGroupResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cl
             super$initialize(
                 options=options,
                 name="",
-                title="Bootstrapowe PU per grupa")
+                title="Bootstrapowe CI per grupa")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="groupTable",
@@ -130,11 +130,11 @@ bootMultiGroupResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cl
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"))))
             self$add(jmvcore::Array$new(
                 options=options,
@@ -176,13 +176,13 @@ bootMultiGroupBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 weightsSupport = 'auto')
         }))
 
-#' Bootstrapowe PU per grupa
+#' Bootstrapowe CI per grupa
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Bootstrapowe przedzialy ufnosci dla srednich w wielu grupach.
+#' Bootstrapowe przedziały ufności dla średnich w wielu grupach.
 #'}
 #' @param data .
 #' @param dep .

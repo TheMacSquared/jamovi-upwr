@@ -96,11 +96,11 @@ bootPairedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             super$initialize(
                 options=options,
                 name="",
-                title="Bootstrapowy PU dla prob zaleznych")
+                title="Bootstrapowy CI dla prób zależnych")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="testTable",
-                title="Bootstrapowy PU dla r\u00F3\u017Cnicy \u015Brednich (pr\u00F3by zale\u017Cne)",
+                title="Bootstrapowy CI dla r\u00F3\u017Cnicy \u015Brednich (pr\u00F3by zale\u017Cne)",
                 clearWith=list(
                     "pair1",
                     "pair2",
@@ -119,11 +119,11 @@ bootPairedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"),
                     list(
                         `name`="n", 
@@ -189,13 +189,13 @@ bootPairedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 weightsSupport = 'auto')
         }))
 
-#' Bootstrapowy PU dla prob zaleznych
+#' Bootstrapowy CI dla prób zależnych
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Bootstrapowy przedzial ufnosci dla roznicy srednich w probach zaleznych (parowych).
+#' Bootstrapowy CI dla różnicy średnich w próbach zależnych (parowych).
 #'}
 #' @param data .
 #' @param pair1 .

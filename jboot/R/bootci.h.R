@@ -7,6 +7,8 @@ bootCIOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     public = list(
         initialize = function(
             dep = NULL,
+            stat = "mean",
+            trimProp = 0.1,
             nBoot = 1000,
             ciWidth = 95,
             showClassical = FALSE,
@@ -26,6 +28,20 @@ bootCIOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "continuous"),
                 permitted=list(
                     "numeric"))
+            private$..stat <- jmvcore::OptionList$new(
+                "stat",
+                stat,
+                options=list(
+                    "mean",
+                    "median",
+                    "trimmed"),
+                default="mean")
+            private$..trimProp <- jmvcore::OptionNumber$new(
+                "trimProp",
+                trimProp,
+                default=0.1,
+                min=0,
+                max=0.49)
             private$..nBoot <- jmvcore::OptionInteger$new(
                 "nBoot",
                 nBoot,
@@ -58,6 +74,8 @@ bootCIOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 default="perc")
 
             self$.addOption(private$..dep)
+            self$.addOption(private$..stat)
+            self$.addOption(private$..trimProp)
             self$.addOption(private$..nBoot)
             self$.addOption(private$..ciWidth)
             self$.addOption(private$..showClassical)
@@ -66,6 +84,8 @@ bootCIOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         }),
     active = list(
         dep = function() private$..dep$value,
+        stat = function() private$..stat$value,
+        trimProp = function() private$..trimProp$value,
         nBoot = function() private$..nBoot$value,
         ciWidth = function() private$..ciWidth$value,
         showClassical = function() private$..showClassical$value,
@@ -73,6 +93,8 @@ bootCIOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
         ciMethod = function() private$..ciMethod$value),
     private = list(
         ..dep = NA,
+        ..stat = NA,
+        ..trimProp = NA,
         ..nBoot = NA,
         ..ciWidth = NA,
         ..showClassical = NA,
@@ -93,17 +115,19 @@ bootCIResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             super$initialize(
                 options=options,
                 name="",
-                title="Bootstrapowy przedzial ufnosci dla sredniej")
+                title="Bootstrapowy CI dla miary centralnej")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="ciTable",
-                title="Bootstrapowy przedzia\u0142 ufno\u015Bci dla \u015Bredniej",
+                title="Bootstrapowy CI dla miary centralnej",
                 rows="(dep)",
                 clearWith=list(
                     "nBoot",
                     "ciWidth",
                     "seed",
-                    "ciMethod"),
+                    "ciMethod",
+                    "stat",
+                    "trimProp"),
                 columns=list(
                     list(
                         `name`="var", 
@@ -111,7 +135,7 @@ bootCIResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `type`="text"),
                     list(
                         `name`="mean", 
-                        `title`="\u015Arednia", 
+                        `title`="Estymata", 
                         `type`="number"),
                     list(
                         `name`="seBoot", 
@@ -119,11 +143,11 @@ bootCIResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"),
                     list(
                         `name`="bias", 
@@ -137,11 +161,12 @@ bootCIResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 options=options,
                 name="classicalTable",
                 title="Test klasyczny (t-test dla jednej pr\u00F3bki)",
-                visible="(showClassical)",
+                visible="(showClassical && stat:mean)",
                 rows="(dep)",
                 clearWith=list(
                     "nBoot",
-                    "ciWidth"),
+                    "ciWidth",
+                    "stat"),
                 columns=list(
                     list(
                         `name`="var", 
@@ -162,11 +187,11 @@ bootCIResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `format`="zto,pvalue"),
                     list(
                         `name`="ciLowerClass", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpperClass", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"))))
             self$add(jmvcore::Array$new(
                 options=options,
@@ -177,7 +202,9 @@ bootCIResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                     "nBoot",
                     "ciWidth",
                     "seed",
-                    "ciMethod"),
+                    "ciMethod",
+                    "stat",
+                    "trimProp"),
                 template=jmvcore::Image$new(
                     options=options,
                     title="Rozk\u0142ad bootstrapowy \u2014 $key",
@@ -193,7 +220,7 @@ bootCIBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             super$initialize(
                 package = "jboot",
                 name = "bootCI",
-                version = c(0,1,0),
+                version = c(0,2,0),
                 options = options,
                 results = bootCIResults$new(options=options),
                 data = data,
@@ -206,16 +233,18 @@ bootCIBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 weightsSupport = 'auto')
         }))
 
-#' Bootstrapowy przedzial ufnosci dla sredniej
+#' Bootstrapowy CI dla miary centralnej
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Bootstrapowy przedzial ufnosci dla sredniej.
+#' Bootstrapowy CI dla miary centralnej (średniej, mediany, średniej uciętej).
 #'}
 #' @param data .
 #' @param dep .
+#' @param stat .
+#' @param trimProp .
 #' @param nBoot .
 #' @param ciWidth .
 #' @param showClassical .
@@ -238,6 +267,8 @@ bootCIBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
 bootCI <- function(
     data,
     dep,
+    stat = "mean",
+    trimProp = 0.1,
     nBoot = 1000,
     ciWidth = 95,
     showClassical = FALSE,
@@ -256,6 +287,8 @@ bootCI <- function(
 
     options <- bootCIOptions$new(
         dep = dep,
+        stat = stat,
+        trimProp = trimProp,
         nBoot = nBoot,
         ciWidth = ciWidth,
         showClassical = showClassical,

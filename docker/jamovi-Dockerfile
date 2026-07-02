@@ -177,6 +177,11 @@ COPY $JAMOVI_ROOT/jmv/ /tmp/source/jmv
 WORKDIR /tmp/source/jmv
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
+# Extra CRAN deps for the bundled 'plots' (scatr) charts that are not in the
+# prebuilt jamovi-deps base image: ridgeline -> ggridges, hexbin -> hexbin.
+# Installed into the module R library so the test-load and runtime find them.
+RUN R -e "install.packages(c('ggridges', 'hexbin'), repos='https://cloud.r-project.org', lib='/usr/lib/jamovi/modules/base/R', INSTALL_opts='--no-data --no-help --no-demo --no-html --no-docs --no-multiarch --clean')"
+
 COPY $JAMOVI_ROOT/plots/ /tmp/source/plots
 WORKDIR /tmp/source/plots
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps

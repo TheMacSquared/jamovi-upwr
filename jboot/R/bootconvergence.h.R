@@ -62,11 +62,11 @@ bootConvergenceResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6C
             super$initialize(
                 options=options,
                 name="",
-                title="Zbieznosc bootstrapu")
+                title="Zbieżność bootstrapu")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="convTable",
-                title="Wp\u0142yw liczby B na przedzia\u0142 ufno\u015Bci",
+                title="Wp\u0142yw liczby B na CI",
                 clearWith=list(
                     "dep",
                     "ciWidth",
@@ -82,20 +82,20 @@ bootConvergenceResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6C
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciWidth", 
-                        `title`="Szeroko\u015B\u0107 PU", 
+                        `title`="Szeroko\u015B\u0107 CI", 
                         `type`="number"))))
             self$add(jmvcore::Image$new(
                 options=options,
                 name="plots",
-                title="Zbie\u017Cno\u015B\u0107 przedzia\u0142u ufno\u015Bci",
+                title="Zbie\u017Cno\u015B\u0107 CI",
                 width=550,
                 height=400,
                 clearWith=list(
@@ -125,13 +125,13 @@ bootConvergenceBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Clas
                 weightsSupport = 'auto')
         }))
 
-#' Zbieznosc bootstrapu
+#' Zbieżność bootstrapu
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Analiza wplywu liczby prob bootstrapowych (B) na stabilnosc wynikow.
+#' Analiza wpływu liczby prób bootstrapowych (B) na stabilność wyników.
 #'}
 #' @param data .
 #' @param dep .

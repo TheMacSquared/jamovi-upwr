@@ -9,7 +9,8 @@ bootExploreOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             dep = NULL,
             nBoot = 10,
             ciWidth = 95,
-            seed = 42, ...) {
+            seed = 42,
+            showConvergence = FALSE, ...) {
 
             super$initialize(
                 package="jboot",
@@ -42,22 +43,29 @@ bootExploreOptions <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 default=42,
                 min=1,
                 max=999999)
+            private$..showConvergence <- jmvcore::OptionBool$new(
+                "showConvergence",
+                showConvergence,
+                default=FALSE)
 
             self$.addOption(private$..dep)
             self$.addOption(private$..nBoot)
             self$.addOption(private$..ciWidth)
             self$.addOption(private$..seed)
+            self$.addOption(private$..showConvergence)
         }),
     active = list(
         dep = function() private$..dep$value,
         nBoot = function() private$..nBoot$value,
         ciWidth = function() private$..ciWidth$value,
-        seed = function() private$..seed$value),
+        seed = function() private$..seed$value,
+        showConvergence = function() private$..showConvergence$value),
     private = list(
         ..dep = NA,
         ..nBoot = NA,
         ..ciWidth = NA,
-        ..seed = NA)
+        ..seed = NA,
+        ..showConvergence = NA)
 )
 
 bootExploreResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
@@ -66,14 +74,16 @@ bootExploreResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
     active = list(
         origTable = function() private$.items[["origTable"]],
         samplesTable = function() private$.items[["samplesTable"]],
-        summaryTable = function() private$.items[["summaryTable"]]),
+        summaryTable = function() private$.items[["summaryTable"]],
+        convTable = function() private$.items[["convTable"]],
+        convPlot = function() private$.items[["convPlot"]]),
     private = list(),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
-                title="Eksploracja bootstrapu krok po kroku")
+                title="Jak działa bootstrap")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="origTable",
@@ -131,7 +141,49 @@ bootExploreResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                     list(
                         `name`="value", 
                         `title`="Warto\u015B\u0107", 
-                        `type`="number"))))}))
+                        `type`="number"))))
+            self$add(jmvcore::Table$new(
+                options=options,
+                name="convTable",
+                title="Wp\u0142yw liczby B na CI",
+                visible="(showConvergence)",
+                clearWith=list(
+                    "dep",
+                    "ciWidth",
+                    "seed"),
+                columns=list(
+                    list(
+                        `name`="b", 
+                        `title`="B", 
+                        `type`="integer"),
+                    list(
+                        `name`="seBoot", 
+                        `title`="B\u0142\u0105d std. bootstrap", 
+                        `type`="number"),
+                    list(
+                        `name`="ciLower", 
+                        `title`="Dolna granica CI", 
+                        `type`="number"),
+                    list(
+                        `name`="ciUpper", 
+                        `title`="G\u00F3rna granica CI", 
+                        `type`="number"),
+                    list(
+                        `name`="ciWidthV", 
+                        `title`="Szeroko\u015B\u0107 CI", 
+                        `type`="number"))))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="convPlot",
+                title="Zbie\u017Cno\u015B\u0107 CI",
+                visible="(showConvergence)",
+                width=550,
+                height=400,
+                clearWith=list(
+                    "dep",
+                    "ciWidth",
+                    "seed"),
+                renderFun=".convPlot"))}))
 
 bootExploreBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     "bootExploreBase",
@@ -141,7 +193,7 @@ bootExploreBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             super$initialize(
                 package = "jboot",
                 name = "bootExplore",
-                version = c(0,1,0),
+                version = c(0,2,0),
                 options = options,
                 results = bootExploreResults$new(options=options),
                 data = data,
@@ -154,24 +206,27 @@ bootExploreBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 weightsSupport = 'auto')
         }))
 
-#' Eksploracja bootstrapu krok po kroku
+#' Jak działa bootstrap
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Krokowa eksploracja procesu bootstrapu dla celow dydaktycznych.
+#' Dydaktyczna analiza procesu bootstrapu: eksploracja krok po kroku oraz zbieżność CI przy rosnącej liczbie prób B.
 #'}
 #' @param data .
 #' @param dep .
 #' @param nBoot .
 #' @param ciWidth .
 #' @param seed .
+#' @param showConvergence .
 #' @return A results object containing:
 #' \tabular{llllll}{
 #'   \code{results$origTable} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$samplesTable} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$summaryTable} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$convTable} \tab \tab \tab \tab \tab a table \cr
+#'   \code{results$convPlot} \tab \tab \tab \tab \tab an image \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
@@ -186,7 +241,8 @@ bootExplore <- function(
     dep,
     nBoot = 10,
     ciWidth = 95,
-    seed = 42) {
+    seed = 42,
+    showConvergence = FALSE) {
 
     if ( ! requireNamespace("jmvcore", quietly=TRUE))
         stop("bootExplore requires jmvcore to be installed (restart may be required)")
@@ -202,7 +258,8 @@ bootExplore <- function(
         dep = dep,
         nBoot = nBoot,
         ciWidth = ciWidth,
-        seed = seed)
+        seed = seed,
+        showConvergence = showConvergence)
 
     analysis <- bootExploreClass$new(
         options = options,

@@ -83,7 +83,7 @@ bootPropResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             super$initialize(
                 options=options,
                 name="",
-                title="Bootstrapowy przedzial ufnosci dla proporcji")
+                title="Bootstrapowy CI dla proporcji")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="propTable",
@@ -114,12 +114,12 @@ bootPropResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number", 
                         `format`="zto"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number", 
                         `format`="zto"))))
             self$add(jmvcore::Array$new(
@@ -160,13 +160,13 @@ bootPropBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 weightsSupport = 'auto')
         }))
 
-#' Bootstrapowy przedzial ufnosci dla proporcji
+#' Bootstrapowy CI dla proporcji
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Bootstrapowy przedzial ufnosci dla proporcji.
+#' Bootstrapowy CI dla proporcji.
 #'}
 #' @param data .
 #' @param var .

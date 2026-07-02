@@ -19,10 +19,12 @@ children:
     children:
       - type: ComboBox
         name: stat
+  - type: LayoutBox
+    margin: large
+    children:
       - type: TextBox
         name: trimProp
         format: number
-        enable: (stat:trimmed)
   - type: LayoutBox
     margin: large
     children:
@@ -40,7 +42,6 @@ children:
     children:
       - type: CheckBox
         name: showClassical
-        enable: (stat:mean)
   - type: LayoutBox
     margin: large
     children:

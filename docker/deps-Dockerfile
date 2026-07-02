@@ -59,7 +59,7 @@ RUN R -e "\
         'Formula', 'GPArotation', 'Matrix', 'PMCMR', 'RUnit', 'RcppEigen', 'SparseM', \
         'TH.data', 'XML', 'abind', 'caTools', 'cellranger', 'checkmate', 'coda', \
         'colorspace', 'corpcor', 'cowplot', 'deSolve', 'elliptic', 'estimability', \
-        'fdrtool', 'forcats', 'ggrepel', 'ggridges', 'gridExtra', 'gtools', 'here', \
+        'fdrtool', 'forcats', 'ggrepel', 'ggridges', 'gridExtra', 'gtools', 'here', 'hexbin', \
         'hms', 'lavaan', 'microbenchmark', 'minqa', 'modelr', 'mvnormtest', 'mvtnorm', \
         'patchwork', 'pbapply', 'plyr', 'rbibutils', 'relimp', 'ssanv', 'zoo', \
         'MatrixModels', 'Rdpack', 'StanHeaders', 'doBy', 'emmeans', 'exactci', \

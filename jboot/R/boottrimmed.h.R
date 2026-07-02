@@ -94,11 +94,11 @@ bootTrimmedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
             super$initialize(
                 options=options,
                 name="",
-                title="Bootstrapowy PU dla sredniej ucietej")
+                title="Bootstrapowy CI dla średniej uciętej")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="trimTable",
-                title="Bootstrapowy PU dla \u015Bredniej uci\u0119tej",
+                title="Bootstrapowy CI dla \u015Bredniej uci\u0119tej",
                 rows="(dep)",
                 clearWith=list(
                     "trimProp",
@@ -125,11 +125,11 @@ bootTrimmedResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"),
                     list(
                         `name`="n", 
@@ -174,13 +174,13 @@ bootTrimmedBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 weightsSupport = 'auto')
         }))
 
-#' Bootstrapowy PU dla sredniej ucietej
+#' Bootstrapowy CI dla średniej uciętej
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Bootstrapowy przedzial ufnosci dla sredniej ucietej (trimmed mean).
+#' Bootstrapowy CI dla średniej uciętej (trimmed mean).
 #'}
 #' @param data .
 #' @param dep .

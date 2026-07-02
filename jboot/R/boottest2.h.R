@@ -120,11 +120,11 @@ bootTest2Results <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             super$initialize(
                 options=options,
                 name="",
-                title="Bootstrapowe porownanie dwoch grup")
+                title="Bootstrapowe porównanie dwóch grup")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="testTable",
-                title="Bootstrapowy PU dla r\u00F3\u017Cnicy \u015Brednich",
+                title="Bootstrapowy CI dla r\u00F3\u017Cnicy \u015Brednich",
                 rows="(dep)",
                 clearWith=list(
                     "group",
@@ -149,11 +149,11 @@ bootTest2Results <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"),
                     list(
                         `name`="n1", 
@@ -226,11 +226,11 @@ bootTest2Results <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `format`="zto,pvalue"),
                     list(
                         `name`="ciLowerClass", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpperClass", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"))))
             self$add(jmvcore::Array$new(
                 options=options,
@@ -273,13 +273,13 @@ bootTest2Base <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 weightsSupport = 'auto')
         }))
 
-#' Bootstrapowe porownanie dwoch grup
+#' Bootstrapowe porównanie dwóch grup
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Bootstrapowy przedzial ufnosci dla roznicy srednich miedzy dwiema niezaleznymi grupami.
+#' Bootstrapowy CI dla różnicy średnich między dwiema niezależnymi grupami.
 #'}
 #' @param data .
 #' @param dep .

@@ -84,11 +84,11 @@ bootMedianResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
             super$initialize(
                 options=options,
                 name="",
-                title="Bootstrapowy PU dla mediany")
+                title="Bootstrapowy CI dla mediany")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="medianTable",
-                title="Bootstrapowy przedzia\u0142 ufno\u015Bci dla mediany",
+                title="Bootstrapowy CI dla mediany",
                 rows="(dep)",
                 clearWith=list(
                     "nBoot",
@@ -110,11 +110,11 @@ bootMedianResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"),
                     list(
                         `name`="n", 
@@ -158,13 +158,13 @@ bootMedianBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
                 weightsSupport = 'auto')
         }))
 
-#' Bootstrapowy PU dla mediany
+#' Bootstrapowy CI dla mediany
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Bootstrapowy przedzial ufnosci dla mediany.
+#' Bootstrapowy CI dla mediany.
 #'}
 #' @param data .
 #' @param dep .

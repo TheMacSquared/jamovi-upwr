@@ -1,4 +1,4 @@
-title: Bootstrapowy przedzial ufnosci dla korelacji
+title: Bootstrapowy CI dla korelacji
 name: bootCorr
 jus: '3.0'
 stage: 0

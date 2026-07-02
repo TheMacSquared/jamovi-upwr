@@ -89,18 +89,19 @@ bootRegressionResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cl
     active = list(
         coefTable = function() private$.items[["coefTable"]],
         fitTable = function() private$.items[["fitTable"]],
-        plots = function() private$.items[["plots"]]),
+        plots = function() private$.items[["plots"]],
+        scatterPlot = function() private$.items[["scatterPlot"]]),
     private = list(),
     public=list(
         initialize=function(options) {
             super$initialize(
                 options=options,
                 name="",
-                title="Bootstrapowy PU dla wspolczynnika regresji")
+                title="Bootstrapowy CI dla współczynnika regresji")
             self$add(jmvcore::Table$new(
                 options=options,
                 name="coefTable",
-                title="Bootstrapowy PU dla wsp\u00F3\u0142czynnik\u00F3w regresji",
+                title="Bootstrapowy CI dla wsp\u00F3\u0142czynnik\u00F3w regresji",
                 clearWith=list(
                     "dep",
                     "pred",
@@ -123,11 +124,11 @@ bootRegressionResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cl
                         `type`="number"),
                     list(
                         `name`="ciLower", 
-                        `title`="Dolna granica PU", 
+                        `title`="Dolna granica CI", 
                         `type`="number"),
                     list(
                         `name`="ciUpper", 
-                        `title`="G\u00F3rna granica PU", 
+                        `title`="G\u00F3rna granica CI", 
                         `type`="number"))))
             self$add(jmvcore::Table$new(
                 options=options,
@@ -148,7 +149,7 @@ bootRegressionResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cl
             self$add(jmvcore::Image$new(
                 options=options,
                 name="plots",
-                title="Rozk\u0142ad bootstrapowy",
+                title="Rozk\u0142ad bootstrapowy nachyle\u0144",
                 width=500,
                 height=350,
                 clearWith=list(
@@ -158,7 +159,21 @@ bootRegressionResults <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Cl
                     "ciWidth",
                     "seed",
                     "ciMethod"),
-                renderFun=".plot"))}))
+                renderFun=".plot"))
+            self$add(jmvcore::Image$new(
+                options=options,
+                name="scatterPlot",
+                title="Wykres regresji z bootstrapowym przedzia\u0142em ufno\u015Bci",
+                width=550,
+                height=400,
+                clearWith=list(
+                    "dep",
+                    "pred",
+                    "nBoot",
+                    "ciWidth",
+                    "seed",
+                    "ciMethod"),
+                renderFun=".plotScatter"))}))
 
 bootRegressionBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class(
     "bootRegressionBase",
@@ -181,13 +196,13 @@ bootRegressionBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
                 weightsSupport = 'auto')
         }))
 
-#' Bootstrapowy PU dla wspolczynnika regresji
+#' Bootstrapowy CI dla współczynnika regresji
 #'
 #' 
 #'
 #' @examples
 #' \donttest{
-#' Bootstrapowy przedzial ufnosci dla wspolczynnika regresji liniowej.
+#' Bootstrapowy CI dla współczynnika regresji liniowej.
 #'}
 #' @param data .
 #' @param dep .
@@ -201,6 +216,7 @@ bootRegressionBase <- if (requireNamespace("jmvcore", quietly=TRUE)) R6::R6Class
 #'   \code{results$coefTable} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$fitTable} \tab \tab \tab \tab \tab a table \cr
 #'   \code{results$plots} \tab \tab \tab \tab \tab an image \cr
+#'   \code{results$scatterPlot} \tab \tab \tab \tab \tab an image \cr
 #' }
 #'
 #' Tables can be converted to data frames with \code{asDF} or \code{\link{as.data.frame}}. For example:
