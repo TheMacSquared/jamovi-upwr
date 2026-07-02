@@ -1,13 +1,13 @@
 ; jUPWR.nsi - installer NSIS (per-user, bez admina) dla natywnego buildu Windows.
 ; Budowanie (z katalogu packaging\scripts\windows\):
 ;   makensis jUPWR.nsi
-;   makensis /DVERSION=0.5.2 jUPWR.nsi      ; nadpisanie wersji
+;   makensis /DVERSION=0.5.3 jUPWR.nsi      ; nadpisanie wersji
 ; Zaklada gotowy payload w PAYLOAD (zmontowany jUPWR\ przez build.ps1).
 
 !define APPNAME    "jUPWR"
 !define COMPANY    "Uniwersytet Przyrodniczy we Wroclawiu"
 !ifndef VERSION
-  !define VERSION  "0.5.2"                 ; wersja jUPWR (client/common/jupwr.ts)
+  !define VERSION  "0.5.3"                 ; wersja jUPWR (client/common/jupwr.ts)
 !endif
 !define PAYLOAD    "..\..\build\dist\jUPWR"
 !define ICON       "..\..\..\platform\app-icon.ico"
