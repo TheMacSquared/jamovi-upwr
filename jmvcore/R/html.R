@@ -56,8 +56,6 @@ Html <- R6::R6Class("Html",
             private$.stale <- FALSE
         },
         setScripts=function(scripts) {
-            package <- self$analysis$package
-            scripts <- paste0(package, "/", scripts)
             private$.scripts <- scripts
             private$.stale <- FALSE
         },
@@ -69,7 +67,8 @@ Html <- R6::R6Class("Html",
         },
         knit=function(value) {
 
-            knitted <- knitr::knit(text=value)
+            knitted <- knitr::knit(text=value, quiet=TRUE)
+            # quiet=TRUE to suppress progress bar
 
             knitMeta <- attr(knitted, 'html_dependencies')
             if ( ! is.null(knitMeta)) {

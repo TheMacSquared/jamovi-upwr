@@ -66,7 +66,6 @@ ifeq ($(os),Linux)
 	LDFLAGS +=	-L$(R_HOME)/lib \
 				-L$(BASE_MODULE_PATH)/RInside/lib \
 				-lboost_filesystem \
-				-lboost_system \
 				-lpthread \
 				$(foreach rp,$(R_PATH),-Wl,-rpath,'$(rp)') \
 				$(foreach p,$(LIBDIR),-L$(p))
@@ -74,6 +73,9 @@ else
 	BINDIR ?= bin
 	R_HOME ?= $(SRCDIR)/../../../Frameworks/R
 	BASE_MODULE_PATH ?= $(SRCDIR)/../../modules/base/R
+	# upstream 28.x links statically against rtools45 (boost -mt-x64 + protobuf/absl
+	# from C:/rtools45); we keep the BOOST_LIBDIR/NANOMSG_DIR/PROTOBUF_DIR toolchain
+	# that packaging/scripts/windows/build.ps1 provides — revisit on a Windows machine
 	LDFLAGS +=	-L$(BOOST_LIBDIR) \
 				-L$(NANOMSG_DIR)/lib \
 				-L$(PROTOBUF_DIR)/lib \

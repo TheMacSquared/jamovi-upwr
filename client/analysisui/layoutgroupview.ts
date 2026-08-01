@@ -8,7 +8,7 @@ import EnumPropertyFilter from './enumpropertyfilter';
 import { FormatDef, StringFormat } from './formatdef';
 import Icons from './iconsupport';
 import interactionManager from '../common/interactionmanager';
-import { HTMLElementCreator as HTML }  from '../common/htmlelementcreator';
+import { h, rich }  from '../common/htmlelementcreator';
 import { GridControlProperties, VerticalAlignment } from './gridcontrol';
 import { Margin } from './controlbase';
 import { Control, CtrlDef } from './optionsview';
@@ -74,7 +74,7 @@ export class LabelControl extends TitledGridControl<LabelControlProperties> {
         classes += isHeading ? ' heading-formating' : '';
 
         this.labelId = interactionManager.nextAriaId('label');
-        this._subel = HTML.parse(`<div id="${ this.labelId }" role="heading" aria-level="3" class="silky-control-label silky-control-margin-${ this.getPropertyValue("margin") } ${ classes }" style="white-space: nowrap;"><span>${ groupText }</span></div>`);
+        this._subel = h('div', { id: this.labelId, role: 'heading', 'aria-level': '3', class: `silky-control-label silky-control-margin-${ this.getPropertyValue("margin") } ${ classes }`, style: 'white-space: nowrap;' }, h('span', {}, rich(groupText)));
         if (this.el === undefined)
             this.setRootElement(this._subel);
 
@@ -98,12 +98,17 @@ export class LabelControl extends TitledGridControl<LabelControlProperties> {
     }
     
     setLabel(value: string): void {
-        if (value === null)
+        if (value === null || value === undefined)
             value = '';
 
         value = this.translate(value);
 
-        this._subel.innerHTML = '<span>' + value + '</span>';
+        let label = this._subel.querySelector('span');
+        if (label === null) {
+            label = h('span');
+            this._subel.append(label);
+        }
+        label.replaceChildren(rich(value));
         let event = new CustomEvent('contentchanged');
         this._subel.dispatchEvent(event);
 
@@ -163,7 +168,7 @@ export class OptionLabelControl extends OptionControl<OptionedLabelControlProper
         classes += isHeading ? ' heading-formating' : '';
 
         this.labelId = interactionManager.nextAriaId('label');
-        this._subel = HTML.parse(`<div id="${ this.labelId }" role="heading" aria-level="3" class="silky-control-label silky-control-margin-${ this.getPropertyValue("margin") } ${ classes }" style="white-space: nowrap;"><span></span></div>`);
+        this._subel = h('div', { id: this.labelId, role: 'heading', 'aria-level': '3', class: `silky-control-label silky-control-margin-${ this.getPropertyValue("margin") } ${ classes }`, style: 'white-space: nowrap;' }, h('span'));
         if (this.el === undefined)
             this.setRootElement(this._subel);
 
@@ -187,12 +192,17 @@ export class OptionLabelControl extends OptionControl<OptionedLabelControlProper
     }
     
     setLabel(value: string): void {
-        if (value === null)
+        if (value === null || value === undefined)
             value = '';
 
         value = this.translate(value);
 
-        this._subel.innerHTML = '<span>' + value + '</span>';
+        let label = this._subel.querySelector('span');
+        if (label === null) {
+            label = h('span');
+            this._subel.append(label);
+        }
+        label.replaceChildren(rich(value));
         let event = new CustomEvent('contentchanged');
         this._subel.dispatchEvent(event);
 
@@ -216,14 +226,22 @@ export class OptionLabelControl extends OptionControl<OptionedLabelControlProper
 
     override onOptionValueChanged(key, data) {
         super.onOptionValueChanged(key, data);
-        let format = this.getPropertyValue('format');
-        this.setLabel(format.toString(this.getValue()));
+        this.setLabel(this.valueAsLabel());
     }
 
     onI18nChanged() {
+        this.setLabel(this.valueAsLabel());
+    }
+
+    // the option value is absent (undefined) when the control is bound to a key
+    // the row data doesn't carry yet, so don't hand that to the format
+    private valueAsLabel(): string {
+        let value = this.getValue();
+        if (value === null || value === undefined)
+            return '';
+
         let format = this.getPropertyValue('format');
-        let label = format.toString(this.getValue());
-        this.setLabel(label);
+        return format.toString(value);
     }
 }
 
