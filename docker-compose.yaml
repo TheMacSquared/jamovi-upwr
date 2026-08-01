@@ -18,7 +18,7 @@ services:
       - donotstart
 
   jamovi: &base
-    image: jupwr/jupwr:sync-28
+    image: jupwr/jupwr:0.5.5
     container_name: jamovi
     profiles: [main]
     build:
