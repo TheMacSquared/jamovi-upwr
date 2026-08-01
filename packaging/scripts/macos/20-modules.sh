@@ -51,10 +51,13 @@ MODULES=(jmv plots jperm jCI jboot jdistrACTION)
 for m in "${MODULES[@]}"; do
     [ -d "$REPO_ROOT/$m" ] || { log "pomijam $m (brak katalogu)"; continue; }
     log "jmc --install $m ..."
+    # --assume-app-version: nie sprawdzaj jamovi z /Applications (może być nowsze niż 2.7,
+    # a installer.check() wtedy odrzuca nasz kompilator); wersję bierzemy z pliku `version`.
     node "$JMC" --install "$REPO_ROOT/$m" \
         --to "$PAYLOAD/modules" \
         --rhome "$R_HOME_SYS" \
         --rlibs "$BASE_R" \
+        --assume-app-version "$JAMOVI_VERSION" \
         --patch-version --skip-deps
 done
 
