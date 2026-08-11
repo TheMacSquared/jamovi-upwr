@@ -1,0 +1,32 @@
+title: Schemat Bernoulliego (seria binarna)
+name: bernoulli
+jus: '2.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Wynik próby
+        children:
+          - type: VariablesListBox
+            name: outcomeVar
+            maxItemCount: 1
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Porządek prób (opcjonalnie)
+        children:
+          - type: VariablesListBox
+            name: orderVar
+            maxItemCount: 1
+            isTarget: true
+  - type: LevelSelector
+    name: successLevel
+    enable: (outcomeVar)
+  - type: Label
+    label: Wykresy
+    children:
+      - type: CheckBox
+        name: plotRunning

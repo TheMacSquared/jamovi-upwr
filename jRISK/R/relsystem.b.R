@@ -5,6 +5,11 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
     .run = function() {
 
+      if (self$options$mode == "data") {
+        private$.runData()
+        return()
+      }
+
       structure <- self$options$structure
       inputsTable <- self$results$inputsTable
       resultTable <- self$results$resultTable
@@ -123,6 +128,138 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       }
 
       layout <- riskDiagramLayout(structure, n, m = m, npb = npb, r = r)
+      self$results$diagram$setState(layout)
+    },
+
+    .runData = function() {
+      inputsTable <- self$results$inputsTable
+      resultTable <- self$results$resultTable
+
+      relVar <- self$options$relVar
+      if (is.null(relVar))
+        return()
+
+      r <- jmvcore::toNumeric(self$data[[relVar]])
+      labelVar <- self$options$labelVar
+      labels <- if (is.null(labelVar)) as.character(seq_along(r))
+                else as.character(self$data[[labelVar]])
+      groupVar <- self$options$groupVar
+      group <- if (is.null(groupVar)) rep("system", length(r))
+               else as.character(self$data[[groupVar]])
+
+      keep <- !is.na(r) & !is.na(labels) & !is.na(group)
+      r <- r[keep]
+      labels <- labels[keep]
+      group <- group[keep]
+
+      if (length(r) == 0) {
+        inputsTable$setError("Brak kompletnych wierszy komponentów.")
+        return()
+      }
+      if (any(r < 0 | r > 1)) {
+        inputsTable$setError("Niezawodności komponentów muszą być w przedziale [0, 1].")
+        return()
+      }
+
+      innerGate <- self$options$innerGate
+      outerGate <- self$options$outerGate
+      gateLabel <- c(series = "szeregowo", parallel = "równolegle")
+
+      # components ordered by group (order of first appearance in the data)
+      group <- factor(group, levels = unique(group))
+      ord <- order(as.integer(group))
+      r <- r[ord]
+      labels <- labels[ord]
+      group <- group[ord]
+      groupSizes <- as.integer(table(group))
+      n <- length(r)
+
+      Rsys <- riskTwoLevelReliability(r, groupSizes, innerGate, outerGate)
+
+      structureLabel <- paste(
+        "Dwupoziomowa: w podsystemie ", gateLabel[[innerGate]],
+        ", podsystemy ", gateLabel[[outerGate]], sep = "")
+      inputsTable$setRow(rowNo = 1, values = list(
+        structureCol = structureLabel,
+        nCol = paste("n = ", n, " (grupy: ",
+                     paste(levels(group), " [", groupSizes, "]",
+                           sep = "", collapse = ", "), ")", sep = ""),
+        relCol = paste("r = (", paste(format(r, digits = 3), collapse = ", "), ")", sep = "")))
+
+      resultTable$setRow(rowNo = 1, values = list(rel = Rsys, fail = 1 - Rsys))
+      resultTable$setNote("assumptions",
+        "Założenia: awarie elementów są niezależne, a wszystkie niezawodności odnoszą się do tego samego czasu misji.")
+
+      if (self$options$showStructureFun) {
+        ends <- cumsum(groupSizes)
+        starts <- c(1, head(ends, -1) + 1)
+        gRel <- vapply(seq_along(groupSizes), function(j) {
+          rs <- r[starts[j]:ends[j]]
+          if (innerGate == "series") prod(rs) else 1 - prod(1 - rs)
+        }, 0)
+        innerTxt <- if (innerGate == "series")
+          "R_grupy = iloczyn r po komponentach grupy"
+        else
+          "R_grupy = 1 − iloczyn (1 − r) po komponentach grupy"
+        outerTxt <- if (outerGate == "series")
+          "R = iloczyn R_grupy"
+        else
+          "R = 1 − iloczyn (1 − R_grupy)"
+        self$results$structureFun$setContent(paste(
+          innerTxt, "\n", outerTxt, "\n",
+          "R_grupy = (", paste(format(round(gRel, 5), nsmall = 5), collapse = ", "), ")\n",
+          "R = ", format(round(Rsys, 5), nsmall = 5), sep = ""))
+      }
+
+      # enumeration-based extras only for small systems
+      if (n <= 8) {
+        phi <- riskPhiTwoLevel(groupSizes, innerGate, outerGate)
+        if (self$options$showPathsCuts) {
+          pathsTable <- self$results$pathsTable
+          rowNo <- 0
+          for (s in riskMinimalPaths(phi, n)) {
+            rowNo <- rowNo + 1
+            pathsTable$addRow(rowKey = rowNo, values = list(
+              type = "ścieżka minimalna",
+              set = paste("{", paste(labels[s], collapse = ", "), "}", sep = "")))
+          }
+          for (s in riskMinimalCuts(phi, n)) {
+            rowNo <- rowNo + 1
+            pathsTable$addRow(rowKey = rowNo, values = list(
+              type = "przekrój minimalny",
+              set = paste("{", paste(labels[s], collapse = ", "), "}", sep = "")))
+          }
+        }
+        if (self$options$showCoherence) {
+          coherenceTable <- self$results$coherenceTable
+          co <- riskCoherence(phi, n)
+          coherenceTable$addRow(rowKey = "mono", values = list(
+            quantity = "Monotoniczność funkcji struktury",
+            value = if (co$monotone) "tak" else "nie"))
+          coherenceTable$addRow(rowKey = "rel", values = list(
+            quantity = "Wszystkie elementy istotne",
+            value = if (all(co$relevant)) "tak"
+                    else paste("nie (nieistotne: ",
+                               paste(labels[!co$relevant], collapse = ", "), ")", sep = "")))
+          coherenceTable$addRow(rowKey = "coh", values = list(
+            quantity = "System koherentny",
+            value = if (co$coherent) "tak" else "nie"))
+        }
+        if (self$options$showStateTable) {
+          stateTable <- self$results$stateTable
+          st <- riskStateTable(phi, r)
+          for (i in seq_len(nrow(st)))
+            stateTable$addRow(rowKey = i, values = list(
+              state = st$state[i], phi = st$phi[i], prob = st$prob[i]))
+        }
+      } else if (self$options$showPathsCuts || self$options$showCoherence ||
+                 self$options$showStateTable) {
+        resultTable$setNote("enumLimit",
+          "Ścieżki/przekroje, koherentność i tabela stanów są wyznaczane dla systemów o maksymalnie 8 komponentach.")
+      }
+
+      layout <- riskDiagramLayoutTwoLevel(groupSizes, innerGate, outerGate,
+                                          r = r, labels = labels)
       self$results$diagram$setState(layout)
     },
 

@@ -8,6 +8,7 @@ items:
       title: Funkcje niezawodnościowe w czasie t
       type: Table
       rows: 1
+      visible: (mode:parametric)
       columns:
         - name: tcol
           title: t
@@ -29,6 +30,7 @@ items:
       title: Charakterystyki modelu
       type: Table
       rows: 0
+      visible: (mode:parametric)
       columns:
         - name: quantity
           title: ""
@@ -40,13 +42,86 @@ items:
           title: Wartość
           type: text
 
+    - name: dataCounts
+      title: Dane czasu życia
+      type: Table
+      rows: 1
+      visible: (mode:data)
+      columns:
+        - name: n
+          title: n
+          type: integer
+        - name: events
+          title: Awarie
+          type: integer
+        - name: censored
+          title: Cenzurowane
+          type: integer
+        - name: kmMedian
+          title: Mediana KM
+          type: number
+
+    - name: fitTable
+      title: Dopasowanie modeli (MLE z cenzorowaniem prawostronnym)
+      type: Table
+      rows: 0
+      visible: (mode:data)
+      columns:
+        - name: model
+          title: Model
+          type: text
+        - name: logLik
+          title: logLik
+          type: number
+        - name: aic
+          title: AIC
+          type: number
+        - name: bic
+          title: BIC
+          type: number
+
+    - name: paramTable
+      title: Parametry (95% CI)
+      type: Table
+      rows: 0
+      visible: (mode:data)
+      columns:
+        - name: model
+          title: Model
+          type: text
+        - name: param
+          title: Parametr
+          type: text
+        - name: est
+          title: Estymata
+          type: number
+        - name: lower
+          title: Dolna
+          type: number
+        - name: upper
+          title: Górna
+          type: number
+
+    - name: dataAtTable
+      title: R(t) w zadanym czasie
+      type: Table
+      rows: 0
+      visible: (mode:data)
+      columns:
+        - name: model
+          title: Model
+          type: text
+        - name: rt
+          title: R(t)
+          type: number
+
     - name: plotR
       title: Funkcja niezawodności R(t)
       type: Image
       width: 500
       height: 400
       renderFun: .plotR
-      visible: (plotReliability)
+      visible: (plotReliability && mode:parametric)
 
     - name: plotH
       title: Intensywność uszkodzeń h(t)
@@ -54,7 +129,7 @@ items:
       width: 500
       height: 400
       renderFun: .plotH
-      visible: (plotHazard)
+      visible: (plotHazard && mode:parametric)
 
     - name: plotF
       title: Gęstość f(t)
@@ -62,5 +137,21 @@ items:
       width: 500
       height: 400
       renderFun: .plotF
-      visible: (plotDensity)
+      visible: (plotDensity && mode:parametric)
+
+    - name: kmPlot
+      title: Kaplan–Meier i dopasowane modele
+      type: Image
+      width: 560
+      height: 420
+      renderFun: .plotKM
+      visible: (plotReliability && mode:data)
+
+    - name: hazPlot
+      title: Intensywności uszkodzeń dopasowanych modeli
+      type: Image
+      width: 560
+      height: 420
+      renderFun: .plotHaz
+      visible: (plotHazard && mode:data)
 ...

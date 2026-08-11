@@ -5,30 +5,65 @@ stage: 0
 compilerMode: tame
 children:
   - type: Label
-    label: Model
+    label: Tryb
+    children:
+      - type: RadioButton
+        name: mode_parametric
+        optionName: mode
+        optionPart: parametric
+      - type: RadioButton
+        name: mode_data
+        optionName: mode
+        optionPart: data
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Czas
+        children:
+          - type: VariablesListBox
+            name: timeVar
+            maxItemCount: 1
+            isTarget: true
+            enable: (mode_data)
+      - type: TargetLayoutBox
+        label: Status zdarzenia (opcjonalnie)
+        children:
+          - type: VariablesListBox
+            name: statusVar
+            maxItemCount: 1
+            isTarget: true
+            enable: (mode_data)
+  - type: LevelSelector
+    name: failureLevel
+    enable: (mode_data && statusVar)
+  - type: Label
+    label: Model (tryb parametryczny)
     children:
       - type: ComboBox
         name: distribution
+        enable: (mode_parametric)
       - type: TextBox
         name: expRate
         format: number
-        enable: (distribution:exponential)
+        enable: (mode_parametric && distribution:exponential)
       - type: TextBox
         name: gammaShape
         format: number
-        enable: (distribution:gamma)
+        enable: (mode_parametric && distribution:gamma)
       - type: TextBox
         name: gammaRate
         format: number
-        enable: (distribution:gamma)
+        enable: (mode_parametric && distribution:gamma)
       - type: TextBox
         name: weibullShape
         format: number
-        enable: (distribution:weibull)
+        enable: (mode_parametric && distribution:weibull)
       - type: TextBox
         name: weibullScale
         format: number
-        enable: (distribution:weibull)
+        enable: (mode_parametric && distribution:weibull)
   - type: Label
     label: Ocena w czasie t
     children:
@@ -40,8 +75,10 @@ children:
     children:
       - type: CheckBox
         name: showMTTF
+        enable: (mode_parametric)
       - type: CheckBox
         name: showMedian
+        enable: (mode_parametric)
   - type: Label
     label: Wykresy
     children:
@@ -51,3 +88,4 @@ children:
         name: plotHazard
       - type: CheckBox
         name: plotDensity
+        enable: (mode_parametric)

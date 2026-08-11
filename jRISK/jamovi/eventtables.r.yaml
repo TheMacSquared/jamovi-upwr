@@ -1,0 +1,87 @@
+---
+name: eventtables
+title: Zdarzenia i warunkowanie
+jrs: '1.1'
+
+items:
+    - name: countsTable
+      title: Tabela liczebności 2×2
+      type: Table
+      rows: 3
+      columns:
+        - name: rowLabel
+          title: ""
+          type: text
+        - name: b
+          title: B
+          type: integer
+        - name: notb
+          title: nie-B
+          type: integer
+        - name: total
+          title: Suma
+          type: integer
+
+    - name: probTable
+      title: Prawdopodobieństwa
+      type: Table
+      rows: 0
+      columns:
+        - name: quantity
+          title: ""
+          type: text
+        - name: formula
+          title: Wzór
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+
+    - name: totalProb
+      title: Wzór na prawdopodobieństwo całkowite
+      type: Preformatted
+      visible: (showTotalProb)
+
+    - name: detectorTable
+      title: Metryki detektora
+      type: Table
+      rows: 0
+      visible: (showDetector)
+      columns:
+        - name: quantity
+          title: ""
+          type: text
+        - name: formula
+          title: Wzór
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+
+    - name: freqTable
+      title: Częstości naturalne (na 1000 przypadków)
+      type: Table
+      rows: 3
+      visible: (showNaturalFreq)
+      columns:
+        - name: rowLabel
+          title: ""
+          type: text
+        - name: b
+          title: B
+          type: number
+        - name: notb
+          title: nie-B
+          type: number
+        - name: total
+          title: Suma
+          type: number
+
+    - name: treePlot
+      title: Drzewo częstości
+      type: Image
+      width: 560
+      height: 400
+      renderFun: .plotTree
+      visible: (showTree)
+...

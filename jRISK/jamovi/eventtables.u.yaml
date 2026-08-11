@@ -1,0 +1,43 @@
+title: Zdarzenia i warunkowanie
+name: eventtables
+jus: '2.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Zdarzenie A
+        children:
+          - type: VariablesListBox
+            name: varA
+            maxItemCount: 1
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Zdarzenie B
+        children:
+          - type: VariablesListBox
+            name: varB
+            maxItemCount: 1
+            isTarget: true
+  - type: LevelSelector
+    name: levelA
+    enable: (varA)
+  - type: LevelSelector
+    name: levelB
+    enable: (varB)
+  - type: Label
+    label: Wyniki
+    children:
+      - type: CheckBox
+        name: showConditional
+      - type: CheckBox
+        name: showTotalProb
+      - type: CheckBox
+        name: showDetector
+      - type: CheckBox
+        name: showNaturalFreq
+      - type: CheckBox
+        name: showTree

@@ -1,0 +1,47 @@
+title: Drzewo błędów (FTA)
+name: fta
+jus: '2.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Etykieta zdarzenia
+        children:
+          - type: VariablesListBox
+            name: labelVar
+            maxItemCount: 1
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Prawdopodobieństwo
+        children:
+          - type: VariablesListBox
+            name: probVar
+            maxItemCount: 1
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Gałąź (opcjonalnie)
+        children:
+          - type: VariablesListBox
+            name: branchVar
+            maxItemCount: 1
+            isTarget: true
+  - type: Label
+    label: Bramki
+    children:
+      - type: ComboBox
+        name: innerGate
+      - type: ComboBox
+        name: topGate
+  - type: Label
+    label: Wyniki
+    children:
+      - type: CheckBox
+        name: showCuts
+      - type: CheckBox
+        name: showImportance
+      - type: CheckBox
+        name: showDiagram

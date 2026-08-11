@@ -16,7 +16,7 @@ Fork [jamovi](https://www.jamovi.org) przygotowany na potrzeby dydaktyki statyst
 | **jboot** | Testy bootstrapowe (przedziały ufności, korelacje, regresja, test dwóch grup i inne) |
 | **jperm** | Testy permutacyjne |
 | **jCI** | Przedziały ufności z wykresami dydaktycznymi (waffle, Gardner–Altman, scatter+regresja); wybór 2 kategorii z wielu poziomów; grupowanie |
-| **jRISK** | Ryzyko i niezawodność: modele czasu życia (R(t), h(t), MTTF dla rozkładów wykładniczego/gamma/Weibulla) oraz niezawodność systemów (struktury szeregowe, równoległe, k-z-n, szeregowo-równoległe i mostek; funkcja struktury, minimalne ścieżki/przekroje, koherentność, schemat blokowy). Zawiera przykładowy zbiór danych „Bananpol — nawadnianie plantacji" (Otwórz → Biblioteka) |
+| **jRISK** | Ryzyko i niezawodność: zdarzenia i warunkowanie z danych (2×2, Bayes, częstości naturalne, metryki detektora), schemat Bernoulliego (seria binarna), modele czasu życia (kalkulator R(t)/h(t)/MTTF oraz tryb „Dane": Kaplan–Meier i MLE wykładniczy/gamma/Weibull z cenzorowaniem prawostronnym, AIC/BIC), niezawodność systemów (topologie kanoniczne z mostkiem + komponenty z arkusza; funkcja struktury, ścieżki/przekroje, koherentność, schemat blokowy) i drzewo błędów FTA (bramki AND/OR, minimalne przekroje, ranking ważności). Zawiera przykładowy zbiór danych „Bananpol — nawadnianie plantacji" (Otwórz → Biblioteka) |
 
 ### Branding
 Aplikacja wyświetlana jako **jUPWR** (tytuł okna, nagłówek)

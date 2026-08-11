@@ -1,0 +1,35 @@
+---
+name: bernoulli
+title: Schemat Bernoulliego (seria binarna)
+jrs: '1.1'
+
+items:
+    - name: summaryTable
+      title: Seria prób
+      type: Table
+      rows: 1
+      columns:
+        - name: n
+          title: Liczba prób (n)
+          type: integer
+        - name: successes
+          title: Sukcesy
+          type: integer
+        - name: phat
+          title: Częstość p̂
+          type: number
+        - name: lower
+          title: 95% CI dolna
+          type: number
+        - name: upper
+          title: 95% CI górna
+          type: number
+
+    - name: runPlot
+      title: Częstość skumulowana sukcesów
+      type: Image
+      width: 560
+      height: 400
+      renderFun: .plotRun
+      visible: (plotRunning)
+...

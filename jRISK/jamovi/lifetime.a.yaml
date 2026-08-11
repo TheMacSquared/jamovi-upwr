@@ -2,10 +2,45 @@
 name: lifetime
 title: Modele czasu zycia
 menuGroup: Ryzyko
-version: '0.1.0'
+version: '0.2.0'
 jas: '1.2'
 
 options:
+    - name: data
+      type: Data
+
+    - name: mode
+      title: Tryb
+      type: List
+      options:
+        - title: Parametry (znany model)
+          name: parametric
+        - title: Dane (dopasowanie modeli)
+          name: data
+      default: parametric
+
+    - name: timeVar
+      title: Czas
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default: null
+
+    - name: statusVar
+      title: Status zdarzenia (opcjonalnie)
+      type: Variable
+      suggested:
+        - nominal
+      default: null
+
+    - name: failureLevel
+      title: Poziom oznaczający awarię
+      type: Level
+      variable: (statusVar)
+      allowNone: true
+
     - name: distribution
       title: Rozkład czasu życia
       type: List

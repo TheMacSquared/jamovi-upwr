@@ -1,0 +1,66 @@
+---
+name: eventtables
+title: Zdarzenia i warunkowanie
+menuGroup: Ryzyko
+version: '0.2.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: varA
+      title: Zdarzenie A (zmienna)
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+      default: null
+
+    - name: levelA
+      title: Poziom oznaczający A
+      type: Level
+      variable: (varA)
+      allowNone: true
+
+    - name: varB
+      title: Zdarzenie B (zmienna)
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+      default: null
+
+    - name: levelB
+      title: Poziom oznaczający B
+      type: Level
+      variable: (varB)
+      allowNone: true
+
+    - name: showConditional
+      title: Prawdopodobieństwa warunkowe i reguła iloczynu
+      type: Bool
+      default: true
+
+    - name: showTotalProb
+      title: Wzór na prawdopodobieństwo całkowite
+      type: Bool
+      default: true
+
+    - name: showDetector
+      title: Metryki detektora (A = stan rzeczywisty, B = alarm/test)
+      type: Bool
+      default: false
+
+    - name: showNaturalFreq
+      title: Częstości naturalne (na 1000 przypadków)
+      type: Bool
+      default: false
+
+    - name: showTree
+      title: Drzewo częstości
+      type: Bool
+      default: false
+...

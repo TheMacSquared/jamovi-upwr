@@ -1,0 +1,40 @@
+---
+name: bernoulli
+title: Schemat Bernoulliego (seria binarna)
+menuGroup: Ryzyko
+version: '0.2.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: outcomeVar
+      title: Wynik próby (zmienna binarna)
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+      default: null
+
+    - name: successLevel
+      title: Poziom oznaczający sukces
+      type: Level
+      variable: (outcomeVar)
+      allowNone: true
+
+    - name: orderVar
+      title: Porządek prób (opcjonalnie)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default: null
+
+    - name: plotRunning
+      title: Wykres częstości skumulowanej
+      type: Bool
+      default: true
+...

@@ -194,6 +194,10 @@ if (results.items) {
     if (_.isUndefined(option['default'])) {
         if (option['type'] === 'Action')
             return '\n    ' + option.name + ' = FALSE';
+        // standalone Level options cannot carry a default in the schema,
+        // yet direct R calls must be able to omit them (level auto-selected)
+        else if (option['type'] === 'Level')
+            return '\n    ' + option.name + ' = NULL';
         else
             return '\n    ' + option.name;
     }

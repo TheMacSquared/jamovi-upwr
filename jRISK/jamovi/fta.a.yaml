@@ -1,0 +1,69 @@
+---
+name: fta
+title: Drzewo błędów (FTA)
+menuGroup: Ryzyko
+version: '0.2.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: labelVar
+      title: Etykieta zdarzenia bazowego
+      type: Variable
+      suggested:
+        - nominal
+      default: null
+
+    - name: probVar
+      title: Prawdopodobieństwo zdarzenia
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default: null
+
+    - name: branchVar
+      title: Gałąź (opcjonalnie)
+      type: Variable
+      suggested:
+        - nominal
+      default: null
+
+    - name: innerGate
+      title: Bramka wewnątrz gałęzi
+      type: List
+      options:
+        - title: AND (wszystkie zdarzenia gałęzi)
+          name: and
+        - title: OR (dowolne zdarzenie gałęzi)
+          name: or
+      default: and
+
+    - name: topGate
+      title: Bramka zdarzenia szczytowego
+      type: List
+      options:
+        - title: OR (dowolna gałąź)
+          name: or
+        - title: AND (wszystkie gałęzie)
+          name: and
+      default: or
+
+    - name: showCuts
+      title: Minimalne przekroje
+      type: Bool
+      default: true
+
+    - name: showImportance
+      title: Ranking ważności zdarzeń
+      type: Bool
+      default: true
+
+    - name: showDiagram
+      title: Diagram drzewa
+      type: Bool
+      default: true
+...

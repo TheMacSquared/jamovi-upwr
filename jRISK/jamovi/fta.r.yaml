@@ -1,0 +1,73 @@
+---
+name: fta
+title: Drzewo błędów (FTA)
+jrs: '1.1'
+
+items:
+    - name: topTable
+      title: Zdarzenie szczytowe
+      type: Table
+      rows: 1
+      columns:
+        - name: structure
+          title: Struktura
+          type: text
+        - name: ptop
+          title: P(zdarzenie szczytowe)
+          type: number
+
+    - name: branchTable
+      title: Gałęzie
+      type: Table
+      rows: 0
+      columns:
+        - name: branch
+          title: Gałąź
+          type: text
+        - name: gate
+          title: Bramka
+          type: text
+        - name: events
+          title: Zdarzenia
+          type: text
+        - name: prob
+          title: P(gałąź)
+          type: number
+
+    - name: cutsTable
+      title: Minimalne przekroje
+      type: Table
+      rows: 0
+      visible: (showCuts)
+      columns:
+        - name: cut
+          title: Zbiór zdarzeń
+          type: text
+        - name: prob
+          title: P(przekrój)
+          type: number
+
+    - name: importanceTable
+      title: Ranking ważności zdarzeń
+      type: Table
+      rows: 0
+      visible: (showImportance)
+      columns:
+        - name: event
+          title: Zdarzenie
+          type: text
+        - name: prob
+          title: p
+          type: number
+        - name: drop
+          title: Spadek P(top) przy p = 0
+          type: number
+
+    - name: diagram
+      title: Diagram drzewa błędów
+      type: Image
+      width: 640
+      height: 420
+      renderFun: .plotTree
+      visible: (showDiagram)
+...

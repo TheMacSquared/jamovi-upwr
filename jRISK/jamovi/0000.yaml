@@ -10,17 +10,40 @@ description: >
   Modele czasu zycia oraz niezawodnosc systemow zlozonych na potrzeby kursu
   analizy ryzyka.
 analyses:
+  - title: Zdarzenia i warunkowanie
+    name: eventtables
+    ns: jRISK
+    menuGroup: Ryzyko
+    menuTitle: Zdarzenia i warunkowanie
+    menuSubgroup: Prawdopodobienstwo
+    category: analyses
+  - title: Schemat Bernoulliego (seria binarna)
+    name: bernoulli
+    ns: jRISK
+    menuGroup: Ryzyko
+    menuTitle: Schemat Bernoulliego (seria binarna)
+    menuSubgroup: Prawdopodobienstwo
+    category: analyses
   - title: Modele czasu zycia
     name: lifetime
     ns: jRISK
     menuGroup: Ryzyko
     menuTitle: Modele czasu zycia
+    menuSubgroup: Niezawodnosc
     category: analyses
   - title: Niezawodnosc systemow
     name: relsystem
     ns: jRISK
     menuGroup: Ryzyko
     menuTitle: Niezawodnosc systemow
+    menuSubgroup: Niezawodnosc
+    category: analyses
+  - title: Drzewo błędów (FTA)
+    name: fta
+    ns: jRISK
+    menuGroup: Ryzyko
+    menuTitle: Drzewo błędów (FTA)
+    menuSubgroup: Niezawodnosc
     category: analyses
 datasets:
   - name: Bananpol — nawadnianie plantacji

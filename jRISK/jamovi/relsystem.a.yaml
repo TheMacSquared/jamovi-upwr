@@ -2,10 +2,66 @@
 name: relsystem
 title: Niezawodnosc systemow
 menuGroup: Ryzyko
-version: '0.1.0'
+version: '0.2.0'
 jas: '1.2'
 
 options:
+    - name: data
+      type: Data
+
+    - name: mode
+      title: Tryb
+      type: List
+      options:
+        - title: Ręczny (kanoniczne topologie)
+          name: manual
+        - title: Dane (komponenty z arkusza)
+          name: data
+      default: manual
+
+    - name: relVar
+      title: Niezawodność komponentu
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default: null
+
+    - name: labelVar
+      title: Etykieta komponentu (opcjonalnie)
+      type: Variable
+      suggested:
+        - nominal
+      default: null
+
+    - name: groupVar
+      title: Podsystem/grupa (opcjonalnie)
+      type: Variable
+      suggested:
+        - nominal
+      default: null
+
+    - name: innerGate
+      title: Połączenie w podsystemie
+      type: List
+      options:
+        - title: Równoległe (rezerwa)
+          name: parallel
+        - title: Szeregowe
+          name: series
+      default: parallel
+
+    - name: outerGate
+      title: Połączenie między podsystemami
+      type: List
+      options:
+        - title: Szeregowe
+          name: series
+        - title: Równoległe
+          name: parallel
+      default: series
+
     - name: structure
       title: Struktura systemu
       type: List

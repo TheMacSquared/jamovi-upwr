@@ -5,35 +5,85 @@ stage: 0
 compilerMode: tame
 children:
   - type: Label
-    label: Struktura
+    label: Tryb
+    children:
+      - type: RadioButton
+        name: mode_manual
+        optionName: mode
+        optionPart: manual
+      - type: RadioButton
+        name: mode_data
+        optionName: mode
+        optionPart: data
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Niezawodność komponentu
+        children:
+          - type: VariablesListBox
+            name: relVar
+            maxItemCount: 1
+            isTarget: true
+            enable: (mode_data)
+      - type: TargetLayoutBox
+        label: Etykieta komponentu
+        children:
+          - type: VariablesListBox
+            name: labelVar
+            maxItemCount: 1
+            isTarget: true
+            enable: (mode_data)
+      - type: TargetLayoutBox
+        label: Podsystem/grupa
+        children:
+          - type: VariablesListBox
+            name: groupVar
+            maxItemCount: 1
+            isTarget: true
+            enable: (mode_data)
+  - type: Label
+    label: Bramki (tryb danych)
+    children:
+      - type: ComboBox
+        name: innerGate
+        enable: (mode_data)
+      - type: ComboBox
+        name: outerGate
+        enable: (mode_data)
+  - type: Label
+    label: Struktura (tryb ręczny)
     children:
       - type: ComboBox
         name: structure
+        enable: (mode_manual)
       - type: TextBox
         name: nComponents
         format: number
-        enable: (structure:series || structure:parallel || structure:koutofn)
+        enable: (mode_manual && (structure:series || structure:parallel || structure:koutofn))
       - type: TextBox
         name: kValue
         format: number
-        enable: (structure:koutofn)
+        enable: (mode_manual && structure:koutofn)
       - type: TextBox
         name: nBlocks
         format: number
-        enable: (structure:seriesParallel || structure:parallelSeries)
+        enable: (mode_manual && (structure:seriesParallel || structure:parallelSeries))
       - type: TextBox
         name: componentsPerBlock
         format: number
-        enable: (structure:seriesParallel || structure:parallelSeries)
+        enable: (mode_manual && (structure:seriesParallel || structure:parallelSeries))
   - type: Label
     label: Niezawodności elementów
     children:
       - type: CheckBox
         name: sameReliability
+        enable: (mode_manual)
       - type: TextBox
         name: componentReliability
         format: number
-        enable: (sameReliability)
+        enable: (mode_manual && sameReliability)
       - type: LayoutBox
         style: inline
         children:
@@ -45,19 +95,19 @@ children:
               - type: TextBox
                 name: r1
                 format: number
-                enable: (!sameReliability)
+                enable: (mode_manual && !sameReliability)
               - type: TextBox
                 name: r2
                 format: number
-                enable: (!sameReliability)
+                enable: (mode_manual && !sameReliability)
               - type: TextBox
                 name: r3
                 format: number
-                enable: (!sameReliability)
+                enable: (mode_manual && !sameReliability)
               - type: TextBox
                 name: r4
                 format: number
-                enable: (!sameReliability)
+                enable: (mode_manual && !sameReliability)
           - type: LayoutBox
             cell:
               row: 1
@@ -66,19 +116,19 @@ children:
               - type: TextBox
                 name: r5
                 format: number
-                enable: (!sameReliability)
+                enable: (mode_manual && !sameReliability)
               - type: TextBox
                 name: r6
                 format: number
-                enable: (!sameReliability)
+                enable: (mode_manual && !sameReliability)
               - type: TextBox
                 name: r7
                 format: number
-                enable: (!sameReliability)
+                enable: (mode_manual && !sameReliability)
               - type: TextBox
                 name: r8
                 format: number
-                enable: (!sameReliability)
+                enable: (mode_manual && !sameReliability)
   - type: Label
     label: Wyniki dodatkowe
     children:
