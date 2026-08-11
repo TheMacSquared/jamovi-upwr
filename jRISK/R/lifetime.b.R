@@ -115,8 +115,10 @@ lifetimeClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       } else {
         sv <- as.factor(self$data[[statusVarName]])
         lev <- self$options$failureLevel
+        # match the UI auto-selection: the event is conventionally the
+        # second level (0/1, nie/tak)
         if (is.null(lev))
-          lev <- levels(sv)[1]
+          lev <- levels(sv)[min(2, nlevels(sv))]
         status <- as.integer(as.character(sv) == lev)
         status[is.na(sv)] <- NA_integer_
       }
@@ -209,11 +211,16 @@ lifetimeClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       if (any(km$time <= tUser))
         kmAt <- km$surv[max(which(km$time <= tUser))]
       dataAtTable$addRow(rowKey = "km", values = list(
-        model = "Kaplan–Meier", rt = kmAt))
-      for (dist in names(okFits))
+        model = "Kaplan–Meier", rt = kmAt, mttf = NA,
+        median = if (is.finite(km$median)) km$median else NA))
+      for (dist in names(okFits)) {
+        par <- okFits[[dist]]$par
         dataAtTable$addRow(rowKey = dist, values = list(
           model = private$.modelLabels[[dist]],
-          rt = riskLtReliability(tUser, dist, okFits[[dist]]$par)))
+          rt = riskLtReliability(tUser, dist, par),
+          mttf = riskLtMTTF(dist, par),
+          median = riskLtMedian(dist, par)))
+      }
 
       # states for the data-mode plots
       grid <- seq(max(t) / 400, max(max(t), tUser) * 1.02, length.out = 400)

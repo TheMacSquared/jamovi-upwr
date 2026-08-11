@@ -80,10 +80,6 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       resultTable$setNote("assumptions",
         "Założenia: awarie elementów są niezależne, a wszystkie niezawodności odnoszą się do tego samego czasu misji.")
 
-      if (self$options$showStructureFun)
-        self$results$structureFun$setContent(
-          private$.structureText(structure, n, k, m, npb, r, Rsys))
-
       if (self$options$showPathsCuts) {
         pathsTable <- self$results$pathsTable
         paths <- riskMinimalPaths(phi, n)
@@ -103,20 +99,12 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         }
       }
 
-      if (self$options$showCoherence) {
-        coherenceTable <- self$results$coherenceTable
-        co <- riskCoherence(phi, n)
-        coherenceTable$addRow(rowKey = "mono", values = list(
-          quantity = "Monotoniczność funkcji struktury",
-          value = if (co$monotone) "tak" else "nie"))
-        coherenceTable$addRow(rowKey = "rel", values = list(
-          quantity = "Wszystkie elementy istotne",
-          value = if (all(co$relevant)) "tak"
-                  else paste("nie (nieistotne: ",
-                             paste(which(!co$relevant), collapse = ", "), ")", sep = "")))
-        coherenceTable$addRow(rowKey = "coh", values = list(
-          quantity = "System koherentny",
-          value = if (co$coherent) "tak" else "nie"))
+      if (self$options$showImportance) {
+        importanceTable <- self$results$importanceTable
+        B <- riskBirnbaum(function(rr) riskSystemReliability(phi, rr), r)
+        for (j in order(B, decreasing = TRUE))
+          importanceTable$addRow(rowKey = j, values = list(
+            component = as.character(j), rj = r[j], birnbaum = B[j]))
       }
 
       if (self$options$showStateTable) {
@@ -190,27 +178,6 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       resultTable$setNote("assumptions",
         "Założenia: awarie elementów są niezależne, a wszystkie niezawodności odnoszą się do tego samego czasu misji.")
 
-      if (self$options$showStructureFun) {
-        ends <- cumsum(groupSizes)
-        starts <- c(1, head(ends, -1) + 1)
-        gRel <- vapply(seq_along(groupSizes), function(j) {
-          rs <- r[starts[j]:ends[j]]
-          if (innerGate == "series") prod(rs) else 1 - prod(1 - rs)
-        }, 0)
-        innerTxt <- if (innerGate == "series")
-          "R_grupy = iloczyn r po komponentach grupy"
-        else
-          "R_grupy = 1 − iloczyn (1 − r) po komponentach grupy"
-        outerTxt <- if (outerGate == "series")
-          "R = iloczyn R_grupy"
-        else
-          "R = 1 − iloczyn (1 − R_grupy)"
-        self$results$structureFun$setContent(paste(
-          innerTxt, "\n", outerTxt, "\n",
-          "R_grupy = (", paste(format(round(gRel, 5), nsmall = 5), collapse = ", "), ")\n",
-          "R = ", format(round(Rsys, 5), nsmall = 5), sep = ""))
-      }
-
       # enumeration-based extras only for small systems
       if (n <= 8) {
         phi <- riskPhiTwoLevel(groupSizes, innerGate, outerGate)
@@ -230,21 +197,6 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
               set = paste("{", paste(labels[s], collapse = ", "), "}", sep = "")))
           }
         }
-        if (self$options$showCoherence) {
-          coherenceTable <- self$results$coherenceTable
-          co <- riskCoherence(phi, n)
-          coherenceTable$addRow(rowKey = "mono", values = list(
-            quantity = "Monotoniczność funkcji struktury",
-            value = if (co$monotone) "tak" else "nie"))
-          coherenceTable$addRow(rowKey = "rel", values = list(
-            quantity = "Wszystkie elementy istotne",
-            value = if (all(co$relevant)) "tak"
-                    else paste("nie (nieistotne: ",
-                               paste(labels[!co$relevant], collapse = ", "), ")", sep = "")))
-          coherenceTable$addRow(rowKey = "coh", values = list(
-            quantity = "System koherentny",
-            value = if (co$coherent) "tak" else "nie"))
-        }
         if (self$options$showStateTable) {
           stateTable <- self$results$stateTable
           st <- riskStateTable(phi, r)
@@ -252,76 +204,24 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             stateTable$addRow(rowKey = i, values = list(
               state = st$state[i], phi = st$phi[i], prob = st$prob[i]))
         }
-      } else if (self$options$showPathsCuts || self$options$showCoherence ||
-                 self$options$showStateTable) {
+      } else if (self$options$showPathsCuts || self$options$showStateTable) {
         resultTable$setNote("enumLimit",
-          "Ścieżki/przekroje, koherentność i tabela stanów są wyznaczane dla systemów o maksymalnie 8 komponentach.")
+          "Ścieżki/przekroje i tabela stanów są wyznaczane dla systemów o maksymalnie 8 komponentach.")
+      }
+
+      # closed form scales to any component count, so importance has no limit
+      if (self$options$showImportance) {
+        importanceTable <- self$results$importanceTable
+        B <- riskBirnbaum(function(rr)
+          riskTwoLevelReliability(rr, groupSizes, innerGate, outerGate), r)
+        for (j in order(B, decreasing = TRUE))
+          importanceTable$addRow(rowKey = j, values = list(
+            component = labels[j], rj = r[j], birnbaum = B[j]))
       }
 
       layout <- riskDiagramLayoutTwoLevel(groupSizes, innerGate, outerGate,
                                           r = r, labels = labels)
       self$results$diagram$setState(layout)
-    },
-
-    .structureText = function(structure, n, k, m, npb, r, Rsys) {
-      idx <- seq_len(n)
-      xs <- paste("x", idx, sep = "")
-      rs <- format(r, digits = 3)
-      RsysTxt <- format(round(Rsys, 5), nsmall = 5)
-
-      if (structure == "series") {
-        phiTxt <- paste("φ(x) =", paste(xs, collapse = " · "))
-        formulaTxt <- paste("R = r1 · … · r", n, " = ",
-                            paste(rs, collapse = " · "), " = ", RsysTxt, sep = "")
-      } else if (structure == "parallel") {
-        phiTxt <- paste("φ(x) = 1 − ",
-                        paste("(1 − ", xs, ")", sep = "", collapse = ""), sep = "")
-        formulaTxt <- paste("R = 1 − ",
-                            paste("(1 − ", rs, ")", sep = "", collapse = ""),
-                            " = ", RsysTxt, sep = "")
-      } else if (structure == "koutofn") {
-        phiTxt <- paste("φ(x) = 1, gdy x1 + … + x", n, " ≥ ", k, "; 0 w przeciwnym razie", sep = "")
-        if (length(unique(r)) == 1) {
-          formulaTxt <- paste("R = Σ(j=", k, "…", n, ") C(", n, ", j) · r^j · (1 − r)^(", n,
-                              " − j), r = ", rs[1], "  →  R = ", RsysTxt, sep = "")
-        } else {
-          formulaTxt <- paste("R obliczone przez enumerację 2^", n,
-                              " stanów (elementy różne) = ", RsysTxt, sep = "")
-        }
-      } else if (structure == "seriesParallel") {
-        blocks <- split(idx, rep(seq_len(m), each = npb))
-        blockTxt <- vapply(blocks, function(b)
-          paste("[1 − ", paste("(1 − x", b, ")", sep = "", collapse = ""), "]", sep = ""), "")
-        phiTxt <- paste("φ(x) =", paste(blockTxt, collapse = " · "))
-        blockVal <- vapply(blocks, function(b) 1 - prod(1 - r[b]), 0)
-        formulaTxt <- paste("R = ", paste(format(blockVal, digits = 5), collapse = " · "),
-                            " = ", RsysTxt, sep = "")
-      } else if (structure == "parallelSeries") {
-        branches <- split(idx, rep(seq_len(m), each = npb))
-        branchTxt <- vapply(branches, function(b)
-          paste("[1 − ", paste("x", b, sep = "", collapse = "·"), "]", sep = ""), "")
-        phiTxt <- paste("φ(x) = 1 −", paste(branchTxt, collapse = " · "))
-        branchVal <- vapply(branches, function(b) prod(r[b]), 0)
-        formulaTxt <- paste("R = 1 − ",
-                            paste("(1 − ", format(branchVal, digits = 5), ")",
-                                  sep = "", collapse = ""),
-                            " = ", RsysTxt, sep = "")
-      } else {  # bridge
-        phiTxt <- paste(
-          "φ(x) = 1, gdy działa któraś ze ścieżek minimalnych:",
-          "{1, 2}, {4, 5}, {1, 3, 5}, {2, 3, 4}",
-          "(e1: S–A, e2: A–T, e3: A–B, e4: S–B, e5: B–T)", sep = "\n")
-        b3work <- (1 - (1 - r[1]) * (1 - r[4])) * (1 - (1 - r[2]) * (1 - r[5]))
-        b3fail <- 1 - (1 - r[1] * r[2]) * (1 - r[4] * r[5])
-        formulaTxt <- paste(
-          "Dekompozycja względem elementu 3 (poprzeczka):\n",
-          "R = r3 · R(3 sprawny) + (1 − r3) · R(3 uszkodzony)\n",
-          "  = ", rs[3], " · ", format(round(b3work, 5), nsmall = 5),
-          " + ", format(round(1 - r[3], 5)), " · ", format(round(b3fail, 5), nsmall = 5),
-          " = ", RsysTxt, sep = "")
-      }
-
-      paste(phiTxt, formulaTxt, sep = "\n")
     },
 
     .plotDiagram = function(image, ...) {

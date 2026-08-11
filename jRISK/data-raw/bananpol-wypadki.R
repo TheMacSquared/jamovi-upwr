@@ -5,12 +5,15 @@
 # Dependency structure (the didactic point):
 #   sekcja -> number of peels encountered (Poisson; section C is next to
 #             the canteen), each peel is a Bernoulli slip trial whose
-#             per-peel probability depends on anti-slip shoes,
+#             per-peel probability depends on anti-slip shoes and on the
+#             workplace floor (dojrzewalnia is humid, magazyn is dry),
 #   slip severity (given a slip) is milder with anti-slip shoes,
 #   sick-leave days grow with severity.
-set.seed(1906)
+set.seed(32)
 n <- 200
 sekcja <- sample(c("A", "B", "C"), n, replace = TRUE, prob = c(0.35, 0.40, 0.25))
+miejsce <- sample(c("magazyn", "dojrzewalnia", "pakownia"), n, replace = TRUE,
+                  prob = c(0.45, 0.30, 0.25))
 staz <- round(rgamma(n, shape = 2, rate = 0.5), 1)
 buty_antyposlizgowe <- sample(c("tak", "nie"), n, replace = TRUE, prob = c(0.6, 0.4))
 
@@ -18,8 +21,10 @@ buty_antyposlizgowe <- sample(c("tak", "nie"), n, replace = TRUE, prob = c(0.6, 
 lambdaSekcja <- c(A = 1, B = 2, C = 5)
 skorki_tydzien <- rpois(n, lambdaSekcja[sekcja])
 
-# each peel is one Bernoulli trial; shoes lower the per-peel slip risk
-pPerPeel <- ifelse(buty_antyposlizgowe == "tak", 0.04, 0.12)
+# each peel is one Bernoulli trial; shoes lower the per-peel slip risk and
+# the floor modifies it (humid ripening room vs dry warehouse)
+floorFactor <- c(magazyn = 0.7, dojrzewalnia = 1.6, pakownia = 1.0)
+pPerPeel <- ifelse(buty_antyposlizgowe == "tak", 0.04, 0.12) * floorFactor[miejsce]
 pSlip <- 1 - (1 - pPerPeel)^skorki_tydzien
 slip <- rbinom(n, 1, pSlip)
 poslizgniecie <- ifelse(slip == 1, "tak", "nie")
@@ -42,6 +47,7 @@ for (i in which(slip == 1))
 d <- data.frame(
   pracownik = 1:n,
   sekcja,
+  miejsce,
   staz,
   buty_antyposlizgowe,
   skorki_tydzien,

@@ -2,7 +2,7 @@
 name: relsystem
 title: Niezawodnosc systemow
 menuGroup: Ryzyko
-version: '0.2.0'
+version: '0.3.0'
 jas: '1.2'
 
 options:
@@ -176,11 +176,6 @@ options:
       min: 0
       max: 1
 
-    - name: showStructureFun
-      title: Funkcja struktury φ(x)
-      type: Bool
-      default: true
-
     - name: showPathsCuts
       title: Minimalne ścieżki i przekroje
       type: Bool
@@ -191,8 +186,8 @@ options:
       type: Bool
       default: false
 
-    - name: showCoherence
-      title: Sprawdzenie koherentności
+    - name: showImportance
+      title: Ważność komponentów (Birnbaum)
       type: Bool
       default: false
 

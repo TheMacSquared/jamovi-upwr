@@ -24,6 +24,7 @@ children:
             isTarget: true
   - type: LevelSelector
     name: successLevel
+    defaultLevelIndex: 1
     enable: (outcomeVar)
   - type: Label
     label: Wykresy

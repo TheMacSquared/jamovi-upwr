@@ -112,6 +112,26 @@ test_that("fault tree minimal cut sets via the occurrence function", {
   expect_equal(canon(riskMinimalPaths(occ, 4)), sort(c("1", "2", "3", "4")))
 })
 
+test_that("Birnbaum importance has the textbook structure", {
+  r <- c(0.9, 0.8, 0.95)
+  # series: B_j = product of the other reliabilities -> weakest component wins
+  Bs <- riskBirnbaum(function(rr) riskSystemReliability(riskPhiSeries(3), rr), r)
+  expect_equal(Bs, c(0.8 * 0.95, 0.9 * 0.95, 0.9 * 0.8), tolerance = 1e-12)
+  expect_equal(which.max(Bs), 2)
+  # parallel: B_j = product of the other unreliabilities -> strongest wins
+  Bp <- riskBirnbaum(function(rr) riskSystemReliability(riskPhiParallel(3), rr), r)
+  expect_equal(Bp, c(0.2 * 0.05, 0.1 * 0.05, 0.1 * 0.2), tolerance = 1e-12)
+  expect_equal(which.max(Bp), 3)
+  # closed-form two-level path agrees with enumeration
+  sizes <- c(2, 2)
+  r4 <- c(0.9, 0.8, 0.95, 0.7)
+  Benum <- riskBirnbaum(function(rr)
+    riskSystemReliability(riskPhiTwoLevel(sizes, "parallel", "series"), rr), r4)
+  Bclosed <- riskBirnbaum(function(rr)
+    riskTwoLevelReliability(rr, sizes, "parallel", "series"), r4)
+  expect_equal(Benum, Bclosed, tolerance = 1e-12)
+})
+
 test_that("fault tree importance ranks the dominant event first", {
   p <- c(0.2, 0.01, 0.01, 0.01)
   branch <- c(1, 2, 3, 4)   # four single-event branches, top OR

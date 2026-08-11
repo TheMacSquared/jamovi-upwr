@@ -2,7 +2,7 @@
 name: bernoulli
 title: Schemat Bernoulliego (seria binarna)
 menuGroup: Ryzyko
-version: '0.2.0'
+version: '0.3.0'
 jas: '1.2'
 
 options:
@@ -22,7 +22,6 @@ options:
       title: Poziom oznaczający sukces
       type: Level
       variable: (outcomeVar)
-      allowNone: true
 
     - name: orderVar
       title: Porządek prób (opcjonalnie)

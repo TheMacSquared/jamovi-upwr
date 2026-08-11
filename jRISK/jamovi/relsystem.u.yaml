@@ -133,11 +133,9 @@ children:
     label: Wyniki dodatkowe
     children:
       - type: CheckBox
-        name: showStructureFun
-      - type: CheckBox
         name: showPathsCuts
       - type: CheckBox
-        name: showCoherence
+        name: showImportance
       - type: CheckBox
         name: showStateTable
       - type: CheckBox

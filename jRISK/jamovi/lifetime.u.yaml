@@ -37,6 +37,7 @@ children:
             enable: (mode_data)
   - type: LevelSelector
     name: failureLevel
+    defaultLevelIndex: 1
     enable: (mode_data && statusVar)
   - type: Label
     label: Model (tryb parametryczny)
@@ -75,10 +76,8 @@ children:
     children:
       - type: CheckBox
         name: showMTTF
-        enable: (mode_parametric)
       - type: CheckBox
         name: showMedian
-        enable: (mode_parametric)
   - type: Label
     label: Wykresy
     children:

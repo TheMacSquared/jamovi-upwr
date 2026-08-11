@@ -2,7 +2,7 @@
 name: eventtables
 title: Zdarzenia i warunkowanie
 menuGroup: Ryzyko
-version: '0.2.0'
+version: '0.3.0'
 jas: '1.2'
 
 options:
@@ -22,7 +22,6 @@ options:
       title: Poziom oznaczający A
       type: Level
       variable: (varA)
-      allowNone: true
 
     - name: varB
       title: Zdarzenie B (zmienna)
@@ -37,15 +36,9 @@ options:
       title: Poziom oznaczający B
       type: Level
       variable: (varB)
-      allowNone: true
 
     - name: showConditional
       title: Prawdopodobieństwa warunkowe i reguła iloczynu
-      type: Bool
-      default: true
-
-    - name: showTotalProb
-      title: Wzór na prawdopodobieństwo całkowite
       type: Bool
       default: true
 

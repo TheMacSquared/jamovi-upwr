@@ -2,7 +2,7 @@
 name: lifetime
 title: Modele czasu zycia
 menuGroup: Ryzyko
-version: '0.2.0'
+version: '0.3.0'
 jas: '1.2'
 
 options:
@@ -39,7 +39,6 @@ options:
       title: Poziom oznaczający awarię
       type: Level
       variable: (statusVar)
-      allowNone: true
 
     - name: distribution
       title: Rozkład czasu życia

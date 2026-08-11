@@ -37,11 +37,6 @@ items:
           title: Wartość
           type: number
 
-    - name: totalProb
-      title: Wzór na prawdopodobieństwo całkowite
-      type: Preformatted
-      visible: (showTotalProb)
-
     - name: detectorTable
       title: Metryki detektora
       type: Table

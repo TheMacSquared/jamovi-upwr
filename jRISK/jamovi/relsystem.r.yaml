@@ -31,11 +31,6 @@ items:
           title: Q = 1 − R (prawd. awarii)
           type: number
 
-    - name: structureFun
-      title: Funkcja struktury
-      type: Preformatted
-      visible: (showStructureFun)
-
     - name: pathsTable
       title: Minimalne ścieżki i przekroje
       type: Table
@@ -49,18 +44,21 @@ items:
           title: Zbiór elementów
           type: text
 
-    - name: coherenceTable
-      title: Koherentność
+    - name: importanceTable
+      title: Ważność komponentów (Birnbaum)
       type: Table
       rows: 0
-      visible: (showCoherence)
+      visible: (showImportance)
       columns:
-        - name: quantity
-          title: Warunek
+        - name: component
+          title: Komponent
           type: text
-        - name: value
-          title: Wynik
-          type: text
+        - name: rj
+          title: r
+          type: number
+        - name: birnbaum
+          title: B = R(sprawny) − R(uszkodzony)
+          type: number
 
     - name: stateTable
       title: Tabela stanów systemu

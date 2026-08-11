@@ -53,10 +53,12 @@ test_that("relsystem reproduces the control values", {
   expect_equal(sum(pc$type == "ścieżka minimalna"), 4)
   expect_equal(sum(pc$type == "przekrój minimalny"), 4)
 
-  # coherence check on the bridge
-  res <- jRISK::relsystem(structure = "bridge", showCoherence = TRUE)
-  co <- res$coherenceTable$asDF
-  expect_true(all(co$value[co$quantity == "System koherentny"] == "tak"))
+  # Birnbaum importance on the bridge: the crossover (3) matters least
+  res <- jRISK::relsystem(structure = "bridge", showImportance = TRUE)
+  imp <- res$importanceTable$asDF
+  expect_equal(nrow(imp), 5)
+  expect_equal(imp$component[5], "3")
+  expect_true(all(diff(imp$birnbaum) <= 1e-12))
 
   # k > n is rejected with an error, not computed
   res <- jRISK::relsystem(structure = "koutofn", nComponents = 3, kValue = 5)

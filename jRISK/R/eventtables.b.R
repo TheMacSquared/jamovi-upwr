@@ -74,20 +74,6 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             "P(A) = 0 lub P(B) = 0 — odpowiednie prawdopodobieństwa warunkowe są niezdefiniowane.")
       }
 
-      if (self$options$showTotalProb) {
-        pAgB <- if (pB > 0) pAB / pB else NA
-        pAgnB <- if (pB < 1) (nAnB / n) / (1 - pB) else NA
-        txt <- paste(
-          "P(A) = P(A|B)·P(B) + P(A|nie-B)·P(nie-B)\n",
-          "     = ", format(round(pAgB, 4), nsmall = 4), " · ",
-          format(round(pB, 4), nsmall = 4), " + ",
-          format(round(pAgnB, 4), nsmall = 4), " · ",
-          format(round(1 - pB, 4), nsmall = 4), "\n",
-          "     = ", format(round(pA, 4), nsmall = 4),
-          sep = "")
-        self$results$totalProb$setContent(txt)
-      }
-
       if (self$options$showDetector) {
         detectorTable <- self$results$detectorTable
         sens <- if (pA > 0) nAB / (nAB + nAnB) else NA

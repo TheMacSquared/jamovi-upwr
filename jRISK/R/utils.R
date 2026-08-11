@@ -516,6 +516,17 @@ riskDiagramLayoutTwoLevel <- function(groupSizes, inner, outer,
   list(boxes = boxes, edges = edges, boxW = boxW, boxH = boxH)
 }
 
+# Birnbaum importance: B_j = dR/dr_j = R(component j perfect) - R(j failed);
+# relFun maps a reliability vector to the system reliability, so the same
+# helper serves enumeration-based and closed-form structures
+riskBirnbaum <- function(relFun, r) {
+  vapply(seq_along(r), function(j) {
+    r1 <- r; r1[j] <- 1
+    r0 <- r; r0[j] <- 0
+    relFun(r1) - relFun(r0)
+  }, 0)
+}
+
 # coherence: phi monotone in every argument and every component relevant
 riskCoherence <- function(phi, n) {
   states <- riskAllStates(n)

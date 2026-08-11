@@ -1,0 +1,9 @@
+"komponent","podsystem","niezawodnosc","p_awarii"
+"AGR1","chlodzenie",0.9,0.1
+"AGR2","chlodzenie",0.92,0.08
+"WEN1","wentylacja",0.85,0.15
+"WEN2","wentylacja",0.88,0.12
+"WEN3","wentylacja",0.86,0.14
+"NAW1","nawilzanie",0.93,0.07
+"NAW2","nawilzanie",0.95,0.05
+"STER","sterowanie",0.98,0.02

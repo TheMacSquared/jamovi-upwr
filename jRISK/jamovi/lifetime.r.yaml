@@ -103,7 +103,7 @@ items:
           type: number
 
     - name: dataAtTable
-      title: R(t) w zadanym czasie
+      title: Charakterystyki dopasowanych modeli
       type: Table
       rows: 0
       visible: (mode:data)
@@ -114,6 +114,14 @@ items:
         - name: rt
           title: R(t)
           type: number
+        - name: mttf
+          title: MTTF
+          type: number
+          visible: (showMTTF)
+        - name: median
+          title: Mediana
+          type: number
+          visible: (showMedian)
 
     - name: plotR
       title: Funkcja niezawodności R(t)

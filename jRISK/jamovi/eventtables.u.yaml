@@ -34,8 +34,6 @@ children:
       - type: CheckBox
         name: showConditional
       - type: CheckBox
-        name: showTotalProb
-      - type: CheckBox
         name: showDetector
       - type: CheckBox
         name: showNaturalFreq

@@ -13,7 +13,9 @@ bernoulliClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       fo <- as.factor(self$data[[outcomeVar]])
       lev <- self$options$successLevel
-      if (is.null(lev)) lev <- levels(fo)[1]
+      # match the UI auto-selection: the event is conventionally the
+      # second level (0/1, nie/tak)
+      if (is.null(lev)) lev <- levels(fo)[min(2, nlevels(fo))]
 
       orderVar <- self$options$orderVar
       if (is.null(orderVar)) {
