@@ -1,7 +1,7 @@
 Package: jRISK
 Type: Package
 Title: Ryzyko i niezawodnosc dla jamovi
-Version: 0.2.0
+Version: 0.2.1
 Author: jUPWR Team
 Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 Description: Modele czasu zycia (funkcje niezawodnosci i intensywnosci

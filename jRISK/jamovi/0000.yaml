@@ -53,6 +53,13 @@ datasets:
       pracy do awarii (Weibull) ze statusem cenzorowania, sekcja i typ
       urządzenia, liczba niezaliczonych kontroli (dwumianowy), usterki w roku
       (Poisson) oraz wydajność (normalny)
+  - name: Bananpol — wypadki (skórki od banana)
+    path: bananpol_wypadki.csv
+    description: >-
+      200 pracowników plantacji: napotkane skórki od banana (Poisson zależny od
+      sekcji), poślizgnięcie (każda skórka to próba Bernoulliego, ryzyko zależne
+      od butów antypoślizgowych), ciężkość urazu (warunkowa) i dni zwolnienia.
+      Przykłady do zdarzeń i warunkowania, schematu Bernoulliego i tabel 2×2
 usesNative: true
 minApp: 1.0.8
 
