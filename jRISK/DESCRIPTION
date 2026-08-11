@@ -1,0 +1,15 @@
+Package: jRISK
+Type: Package
+Title: Ryzyko i niezawodnosc dla jamovi
+Version: 0.1.0
+Author: jUPWR Team
+Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+Description: Modele czasu zycia (funkcje niezawodnosci i intensywnosci
+    uszkodzen) oraz niezawodnosc systemow (struktury szeregowe, rownolegle,
+    k-z-n i mostkowe) na potrzeby kursu analizy ryzyka.
+License: GPL (>= 2)
+Encoding: UTF-8
+Imports:
+    jmvcore (>= 2.4.2),
+    R6,
+    ggplot2

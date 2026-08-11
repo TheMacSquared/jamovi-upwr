@@ -1,7 +1,7 @@
 ---
 title: distrACTION - Kwantyle i prawdopodobieństwa rozkładów ciągłych i dyskretnych
 name: distrACTION
-version: 1.0.1
+version: 28.1.0.0
 jms: '1.0'
 authors:
   - Michael Rihs
@@ -48,6 +48,20 @@ analyses:
     menuTitle: Rozkład wykładniczy
     menuSubgroup: Rozkłady ciągłe
     category: analyses
+  - title: Rozkład gamma
+    name: GammaDistribution
+    ns: distrACTION
+    menuGroup: Rozkłady
+    menuTitle: Rozkład gamma
+    menuSubgroup: Rozkłady ciągłe
+    category: analyses
+  - title: Rozkład Weibulla
+    name: WeibullDistribution
+    ns: distrACTION
+    menuGroup: Rozkłady
+    menuTitle: Rozkład Weibulla
+    menuSubgroup: Rozkłady ciągłe
+    category: analyses
   - title: Rozkład dwumianowy
     name: BinomialDistribution
     ns: distrACTION
@@ -67,6 +81,13 @@ analyses:
     ns: distrACTION
     menuGroup: Rozkłady
     menuTitle: Rozkład geometryczny
+    menuSubgroup: Rozkłady dyskretne
+    category: analyses
+  - title: Rozkład ujemny dwumianowy
+    name: NegBinomialDistribution
+    ns: distrACTION
+    menuGroup: Rozkłady
+    menuTitle: Rozkład ujemny dwumianowy
     menuSubgroup: Rozkłady dyskretne
     category: analyses
 usesNative: true

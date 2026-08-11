@@ -6,7 +6,7 @@ do rozdania studentom na ich własnych komputerach (bez Dockera).
 ## Strategia
 
 Pełny natywny build z brandingiem jUPWR i wszystkimi modułami wbudowanymi (jmv z modyfikacjami
-forka, jCI, jboot, jperm, distrACTION, scatr). Aplikacja = powłoka Electron + serwer Python +
+forka, jCI, jboot, jperm, distrACTION, jRISK, scatr). Aplikacja = powłoka Electron + serwer Python +
 silnik C++ + runtime R + moduły. Szczegóły anatomii: [`00-architecture.md`](00-architecture.md).
 
 ## Macierz deliverables

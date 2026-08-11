@@ -1,0 +1,66 @@
+---
+name: lifetime
+title: Modele czasu zycia
+jrs: '1.1'
+
+items:
+    - name: atTable
+      title: Funkcje niezawodnościowe w czasie t
+      type: Table
+      rows: 1
+      columns:
+        - name: tcol
+          title: t
+          type: number
+        - name: ft
+          title: f(t)
+          type: number
+        - name: Ft
+          title: F(t)
+          type: number
+        - name: Rt
+          title: R(t) = 1 − F(t)
+          type: number
+        - name: ht
+          title: h(t) = f(t)/R(t)
+          type: number
+
+    - name: summaryTable
+      title: Charakterystyki modelu
+      type: Table
+      rows: 0
+      columns:
+        - name: quantity
+          title: ""
+          type: text
+        - name: formula
+          title: Wzór
+          type: text
+        - name: value
+          title: Wartość
+          type: text
+
+    - name: plotR
+      title: Funkcja niezawodności R(t)
+      type: Image
+      width: 500
+      height: 400
+      renderFun: .plotR
+      visible: (plotReliability)
+
+    - name: plotH
+      title: Intensywność uszkodzeń h(t)
+      type: Image
+      width: 500
+      height: 400
+      renderFun: .plotH
+      visible: (plotHazard)
+
+    - name: plotF
+      title: Gęstość f(t)
+      type: Image
+      width: 500
+      height: 400
+      renderFun: .plotF
+      visible: (plotDensity)
+...

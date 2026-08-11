@@ -1,0 +1,147 @@
+---
+name: relsystem
+title: Niezawodnosc systemow
+menuGroup: Ryzyko
+version: '0.1.0'
+jas: '1.2'
+
+options:
+    - name: structure
+      title: Struktura systemu
+      type: List
+      options:
+        - title: Szeregowa
+          name: series
+        - title: Równoległa
+          name: parallel
+        - title: k-z-n
+          name: koutofn
+        - title: Szeregowo-równoległa (bloki równoległe w szeregu)
+          name: seriesParallel
+        - title: Równoległo-szeregowa (gałęzie szeregowe równolegle)
+          name: parallelSeries
+        - title: Mostek (5 elementów)
+          name: bridge
+      default: series
+
+    - name: nComponents
+      title: Liczba elementów (n) =
+      type: Number
+      default: 3
+      min: 2
+      max: 8
+
+    - name: kValue
+      title: Wymagane sprawne (k) =
+      type: Number
+      default: 2
+      min: 1
+      max: 8
+
+    - name: nBlocks
+      title: Liczba bloków/gałęzi (m) =
+      type: Number
+      default: 2
+      min: 2
+      max: 4
+
+    - name: componentsPerBlock
+      title: Elementów w bloku/gałęzi =
+      type: Number
+      default: 2
+      min: 2
+      max: 4
+
+    - name: sameReliability
+      title: Jednakowe elementy
+      type: Bool
+      default: true
+
+    - name: componentReliability
+      title: Niezawodność elementu r =
+      type: Number
+      default: 0.9
+      min: 0
+      max: 1
+
+    - name: r1
+      title: r1 =
+      type: Number
+      default: 0.9
+      min: 0
+      max: 1
+
+    - name: r2
+      title: r2 =
+      type: Number
+      default: 0.9
+      min: 0
+      max: 1
+
+    - name: r3
+      title: r3 =
+      type: Number
+      default: 0.9
+      min: 0
+      max: 1
+
+    - name: r4
+      title: r4 =
+      type: Number
+      default: 0.9
+      min: 0
+      max: 1
+
+    - name: r5
+      title: r5 =
+      type: Number
+      default: 0.9
+      min: 0
+      max: 1
+
+    - name: r6
+      title: r6 =
+      type: Number
+      default: 0.9
+      min: 0
+      max: 1
+
+    - name: r7
+      title: r7 =
+      type: Number
+      default: 0.9
+      min: 0
+      max: 1
+
+    - name: r8
+      title: r8 =
+      type: Number
+      default: 0.9
+      min: 0
+      max: 1
+
+    - name: showStructureFun
+      title: Funkcja struktury φ(x)
+      type: Bool
+      default: true
+
+    - name: showPathsCuts
+      title: Minimalne ścieżki i przekroje
+      type: Bool
+      default: false
+
+    - name: showStateTable
+      title: Tabela stanów systemu
+      type: Bool
+      default: false
+
+    - name: showCoherence
+      title: Sprawdzenie koherentności
+      type: Bool
+      default: false
+
+    - name: showDiagram
+      title: Schemat blokowy systemu
+      type: Bool
+      default: true
+...

@@ -1,0 +1,53 @@
+title: Modele czasu zycia
+name: lifetime
+jus: '2.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: Label
+    label: Model
+    children:
+      - type: ComboBox
+        name: distribution
+      - type: TextBox
+        name: expRate
+        format: number
+        enable: (distribution:exponential)
+      - type: TextBox
+        name: gammaShape
+        format: number
+        enable: (distribution:gamma)
+      - type: TextBox
+        name: gammaRate
+        format: number
+        enable: (distribution:gamma)
+      - type: TextBox
+        name: weibullShape
+        format: number
+        enable: (distribution:weibull)
+      - type: TextBox
+        name: weibullScale
+        format: number
+        enable: (distribution:weibull)
+  - type: Label
+    label: Ocena w czasie t
+    children:
+      - type: TextBox
+        name: t
+        format: number
+  - type: Label
+    label: Charakterystyki
+    children:
+      - type: CheckBox
+        name: showMTTF
+      - type: CheckBox
+        name: showMedian
+  - type: Label
+    label: Wykresy
+    children:
+      - type: CheckBox
+        name: plotReliability
+      - type: CheckBox
+        name: plotHazard
+      - type: CheckBox
+        name: plotDensity

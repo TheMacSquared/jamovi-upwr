@@ -47,7 +47,7 @@ log "Instalacja zależności ridge/hexbin (ggridges, hexbin) do $BASE_R ..."
 
 # Moduły w kolejności jak w docker/jamovi-Dockerfile.
 # R znajduje zależności w $R_HOME_SYS/library (systemowy R), jmvcore w base/R.
-MODULES=(jmv plots jperm jCI jboot jdistrACTION)
+MODULES=(jmv plots jperm jCI jboot jdistrACTION jRISK)
 for m in "${MODULES[@]}"; do
     [ -d "$REPO_ROOT/$m" ] || { log "pomijam $m (brak katalogu)"; continue; }
     log "jmc --install $m ..."
@@ -63,7 +63,7 @@ done
 
 log "Zainstalowane moduły:"
 ls "$PAYLOAD/modules"
-for m in jmv jCI scatr; do
+for m in jmv jCI scatr distrACTION jRISK; do
     [ -d "$PAYLOAD/modules/$m" ] || die "Moduł $m nie zainstalowany!"
     [ -d "$PAYLOAD/modules/$m/R" ] || die "Moduł $m nie ma zainstalowanego pakietu R (brak modules/$m/R) — silnik nie znajdzie analiz!"
 done

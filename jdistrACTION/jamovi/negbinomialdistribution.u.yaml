@@ -1,5 +1,5 @@
-title: Rozkład geometryczny
-name: GeometricDistribution
+title: Rozkład ujemny dwumianowy
+name: NegBinomialDistribution
 jus: '2.0'
 stage: 0
 compilerMode: tame
@@ -10,14 +10,17 @@ children:
       - type: TextBox
         name: dp1
         format: number
-      - type: RadioButton
-        name: RandomVariable_failures
-        optionName: RandomVariable
-        optionPart: failures
+      - type: TextBox
+        name: dp2
+        format: number
       - type: RadioButton
         name: RandomVariable_trials
         optionName: RandomVariable
         optionPart: trials
+      - type: RadioButton
+        name: RandomVariable_failures
+        optionName: RandomVariable
+        optionPart: failures
   - type: Label
     label: Funkcja
     children:

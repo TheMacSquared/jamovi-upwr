@@ -1,0 +1,94 @@
+title: Niezawodnosc systemow
+name: relsystem
+jus: '2.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: Label
+    label: Struktura
+    children:
+      - type: ComboBox
+        name: structure
+      - type: TextBox
+        name: nComponents
+        format: number
+        enable: (structure:series || structure:parallel || structure:koutofn)
+      - type: TextBox
+        name: kValue
+        format: number
+        enable: (structure:koutofn)
+      - type: TextBox
+        name: nBlocks
+        format: number
+        enable: (structure:seriesParallel || structure:parallelSeries)
+      - type: TextBox
+        name: componentsPerBlock
+        format: number
+        enable: (structure:seriesParallel || structure:parallelSeries)
+  - type: Label
+    label: Niezawodności elementów
+    children:
+      - type: CheckBox
+        name: sameReliability
+      - type: TextBox
+        name: componentReliability
+        format: number
+        enable: (sameReliability)
+      - type: LayoutBox
+        style: inline
+        children:
+          - type: LayoutBox
+            cell:
+              row: 1
+              column: 1
+            children:
+              - type: TextBox
+                name: r1
+                format: number
+                enable: (!sameReliability)
+              - type: TextBox
+                name: r2
+                format: number
+                enable: (!sameReliability)
+              - type: TextBox
+                name: r3
+                format: number
+                enable: (!sameReliability)
+              - type: TextBox
+                name: r4
+                format: number
+                enable: (!sameReliability)
+          - type: LayoutBox
+            cell:
+              row: 1
+              column: 2
+            children:
+              - type: TextBox
+                name: r5
+                format: number
+                enable: (!sameReliability)
+              - type: TextBox
+                name: r6
+                format: number
+                enable: (!sameReliability)
+              - type: TextBox
+                name: r7
+                format: number
+                enable: (!sameReliability)
+              - type: TextBox
+                name: r8
+                format: number
+                enable: (!sameReliability)
+  - type: Label
+    label: Wyniki dodatkowe
+    children:
+      - type: CheckBox
+        name: showStructureFun
+      - type: CheckBox
+        name: showPathsCuts
+      - type: CheckBox
+        name: showCoherence
+      - type: CheckBox
+        name: showStateTable
+      - type: CheckBox
+        name: showDiagram

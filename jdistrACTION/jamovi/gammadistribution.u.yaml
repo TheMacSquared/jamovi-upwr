@@ -1,5 +1,5 @@
-title: Rozkład geometryczny
-name: GeometricDistribution
+title: Rozkład gamma
+name: GammaDistribution
 jus: '2.0'
 stage: 0
 compilerMode: tame
@@ -10,14 +10,9 @@ children:
       - type: TextBox
         name: dp1
         format: number
-      - type: RadioButton
-        name: RandomVariable_failures
-        optionName: RandomVariable
-        optionPart: failures
-      - type: RadioButton
-        name: RandomVariable_trials
-        optionName: RandomVariable
-        optionPart: trials
+      - type: TextBox
+        name: dp2
+        format: number
   - type: Label
     label: Funkcja
     children:
@@ -35,11 +30,6 @@ children:
               - type: TextBox
                 name: x1
                 format: number
-                enable: (DistributionFunction)
-              - type: RadioButton
-                name: DistributionFunctionType_is
-                optionName: DistributionFunctionType
-                optionPart: is
                 enable: (DistributionFunction)
               - type: RadioButton
                 name: DistributionFunctionType_lower

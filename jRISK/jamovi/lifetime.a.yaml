@@ -1,0 +1,81 @@
+---
+name: lifetime
+title: Modele czasu zycia
+menuGroup: Ryzyko
+version: '0.1.0'
+jas: '1.2'
+
+options:
+    - name: distribution
+      title: Rozkład czasu życia
+      type: List
+      options:
+        - title: Wykładniczy
+          name: exponential
+        - title: Gamma
+          name: gamma
+        - title: Weibulla
+          name: weibull
+      default: exponential
+
+    - name: expRate
+      title: Intensywność (λ) =
+      type: Number
+      default: 1
+      min: 0.0001
+
+    - name: gammaShape
+      title: Kształt (α) =
+      type: Number
+      default: 2
+      min: 0.0001
+
+    - name: gammaRate
+      title: Intensywność (λ) =
+      type: Number
+      default: 1
+      min: 0.0001
+
+    - name: weibullShape
+      title: Kształt (β) =
+      type: Number
+      default: 1.5
+      min: 0.0001
+
+    - name: weibullScale
+      title: Skala (η) =
+      type: Number
+      default: 1
+      min: 0.0001
+
+    - name: t
+      title: Czas t =
+      type: Number
+      default: 1
+      min: 0
+
+    - name: showMTTF
+      title: MTTF (oczekiwany czas życia)
+      type: Bool
+      default: true
+
+    - name: showMedian
+      title: Mediana czasu życia
+      type: Bool
+      default: true
+
+    - name: plotReliability
+      title: Wykres funkcji niezawodności R(t)
+      type: Bool
+      default: true
+
+    - name: plotHazard
+      title: Wykres intensywności uszkodzeń h(t)
+      type: Bool
+      default: true
+
+    - name: plotDensity
+      title: Wykres gęstości f(t)
+      type: Bool
+      default: false
+...

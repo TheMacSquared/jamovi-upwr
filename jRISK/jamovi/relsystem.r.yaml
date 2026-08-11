@@ -1,0 +1,88 @@
+---
+name: relsystem
+title: Niezawodnosc systemow
+jrs: '1.1'
+
+items:
+    - name: inputsTable
+      title: Dane wejściowe
+      type: Table
+      rows: 1
+      columns:
+        - name: structureCol
+          title: Struktura
+          type: text
+        - name: nCol
+          title: Elementy
+          type: text
+        - name: relCol
+          title: Niezawodności
+          type: text
+
+    - name: resultTable
+      title: Niezawodność systemu
+      type: Table
+      rows: 1
+      columns:
+        - name: rel
+          title: R (niezawodność)
+          type: number
+        - name: fail
+          title: Q = 1 − R (prawd. awarii)
+          type: number
+
+    - name: structureFun
+      title: Funkcja struktury
+      type: Preformatted
+      visible: (showStructureFun)
+
+    - name: pathsTable
+      title: Minimalne ścieżki i przekroje
+      type: Table
+      rows: 0
+      visible: (showPathsCuts)
+      columns:
+        - name: type
+          title: Rodzaj
+          type: text
+        - name: set
+          title: Zbiór elementów
+          type: text
+
+    - name: coherenceTable
+      title: Koherentność
+      type: Table
+      rows: 0
+      visible: (showCoherence)
+      columns:
+        - name: quantity
+          title: Warunek
+          type: text
+        - name: value
+          title: Wynik
+          type: text
+
+    - name: stateTable
+      title: Tabela stanów systemu
+      type: Table
+      rows: 0
+      visible: (showStateTable)
+      columns:
+        - name: state
+          title: Stan (x₁…xₙ)
+          type: text
+        - name: phi
+          title: φ(x)
+          type: integer
+        - name: prob
+          title: P(stan)
+          type: number
+
+    - name: diagram
+      title: Schemat blokowy
+      type: Image
+      width: 620
+      height: 340
+      renderFun: .plotDiagram
+      visible: (showDiagram)
+...

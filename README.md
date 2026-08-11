@@ -12,10 +12,11 @@ Fork [jamovi](https://www.jamovi.org) przygotowany na potrzeby dydaktyki statyst
 ### Preinstalowane moduły dodatkowe
 | Moduł | Opis |
 |-------|------|
-| **distrACTION** | Obliczanie i wizualizacja rozkładów prawdopodobieństwa (ciągłe i dyskretne). Pełny interfejs po polsku, wartość oczekiwana E[X] i wariancja Var[X] z wzorami dla wszystkich 8 rozkładów |
+| **distrACTION** | Obliczanie i wizualizacja rozkładów prawdopodobieństwa (ciągłe i dyskretne). Pełny interfejs po polsku, wartość oczekiwana E[X] i wariancja Var[X] z wzorami dla wszystkich 11 rozkładów (w tym gamma, Weibulla i ujemny dwumianowy z wyborem konwencji zmiennej) |
 | **jboot** | Testy bootstrapowe (przedziały ufności, korelacje, regresja, test dwóch grup i inne) |
 | **jperm** | Testy permutacyjne |
 | **jCI** | Przedziały ufności z wykresami dydaktycznymi (waffle, Gardner–Altman, scatter+regresja); wybór 2 kategorii z wielu poziomów; grupowanie |
+| **jRISK** | Ryzyko i niezawodność: modele czasu życia (R(t), h(t), MTTF dla rozkładów wykładniczego/gamma/Weibulla) oraz niezawodność systemów (struktury szeregowe, równoległe, k-z-n, szeregowo-równoległe i mostek; funkcja struktury, minimalne ścieżki/przekroje, koherentność, schemat blokowy). Zawiera przykładowy zbiór danych „Bananpol — nawadnianie plantacji" (Otwórz → Biblioteka) |
 
 ### Branding
 Aplikacja wyświetlana jako **jUPWR** (tytuł okna, nagłówek)
@@ -44,9 +45,11 @@ docker compose --profile dev up
 jamovi/          # aplikacja (Electron + Python + C++)
 jmv/             # moduł analityczny R (submoduł)
 jdistrACTION/       # moduł rozkładów — fork distrACTION
-jboot/           # moduł bootstrap (submoduł)
-jperm/           # moduł testów permutacyjnych (submoduł)
-jCI/             # moduł przedziałów ufności (submoduł)
+jboot/           # moduł bootstrap
+jperm/           # moduł testów permutacyjnych
+jCI/             # moduł przedziałów ufności
+jRISK/           # moduł ryzyka i niezawodności
+
 ```
 
 ## Zależności (build natywny Windows)

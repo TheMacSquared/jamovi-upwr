@@ -1,0 +1,36 @@
+---
+title: Ryzyko i niezawodnosc
+name: jRISK
+version: 28.1.0.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: >
+  Modele czasu zycia oraz niezawodnosc systemow zlozonych na potrzeby kursu
+  analizy ryzyka.
+analyses:
+  - title: Modele czasu zycia
+    name: lifetime
+    ns: jRISK
+    menuGroup: Ryzyko
+    menuTitle: Modele czasu zycia
+    category: analyses
+  - title: Niezawodnosc systemow
+    name: relsystem
+    ns: jRISK
+    menuGroup: Ryzyko
+    menuTitle: Niezawodnosc systemow
+    category: analyses
+datasets:
+  - name: Bananpol — nawadnianie plantacji
+    path: bananpol.csv
+    description: >-
+      Syntetyczne dane 150 urządzeń systemu nawadniania plantacji bananów: czas
+      pracy do awarii (Weibull) ze statusem cenzorowania, sekcja i typ
+      urządzenia, liczba niezaliczonych kontroli (dwumianowy), usterki w roku
+      (Poisson) oraz wydajność (normalny)
+usesNative: true
+minApp: 1.0.8
+
+...

@@ -151,6 +151,7 @@ export class AnalyseTab extends RibbonTab {
         const groupOrder: { [key: string]: number } = {
             'Exploration': 10,
             'Rozkłady': 20,
+            'Ryzyko': 25,
             'Przedzialy ufnosci': 30,
             'Przedziały ufności': 30,
             'T-Tests': 40,

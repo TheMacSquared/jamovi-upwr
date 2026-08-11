@@ -1,6 +1,6 @@
-GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
-  "GeometricDistributionClass",
-  inherit = GeometricDistributionBase,
+NegBinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
+  "NegBinomialDistributionClass",
+  inherit = NegBinomialDistributionBase,
   private = list(
 
     .run = function() {
@@ -12,25 +12,37 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       XValue <- self$options$x1
       Quantile <- self$options$p
       XValue2 <- self$options$x2
-      DP1 <- self$options$dp1  # probability of success
+      DP1 <- self$options$dp1  # number of successes (r)
+      DP2 <- self$options$dp2  # probability of success (p)
       Convention <- self$options$RandomVariable
 
-      # X counts failures before the first success (support 0, 1, ... — the R
-      # convention, historical default here) or trials up to the first success
-      # (support 1, 2, ...); both map onto dgeom/pgeom/qgeom via the offset
+      Inputs <- self$results$Inputs
+      Outputs <- self$results$Outputs
+
+      if (DP1 != round(DP1)) {
+        Inputs$setError("Liczba sukcesów r musi być liczbą całkowitą.")
+        Outputs$setVisible(visible = FALSE)
+        return()
+      }
+
+      # X counts trials up to the r-th success (support r, r+1, ...) or, in the
+      # R convention, failures before the r-th success (support 0, 1, ...);
+      # both map onto dnbinom/pnbinom/qnbinom via the offset below
       Offset <- 0
-      if (Convention == "trials") Offset <- 1
+      if (Convention == "trials") Offset <- DP1
       SupportStart <- Offset
 
-      dGeom <- function(k)
-        ifelse(k == floor(k) & k >= SupportStart, dgeom(k - Offset, DP1), 0)
-      pGeom <- function(k)  # P(X <= k) for any real k
-        pgeom(floor(k) - Offset, DP1)
-      qGeom <- function(q)
-        qgeom(q, DP1) + Offset
+      dNB <- function(k)
+        ifelse(k == floor(k) & k >= SupportStart,
+               dnbinom(k - Offset, size = DP1, prob = DP2), 0)
+      pNB <- function(k)  # P(X <= k) for any real k
+        pnbinom(floor(k) - Offset, size = DP1, prob = DP2)
+      sNB <- function(k)  # P(X > k) for integer k, stable in the right tail
+        pnbinom(k - Offset, size = DP1, prob = DP2, lower.tail = FALSE)
+      qNB <- function(q)
+        qnbinom(q, size = DP1, prob = DP2) + Offset
 
-      LowerTail <- SupportStart
-      UpperTail <- qGeom(0.999)
+      UpperTail <- qNB(0.999)
       if ((UpperTail - SupportStart) < 5) UpperTail <- SupportStart + 5
       Columnames <- c("X", "Prob")
 
@@ -39,55 +51,36 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           LowerQuantile <- ((1 - Quantile) / 2)
           HigherQuantile <- LowerQuantile + Quantile}}
 
-      ConventionLabel <- "X = liczba porażek przed pierwszym sukcesem"
-      if (Convention == "trials")
-        ConventionLabel <- "X = numer próby pierwszego sukcesu"
-      InputLabel1 <- paste("Prawdopodb. = ", DP1, "; ", ConventionLabel, sep = "")
-      DistributionFunctionTypeLabel <- ""
-      QuantileFunctionTypeLabel <- ""
-      if (DistributionFunctionType == "lower")
-        DistributionFunctionTypeLabel <- "Tryb: P(X ≤ x1)"
-      if (DistributionFunctionType == "higher")
-        DistributionFunctionTypeLabel <- "Tryb: P(X ≥ x1)"
-      if (DistributionFunctionType == "interval")
-        DistributionFunctionTypeLabel <- paste("Tryb: x2 = ", XValue2, sep = "")
-      if (DistributionFunctionType == "is")
-        DistributionFunctionTypeLabel <- "Tryb: P(X = x1)"
-      if (QuantileFunctionType == "cumulative")
-        QuantileFunctionTypeLabel <- "tryb kumulatywny"
-      if (QuantileFunctionType == "central")
-        QuantileFunctionTypeLabel <- "tryb centralny"
+      ConventionLabel <- "X = numer próby r-tego sukcesu"
+      if (Convention == "failures")
+        ConventionLabel <- "X = liczba porażek przed r-tym sukcesem"
+      InputLabel1 <- paste("r = ", DP1, ", p = ", DP2, "; ", ConventionLabel, sep = "")
 
-      Inputs <- self$results$Inputs
       Inputs$setRow(rowNo = 1, values = list(
         ParametersColumn = InputLabel1,
         DistributionFunctionColumn = paste("x1 = ", XValue, sep = ""),
         QuantileFunctionColumn = paste("p = ", Quantile, sep = "")))
 
-      # Discrete: integer sequence
-      x <- seq(LowerTail, UpperTail, by = 1)
-      Density <- dGeom(x)
+      # Discrete: integer sequence over the support
+      x <- seq(SupportStart, UpperTail, by = 1)
+      Density <- dNB(x)
 
       if(DistributionFunction == "TRUE"){
-        if (DistributionFunctionType == "is"){
-          DistributionResult <- dGeom(XValue)
-        } else {
-          DistributionResult1 <- pGeom(XValue)
-          if (DistributionFunctionType == "interval" || DistributionFunctionType == "higher")
-            DistributionResult1 <- pGeom(ceiling(XValue) - 1)
-          DistributionResult <- DistributionResult1
-          if (DistributionFunctionType == "interval"){
-            DistributionResult2 <- pGeom(XValue2)
-            DistributionResult <- DistributionResult2 - DistributionResult1}
-          if (DistributionFunctionType == "higher")
-            DistributionResult <- 1 - DistributionResult}}
+        if (DistributionFunctionType == "is")
+          DistributionResult <- dNB(XValue)
+        if (DistributionFunctionType == "lower")
+          DistributionResult <- pNB(XValue)
+        if (DistributionFunctionType == "higher")
+          DistributionResult <- sNB(ceiling(XValue) - 1)
+        if (DistributionFunctionType == "interval")
+          DistributionResult <- pNB(XValue2) - pNB(ceiling(XValue) - 1)}
 
       if(QuantileFunction == "TRUE"){
         if (QuantileFunctionType == "cumulative")
-          QuantileResult <- qGeom(Quantile)
+          QuantileResult <- qNB(Quantile)
         if (QuantileFunctionType == "central"){
-          QuantileResult <- qGeom(LowerQuantile)
-          QuantileResult2 <- qGeom(HigherQuantile)}}
+          QuantileResult <- qNB(LowerQuantile)
+          QuantileResult2 <- qNB(HigherQuantile)}}
 
       OutputLabel11 <- ""
       OutputLabel12 <- ""
@@ -104,7 +97,6 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")
           OutputLabel22 <- paste("x2 = ", QuantileResult2, sep = "")}}
 
-      Outputs <- self$results$Outputs
       Outputs$setRow(rowNo = 1, values = list(
         DistributionResultColumn = OutputLabel11,
         QuantileResultColumn = OutputLabel12))
@@ -120,11 +112,11 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         MomentsTable$setVisible(visible = TRUE)
         if (ShowMean) {
           if (Convention == "trials") {
-            MeanFormula <- "E[X] = 1 / p"
-            MeanValue <- 1 / DP1
+            MeanFormula <- "E[X] = r/p"
+            MeanValue <- DP1 / DP2
           } else {
-            MeanFormula <- "E[X] = (1 − p) / p"
-            MeanValue <- (1 - DP1) / DP1
+            MeanFormula <- "E[X] = r(1 − p)/p"
+            MeanValue <- DP1 * (1 - DP2) / DP2
           }
           MomentsTable$addRow(rowKey = "mean", values = list(
             MomentColumn = "E[X]",
@@ -135,8 +127,8 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         if (ShowVariance) {
           MomentsTable$addRow(rowKey = "var", values = list(
             MomentColumn = "Var[X]",
-            FormulaColumn = "Var[X] = (1 − p) / p²",
-            ValueColumn = as.character(round((1 - DP1) / DP1^2, 4))
+            FormulaColumn = "Var[X] = r(1 − p)/p²",
+            ValueColumn = as.character(round(DP1 * (1 - DP2) / DP2^2, 4))
           ))
         }
       } else {
@@ -171,14 +163,14 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       if(QuantileFunction == "TRUE"){
         if(QuantileFunctionType == "cumulative"){
-          HigherSegment <- qGeom(Quantile)
+          HigherSegment <- qNB(Quantile)
           HigherSegmentLength <- max(Datas$Prob) * 0.8
           LowerSegment <- HigherSegment
           LowerSegmentLength <- HigherSegmentLength}
         if(QuantileFunctionType == "central"){
-          LowerSegment <- qGeom(LowerQuantile)
+          LowerSegment <- qNB(LowerQuantile)
           LowerSegmentLength <- max(Datas$Prob) * 0.8
-          HigherSegment <- qGeom(HigherQuantile)
+          HigherSegment <- qNB(HigherQuantile)
           HigherSegmentLength <- max(Datas$Prob) * 0.8}}
 
       # Pack data for plot

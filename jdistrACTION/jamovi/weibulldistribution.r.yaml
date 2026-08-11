@@ -1,0 +1,59 @@
+---
+name:  WeibullDistribution
+title: Rozkład Weibulla
+jrs:   '1.1'
+
+items:
+    - name: Inputs
+      title: Dane wejściowe
+      type: Table
+      rows: 1
+      columns:
+        - name: ParametersColumn
+          title: Parametry
+          type: text
+        - name: DistributionFunctionColumn
+          title: "'Oblicz prawdopodobieństwo'"
+          type: text
+          visible: (DistributionFunction)
+        - name: QuantileFunctionColumn
+          title: "'Oblicz kwantyl(e)'"
+          type: text
+          visible: (QuantileFunction)
+
+    - name: Outputs
+      title: "Wyniki"
+      type: Table
+      rows: 1
+      columns:
+        - name: DistributionResultColumn
+          title: Prawdopodobieństwo
+          type: text
+          visible: (DistributionFunction)
+        - name: QuantileResultColumn
+          title: Kwantyl(e)
+          type: text
+          visible: (QuantileFunction)
+
+    - name: MomentsTable
+      title: Momenty
+      type: Table
+      rows: 0
+      columns:
+        - name: MomentColumn
+          title: ""
+          type: text
+        - name: FormulaColumn
+          title: Wzór
+          type: text
+        - name: ValueColumn
+          title: Wartość
+          type: text
+
+    - name: plot
+      title: ""
+      type:  Image
+      width:  500
+      height: 400
+      renderFun: .plot
+...

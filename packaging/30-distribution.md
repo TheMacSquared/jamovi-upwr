@@ -73,6 +73,6 @@ auto-update w przyszłości, jeśli częstotliwość wydań wzrośnie.
 
 - [ ] Zbuduj installki (macOS: `scripts/macos/*`, Windows: `scripts/windows/*`).
 - [ ] Przetestuj na **czystej** maszynie (bez Homebrew/R/Pythona) — krytyczne dla wykrycia braków relokowalności.
-- [ ] Sprawdź: uruchomienie, otwarcie danych, Descriptives (boxMean/histFacet/V), jeden moduł (jCI).
+- [ ] Sprawdź: uruchomienie, otwarcie danych, Descriptives (boxMean/histFacet/V), jeden moduł (jCI), menu Ryzyko (jRISK: modele czasu życia, niezawodność systemów) i nowe rozkłady (gamma, Weibulla, ujemny dwumianowy).
 - [ ] Wgraj do GitHub Releases z notką o obejściu Gatekeeper/SmartScreen.
 - [ ] Zlinkuj instrukcję instalacji na stronie kursu.

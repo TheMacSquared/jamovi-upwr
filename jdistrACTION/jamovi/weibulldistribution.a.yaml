@@ -1,8 +1,8 @@
 ---
-name:  GeometricDistribution
-title: Rozkład geometryczny
+name:  WeibullDistribution
+title: Rozkład Weibulla
 menuGroup: Rozkłady
-menuSubgroup: Rozkłady dyskretne
+menuSubgroup: Rozkłady ciągłe
 version: '1.3.0'
 jas: '1.2'
 
@@ -37,19 +37,7 @@ options:
           name:  higher
         - title: P(x1 ≤ X ≤ x2)
           name: interval
-        - title: P(X = x1)
-          name: is
-      default: is
-
-    - name: RandomVariable
-      title: Zmienna losowa
-      type: List
-      options:
-        - title: X = liczba porażek przed pierwszym sukcesem (X = 0, 1, …)
-          name: failures
-        - title: X = numer próby, w której pada pierwszy sukces (X = 1, 2, …)
-          name: trials
-      default: failures
+      default: lower
 
     - name: x1
       title: x1 =
@@ -66,14 +54,19 @@ options:
     - name: x2
       title: x2 =
       type: Number
-      default: 3
+      default: 2
 
     - name: dp1
-      title: Prawdopodb. (p) =
+      title: Kształt (β) =
       type: Number
-      default: 0.5
+      default: 1.5
       min: 0.0001
-      max: 1
+
+    - name: dp2
+      title: Skala (η) =
+      type: Number
+      default: 1
+      min: 0.0001
 
     - title: Pokaż wartość oczekiwaną E[X]
       name: showMean
