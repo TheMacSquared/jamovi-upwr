@@ -46,20 +46,21 @@ analyses:
     menuSubgroup: Niezawodnosc
     category: analyses
 datasets:
-  - name: Bananpol — nawadnianie plantacji
+  - name: Bananpol — urządzenia dojrzewalni
     path: bananpol.csv
     description: >-
-      Syntetyczne dane 150 urządzeń systemu nawadniania plantacji bananów: czas
-      pracy do awarii (Weibull) ze statusem cenzorowania, sekcja i typ
-      urządzenia, liczba niezaliczonych kontroli (dwumianowy), usterki w roku
-      (Poisson) oraz wydajność (normalny)
+      Syntetyczne dane 150 urządzeń dojrzewalni bananów u dystrybutora Bananpol
+      (agregaty chłodnicze, wentylatory, nawilżacze): czas pracy do awarii
+      (Weibull) ze statusem cenzorowania, sekcja, liczba niezaliczonych
+      kontroli (dwumianowy), usterki w roku (Poisson) oraz wydajność (normalny)
   - name: Bananpol — wypadki (skórki od banana)
     path: bananpol_wypadki.csv
     description: >-
-      200 pracowników plantacji: napotkane skórki od banana (Poisson zależny od
-      sekcji), poślizgnięcie (każda skórka to próba Bernoulliego, ryzyko zależne
-      od butów antypoślizgowych), ciężkość urazu (warunkowa) i dni zwolnienia.
-      Przykłady do zdarzeń i warunkowania, schematu Bernoulliego i tabel 2×2
+      200 pracowników centrum dystrybucji Bananpol: skórki od banana na hali
+      (Poisson zależny od sekcji), poślizgnięcie (każda skórka to próba
+      Bernoulliego, ryzyko zależne od butów antypoślizgowych), ciężkość urazu
+      (warunkowa) i dni zwolnienia. Przykłady do zdarzeń i warunkowania,
+      schematu Bernoulliego i tabel 2×2
 usesNative: true
 minApp: 1.0.8
 

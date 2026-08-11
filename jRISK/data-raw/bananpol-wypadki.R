@@ -1,5 +1,5 @@
 # Generates data/bananpol_wypadki.csv — banana-peel slip accidents among
-# plantation workers. Deterministic (fixed seed); rerun after editing and
+# warehouse workers at the Bananpol banana distribution centre. Deterministic (fixed seed); rerun after editing and
 # commit the regenerated CSV together with this script.
 #
 # Dependency structure (the didactic point):
@@ -14,7 +14,7 @@ sekcja <- sample(c("A", "B", "C"), n, replace = TRUE, prob = c(0.35, 0.40, 0.25)
 staz <- round(rgamma(n, shape = 2, rate = 0.5), 1)
 buty_antyposlizgowe <- sample(c("tak", "nie"), n, replace = TRUE, prob = c(0.6, 0.4))
 
-# peels encountered in a week; the canteen effect
+# peels encountered on the warehouse floor in a week; the canteen effect
 lambdaSekcja <- c(A = 1, B = 2, C = 5)
 skorki_tydzien <- rpois(n, lambdaSekcja[sekcja])
 
