@@ -133,26 +133,19 @@ do pakowania na konkretny system i nie powinny być źródłem zmian w kodzie.
 7. Jeśli celem jest instalator/paczka systemowa, po poprawnym Dockerze uruchom build
    właściwy dla aktualnej maszyny: Windows albo macOS.
 
-## Kolejka zadań
+## Stan dystrybucji (kolejka pierwotnych zadań zrealizowana)
 
-### Zadanie 1: Boxplot — średnia jako kwadrat
-Plik: descriptives. Nowa opcja: boxMean (Bool, default: false).
-stat_summary(fun=mean, geom="point", shape=15, size=3)
+Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpień 2026:
+- descriptives: boxMean, współczynnik zmienności V (%); facetowanie histogramów
+  zapewnia wbudowany mechanizm „Podziel według" upstreamu (osobna opcja
+  histFacet okazała się zbędna); CI dla średniej usunięte (przeniesione do jCI)
+- moduły preinstalowane: jmv, plots (scatr), jperm, jCI, jboot,
+  jdistrACTION 1.3.x (11 rozkładów, w tym gamma, Weibulla i ujemny dwumianowy
+  z wyborem konwencji zmiennej losowej) oraz jRISK (ryzyko i niezawodność:
+  modele czasu życia z cenzorowaniem, systemy, FTA, zdarzenia/warunkowanie,
+  schemat Bernoulliego + zbiory danych Bananpol w bibliotece)
+- branding jUPWR: nazwa, ikony (icns/ico/iconset), wersja dystrybucji
+  w client/common/jupwr.ts (patrz sekcja Wersje)
 
-### Zadanie 2: Histogram — facetowanie grup
-Plik: descriptives. Nowa opcja: histFacet (Bool, default: false).
-facet_wrap(~ grupująca, ncol=1, scales="free_y")
-
-### Zadanie 3: Współczynnik zmienności (V)
-Plik: descriptives (.a.yaml, .u.yaml, .r.yaml, .b.R). Nowa opcja: v (Bool, default: false).
-Etykieta: "V (%)" (nie "CV" — unikamy kolizji z cross-validation).
-sd / mean * 100. Obsłużyć mean=0.
-
-### Zadanie 4: Preinstalowane moduły (distrACTION, jboot, jperm, jCI)
-### Zadanie 5: Nowy moduł jperm (testy permutacyjne)
-### Zadanie 6: Nowy moduł jCI (przedziały ufności)
-Dedykowany moduł z pełną obsługą przedziałów ufności (CI) — dydaktycznie
-spójne miejsce zamiast rozproszenia po eksploracji i testach.
-Przy okazji: usunąć CI dla średniej z descriptives (eksploracja).
-Szczegóły do ustalenia.
-### Zadanie 7: Branding
+Nowe zadania dopisuj poniżej jako "### Zadanie N: ..." z plikiem docelowym
+i oczekiwanym zachowaniem.
