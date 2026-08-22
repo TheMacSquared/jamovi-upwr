@@ -24,13 +24,14 @@ Instrukcja budowania `jUPWR.app` (i `.dmg`) na macOS arm64. Komendy zebrane w sk
 cd packaging/scripts/macos
 ./00-prereqs.sh        # Homebrew: boost, nanomsg, protobuf, python@3.12, create-dmg
 ./10-client.sh         # vite build -> stage/jamovi/client
-./20-modules.sh        # jmvcore + jmc install (jmv, scatr, jperm, jCI, jboot, distrACTION, jRISK)
+./20-modules.sh        # jmvcore + jmc install (jmv, scatr, jperm, jCI, jboot, distrACTION)
 ./25-i18n.sh           # kompilacja tłumaczeń
 ./40-engine.sh         # kompilacja jamovi-engine (C++)
 ./30-server.sh         # venv 3.12 + requirements + jamovi.core/server/readstat
 ./50-assemble-app.sh   # montaż jUPWR.app (wariant DEV: systemowy R/Homebrew)
 ./55-relocate.sh       # RELOKACJA: wbuduj R + Python-standalone + dyliby (czysta maszyna)
 ./60-package-dmg.sh    # jUPWR.dmg
+./70-jmo-jrisk.sh      # jRISK jako moduł opcjonalny -> dist/jRISK_<wersja>-macos-arm64.jmo
 ```
 
 > `55-relocate.sh` jest WYMAGANY do dystrybucji studentom. Pomiń go tylko do szybkiego testu na
@@ -80,7 +81,8 @@ i `vite build --outDir stage/jamovi/client`. Wynik ~5.6 MB, zawiera `index.html`
 `--skip-deps` zakłada, że zależności (ggplot2, car, multcomp, emmeans, vcd…) są w bibliotece
 systemowego R — tak jak w Dockerze pochodzą z obrazu `jamovi-deps`. Moduł `plots` (submoduł
 jmvplots) instaluje się pod nazwą **`scatr`**. Zainstalowane: `jmv, scatr, jperm, jCI, jboot,
-distrACTION, jRISK` + `base` (jmvcore).
+distrACTION` + `base` (jmvcore). jRISK nie jest preinstalowany — `70-jmo-jrisk.sh` buduje
+osobny plik `jRISK_<wersja>-macos-arm64.jmo` w `dist/` (instalacja: Moduły → Sideload).
 
 ### Pułapka: `jmc` izoluje `R_LIBS` — zależności modułu trzeba doinstalować do `base/R`
 

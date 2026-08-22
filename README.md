@@ -16,7 +16,16 @@ Fork [jamovi](https://www.jamovi.org) przygotowany na potrzeby dydaktyki statyst
 | **jboot** | Testy bootstrapowe (przedziały ufności, korelacje, regresja, test dwóch grup i inne) |
 | **jperm** | Testy permutacyjne |
 | **jCI** | Przedziały ufności z wykresami dydaktycznymi (waffle, Gardner–Altman, scatter+regresja); wybór 2 kategorii z wielu poziomów; grupowanie |
-| **jRISK** | Ryzyko i niezawodność: zdarzenia i warunkowanie z danych (2×2, Bayes, częstości naturalne, metryki detektora), schemat Bernoulliego (seria binarna), modele czasu życia (kalkulator R(t)/h(t)/MTTF oraz tryb „Dane": Kaplan–Meier i MLE wykładniczy/gamma/Weibull z cenzorowaniem prawostronnym, AIC/BIC), niezawodność systemów (topologie kanoniczne z mostkiem + komponenty z arkusza; funkcja struktury, ścieżki/przekroje, koherentność, schemat blokowy) i drzewo błędów FTA (bramki AND/OR, minimalne przekroje, ranking ważności). Zawiera przykładowe zbiory danych „Bananpol — urządzenia dojrzewalni" i „Bananpol — wypadki (skórki od banana)" (Otwórz → Biblioteka) |
+| **jRISK** *(opcjonalny — plik `.jmo`, patrz niżej)* | Ryzyko i niezawodność: zdarzenia i warunkowanie z danych (2×2, Bayes, częstości naturalne, metryki detektora), schemat Bernoulliego (seria binarna), modele czasu życia (kalkulator R(t)/h(t)/MTTF oraz tryb „Dane": Kaplan–Meier i MLE wykładniczy/gamma/Weibull z cenzorowaniem prawostronnym, AIC/BIC), niezawodność systemów (topologie kanoniczne z mostkiem + komponenty z arkusza; funkcja struktury, ścieżki/przekroje, koherentność, schemat blokowy) i drzewo błędów FTA (bramki AND/OR, minimalne przekroje, ranking ważności). Zawiera przykładowe zbiory danych „Bananpol — urządzenia dojrzewalni" i „Bananpol — wypadki (skórki od banana)" (Otwórz → Biblioteka) |
+
+
+### Moduł opcjonalny jRISK (analiza ryzyka)
+jRISK obsługuje jeden kurs (analiza ryzyka), więc **nie jest preinstalowany** — studenci
+tego kursu instalują go z pliku `.jmo` (**Moduły → Sideload** w jUPWR). Dzięki temu
+poprawki i nowe funkcje jRISK nie wymagają reinstalacji całej aplikacji.
+Plik `.jmo` zawiera pakiet R skompilowany pod konkretną platformę, dlatego budowany jest
+osobno: `packaging/scripts/macos/70-jmo-jrisk.sh` (macOS arm64) i krok 4e w
+`packaging/scripts/windows/build.ps1` (Windows x64); wynik trafia do `packaging/build/dist/`.
 
 ### Branding
 Aplikacja wyświetlana jako **jUPWR** (tytuł okna, nagłówek)
@@ -48,7 +57,7 @@ jdistrACTION/       # moduł rozkładów — fork distrACTION
 jboot/           # moduł bootstrap
 jperm/           # moduł testów permutacyjnych
 jCI/             # moduł przedziałów ufności
-jRISK/           # moduł ryzyka i niezawodności
+jRISK/           # moduł ryzyka i niezawodności (opcjonalny — dystrybuowany jako .jmo)
 
 ```
 

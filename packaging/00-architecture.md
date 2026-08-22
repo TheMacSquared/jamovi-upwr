@@ -42,7 +42,7 @@ powłoką Electrona:
 │   • R runtime (ten sam, pod który skompilowano moduły)  │
 │   • modules/base/R — jmvcore + WSZYSTKIE zależności      │
 │   • modules/<nazwa> — jmv, plots, jperm, jCI, jboot,    │
-│     jdistrACTION, jRISK (skompilowane przez jmc)        │
+│     jdistrACTION (skompilowane przez jmc); jRISK = .jmo  │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -65,7 +65,7 @@ W Dockerze wszystko ląduje pod `/usr/lib/jamovi/`. W buildzie natywnym ten sam 
 | `python/` | relokowalny interpreter Python 3.12 + pakiety z `requirements.txt` | python-build-standalone / framework |
 | `R/` | relokowalny runtime R | kopia R.framework (macOS) / R-portable (Win) |
 | `modules/base/R/` | `jmvcore` + wszystkie zależności pakietowe modułów | `R CMD INSTALL` + `install.packages` |
-| `modules/<nazwa>/` | jmv, plots, jperm, jCI, jboot, jdistrACTION, jRISK | `jmc --install` |
+| `modules/<nazwa>/` | jmv, plots, jperm, jCI, jboot, jdistrACTION (jRISK nie jest preinstalowany — osobny `.jmo`) | `jmc --install` |
 | `i18n/json/` | skompilowane tłumaczenia | `i18n/index.js --build` |
 | `version` | numer wersji (np. `2.7.35.0`) | plik `version` z repo |
 | ikona | `app-icon.icns` (macOS) / `.ico` (Win) | z `platform/app-icon.*` |

@@ -50,7 +50,7 @@ $ElectronVer= "32.3.3"
 $PbsUrl     = "https://github.com/astral-sh/python-build-standalone/releases/download/20250612/cpython-3.12.11+20250612-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
 $NanomsgUrl = "https://github.com/nanomsg/nanomsg/archive/refs/tags/1.2.tar.gz"
 $CranRepo   = "https://packagemanager.posit.co/cran/latest"
-$Modules    = @('jmv','plots','jperm','jCI','jboot','jdistrACTION','jRISK')
+$Modules    = @('jmv','plots','jperm','jCI','jboot','jdistrACTION')   # jRISK: modul opcjonalny (.jmo, krok 4e)
 
 $ProgressPreference = 'SilentlyContinue'
 function Step($m){ Write-Host "`n==> $m" -ForegroundColor Cyan }
@@ -165,6 +165,14 @@ foreach ($m in $Modules) {
     node $jmc --install (Join-Path $RepoRoot $m) --to "$Payload\modules" --rhome $RHome --rlibs "$BaseR;$UserLib" --assume-app-version $JamoviVer --patch-version --skip-deps | Out-Null
     Info "jmc $m OK"
 }
+
+# 4e. jRISK jako modul OPCJONALNY — nie preinstalowany; budujemy .jmo do sideloadu
+#     (Moduly -> Sideload w jUPWR). .jmo zawiera pakiet R skompilowany pod Windows.
+$JriskVer = ((Select-String -Path (Join-Path $RepoRoot "jRISK\DESCRIPTION") -Pattern "^Version:\s*([0-9.]+)").Matches.Groups[1].Value)
+$Jmo = "$Dist\jRISK_$JriskVer-win64.jmo"
+node $jmc --build (Join-Path $RepoRoot "jRISK") --jmo $Jmo --rhome $RHome --rlibs "$BaseR;$UserLib" --assume-app-version $JamoviVer --skip-deps | Out-Null
+if (-not (Test-Path $Jmo)) { throw "jRISK: plik .jmo nie powstal" }
+Info "jRISK .jmo OK ($Jmo)"
 
 # ---------------------------------------------------------------------------
 # FAZA 5 — i18n

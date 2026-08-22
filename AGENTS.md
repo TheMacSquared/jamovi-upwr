@@ -141,9 +141,11 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   histFacet okazała się zbędna); CI dla średniej usunięte (przeniesione do jCI)
 - moduły preinstalowane: jmv, plots (scatr), jperm, jCI, jboot,
   jdistrACTION 1.3.x (11 rozkładów, w tym gamma, Weibulla i ujemny dwumianowy
-  z wyborem konwencji zmiennej losowej) oraz jRISK (ryzyko i niezawodność:
+  z wyborem konwencji zmiennej losowej); jRISK (ryzyko i niezawodność:
   modele czasu życia z cenzorowaniem, systemy, FTA, zdarzenia/warunkowanie,
-  schemat Bernoulliego + zbiory danych Bananpol w bibliotece)
+  schemat Bernoulliego + zbiory danych Bananpol w bibliotece) jest modułem
+  OPCJONALNYM: nie preinstalowany, budowany jako .jmo (macOS: 70-jmo-jrisk.sh,
+  Windows: build.ps1 krok 4e), instalowany przez Moduły → Sideload
 - branding jUPWR: nazwa, ikony (icns/ico/iconset), wersja dystrybucji
   w client/common/jupwr.ts (patrz sekcja Wersje)
 

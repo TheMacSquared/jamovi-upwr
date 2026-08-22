@@ -61,7 +61,8 @@ Katalogi robocze (ignorowane przez git): `packaging\build\{stage,dist,deps,dl}`.
 3. **Klient** — `npm run build:coms` + `vite build` → `stage\jamovi\client`.
 4. **Moduły R** — RInside/Rcpp/**RProtoBuf** (binarne) do `base\R`, **potem** `jmvcore`
    (kolejność: patrz pułapka #6), brakujące zależności do user-lib, `jmc --install` dla
-   `jmv plots jperm jCI jboot jdistrACTION jRISK`.
+   `jmv plots jperm jCI jboot jdistrACTION`; jRISK nie jest preinstalowany — krok 4e buduje
+   `dist\jRISK_<wersja>-win64.jmo` do sideloadu.
 5. **i18n** — `i18n\index.js --build` → `stage\jamovi\i18n\json`.
 6. **Silnik** — generacja `Makefile` z `Makefile.in`, build w środowisku RTools (make+sh,
    gcc/g++/windres/protoc) ze ścieżkami deps przez zmienne środowiskowe.
@@ -78,7 +79,7 @@ Docelowy układ (jak instalka jamovi 2.7.35):
 jUPWR\
 ├─ bin\         jUPWR.exe, jamovi-engine.exe, env.conf, libnanomsg.dll, R*.dll, resources\app.asar, (electron DLL)
 ├─ Frameworks\  R\ (R 4.6 + scalona biblioteka), python\ (PBS 3.12 + nanomsg.dll)
-└─ Resources\   modules\{base,jmv,scatr,jperm,jCI,jboot,distrACTION,jRISK}, client\, i18n\*.json, server\, version
+└─ Resources\   modules\{base,jmv,scatr,jperm,jCI,jboot,distrACTION}, client\, i18n\*.json, server\, version
 ```
 
 ---

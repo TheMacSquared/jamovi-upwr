@@ -212,9 +212,6 @@ COPY $JAMOVI_ROOT/jdistrACTION/ /tmp/source/distrACTION
 WORKDIR /tmp/source/distrACTION
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
-COPY $JAMOVI_ROOT/jRISK/ /tmp/source/jRISK
-WORKDIR /tmp/source/jRISK
-RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
 
 ##### I18N #####
