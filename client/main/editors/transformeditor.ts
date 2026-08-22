@@ -54,6 +54,8 @@ class TransformEditor extends HTMLElement {
             { s: ">", a: "2000", b: "$source" },
             { s: "<=", a: "1000", b: "A" },
             { s: "==", a: "5", b: "B" },
+            { s: ">", a: "60 and diabetes == 1", b: "'high'" },
+            { s: "<", a: "3 or age >= 65", b: "'risk'" },
             { s: "<", a: "17000", b: "'Male'" },
             { s: ">=", a: "1", b: "'Early'" },
             { s: "=", a: "'tom'", b: "'medium'" }
@@ -161,6 +163,11 @@ class TransformEditor extends HTMLElement {
         $insertBox.addEventListener('click', (event) => {
             this._createRecodeConditionUI();
         });
+
+        // jUPWR: conditions may reference other variables and combine them
+        let $hint = h('div', { class: 'multi-var-hint' },
+            _('Conditions may reference other variables and be combined with and / or, e.g. > 60 and diabetes == 1. Pick variables from the fx list.'));
+        this.$contents.append($hint);
 
         let $list = h('div', { class: 'content-list' });
         this.$contents.append($list);

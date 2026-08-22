@@ -449,3 +449,10 @@
     transition: .05s left ease-out, .05s inset-inline-start ease-out, .05s top ease-out;
     pointer-events: none;
 }
+
+.jmv-transform-editor > .contents > .multi-var-hint {
+    font-size: 11px;
+    color: #777;
+    margin: 2px 0 4px 10px;
+    flex-shrink: 0;
+}
