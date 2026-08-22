@@ -41,9 +41,10 @@ R_LIBS="$BASE_R" R CMD INSTALL "$REPO_ROOT/jmvcore" --library="$BASE_R"
 # jamovi-compiler/compilerr.js), więc systemowa biblioteka R.framework NIE jest widoczna mimo
 # --skip-deps. Bez tego kroku instalacja modułu 'plots' pada z "dependency 'hexbin' is not
 # available for package 'scatr'" i moduł scatr w ogóle się nie buduje (brak R/ w payloadzie).
-log "Instalacja zależności ridge/hexbin (ggridges, hexbin) do $BASE_R ..."
-"$R_HOME_SYS/bin/R" -e "install.packages(c('ggridges', 'hexbin'), repos='https://cloud.r-project.org', lib='$BASE_R')" \
-  || die "Nie udało się zainstalować ggridges/hexbin — moduł plots (scatr) nie zbuduje się poprawnie!"
+# GGally: wykres macierzy korelacji (jmv/plots) — również musi być widoczny w $BASE_R.
+log "Instalacja zależności ridge/hexbin/GGally (ggridges, hexbin, GGally) do $BASE_R ..."
+"$R_HOME_SYS/bin/R" -e "install.packages(c('ggridges', 'hexbin', 'GGally'), repos='https://cloud.r-project.org', lib='$BASE_R')" \
+  || die "Nie udało się zainstalować ggridges/hexbin/GGally — moduły plots/jmv nie zbudują się poprawnie!"
 
 # Moduły w kolejności jak w docker/jamovi-Dockerfile.
 # R znajduje zależności w $R_HOME_SYS/library (systemowy R), jmvcore w base/R.
