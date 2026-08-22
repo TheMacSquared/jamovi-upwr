@@ -220,7 +220,8 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       }
 
       layout <- riskDiagramLayoutTwoLevel(groupSizes, innerGate, outerGate,
-                                          r = r, labels = labels)
+                                          r = r,
+                                          labels = jmvcore::wrapLabels(labels, width = 14))
       self$results$diagram$setState(layout)
     },
 

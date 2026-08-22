@@ -286,7 +286,7 @@ baseTheme <- function(base_size = 16) {
             plot.background = ggplot2::element_rect(fill='transparent', color=NA),
             panel.background = ggplot2::element_rect(fill='#E8E8E8', color=NA),
             plot.margin = ggplot2::margin(15, 15, 15, 15),
-            axis.text.x = ggplot2::element_text(margin=ggplot2::margin(5, 0, 0, 0), colour='#333333'),
+            axis.text.x = ggplot2::element_text(margin=ggplot2::margin(5, 0, 0, 0), colour='#333333', lineheight=0.85),
             axis.text.y = ggplot2::element_text(margin=ggplot2::margin(0, 5, 0, 0), colour='#333333'),
             axis.title.x = ggplot2::element_text(margin=ggplot2::margin(10, 0, 0, 0), colour='#333333'),
             axis.title.y = ggplot2::element_text(margin=ggplot2::margin(0, 10, 0, 0), colour='#333333', angle = 90),
@@ -297,4 +297,58 @@ baseTheme <- function(base_size = 16) {
             legend.text = ggplot2::element_text(colour='#333333'),
             strip.text.x = ggplot2::element_text(colour='#333333'),
             strip.text.y = ggplot2::element_text(colour='#333333')))
+}
+
+#' Wrap long axis / facet / legend labels for plots
+#'
+#' Breaks labels at spaces, hyphens and underscores so that no line exceeds
+#' \code{width} characters; a single word longer than \code{width} is broken
+#' hard with a hyphen. If the result still has more than \code{maxLines}
+#' lines, it is truncated with an ellipsis. Only intended for plot labels --
+#' tables keep the full label.
+#'
+#' @param x character vector (or factor) of labels
+#' @param width maximum characters per line
+#' @param maxLines maximum number of lines before truncating
+#'
+#' @return character vector with embedded newlines
+#' @export
+wrapLabels <- function(x, width = 12, maxLines = 3) {
+    wrapOne <- function(label) {
+        if (is.na(label) || nchar(label) <= width)
+            return(label)
+        # split on spaces / hyphens / underscores, keeping the hyphen
+        tokens <- unlist(strsplit(label, '(?<=-)|[ _]', perl = TRUE))
+        tokens <- tokens[nzchar(tokens)]
+        # hard-break any token longer than width
+        pieces <- character(0)
+        for (tok in tokens) {
+            while (nchar(tok) > width) {
+                pieces <- c(pieces, paste0(substr(tok, 1, width - 1), '-'))
+                tok <- substr(tok, width, nchar(tok))
+            }
+            pieces <- c(pieces, tok)
+        }
+        # greedy line fill
+        lines <- character(0)
+        current <- ''
+        for (piece in pieces) {
+            sep <- if (nzchar(current) && !endsWith(current, '-')) ' ' else ''
+            candidate <- paste0(current, sep, piece)
+            if (nzchar(current) && nchar(candidate) > width) {
+                lines <- c(lines, current)
+                current <- piece
+            } else {
+                current <- candidate
+            }
+        }
+        lines <- c(lines, current)
+        if (length(lines) > maxLines) {
+            lines <- lines[seq_len(maxLines)]
+            lines[maxLines] <- paste0(substr(lines[maxLines], 1, width - 1), '…')
+        }
+        paste(lines, collapse = '\n')
+    }
+    labels <- as.character(x)
+    vapply(labels, wrapOne, character(1), USE.NAMES = FALSE)
 }

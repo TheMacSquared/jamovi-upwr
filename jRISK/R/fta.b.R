@@ -117,10 +117,11 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       leaves <- data.frame(
         x = leafX, y = 0,
-        label = paste(s$labels, "\n", format(s$probs, digits = 3), sep = ""))
+        label = paste(jmvcore::wrapLabels(s$labels, width = 14), "\n",
+                      format(s$probs, digits = 3), sep = ""))
       gates <- data.frame(
         x = branchX, y = 1.2,
-        label = paste(branches, "\n[", s$innerGate, "]", sep = ""))
+        label = paste(jmvcore::wrapLabels(branches, width = 14), "\n[", s$innerGate, "]", sep = ""))
       top <- data.frame(
         x = topX, y = 2.4,
         label = paste("TOP [", s$topGate, "]\nP = ",

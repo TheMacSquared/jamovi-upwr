@@ -103,6 +103,12 @@ bootMultiGroupClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Clas
                     stringsAsFactors = FALSE))
             }
 
+            # wrap long legend labels (colours still come from ggtheme)
+            allReps$group <- factor(allReps$group, levels = names(groupReps))
+            wrapped <- jmvcore::wrapLabels(levels(allReps$group))
+            if (!anyDuplicated(wrapped))
+                levels(allReps$group) <- wrapped
+
             plot <- ggplot2::ggplot(allReps,
                     ggplot2::aes(x = x, fill = group)) +
                 ggplot2::geom_histogram(bins = 40, alpha = 0.5,
