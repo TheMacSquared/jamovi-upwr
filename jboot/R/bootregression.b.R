@@ -109,21 +109,24 @@ bootRegressionClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Clas
             info <- private$.bootData
             df   <- data.frame(x = info$reps)
 
+            # Palette colours: [2] = observed estimate, [3] = CI bounds / band
+            pal <- jmvcore::colorPalette(3, theme$palette, "color")
+
             plot <- ggplot2::ggplot(df, ggplot2::aes(x = x)) +
-                ggplot2::geom_histogram(bins = 40, fill = "steelblue",
-                    color = "white", alpha = 0.7) +
+                ggplot2::geom_histogram(bins = 40, fill = theme$fill[2],
+                    color = theme$color[1], alpha = 0.7) +
                 ggplot2::geom_vline(xintercept = info$obs,
-                    color = "red", linewidth = 1) +
+                    color = pal[2], linewidth = 1) +
                 ggplot2::geom_vline(xintercept = c(info$ciLower, info$ciUpper),
-                    color = "darkgreen", linetype = "dashed", linewidth = 0.8) +
+                    color = pal[3], linetype = "dashed", linewidth = 0.8) +
                 ggplot2::annotate("rect",
                     xmin = info$ciLower, xmax = info$ciUpper,
                     ymin = -Inf, ymax = Inf,
-                    fill = "green", alpha = 0.1) +
+                    fill = pal[3], alpha = 0.15) +
                 ggplot2::labs(
                     x = "Bootstrapowe nachylenia (slope)",
                     y = "Częstość",
-                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
+                    subtitle = "Linia ciągła = wartość obserwowana | Linie przerywane = granice CI") +
                 ggtheme
 
             print(plot)
@@ -161,19 +164,22 @@ bootRegressionClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Clas
             depName  <- self$options$dep
             predName <- self$options$pred
 
+            # Palette colours: [2] = observed fit line
+            pal <- jmvcore::colorPalette(3, theme$palette, "color")
+
             plot <- ggplot2::ggplot(dat, ggplot2::aes(x = x, y = y)) +
-                ggplot2::geom_point(alpha = 0.5, color = "grey40") +
+                ggplot2::geom_point(alpha = 0.5, color = theme$color[2]) +
                 ggplot2::geom_ribbon(data = bandDf,
                     ggplot2::aes(x = x, ymin = ciLower, ymax = ciUpper, y = NULL),
-                    fill = "steelblue", alpha = 0.3) +
+                    fill = theme$fill[2], alpha = 0.3) +
                 ggplot2::geom_line(data = bandDf,
                     ggplot2::aes(x = x, y = yFit),
-                    color = "red", linewidth = 1) +
+                    color = pal[2], linewidth = 1) +
                 ggplot2::labs(
                     x = predName,
                     y = depName,
-                    subtitle = paste0("Czerwona linia = regresja obserwowana | ",
-                        "Niebieskie pasmo = bootstrapowy CI (",
+                    subtitle = paste0("Linia = regresja obserwowana | ",
+                        "Pasmo = bootstrapowy CI (",
                         round(sd$ciWidth * 100), "%)")) +
                 ggtheme
 

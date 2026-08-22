@@ -1,7 +1,7 @@
 Package: jboot
 Type: Package
 Title: Wnioskowanie Bootstrapowe dla jamovi
-Version: 0.2.0
+Version: 0.2.1
 Author: Maciej Dzikowski
 Maintainer: Maciej Dzikowski <email@example.com>
 Description: Metody bootstrapowe do wnioskowania statystycznego w jamovi.

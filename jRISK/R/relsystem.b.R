@@ -224,7 +224,7 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       self$results$diagram$setState(layout)
     },
 
-    .plotDiagram = function(image, ...) {
+    .plotDiagram = function(image, ggtheme, theme, ...) {
       layout <- image$state
       if (is.null(layout))
         return(FALSE)
@@ -236,12 +236,12 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Plot <- ggplot() +
         geom_segment(data = edges,
                      aes(x = x, y = y, xend = xend, yend = yend),
-                     colour = "#9f9f9f", linewidth = 0.7) +
+                     colour = "grey60", linewidth = 0.7) +
         geom_rect(data = boxes,
                   aes(xmin = x - w, xmax = x + w, ymin = y - h, ymax = y + h),
-                  fill = "#e0bc6b", colour = "black") +
+                  fill = theme$fill[2], colour = theme$color[1]) +
         geom_text(data = boxes, aes(x = x, y = y, label = label),
-                  size = 3.6, lineheight = 0.9) +
+                  size = 3.6, lineheight = 0.9, colour = theme$color[1]) +
         theme_void() +
         coord_fixed(clip = "off")
 

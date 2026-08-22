@@ -101,11 +101,12 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         pTop = pTop))
     },
 
-    .plotTree = function(image, ...) {
+    .plotTree = function(image, ggtheme, theme, ...) {
       s <- image$state
       if (is.null(s))
         return(FALSE)
-      Color <- c("#e0bc6b", "#7b9ee6", "#9f9f9f")
+      # Palette fills: leaves (1st), top event (2nd); gates keep neutral fill
+      Fill <- jmvcore::colorPalette(2, theme$palette, 'fill')
 
       branches <- unique(s$branch)
       nB <- length(branches)
@@ -132,15 +133,15 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       Plot <- ggplot() +
         geom_segment(data = edges, aes(x = x, y = y, xend = xend, yend = yend),
-                     colour = Color[3]) +
+                     colour = "grey60") +
         geom_label(data = leaves, aes(x = x, y = y, label = label),
-                   fill = Color[1], label.size = 0.3, size = 3.2,
+                   fill = Fill[1], colour = theme$color[1], label.size = 0.3, size = 3.2,
                    lineheight = 0.9) +
         geom_label(data = gates, aes(x = x, y = y, label = label),
-                   fill = "white", label.size = 0.3, size = 3.4,
+                   fill = theme$fill[1], colour = theme$color[1], label.size = 0.3, size = 3.4,
                    lineheight = 0.9) +
         geom_label(data = top, aes(x = x, y = y, label = label),
-                   fill = Color[2], label.size = 0.4, size = 3.6,
+                   fill = Fill[2], colour = theme$color[1], label.size = 0.4, size = 3.6,
                    lineheight = 0.9) +
         theme_void() +
         coord_cartesian(xlim = c(0.4, max(leafX) + 0.6),

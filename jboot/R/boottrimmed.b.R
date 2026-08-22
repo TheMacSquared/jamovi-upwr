@@ -72,21 +72,24 @@ bootTrimmedClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
             info <- private$.bootData[[depName]]
             df   <- data.frame(x = info$reps)
 
+            # Palette colours: [2] = observed estimate, [3] = CI bounds / band
+            pal <- jmvcore::colorPalette(3, theme$palette, "color")
+
             plot <- ggplot2::ggplot(df, ggplot2::aes(x = x)) +
-                ggplot2::geom_histogram(bins = 40, fill = "steelblue",
-                    color = "white", alpha = 0.7) +
+                ggplot2::geom_histogram(bins = 40, fill = theme$fill[2],
+                    color = theme$color[1], alpha = 0.7) +
                 ggplot2::geom_vline(xintercept = info$obs,
-                    color = "red", linewidth = 1) +
+                    color = pal[2], linewidth = 1) +
                 ggplot2::geom_vline(xintercept = c(info$ciLower, info$ciUpper),
-                    color = "darkgreen", linetype = "dashed", linewidth = 0.8) +
+                    color = pal[3], linetype = "dashed", linewidth = 0.8) +
                 ggplot2::annotate("rect",
                     xmin = info$ciLower, xmax = info$ciUpper,
                     ymin = -Inf, ymax = Inf,
-                    fill = "green", alpha = 0.1) +
+                    fill = pal[3], alpha = 0.15) +
                 ggplot2::labs(
                     x = paste0("Bootstrapowe średnie ucięte (", depName, ")"),
                     y = "Częstość",
-                    subtitle = "Czerwona linia = wartość obserwowana | Zielone linie = granice CI") +
+                    subtitle = "Linia ciągła = wartość obserwowana | Linie przerywane = granice CI") +
                 ggtheme
 
             print(plot)

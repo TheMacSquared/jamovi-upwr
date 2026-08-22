@@ -106,7 +106,7 @@ bootMultiGroupClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Clas
             plot <- ggplot2::ggplot(allReps,
                     ggplot2::aes(x = x, fill = group)) +
                 ggplot2::geom_histogram(bins = 40, alpha = 0.5,
-                    position = "identity", color = "white") +
+                    position = "identity", color = theme$color[1]) +
                 ggplot2::labs(
                     x = paste0("Bootstrapowe średnie (", depName, ")"),
                     y = "Częstość",

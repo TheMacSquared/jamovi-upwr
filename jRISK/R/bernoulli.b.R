@@ -52,21 +52,22 @@ bernoulliClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         trial = seq_len(n), prop = cumsum(x) / seq_len(n), phat = phat))
     },
 
-    .plotRun = function(image, ...) {
+    .plotRun = function(image, ggtheme, theme, ...) {
       state <- image$state
       if (is.null(state))
         return(FALSE)
-      Color <- c("#e0bc6b", "#7b9ee6", "#9f9f9f")
+      # Two palette colours: points (1st), reference line for p-hat (2nd)
+      Color <- jmvcore::colorPalette(2, theme$palette, 'color')
 
       Plot <- ggplot(state, aes(x = trial, y = prop)) +
         geom_hline(yintercept = state$phat[1], colour = Color[2],
                    linetype = "dashed") +
-        geom_line(colour = "black", linewidth = 0.7) +
+        geom_line(colour = theme$color[1], linewidth = 0.7) +
         geom_point(size = 0.8, colour = Color[1]) +
         ggplot2::xlab("Numer próby") +
         ggplot2::ylab("Skumulowana częstość sukcesów") +
         coord_cartesian(ylim = c(0, 1)) +
-        theme_classic() +
+        ggtheme +
         theme(text = element_text(size = 14))
 
       print(Plot)

@@ -148,16 +148,16 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       colnames(Datas) <- Columnames
 
       # Color vector for bars
-      BarColors <- rep("grey", length(x))
+      BarColors <- rep("base", length(x))
       if (DistributionFunction == "TRUE") {
         if (DistributionFunctionType == "is")
-          BarColors[x == XValue] <- "#e0bc6b"
+          BarColors[x == XValue] <- "highlight"
         if (DistributionFunctionType == "lower")
-          BarColors[x <= XValue] <- "#e0bc6b"
+          BarColors[x <= XValue] <- "highlight"
         if (DistributionFunctionType == "higher")
-          BarColors[x >= XValue] <- "#e0bc6b"
+          BarColors[x >= XValue] <- "highlight"
         if (DistributionFunctionType == "interval")
-          BarColors[x >= XValue & x <= XValue2] <- "#e0bc6b"
+          BarColors[x >= XValue & x <= XValue2] <- "highlight"
       }
 
       QuantileAlphaLow <- 1
@@ -201,22 +201,27 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         Inputs$setError("x2 musi być większe od x1.")
         Outputs$setVisible(visible = FALSE)}},
 
-    .plot = function(image, ...) {
+    .plot = function(image, ggtheme, theme, ...) {
       state <- image$state
       Datas <- state$Datas
       BarColors <- state$BarColors
 
       DistributionFunction <- self$options$DistributionFunction
       QuantileFunction <- self$options$QuantileFunction
-      Color <- c("#e0bc6b", "#7b9ee6", "#9f9f9f")
+      # Colours from the palette selected in the app: pal[1] highlights the
+      # probability area / bars, pal[2] draws the quantile lines
+      pal <- jmvcore::colorPalette(2, theme$palette, 'fill')
+      Color <- c(pal[1], pal[2], '#9f9f9f')
+      # Highlighted bars take the palette colour, the rest stay neutral grey
+      BarFill <- ifelse(BarColors == "highlight", pal[1], Color[3])
       Linewidth <- 1
       TypeOfLine <- "dashed"
 
       Plot <- ggplot(Datas, aes(x = X, y = Prob)) +
-        geom_col(fill = BarColors, color = "black", width = 0.7) +
+        geom_col(fill = BarFill, color = theme$color[1], width = 0.7) +
         ggplot2::xlab("") + ggplot2::ylab("") +
         scale_x_continuous(breaks = Datas$X) +
-        theme_classic() +
+        ggtheme +
         theme(legend.title = element_blank())
 
       if (QuantileFunction == "TRUE") {

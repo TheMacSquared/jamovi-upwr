@@ -187,7 +187,7 @@ WeibullDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         Inputs$setError("x1 musi być ≥ 0 dla rozkładu Weibulla.")
         Outputs$setVisible(visible = FALSE)}},
 
-    .plot = function(image, ...) {
+    .plot = function(image, ggtheme, theme, ...) {
       Dataset <- image$state
       PlotData <- Dataset[, 1:3]
       colnames(PlotData) <- c("X", "Prob", "CurveProb")
@@ -208,9 +208,14 @@ WeibullDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Pointsize <- 0.000001
       TypeOfLine <- "dashed"
       Linewidth <- 1
-      Color <- c("#e0bc6b", "#7b9ee6", "#9f9f9f")
+      # Colours from the palette selected in the app: pal[1] highlights the
+      # probability area / bars, pal[2] draws the quantile lines
+      pal <- jmvcore::colorPalette(2, theme$palette, 'fill')
+      Color <- c(pal[1], pal[2], '#9f9f9f')
 
       Plot <- ggplot(PlotData, mapping = aes(x = PlotData$X, y = PlotData$Prob)) +
+        # Theme (and base scales) selected in the app; manual scales below override
+        ggtheme +
         ggplot2::xlab("") + ggplot2::ylab("") +
         scale_x_continuous(breaks = AxisSegments)
 
@@ -228,7 +233,6 @@ WeibullDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Plot <- Plot +
         geom_point(size = Pointsize, color = Color[1]) +
         geom_line() +
-        theme_classic() +
         theme(legend.text = element_text(size = Textsize)) +
         theme(legend.title = element_blank())
 

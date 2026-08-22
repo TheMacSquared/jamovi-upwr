@@ -241,68 +241,62 @@ lifetimeClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       self$results$hazPlot$setState(list(curves = hazCurves, tUser = tUser))
     },
 
-    .plotCurve = function(image, ylab) {
+    .plotCurve = function(image, ggtheme, theme, ylab) {
       state <- image$state
       if (is.null(state))
         return(FALSE)
-      Color <- c("#e0bc6b", "#7b9ee6", "#9f9f9f")
       tUser <- state$tUser[1]
 
       Plot <- ggplot(state, aes(x = x, y = y)) +
-        geom_line(colour = "black", linewidth = 0.8) +
-        geom_vline(xintercept = tUser, colour = Color[2], linetype = "dashed") +
+        geom_line(colour = theme$color[2], linewidth = 0.8) +
+        geom_vline(xintercept = tUser, colour = "grey60", linetype = "dashed") +
         ggplot2::xlab("t") + ggplot2::ylab(ylab) +
-        theme_classic() +
+        ggtheme +
         theme(text = element_text(size = 14))
 
       print(Plot)
       TRUE
     },
 
-    .plotR = function(image, ...)
-      private$.plotCurve(image, "R(t)"),
+    .plotR = function(image, ggtheme, theme, ...)
+      private$.plotCurve(image, ggtheme, theme, "R(t)"),
 
-    .plotH = function(image, ...)
-      private$.plotCurve(image, "h(t)"),
+    .plotH = function(image, ggtheme, theme, ...)
+      private$.plotCurve(image, ggtheme, theme, "h(t)"),
 
-    .plotF = function(image, ...)
-      private$.plotCurve(image, "f(t)"),
+    .plotF = function(image, ggtheme, theme, ...)
+      private$.plotCurve(image, ggtheme, theme, "f(t)"),
 
-    .plotKM = function(image, ...) {
+    .plotKM = function(image, ggtheme, theme, ...) {
       state <- image$state
       if (is.null(state))
         return(FALSE)
-      Color <- c("#e0bc6b", "#7b9ee6", "#9f9f9f")
-
       Plot <- ggplot() +
         geom_step(data = state$km, aes(x = time, y = surv),
-                  colour = "black", linewidth = 0.9) +
+                  colour = theme$color[1], linewidth = 0.9) +
         geom_vline(xintercept = state$tUser, colour = "grey60", linetype = "dotted") +
         ggplot2::xlab("t") + ggplot2::ylab("R(t)") +
-        theme_classic() +
+        ggtheme +
         theme(text = element_text(size = 14), legend.title = element_blank())
       if (!is.null(state$curves))
         Plot <- Plot +
           geom_line(data = state$curves, aes(x = x, y = y, colour = model),
-                    linewidth = 0.8) +
-          scale_colour_manual(values = Color)
+                    linewidth = 0.8)
+      # discrete colour scale for fitted models comes from ggtheme (palette)
 
       print(Plot)
       TRUE
     },
 
-    .plotHaz = function(image, ...) {
+    .plotHaz = function(image, ggtheme, theme, ...) {
       state <- image$state
       if (is.null(state) || is.null(state$curves))
         return(FALSE)
-      Color <- c("#e0bc6b", "#7b9ee6", "#9f9f9f")
-
       Plot <- ggplot(state$curves, aes(x = x, y = y, colour = model)) +
         geom_line(linewidth = 0.8) +
         geom_vline(xintercept = state$tUser, colour = "grey60", linetype = "dotted") +
-        scale_colour_manual(values = Color) +
         ggplot2::xlab("t") + ggplot2::ylab("h(t)") +
-        theme_classic() +
+        ggtheme +
         theme(text = element_text(size = 14), legend.title = element_blank())
 
       print(Plot)

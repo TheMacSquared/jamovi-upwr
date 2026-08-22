@@ -335,7 +335,7 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       
       
       ########### 2.) Plot-Function ##########
-      .plot=function(image, ...) {
+      .plot = function(image, ggtheme, theme, ...) {
         
       
         ###### 2.1) Extraction of values ######
@@ -381,14 +381,19 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # Linewidth
         Linewidth <- 1
         # Color to fill points
-        Color <- c("#e0bc6b", "#7b9ee6", "#9f9f9f")
+        # Colours from the palette selected in the app: pal[1] highlights the
+        # probability area / bars, pal[2] draws the quantile lines
+        pal <- jmvcore::colorPalette(2, theme$palette, 'fill')
+        Color <- c(pal[1], pal[2], '#9f9f9f')
 
         
         ###### 2.3) Creation of the plot ######
         ##### 2.3.1) Settings of the plot #####
         Plot <- ggplot(PlotData, mapping = aes(x=PlotData$X, y=PlotData$Prob))+
+          # Theme (and base scales) selected in the app; manual scales below override
+          ggtheme +
           # # The whole distribution is plottet as background
-          geom_col(PlotData, mapping = aes(x=PlotData$X, y=PlotData$Prob), fill="grey")+
+          geom_col(PlotData, mapping = aes(x=PlotData$X, y=PlotData$Prob), fill=Color[3])+
           # X-axis-label
           ggplot2::xlab("")+
           # Y-axis-label
@@ -418,8 +423,6 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         
         ##### 2.3.4) Final adjustments of the plot #####
         Plot <- Plot+
-          # Theme of the Plot
-          theme_classic()+
           # Set fontsize of the legend
           theme(legend.text = element_text(size = Textsize))+
           # Remove legend title

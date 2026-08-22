@@ -113,12 +113,10 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         labA = levA, labB = levB))
     },
 
-    .plotTree = function(image, ...) {
+    .plotTree = function(image, ggtheme, theme, ...) {
       s <- image$state
       if (is.null(s))
         return(FALSE)
-      Color <- c("#e0bc6b", "#7b9ee6", "#9f9f9f")
-
       nodes <- data.frame(
         x = c(0, 1, 1, 2, 2, 2, 2),
         y = c(0, 1, -1, 1.5, 0.5, -0.5, -1.5),
@@ -135,9 +133,9 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       Plot <- ggplot() +
         geom_segment(data = edges, aes(x = x, y = y, xend = xend, yend = yend),
-                     colour = Color[3]) +
+                     colour = "grey60") +
         geom_label(data = nodes, aes(x = x, y = y, label = label),
-                   fill = "white", label.size = 0.3, size = 3.6,
+                   fill = theme$fill[2], colour = theme$color[1], label.size = 0.3, size = 3.6,
                    lineheight = 0.9) +
         theme_void() +
         coord_cartesian(xlim = c(-0.3, 2.4))
