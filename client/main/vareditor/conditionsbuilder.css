@@ -1,0 +1,157 @@
+.jmv-conditions-builder {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    gap: 4px;
+    padding: 2px 0;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.jmv-conditions-builder.hidden {
+    display: none;
+}
+
+.jmv-conditions-builder > .add-row {
+    align-self: flex-start;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background: hsla(0, 0%, 99%, 1);
+    color: #575757;
+    padding: 0 5px;
+    line-height: 1.6;
+    cursor: default;
+}
+
+.jmv-conditions-builder > .add-row:hover {
+    background: #F0F0F0;
+    border-color: #CCCCCC;
+}
+
+.jmv-conditions-builder > .add-row > .plus::before {
+    content: '+';
+    color: #3E6DA9;
+    font-weight: bold;
+    margin-inline-end: 4px;
+}
+
+.jmv-conditions-builder .row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 8px;
+    border: 1px solid #DDDDDD;
+    border-radius: 3px;
+    background: #FFFFFF;
+    padding: 4px 6px;
+}
+
+.jmv-conditions-builder .row.else-row {
+    align-items: center;
+}
+
+.jmv-conditions-builder .clauses {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1 1 20em;
+    min-width: 0;
+}
+
+.jmv-conditions-builder .clause {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.jmv-conditions-builder .tag {
+    font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+    color: #3E6DA9;
+    min-width: 3em;
+}
+
+.jmv-conditions-builder select,
+.jmv-conditions-builder input.value {
+    font-size: 12px;
+    border: 1px solid #CCCCCC;
+    background: #FFFFFF;
+    padding: 1px 3px;
+    height: 22px;
+    box-sizing: border-box;
+}
+
+.jmv-conditions-builder select.join {
+    min-width: 3em;
+    color: #3E6DA9;
+    font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+}
+
+.jmv-conditions-builder select.variable {
+    min-width: 9em;
+}
+
+.jmv-conditions-builder select.op {
+    width: 4em;
+    font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+}
+
+.jmv-conditions-builder input.value {
+    flex: 1 1 6em;
+    min-width: 4em;
+    max-width: 14em;
+}
+
+.jmv-conditions-builder .use {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    flex: 0 1 auto;
+}
+
+.jmv-conditions-builder .add-clause {
+    align-self: flex-start;
+    border: none;
+    background: none;
+    color: #3E6DA9;
+    padding: 0 2px;
+    font-size: 11px;
+    cursor: default;
+}
+
+.jmv-conditions-builder .add-clause:hover {
+    text-decoration: underline;
+}
+
+.jmv-conditions-builder .remove-clause,
+.jmv-conditions-builder .remove-row {
+    border: none;
+    background: none;
+    color: #999999;
+    font-size: 14px;
+    width: 18px;
+    padding: 0;
+    cursor: default;
+}
+
+.jmv-conditions-builder .remove-clause:hover,
+.jmv-conditions-builder .remove-row:hover {
+    color: #C0392B;
+}
+
+.jmv-conditions-builder > .hint {
+    font-size: 11px;
+    color: #777777;
+    white-space: normal;
+}
+
+.jmv-conditions-builder.not-representable::before {
+    content: attr(data-warning);
+    font-size: 11px;
+    color: #A05A00;
+}

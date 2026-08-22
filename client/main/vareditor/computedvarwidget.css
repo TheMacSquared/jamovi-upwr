@@ -157,3 +157,54 @@
     transition: .05s left ease-out, .05s inset-inline-start ease-out, .05s top ease-out;
     pointer-events: none;
 }
+
+/* jUPWR: Formula / Conditions mode switch as a horizontal bar above the editor */
+.jmv-variable-computed-widget {
+    flex-direction: column;
+    min-width: 0;
+}
+
+.jmv-variable-computed-methods {
+    flex-direction: row;
+    flex-grow: 0;
+    max-width: none;
+    margin: 0 0 6px 0;
+    border: none;
+    background: none;
+    align-self: flex-start;
+}
+
+.jmv-variable-computed-methods > .top {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    margin: 0;
+}
+
+.jmv-variable-computed-methods > .separator,
+.jmv-variable-computed-methods > .bottom {
+    display: none;
+}
+
+.jmv-variable-computed-methods .item {
+    cursor: default;
+    padding: 3px 12px;
+    border: 1px solid #CCCCCC;
+    border-radius: 3px;
+    background-color: #FFFFFF;
+}
+
+.jmv-variable-computed-methods .item.selected {
+    background-color: #E6EEF7;
+    border-color: #3E6DA9;
+    font-weight: bold;
+}
+
+.jmv-variable-computed-options {
+    min-width: 0;
+    width: 100%;
+}
+
+.jmv-variable-computed-options > .formula-box.hidden {
+    display: none;
+}

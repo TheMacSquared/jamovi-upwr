@@ -35,6 +35,7 @@
 @import "vareditor/datavarwidget.css";
 @import "vareditor/outputvarwidget.css";
 @import "vareditor/computedvarwidget.css";
+@import './vareditor/conditionsbuilder.css';
 @import "vareditor/recodedvarwidget.css";
 @import "vareditor/filterwidget.css";
 @import "vareditor/newvarwidget.css";

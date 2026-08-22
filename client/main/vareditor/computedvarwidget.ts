@@ -6,6 +6,7 @@ import formulaToolbar from './formulatoolbar';
 import dropdown from './dropdown';
 import { h }  from '../../common/htmlelementcreator';
 import VariableModel from './variablemodel';
+import ConditionsBuilder, { formulaToChain } from './conditionsbuilder';
 
 class ComputedVarWidget extends HTMLElement{
 
@@ -31,6 +32,13 @@ class ComputedVarWidget extends HTMLElement{
 
     _editorClicked: boolean;
 
+    // jUPWR: structured conditions mode
+    mode: 'formula' | 'conditions' = 'formula';
+    $modeFormula: HTMLElement;
+    $modeConditions: HTMLElement;
+    $formulaBox: HTMLElement;
+    builder: ConditionsBuilder;
+
     constructor(model) {
         super();
 
@@ -45,7 +53,11 @@ class ComputedVarWidget extends HTMLElement{
 
         let $top = h('div', { class: 'top' });
         $methods.append($top);
-        $top.append(h('div', { class: 'item' }, _('Formula')));
+        this.$modeFormula = h('div', { class: 'item selected', role: 'button', tabindex: '0' }, _('Formula'));
+        this.$modeConditions = h('div', { class: 'item', role: 'button', tabindex: '0' }, _('Conditions'));
+        $top.append(this.$modeFormula, this.$modeConditions);
+        this.$modeFormula.addEventListener('click', () => this._setMode('formula'));
+        this.$modeConditions.addEventListener('click', () => this._setMode('conditions'));
 
         $methods.append(h('div', { class: 'separator' }));
 
@@ -55,6 +67,13 @@ class ComputedVarWidget extends HTMLElement{
         let $options = h('div', { class: 'jmv-variable-computed-options' });
         this.append($options);
         this._createFormulaBox($options);
+
+        this.builder = new ConditionsBuilder(
+            () => this.model.dataset.get('columns') || [],
+            () => this.model.get('name'),
+            (formula) => this.model.set('formula', formula));
+        this.builder.classList.add('hidden');
+        $options.append(this.builder);
 
         this.model.on('columnChanging', () => {
             if (document.activeElement === this.$formula && this.model.attributes.formula !== this.$formula.textContent)
@@ -95,13 +114,31 @@ class ComputedVarWidget extends HTMLElement{
             this.$showEditor.classList.remove('is-active');
         });
 
-        this.model.on('change:formula', (event) => this._setFormula(event.changed.formula));
+        this.model.on('change:formula', (event) => {
+            this._setFormula(event.changed.formula);
+            if (this.attached && this.mode === 'conditions')
+                this.builder.setFormula(event.changed.formula || '');
+        });
         this.model.on('change:formulaMessage', (event) => this._setFormulaMessage(event.changed.formulaMessage));
 
     }
 
+    _setMode(mode: 'formula' | 'conditions') {
+        this.mode = mode;
+        this.$modeFormula.classList.toggle('selected', mode === 'formula');
+        this.$modeConditions.classList.toggle('selected', mode === 'conditions');
+        this.$formulaBox.classList.toggle('hidden', mode !== 'formula');
+        this.builder.classList.toggle('hidden', mode !== 'conditions');
+        if (mode === 'conditions') {
+            let formula = this.model.attributes.formula || '';
+            let ok = this.builder.setFormula(formula);
+            this.builder.classList.toggle('not-representable', ! ok && formula.trim() !== '');
+        }
+    }
+
     _createFormulaBox($parent: HTMLElement) {
         let $formulaBox = h('div', { class: 'formula-box' });
+        this.$formulaBox = $formulaBox;
         $parent.append($formulaBox);
 
         $formulaBox.append(h('div', { class: 'equal' }, '='))
@@ -178,6 +215,12 @@ class ComputedVarWidget extends HTMLElement{
         this._setFormula(this.model.attributes.formula);
         this._setFormulaMessage(this.model.attributes.formulaMessage);
         this.$formula.setAttribute('contenteditable', 'true');
+
+        // open in conditions mode when the formula is a plain IF chain built here
+        let formula = this.model.attributes.formula || '';
+        let chain = formulaToChain(formula);
+        this.builder.lastFormula = null;
+        this._setMode(chain !== null && chain.rows.length > 0 ? 'conditions' : 'formula');
     }
 }
 
