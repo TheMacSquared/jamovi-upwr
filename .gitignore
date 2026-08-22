@@ -41,3 +41,6 @@ __pycache__
 /engine/jamovi-engine
 /engine/jamovi-engine.exe
 /server/jamovi.egg-info/
+
+# Claude Code local permissions (machine-specific)
+.claude/settings.local.json
