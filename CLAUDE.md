@@ -98,6 +98,9 @@ do pakowania na konkretny system i nie powinny być źródłem zmian w kodzie.
 
 ### Checklist przed commitem/pushem
 - `git status` pokazuje tylko ręczne, zamierzone zmiany.
+- Przy zmianie wersji jUPWR: wpis w `CHANGELOG.md`, aktualizacja `packaging/MODULES.md`
+  (rejestr modułów + macierz zgodności modułów opcjonalnych) i przebudowa `.jmo` każdego
+  modułu opcjonalnego; `packaging/scripts/release-check.sh` bez ostrzeżeń.
 - Docker build działa albo w finalnej odpowiedzi jasno opisano, dlaczego nie był uruchomiony.
 - Wersja jUPWR jest taka sama w kliencie, Dockerze i skryptach packagingu.
 - Artefakty z builda natywnego lub `jmc` nie są dodane do commita.
