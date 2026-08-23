@@ -9,7 +9,7 @@ theme_default(base_size = 16, scale = "none", palette = "jmv")
 \arguments{
 \item{base_size}{Font size}
 
-\item{scale}{'none' or 'discrete'}
+\item{scale}{'none', 'discrete' or 'continuous'}
 
 \item{palette}{Color palette name}
 }
@@ -17,5 +17,7 @@ theme_default(base_size = 16, scale = "none", palette = "jmv")
 the default jmv ggplot2 theme
 }
 \description{
-Creates the default jmv ggplot2 theme
+Follows the APA 7 figure conventions: pure black axes and lettering on a
+white field, no grid, ticks pointing outward and one single type size
+throughout the figure.
 }

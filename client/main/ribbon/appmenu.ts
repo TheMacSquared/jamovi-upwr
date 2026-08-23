@@ -210,9 +210,14 @@ export class AppMenuButton extends EventDistributor {
         let $theme = appMenuItem();
         $plots.append($theme);
         $theme.append(h('div', { id: themeId }, _('Plot theme')));
+        // the 'default' theme follows the APA figure conventions, hence the
+        // label; the value stays 'default' because it is the fallback theme
+        // name used across the client, jmvcore and the server
         this.$themeList = h('select', { 'aria-labelledby': themeId },
-            selectOption('default', _('Default')),
+            selectOption('default', _('APA')),
             selectOption('minimal', _('Minimal')),
+            selectOption('grid', _('Grid')),
+            selectOption('presentation', _('Presentation')),
             selectOption('iheartspss', _('I ♥ SPSS')),
             selectOption('hadley', _('Hadley')),
             selectOption('bw', _('Black & white')));
@@ -227,6 +232,8 @@ export class AppMenuButton extends EventDistributor {
         this.$paletteList = h('select', { 'aria-labelledby': paletteId },
             optGroup(_('qualitative'),
                 selectOption('jmv', 'jmv'),
+                selectOption('upwr', _('UPWr')),
+                selectOption('okabeito', _('Colour-blind safe')),
                 selectOption('Dark2', _('Dark2')),
                 selectOption('Set1', _('Set1')),
                 selectOption('Accent', _('Accent')),
@@ -235,7 +242,11 @@ export class AppMenuButton extends EventDistributor {
             optGroup(_('sequential'),
                 selectOption('Greys', _('Greys')),
                 selectOption('Blues', _('Blues')),
-                selectOption('Greens', _('Greens'))));
+                selectOption('Greens', _('Greens')),
+                selectOption('viridis', _('Viridis'))),
+            optGroup(_('diverging'),
+                selectOption('RdBu', _('RdBu')),
+                selectOption('BrBG', _('BrBG'))));
         $palette.append(this.$paletteList);
         this.$paletteList.addEventListener('click', event => event.stopPropagation())
         this.$paletteList.addEventListener('change', event => this._changePalette(this.$paletteList.value));

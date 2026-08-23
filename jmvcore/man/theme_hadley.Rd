@@ -9,7 +9,7 @@ theme_hadley(base_size = 16, scale = "none", palette = "jmv")
 \arguments{
 \item{base_size}{Font size}
 
-\item{scale}{'none' or 'discrete'}
+\item{scale}{'none', 'discrete' or 'continuous'}
 
 \item{palette}{Color palette name}
 }

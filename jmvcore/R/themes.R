@@ -18,6 +18,12 @@ getGGTheme <- function(name, scale, palette) {
             ggtheme <- jmvcore::theme_min(base_size, scale, palette)
         else if (name == 'iheartspss')
             ggtheme <- jmvcore::theme_spss(base_size, scale, palette)
+        else if (name == 'bw')
+            ggtheme <- jmvcore::theme_blackwhite(base_size, scale, palette)
+        else if (name == 'presentation')
+            ggtheme <- jmvcore::theme_presentation(base_size, scale, palette)
+        else if (name == 'grid')
+            ggtheme <- jmvcore::theme_grid(base_size, scale, palette)
         else
             ggtheme <- jmvcore::theme_default(base_size, scale, palette)
 
@@ -49,13 +55,18 @@ getTheme = function(name = 'default', palette = 'jmv') {
     else
         theme[['bw']] <- FALSE
 
+    # smooth ramps for continuous aesthetics (heat maps, gradients); analyses
+    # can use these with scale_fill_gradientn() / scale_colour_gradientn()
+    theme[['gradient']] <- gradientPalette(palette, 'sequential')
+    theme[['divergent']] <- gradientPalette(palette, 'diverging')
+
     return(theme)
 }
 
 #' Creates the hadley jmv ggplot2 theme
 #'
 #' @param base_size Font size
-#' @param scale 'none' or 'discrete'
+#' @param scale 'none', 'discrete' or 'continuous'
 #' @param palette Color palette name
 #'
 #' @return the hadley jmv ggplot2 theme
@@ -64,32 +75,56 @@ theme_hadley <- function(base_size = 16, scale = 'none', palette = 'jmv') {
     theme <- list(baseTheme(base_size))
 
     if (scale != 'none')
-        theme <- c(theme, ggPalette(palette))
+        theme <- c(theme, ggPalette(palette, scale))
 
     return(theme)
 }
 
 #' Creates the default jmv ggplot2 theme
 #'
+#' Follows the APA 7 figure conventions: pure black axes and lettering on a
+#' white field, no grid, ticks pointing outward and one single type size
+#' throughout the figure.
+#'
 #' @param base_size Font size
-#' @param scale 'none' or 'discrete'
+#' @param scale 'none', 'discrete' or 'continuous'
 #' @param palette Color palette name
 #'
 #' @return the default jmv ggplot2 theme
 #' @export
 theme_default <- function(base_size = 16, scale = 'none', palette = 'jmv') {
+
+    # APA asks for black lettering at a single size across the whole figure
+    ink <- '#000000'
+    size <- base_size * 0.8
+
     theme <- list(ggplot2::`%+replace%`(
         baseTheme(base_size),
         ggplot2::theme(
-            panel.background=ggplot2::element_rect(fill='transparent', color=NA),
-            axis.line = ggplot2::element_line(linewidth = .5, colour = "#333333"),
-            legend.key = ggplot2::element_blank(),
+            panel.background = ggplot2::element_rect(fill='transparent', color=NA),
+            panel.border = ggplot2::element_blank(),
             panel.grid.major = ggplot2::element_blank(),
             panel.grid.minor = ggplot2::element_blank(),
-            strip.background = ggplot2::element_rect(fill='transparent', color=NA))))
+            axis.line = ggplot2::element_line(linewidth=.6, colour=ink),
+            axis.ticks = ggplot2::element_line(linewidth=.6, colour=ink),
+            axis.ticks.length = ggplot2::unit(4, 'pt'),
+            axis.text.x = ggplot2::element_text(margin=ggplot2::margin(5, 0, 0, 0), colour=ink, size=size, lineheight=0.85),
+            axis.text.y = ggplot2::element_text(margin=ggplot2::margin(0, 5, 0, 0), colour=ink, size=size),
+            axis.title.x = ggplot2::element_text(margin=ggplot2::margin(10, 0, 0, 0), colour=ink, size=size),
+            axis.title.y = ggplot2::element_text(margin=ggplot2::margin(0, 10, 0, 0), colour=ink, size=size, angle=90),
+            legend.key = ggplot2::element_blank(),
+            legend.background = ggplot2::element_blank(),
+            legend.text = ggplot2::element_text(colour=ink, size=size),
+            legend.title = ggplot2::element_text(colour=ink, size=size),
+            strip.background = ggplot2::element_rect(fill='transparent', color=NA),
+            strip.text.x = ggplot2::element_text(colour=ink, size=size),
+            strip.text.y = ggplot2::element_text(colour=ink, size=size),
+            plot.title = ggplot2::element_text(
+                margin=ggplot2::margin(0, 0, 15, 0), colour=ink,
+                size=size, hjust=0, face='bold'))))
 
     if (scale != 'none')
-        theme <- c(theme, ggPalette(palette))
+        theme <- c(theme, ggPalette(palette, scale))
 
     return(theme)
 }
@@ -97,7 +132,7 @@ theme_default <- function(base_size = 16, scale = 'none', palette = 'jmv') {
 #' Creates the spss jmv ggplot2 theme
 #'
 #' @param base_size Font size
-#' @param scale 'none' or 'discrete'
+#' @param scale 'none', 'discrete' or 'continuous'
 #' @param palette Color palette name
 #'
 #' @return the spss jmv ggplot2 theme
@@ -114,7 +149,7 @@ theme_spss <- function(base_size = 16, scale = 'none', palette = 'jmv') {
             strip.background = ggplot2::element_rect(fill='transparent', color=NA))))
 
     if (scale != 'none')
-        theme <- c(theme, ggPalette(palette))
+        theme <- c(theme, ggPalette(palette, scale))
 
     return(theme)
 }
@@ -122,7 +157,7 @@ theme_spss <- function(base_size = 16, scale = 'none', palette = 'jmv') {
 #' Creates the minimal jmv ggplot2 theme
 #'
 #' @param base_size Font size
-#' @param scale 'none' or 'discrete'
+#' @param scale 'none', 'discrete' or 'continuous'
 #' @param palette Color palette name
 #'
 #' @return the minimal jmv ggplot2 theme
@@ -141,7 +176,91 @@ theme_min <- function(base_size = 16, scale = 'none', palette = 'jmv') {
             strip.background = ggplot2::element_rect(fill='transparent', color=NA))))
 
     if (scale != 'none')
-        theme <- c(theme, ggPalette(palette))
+        theme <- c(theme, ggPalette(palette, scale))
+
+    return(theme)
+}
+
+#' Creates the black & white jmv ggplot2 theme
+#'
+#' @param base_size Font size
+#' @param scale 'none', 'discrete' or 'continuous'
+#' @param palette Color palette name
+#'
+#' @return the black & white jmv ggplot2 theme
+#' @export
+theme_blackwhite <- function(base_size = 16, scale = 'none', palette = 'Greys') {
+    theme <- list(ggplot2::`%+replace%`(
+        baseTheme(base_size),
+        ggplot2::theme(
+            panel.background = ggplot2::element_rect(fill='transparent', color=NA),
+            panel.border = ggplot2::element_rect(colour='#333333', fill=NA, linewidth=0.5),
+            panel.grid.major = ggplot2::element_line(colour='#D9D9D9', linewidth=0.3),
+            panel.grid.minor = ggplot2::element_blank(),
+            axis.line = ggplot2::element_blank(),
+            axis.ticks = ggplot2::element_line(colour='#333333', linewidth=0.3),
+            legend.key = ggplot2::element_rect(fill='transparent', color=NA),
+            strip.background = ggplot2::element_rect(fill='transparent', colour='#333333'))))
+
+    if (scale != 'none')
+        theme <- c(theme, ggPalette(palette, scale))
+
+    return(theme)
+}
+
+#' Creates the presentation jmv ggplot2 theme
+#'
+#' Like the default theme, but with larger type and heavier lines so that
+#' plots stay readable when projected or pasted onto a slide.
+#'
+#' @param base_size Font size (scaled up internally)
+#' @param scale 'none', 'discrete' or 'continuous'
+#' @param palette Color palette name
+#'
+#' @return the presentation jmv ggplot2 theme
+#' @export
+theme_presentation <- function(base_size = 16, scale = 'none', palette = 'jmv') {
+    theme <- list(ggplot2::`%+replace%`(
+        baseTheme(base_size * 1.35),
+        ggplot2::theme(
+            panel.background = ggplot2::element_rect(fill='transparent', color=NA),
+            axis.line = ggplot2::element_line(linewidth=.8, colour='#333333'),
+            axis.ticks = ggplot2::element_line(linewidth=.8, colour='#333333'),
+            panel.grid.major = ggplot2::element_blank(),
+            panel.grid.minor = ggplot2::element_blank(),
+            legend.key = ggplot2::element_blank(),
+            strip.background = ggplot2::element_rect(fill='transparent', color=NA))))
+
+    if (scale != 'none')
+        theme <- c(theme, ggPalette(palette, scale))
+
+    return(theme)
+}
+
+#' Creates the grid jmv ggplot2 theme
+#'
+#' White panel with both major and minor grid lines, for plots that are meant
+#' to be read off rather than only looked at.
+#'
+#' @param base_size Font size
+#' @param scale 'none', 'discrete' or 'continuous'
+#' @param palette Color palette name
+#'
+#' @return the grid jmv ggplot2 theme
+#' @export
+theme_grid <- function(base_size = 16, scale = 'none', palette = 'jmv') {
+    theme <- list(ggplot2::`%+replace%`(
+        baseTheme(base_size),
+        ggplot2::theme(
+            panel.background = ggplot2::element_rect(fill='transparent', color=NA),
+            axis.line = ggplot2::element_line(linewidth=.5, colour='#333333'),
+            panel.grid.major = ggplot2::element_line(colour='#D0D0D0', linewidth=0.35),
+            panel.grid.minor = ggplot2::element_line(colour='#E8E8E8', linewidth=0.25),
+            legend.key = ggplot2::element_blank(),
+            strip.background = ggplot2::element_rect(fill='transparent', color=NA))))
+
+    if (scale != 'none')
+        theme <- c(theme, ggPalette(palette, scale))
 
     return(theme)
 }
@@ -153,6 +272,23 @@ seqPalettes <- c('Blues', 'BuGn', 'BuPu', 'GnBu', 'Greens', 'Greys', 'Oranges',
 otherPalettes <- c('BrBG', 'PiYG', 'PRGn', 'PuOr', 'RdBu', 'RdGy', 'RdYlBu',
                  'RdYlGn', 'Spectral', 'Accent', 'Dark2', 'Paired', 'Pastel1',
                  'Pastel2', 'Set1', 'Set2', 'Set3')
+
+divPalettes <- c('BrBG', 'PiYG', 'PRGn', 'PuOr', 'RdBu', 'RdGy', 'RdYlBu',
+                 'RdYlGn', 'Spectral')
+
+# UPWr house colours; the burgundy and the gold are taken from the jUPWR app
+# icon, the remaining hues are chosen for separability
+upwrColors <- c('#832034', '#E6AC41', '#3E6DA9', '#4C8C5A', '#5B4A82', '#6E6E6E')
+
+# Okabe & Ito's qualitative palette -- distinguishable under the common forms
+# of colour vision deficiency
+okabeItoColors <- c('#E69F00', '#56B4E9', '#009E73', '#F0E442', '#0072B2',
+                    '#D55E00', '#CC79A7', '#000000')
+
+# anchor points of the viridis colour map; perceptually uniform, colour vision
+# deficiency friendly and legible when printed in greyscale
+viridisColors <- c('#440154', '#482878', '#3E4A89', '#31688E', '#26828E',
+                   '#1F9E89', '#35B779', '#6DCD59', '#B4DE2C', '#FDE725')
 
 #' @importFrom grDevices col2rgb rgb
 #' @importFrom stats approx
@@ -235,6 +371,35 @@ colorPalette <- function(n = 5, pal = 'jmv', type='fill') {
                 cols <- lighten(cols, .1)
         }
 
+    } else if (pal == 'upwr') {
+
+        cols <- upwrColors
+
+        if (type == 'fill')
+            cols <- lighten(cols, .4)
+        else
+            cols <- lighten(cols, .1)
+
+    } else if (pal == 'okabeito') {
+
+        cols <- okabeItoColors
+
+        if (type == 'fill')
+            cols <- lighten(cols, .4)
+        else
+            cols <- lighten(cols, .1)
+
+    } else if (pal == 'viridis') {
+
+        ramp <- grDevices::colorRampPalette(viridisColors)
+        if (n == 1)
+            cols <- ramp(3)[2]
+        else
+            cols <- ramp(n)
+
+        if (type == 'fill')
+            cols <- lighten(cols, .3)
+
     } else if (pal == 'hadley') {
 
         ggColors <- function(n) {
@@ -268,7 +433,61 @@ colorPalette <- function(n = 5, pal = 'jmv', type='fill') {
     return(cols[1:n])
 }
 
+#' A function that creates a smooth colour ramp for continuous scales
+#'
+#' Discrete palettes only cover grouping aesthetics; heat maps and other
+#' gradients need a continuous ramp. Sequential and diverging palettes are
+#' ramped through their own colours, qualitative palettes are ramped from
+#' (or through) their leading colours.
+#'
+#' @param pal Color palette name
+#' @param type 'sequential' or 'diverging'
+#' @param n Number of colors in the ramp
+#'
+#' @return a vector of hex color codes
+#' @export
+gradientPalette <- function(pal = 'jmv', type = 'sequential', n = 256) {
+
+    if (pal %in% seqPalettes) {
+
+        # a sequential palette has no natural midpoint, so both types are
+        # served by the same light -> dark ramp
+        anchors <- RColorBrewer::brewer.pal(9, pal)
+
+    } else if (pal %in% divPalettes) {
+
+        # brewer lists the diverging palettes warm end first; reverse them so
+        # that the ramp always runs low -> midpoint -> high
+        anchors <- rev(RColorBrewer::brewer.pal(11, pal))
+        if (type == 'sequential')
+            anchors <- anchors[6:11]
+
+    } else if (pal == 'viridis') {
+
+        anchors <- viridisColors
+
+    } else {
+
+        # qualitative palette -- build the ramp from its leading colours
+        cols <- colorPalette(2, pal, 'color')
+        if (type == 'diverging')
+            anchors <- c(cols[2], '#E6E6E6', cols[1])
+        else
+            anchors <- c(lighten(cols[1], .85), cols[1])
+    }
+
+    grDevices::colorRampPalette(anchors)(n)
+}
+
 ggPalette <- function(pal = 'jmv', scale = 'discrete') {
+
+    if (scale == 'continuous') {
+        cols <- gradientPalette(pal, 'sequential')
+        return(
+            list(ggplot2::scale_fill_gradientn(colours=cols),
+                 ggplot2::scale_colour_gradientn(colours=cols))
+        )
+    }
 
     fill <- function(n) colorPalette(n, pal=pal, 'fill')
     color <- function(n) colorPalette(n, pal=pal, 'color')

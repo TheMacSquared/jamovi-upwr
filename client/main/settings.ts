@@ -11,7 +11,9 @@ export enum Theme {
     MINIMAL = 'minimal',
     SPSS = 'iheartspss', 
     HADLEY = 'hadley', 
-    BW = 'bw'
+    BW = 'bw',
+    PRESENTATION = 'presentation',
+    GRID = 'grid'
 }
 
 enum Mode {
