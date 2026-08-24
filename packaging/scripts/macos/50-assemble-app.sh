@@ -53,6 +53,9 @@ cp -R "$PAYLOAD/python"  "$RES/jamovi/python"
 cp -R "$PAYLOAD/modules" "$RES/jamovi/modules"
 [ -d "$PAYLOAD/i18n" ] && cp -R "$PAYLOAD/i18n" "$RES/jamovi/i18n"
 cp "$REPO_ROOT/version" "$RES/jamovi/version"
+# fonty motywów jUPWR — rejestrowane w runtime przez systemfonts::add_fonts(),
+# nie instalowane w systemie; jmvcore szuka ich w <payload>/fonts
+cp -R "$REPO_ROOT/platform/fonts" "$RES/jamovi/fonts"
 
 # silnik do Contents/MacOS (engine.py szuka home/MacOS/jamovi-engine na Darwin)
 cp "$PAYLOAD/bin/jamovi-engine" "$MACOS/jamovi-engine"

@@ -238,6 +238,7 @@ RUN node /tmp/source/i18n/index.js --build src --dest /usr/lib/jamovi/i18n/json
 FROM r-base AS jamovi
 
 ARG TARGETARCH
+ARG JAMOVI_ROOT=.
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     python3-minimal \
@@ -276,6 +277,11 @@ RUN --mount=type=bind,from=server,source=/usr/lib,target=/server_root/usr/lib \
     cp /server_root/usr/lib/${LIBARCH}/libnanomsg.so /usr/lib/${LIBARCH}/libnanomsg.so
 
 COPY --from=server  /usr/lib/jamovi/ /usr/lib/jamovi/
+
+# fonts used by the jUPWR plot themes; registered at runtime through
+# systemfonts::add_fonts() rather than installed system wide, so that the
+# Docker image and the native packages behave the same way
+COPY $JAMOVI_ROOT/platform/fonts/ /usr/lib/jamovi/fonts/
 
 ENV LD_LIBRARY_PATH $R_HOME/lib
 ENV JAMOVI_HOME /usr/lib/jamovi

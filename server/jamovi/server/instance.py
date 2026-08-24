@@ -1210,8 +1210,8 @@ class Instance:
         if 'theme' in event.data or 'palette' in event.data or 'decSymbol' in event.data:
             for analysis in self._data.analyses:
                 main_settings = self._settings.group('main')
-                analysis.options.set_value('theme', main_settings.get('theme', 'default'))
-                analysis.options.set_value('palette', main_settings.get('palette', 'default'))
+                analysis.options.set_value('theme', main_settings.get('theme', 'jupwrJasny'))
+                analysis.options.set_value('palette', main_settings.get('palette', 'jupwrJasny'))
                 analysis.options.set_value('decSymbol', main_settings.get('decSymbol', '.'))
                 if analysis.enabled:
                     analysis.run()

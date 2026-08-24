@@ -13,7 +13,9 @@ export enum Theme {
     HADLEY = 'hadley', 
     BW = 'bw',
     PRESENTATION = 'presentation',
-    GRID = 'grid'
+    GRID = 'grid',
+    JUPWR_CIEMNY = 'jupwrCiemny',
+    JUPWR_JASNY = 'jupwrJasny'
 }
 
 enum Mode {
@@ -52,7 +54,7 @@ class Settings extends EventMap<SettingsData> {
             recents: [ ],
             //examples: [ ],
             modules: [ ],
-            theme: Theme.DEFAULT,
+            theme: Theme.JUPWR_JASNY,
             devMode: false,
             syntaxMode: false,
             selectedLanguage: '',

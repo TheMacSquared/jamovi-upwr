@@ -890,8 +890,8 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
 
     _optionsExtras() {
         let ppi = Math.trunc(72 * (window.devicePixelRatio || 1));
-        let theme = this._settings.getSetting('theme', Theme.DEFAULT);
-        let palette = this._settings.getSetting('palette', 'jmv');
+        let theme = this._settings.getSetting('theme', Theme.JUPWR_JASNY);
+        let palette = this._settings.getSetting('palette', 'jupwrJasny');
         const decSymbol = this._settings.getSetting('decSymbol', '.');
 
         return { '.ppi': ppi, theme, palette, decSymbol };

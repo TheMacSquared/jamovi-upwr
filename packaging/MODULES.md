@@ -9,7 +9,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 
 | Moduł (katalog) | Nazwa w jamovi | Rola | Dystrybucja | Wersja |
 |---|---|---|---|---|
-| `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.3 |
+| `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.4 |
 | `plots/` (submoduł) | scatr | wykresy (jmvplots) | wbudowany | 2.8.3 |
 | `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.3.1 |
 | `jCI/` | jCI | przedziały ufności | wbudowany | 0.1.0 |
@@ -45,6 +45,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.8.0 | 28.1 | 0.3.2 | ✅ 2026-08-23 (z 0.7.8, bez zmian) | ⬜ do zbudowania |
 | 0.7.8 | 28.1 | 0.3.2 | ✅ 2026-08-23 | ⬜ do zbudowania |
 
 (Wcześniejsze wydania: jRISK był wbudowany — macierz nie dotyczy.)

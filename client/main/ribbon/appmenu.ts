@@ -218,8 +218,8 @@ export class AppMenuButton extends EventDistributor {
             selectOption('minimal', _('Minimal')),
             selectOption('grid', _('Grid')),
             selectOption('presentation', _('Presentation')),
-            selectOption('iheartspss', _('I ♥ SPSS')),
-            selectOption('hadley', _('Hadley')),
+            selectOption('jupwrJasny', _('jUPWR — light')),
+            selectOption('jupwrCiemny', _('jUPWR — dark')),
             selectOption('bw', _('Black & white')));
         $theme.append(this.$themeList);
         this.$themeList.addEventListener('click', event => event.stopPropagation())
@@ -230,23 +230,11 @@ export class AppMenuButton extends EventDistributor {
         $plots.append($palette);
         $palette.append(h('div', { id: paletteId }, _('Color palette')));
         this.$paletteList = h('select', { 'aria-labelledby': paletteId },
-            optGroup(_('qualitative'),
-                selectOption('jmv', 'jmv'),
-                selectOption('upwr', _('UPWr')),
-                selectOption('okabeito', _('Colour-blind safe')),
-                selectOption('Dark2', _('Dark2')),
-                selectOption('Set1', _('Set1')),
-                selectOption('Accent', _('Accent')),
-                selectOption('spss', _('I ♥ SPSS')),
-                selectOption('hadley', _('Hadley'))),
-            optGroup(_('sequential'),
-                selectOption('Greys', _('Greys')),
-                selectOption('Blues', _('Blues')),
-                selectOption('Greens', _('Greens')),
-                selectOption('viridis', _('Viridis'))),
-            optGroup(_('diverging'),
-                selectOption('RdBu', _('RdBu')),
-                selectOption('BrBG', _('BrBG'))));
+            selectOption('jmv', 'jmv'),
+            selectOption('okabeito', _('Okabe-Ito')),
+            selectOption('jupwrJasny', _('jUPWR — light')),
+            selectOption('jupwrCiemny', _('jUPWR — dark')),
+            selectOption('greyscale', _('Greyscale')));
         $palette.append(this.$paletteList);
         this.$paletteList.addEventListener('click', event => event.stopPropagation())
         this.$paletteList.addEventListener('change', event => this._changePalette(this.$paletteList.value));
@@ -342,7 +330,9 @@ export class AppMenuButton extends EventDistributor {
         if (name === 'iheartspss')
             this.model.settings().setSetting('palette', 'spss');
         else if (name === 'bw')
-            this.model.settings().setSetting('palette', 'Greys');
+            this.model.settings().setSetting('palette', 'greyscale');
+        else if (name.startsWith('jupwr'))
+            this.model.settings().setSetting('palette', name);
     }
 
     _changePalette(name) {
@@ -411,9 +401,9 @@ export class AppMenuButton extends EventDistributor {
         let refsMode = settings.getSetting('refsMode', 'bottom');
         this.$refsModeList.value = refsMode;
 
-        let theme = settings.getSetting('theme', Theme.DEFAULT);
+        let theme = settings.getSetting('theme', Theme.JUPWR_JASNY);
         this.$themeList.value = theme;
-        let palette = settings.getSetting('palette', 'jmv');
+        let palette = settings.getSetting('palette', 'jupwrJasny');
         this.$paletteList.value = palette;
         let decSymbol = settings.getSetting('decSymbol', '.');
         this.$decSymbolList.value = decSymbol;

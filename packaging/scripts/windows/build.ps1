@@ -335,6 +335,9 @@ Move-Item "$Payload\client"  "$AppDir\Resources\client"  -Force
 Move-Item "$Payload\server"  "$AppDir\Resources\server"  -Force
 Copy-Item "$Payload\i18n\json\*" "$AppDir\Resources\i18n\" -Recurse -Force
 Copy-Item (Join-Path $RepoRoot "version") "$AppDir\Resources\version" -Force
+# fonty motywow jUPWR - rejestrowane w runtime przez systemfonts::add_fonts(),
+# nie instalowane w systemie; jmvcore szuka ich w <Resources>\fonts
+Copy-Item (Join-Path $RepoRoot "platform\fonts") "$AppDir\Resources\fonts" -Recurse -Force
 # nanomsg.dll obok python.exe (Py3.8+ ctypes)
 Copy-Item "$Deps\nanomsg\bin\libnanomsg.dll" "$AppDir\Frameworks\python\nanomsg.dll" -Force
 # env.conf (sciezki wzgledem bin; JAMOVI_R_VERSION = rVersion modulu; bez NETWORK_SANDBOX dla portable)

@@ -24,6 +24,10 @@ getGGTheme <- function(name, scale, palette) {
             ggtheme <- jmvcore::theme_presentation(base_size, scale, palette)
         else if (name == 'grid')
             ggtheme <- jmvcore::theme_grid(base_size, scale, palette)
+        else if (name == 'jupwrJasny')
+            ggtheme <- jmvcore::theme_jupwr_jasny(base_size, scale, palette)
+        else if (name == 'jupwrCiemny')
+            ggtheme <- jmvcore::theme_jupwr_ciemny(base_size, scale, palette)
         else
             ggtheme <- jmvcore::theme_default(base_size, scale, palette)
 
@@ -43,6 +47,14 @@ getTheme = function(name = 'default', palette = 'jmv') {
     if (name == 'iheartspss') {
         theme[['color']] <- c('#333333', '#333333')
         theme[['fill']] <- c('#F0F0F0', '#d3ce97')
+        theme[['palette']] <- palette
+    } else if (name %in% names(jupwrNames)) {
+        # analyses draw reference lines and point outlines with color[1] and
+        # fill points with fill[1], so these have to follow the variant --
+        # otherwise the dark variant draws near-black marks on a dark panel
+        v <- jupwrVariants[[jupwrNames[[name]]]]
+        theme[['color']] <- c(v$ink_soft, jmvcore::colorPalette(1, palette, 'color'))
+        theme[['fill']] <- c(v$panel, jmvcore::colorPalette(1, palette, 'fill'))
         theme[['palette']] <- palette
     } else {
         theme[['color']] <- c('#333333', jmvcore::colorPalette(1, palette, 'color'))
@@ -265,6 +277,226 @@ theme_grid <- function(base_size = 16, scale = 'none', palette = 'jmv') {
     return(theme)
 }
 
+# --- jUPWR lecture-script styling ---------------------------------------------
+# Ported from the standalone lecture-note theme so that plots produced in jamovi
+# match the lecture notes. Each variant carries its own ink, panel and rule
+# colours; the matching palettes live in jupwrPalettes below.
+
+jupwrVariants <- list(
+    ciemny = list(
+        bg = '#0f1419', panel = '#141a21', panel_alt = '#1a2028',
+        ink = '#e8e4da', ink_soft = '#b5b1a7', ink_faded = '#a09b90',
+        rule = '#3a4252', rule_soft = '#242b36', accent = '#d76473',
+        small_text = 0.95),
+    jasny = list(
+        # white ground so exported figures sit neutrally on any page
+        bg = '#ffffff', panel = '#ffffff', panel_alt = '#f7ece8',
+        ink = '#2a1f24', ink_soft = '#5a4850', ink_faded = '#9a8790',
+        rule = '#ead8d3', rule_soft = '#f4e6e1', accent = '#9c3b4a'))
+
+# main       -- 6 colours, accent first; separated by lightness and a
+#               yellow/blue axis rather than a red/green pair, so the series
+#               stay apart under protanopia and deuteranopia
+# para       -- accent against a second colour of equal weight, used for n = 2
+# rozbiezna  -- bipolar, for values with a natural zero (r, residuals)
+# ciepla     -- ordinal, reads by lightness
+jupwrPalettes <- list(
+    ciemny = list(
+        main = c('#d76473', '#d4a858', '#4a7fb5', '#6ac4b8', '#8fd6a0', '#c39ae0'),
+        para = c('#d76473', '#d4a858'),
+        rozbiezna = c('#e8737f', '#b0505f', '#6b3a45', '#2a3140', '#3a5f85', '#4a8fc7', '#7fbde8'),
+        ciepla = c('#3a1a20', '#7d2f3c', '#b84050', '#d76473', '#d4a858', '#f0dcae')),
+    jasny = list(
+        main = c('#9c3b4a', '#d99a5b', '#3f6f9e', '#7a9b8e', '#b183a8', '#c2571f'),
+        para = c('#9c3b4a', '#d99a5b'),
+        rozbiezna = c('#9c3b4a', '#c0737e', '#e0b2b8', '#f7f0ec', '#b3c6d8', '#6f97b8', '#3f6f9e'),
+        ciepla = c('#6e2632', '#9c3b4a', '#c85264', '#d99a5b', '#eec79a', '#fbe3e5')))
+
+# a plain greyscale set, so that the black & white theme has a palette of the
+# same kind as the others to pair with
+greyscaleColors <- c('#1a1a1a', '#3d3d3a', '#8a8780', '#b8b5ad', '#d9d5cc', '#e8e5de')
+
+# theme and palette names map onto the same variant
+jupwrNames <- c(jupwrJasny = 'jasny', jupwrCiemny = 'ciemny')
+
+# fonts shipped with the distribution, keyed by the family name they report
+jupwrFontFiles <- c(
+    'Source Serif 4' = 'SourceSerif4-Regular.ttf',
+    'Atkinson Hyperlegible' = 'AtkinsonHyperlegible-Regular.ttf',
+    'JetBrains Mono' = 'JetBrainsMono-Regular.ttf')
+
+jupwrFontState <- new.env(parent = emptyenv())
+
+#' Locate the directory holding the bundled fonts
+#'
+#' Looks at JUPWR_FONTS_PATH, then at <JAMOVI_HOME>/fonts, then walks up from
+#' the installed jmvcore (modules/base/R/jmvcore -> the installation root), so
+#' that the Docker image and the macOS and Windows packages all resolve.
+#'
+#' @return the path, or NULL when no font directory is present
+jupwrFontsDir <- function() {
+
+    root <- tryCatch(
+        dirname(dirname(dirname(dirname(system.file(package='jmvcore'))))),
+        error=function(e) '')
+
+    candidates <- c(
+        Sys.getenv('JUPWR_FONTS_PATH', ''),
+        file.path(Sys.getenv('JAMOVI_HOME', ''), 'fonts'),
+        file.path(root, 'fonts'))
+
+    candidates <- candidates[nzchar(candidates)]
+    found <- candidates[dir.exists(candidates)]
+
+    if (length(found) > 0)
+        found[1]
+    else
+        NULL
+}
+
+#' Register the bundled fonts with systemfonts
+#'
+#' They are added as local fonts rather than installed system wide, which is
+#' the one mechanism that works the same way on Linux, macOS and Windows.
+#' Runs once per session.
+jupwrRegisterFonts <- function() {
+
+    if (isTRUE(jupwrFontState$registered))
+        return(invisible(FALSE))
+    jupwrFontState$registered <- TRUE
+
+    if ( ! requireNamespace('systemfonts', quietly=TRUE))
+        return(invisible(FALSE))
+
+    dir <- jupwrFontsDir()
+    if (is.null(dir))
+        return(invisible(FALSE))
+
+    files <- list.files(dir, pattern='[.](ttf|otf|ttc)$', full.names=TRUE)
+    if (length(files) == 0)
+        return(invisible(FALSE))
+
+    ok <- tryCatch({ systemfonts::add_fonts(files); TRUE },
+                   error=function(e) FALSE)
+
+    invisible(ok)
+}
+
+#' Resolve the lecture-note fonts, falling back to the generic families
+#'
+#' A family counts as available when it is either shipped with the
+#' distribution or already installed on the machine; otherwise the theme takes
+#' 'serif' / 'sans' / 'mono' so that plots still render.
+#'
+#' @return a list with the title, text and mono family names
+jupwrFamilies <- function() {
+
+    if ( ! is.null(jupwrFontState$families))
+        return(jupwrFontState$families)
+
+    jupwrRegisterFonts()
+    dir <- jupwrFontsDir()
+
+    installed <- character(0)
+    if (requireNamespace('systemfonts', quietly=TRUE))
+        installed <- tryCatch(systemfonts::system_fonts()$family,
+                              error=function(e) character(0))
+
+    pick <- function(preferred, fallback) {
+        bundled <- ! is.null(dir) && jupwrFontFiles[[preferred]] %in% list.files(dir)
+        if (bundled || preferred %in% installed) preferred else fallback
+    }
+
+    families <- list(
+        title = pick('Source Serif 4', 'serif'),
+        text  = pick('Atkinson Hyperlegible', 'sans'),
+        mono  = pick('JetBrains Mono', 'mono'))
+
+    jupwrFontState$families <- families
+    families
+}
+
+# Built on theme_minimal() rather than on baseTheme(), to stay faithful to the
+# lecture-note styling; everything baseTheme() would set is overridden anyway.
+buildJupwrTheme <- function(variant, base_size, scale, palette) {
+
+    v <- jupwrVariants[[variant]]
+    fam <- jupwrFamilies()
+    half <- base_size / 2
+    small <- if (is.null(v$small_text)) 0.85 else v$small_text
+    gridLine <- ggplot2::element_line(colour=v$rule_soft, linewidth=0.35)
+
+    theme <- list(
+        ggplot2::theme_minimal(base_size=base_size, base_family=fam$text) +
+        ggplot2::theme(
+            plot.background = ggplot2::element_rect(fill=v$bg, colour=NA),
+            panel.background = ggplot2::element_rect(fill=v$panel, colour=NA),
+            panel.border = ggplot2::element_blank(),
+            panel.grid.major.x = gridLine,
+            panel.grid.major.y = gridLine,
+            panel.grid.minor = ggplot2::element_blank(),
+            axis.line.x = ggplot2::element_line(colour=v$rule, linewidth=0.5),
+            axis.line.y = ggplot2::element_blank(),
+            axis.ticks = ggplot2::element_line(colour=v$rule, linewidth=0.4),
+            axis.ticks.length = ggplot2::unit(base_size / 3, 'pt'),
+            axis.text = ggplot2::element_text(colour=v$ink_faded, size=ggplot2::rel(small), family=fam$mono),
+            axis.title = ggplot2::element_text(colour=v$ink_soft, size=ggplot2::rel(0.9)),
+            axis.title.x = ggplot2::element_text(margin=ggplot2::margin(t=half), hjust=0),
+            axis.title.y = ggplot2::element_text(margin=ggplot2::margin(r=half), hjust=1, angle=90),
+            plot.title = ggplot2::element_text(family=fam$title, face='bold', colour=v$ink,
+                                               size=ggplot2::rel(1.5), hjust=0,
+                                               margin=ggplot2::margin(b=half * 0.6)),
+            plot.subtitle = ggplot2::element_text(family=fam$title, colour=v$ink_soft,
+                                                  size=ggplot2::rel(1.0), hjust=0, lineheight=1.3,
+                                                  face='italic', margin=ggplot2::margin(b=base_size)),
+            plot.caption = ggplot2::element_text(family=fam$mono, colour=v$ink_faded,
+                                                 size=ggplot2::rel(0.72), hjust=0,
+                                                 margin=ggplot2::margin(t=base_size)),
+            plot.title.position = 'plot',
+            plot.caption.position = 'plot',
+            plot.margin = ggplot2::margin(half, half, half, half),
+            legend.position = 'top',
+            legend.justification = 'left',
+            legend.title = ggplot2::element_text(colour=v$ink_soft, size=ggplot2::rel(small)),
+            legend.text = ggplot2::element_text(colour=v$ink_soft, size=ggplot2::rel(small)),
+            legend.key = ggplot2::element_blank(),
+            legend.background = ggplot2::element_blank(),
+            legend.margin = ggplot2::margin(0, 0, half, 0),
+            strip.background = ggplot2::element_rect(fill=v$panel_alt, colour=NA),
+            strip.text = ggplot2::element_text(family=fam$title, face='bold', colour=v$ink,
+                                               size=ggplot2::rel(0.9),
+                                               margin=ggplot2::margin(half * 0.6, half * 0.6,
+                                                                      half * 0.6, half * 0.6)),
+            panel.spacing = ggplot2::unit(base_size, 'pt')))
+
+    if (scale != 'none')
+        theme <- c(theme, ggPalette(palette, scale))
+
+    return(theme)
+}
+
+#' Creates the jUPWR lecture-note ggplot2 theme (dark)
+#'
+#' @param base_size Font size
+#' @param scale 'none', 'discrete' or 'continuous'
+#' @param palette Color palette name
+#'
+#' @return the dark lecture-note ggplot2 theme
+#' @export
+theme_jupwr_ciemny <- function(base_size = 16, scale = 'none', palette = 'jupwrCiemny')
+    buildJupwrTheme('ciemny', base_size, scale, palette)
+
+#' Creates the jUPWR lecture-note ggplot2 theme (light)
+#'
+#' @param base_size Font size
+#' @param scale 'none', 'discrete' or 'continuous'
+#' @param palette Color palette name
+#'
+#' @return the light lecture-note ggplot2 theme
+#' @export
+theme_jupwr_jasny <- function(base_size = 16, scale = 'none', palette = 'jupwrJasny')
+    buildJupwrTheme('jasny', base_size, scale, palette)
+
 seqPalettes <- c('Blues', 'BuGn', 'BuPu', 'GnBu', 'Greens', 'Greys', 'Oranges',
                  'OrRd', 'PuBu', 'PuBuGn', 'PuRd', 'Purples', 'RdPu', 'Reds',
                  'YlGn', 'YlGnBu', 'YlOrBr', 'YlOrRd')
@@ -275,10 +507,6 @@ otherPalettes <- c('BrBG', 'PiYG', 'PRGn', 'PuOr', 'RdBu', 'RdGy', 'RdYlBu',
 
 divPalettes <- c('BrBG', 'PiYG', 'PRGn', 'PuOr', 'RdBu', 'RdGy', 'RdYlBu',
                  'RdYlGn', 'Spectral')
-
-# UPWr house colours; the burgundy and the gold are taken from the jUPWR app
-# icon, the remaining hues are chosen for separability
-upwrColors <- c('#832034', '#E6AC41', '#3E6DA9', '#4C8C5A', '#5B4A82', '#6E6E6E')
 
 # Okabe & Ito's qualitative palette -- distinguishable under the common forms
 # of colour vision deficiency
@@ -371,14 +599,29 @@ colorPalette <- function(n = 5, pal = 'jmv', type='fill') {
                 cols <- lighten(cols, .1)
         }
 
-    } else if (pal == 'upwr') {
+    } else if (pal %in% names(jupwrNames)) {
 
-        cols <- upwrColors
+        p <- jupwrPalettes[[jupwrNames[[pal]]]]
+        if (n == 1)
+            cols <- p$main[1]
+        else if (n == 2)
+            cols <- p$para
+        else
+            cols <- p$main
+
+        # the palettes are designed as-is, so only lift the fills enough to
+        # keep a box or bar lighter than its own outline
+        if (type == 'fill')
+            cols <- lighten(cols, .25)
+
+    } else if (pal == 'greyscale') {
+
+        cols <- greyscaleColors
+        if (n == 2)
+            cols <- cols[c(1, 4)]
 
         if (type == 'fill')
-            cols <- lighten(cols, .4)
-        else
-            cols <- lighten(cols, .1)
+            cols <- lighten(cols, .25)
 
     } else if (pal == 'okabeito') {
 
@@ -465,6 +708,16 @@ gradientPalette <- function(pal = 'jmv', type = 'sequential', n = 256) {
     } else if (pal == 'viridis') {
 
         anchors <- viridisColors
+
+    } else if (pal %in% names(jupwrNames)) {
+
+        p <- jupwrPalettes[[jupwrNames[[pal]]]]
+        # both are listed high-to-low in the lecture notes, so reverse them to
+        # run low -> high like every other ramp here
+        if (type == 'diverging')
+            anchors <- rev(p$rozbiezna)
+        else
+            anchors <- rev(p$ciepla)
 
     } else {
 
