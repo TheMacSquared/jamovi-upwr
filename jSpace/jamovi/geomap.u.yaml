@@ -1,0 +1,71 @@
+title: Mapa punktowa i statystyki regionalne
+name: geomap
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Dlugosc geograficzna (lon)
+        children:
+          - type: VariablesListBox
+            name: lon
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Szerokosc geograficzna (lat)
+        children:
+          - type: VariablesListBox
+            name: lat
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Wartosc (opcjonalnie)
+        children:
+          - type: VariablesListBox
+            name: wartosc
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Grupa (opcjonalnie)
+        children:
+          - type: VariablesListBox
+            name: grupa
+            isTarget: true
+            maxItemCount: 1
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Tabele
+            children:
+              - type: CheckBox
+                name: pokazRegiony
+              - type: CheckBox
+                name: korelacja
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Mapa
+            children:
+              - type: ComboBox
+                name: zakres
+              - type: CheckBox
+                name: kartogram
+              - type: ComboBox
+                name: agregacja
+                enable: (kartogram)

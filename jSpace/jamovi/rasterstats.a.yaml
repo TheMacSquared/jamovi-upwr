@@ -1,0 +1,74 @@
+---
+name: rasterstats
+title: Statystyki rastra (NDVI)
+menuGroup: Kosmos
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: zrodlo
+      title: Zrodlo rastra
+      type: List
+      options:
+        - name: ndviWroclaw
+          title: NDVI — okolice Wroclawia (przyklad)
+        - name: elewacja
+          title: Elewacja — przyklad z pakietu terra
+        - name: kolumny
+          title: Kolumny arkusza (x, y, wartosc)
+      default: ndviWroclaw
+
+    - name: xKol
+      title: Kolumna x (lon)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: yKol
+      title: Kolumna y (lat)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: wartoscKol
+      title: Kolumna wartosci
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: pokazProg
+      title: Odsetek komorek powyzej progu
+      type: Bool
+      default: true
+
+    - name: prog
+      title: Prog
+      type: Number
+      default: 0.4
+
+    - name: pokazHist
+      title: Histogram wartosci
+      type: Bool
+      default: true
+
+    - name: klasyHist
+      title: Liczba klas histogramu
+      type: Number
+      min: 5
+      max: 100
+      default: 30
+
+    - name: pokazMape
+      title: Mapa rastra
+      type: Bool
+      default: true
+...

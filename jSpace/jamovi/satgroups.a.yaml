@@ -1,0 +1,50 @@
+---
+name: satgroups
+title: Porownanie grup satelitow
+menuGroup: Kosmos
+version: '1.0.0'
+jas: '1.2'
+
+completeWhenFilled: true
+
+options:
+    - name: data
+      type: Data
+
+    - name: dep
+      title: Zmienna
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: group
+      title: Zmienna grupujaca
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: testAnova
+      title: ANOVA (test F)
+      type: Bool
+      default: true
+
+    - name: testKruskal
+      title: Kruskal-Wallis
+      type: Bool
+      default: false
+
+    - name: showPlot
+      title: Wykres pudelkowy
+      type: Bool
+      default: true
+
+    - name: plotMeans
+      title: Srednie na wykresie
+      type: Bool
+      default: true
+...

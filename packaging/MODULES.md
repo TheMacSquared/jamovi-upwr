@@ -17,6 +17,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jboot/` | jboot | bootstrap | wbudowany | 0.2.2 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.3.0 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
+| `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.0 |
 
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
 jeden kurs jest **opcjonalny** i trafia do studentów jako plik `.jmo` (Moduły → Sideload).
@@ -31,12 +32,20 @@ Gdzie jest zdefiniowana lista wbudowanych (musi być identyczna w trzech miejsca
 Plik `.jmo` zawiera pakiet R **skompilowany pod platformę hosta**, więc każda platforma
 wymaga osobnego builda, na maszynie z tą platformą:
 
-| Platforma | Skrypt | Wynik |
-|---|---|---|
-| macOS arm64 | `packaging/scripts/macos/70-jmo-jrisk.sh` | `packaging/build/dist/jRISK_<wersja>-macos-arm64.jmo` |
-| Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4e) | `packaging\build\dist\jRISK_<wersja>-win64.jmo` |
+| Moduł | Platforma | Skrypt | Wynik |
+|---|---|---|---|
+| jRISK | macOS arm64 | `packaging/scripts/macos/70-jmo-jrisk.sh` | `packaging/build/dist/jRISK_<wersja>-macos-arm64.jmo` |
+| jRISK | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4e) | `packaging\build\dist\jRISK_<wersja>-win64.jmo` |
+| jSpace | macOS arm64 | `packaging/scripts/macos/71-jmo-jspace.sh` | `packaging/build/dist/jSpace_<wersja>-macos-arm64.jmo` |
+| jSpace | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4f) | `packaging\build\dist\jSpace_<wersja>-win64.jmo` |
 
 Nowy moduł opcjonalny = kopia tych dwóch kroków z podmienioną nazwą + wiersz w tabeli wyżej.
+
+**jSpace buduje się BEZ `--skip-deps`** (inaczej niż jRISK): jmc doinstalowuje wtedy
+`sf`, `terra` i `asteRisk` (z zależnościami) do `jSpace/build/R<ver>-<platforma>/`
+z przypiętego snapshotu CRAN i pakuje je do `.jmo`. Moduł jest przez to samowystarczalny
+po sideloadzie (binaria CRAN sf/terra zawierają GDAL/GEOS/PROJ), ale plik `.jmo` jest
+dużo większy niż jRISK — to oczekiwane.
 
 ## Macierz zgodności (moduły opcjonalne ↔ wydania jUPWR)
 
@@ -44,12 +53,20 @@ Nowy moduł opcjonalny = kopia tych dwóch kroków z podmienioną nazwą + wiers
 jUPWR moduły opcjonalne trzeba przebudować i dołączyć do wydania**, nawet gdy ich kod się
 nie zmienił. Ta tabela mówi, czy to zrobiono.
 
+### jRISK
+
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
 | 0.8.0 | 28.1 | 0.3.2 | ✅ 2026-08-23 (z 0.7.8, bez zmian) | ⬜ do zbudowania |
 | 0.7.8 | 28.1 | 0.3.2 | ✅ 2026-08-23 | ⬜ do zbudowania |
 
 (Wcześniejsze wydania: jRISK był wbudowany — macierz nie dotyczy.)
+
+### jSpace
+
+| jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
+|---|---|---|---|---|
+| 0.8.0 | 28.1 | 0.1.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 
 ## Procedura wydania jUPWR — checklist
 

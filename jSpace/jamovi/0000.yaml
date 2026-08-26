@@ -1,0 +1,78 @@
+---
+title: Statystyka danych kosmicznych
+name: jSpace
+version: 28.1.0.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: >
+  Statystyka na danych satelitarnych i geoprzestrzennych: orbity satelitow
+  (TLE/SGP4), mapy punktowe i statystyki regionalne, statystyki rastrow oraz
+  prosta klasyfikacja pokrycia terenu. Na potrzeby kursu statystyki dla
+  inzynierii danych satelitarnych i kosmicznych.
+analyses:
+  - title: Orbita satelity (TLE / SGP4)
+    name: tleorbit
+    ns: jSpace
+    menuGroup: Kosmos
+    menuTitle: Orbita satelity (TLE / SGP4)
+    menuSubgroup: Orbity
+    category: analyses
+  - title: Porownanie grup satelitow
+    name: satgroups
+    ns: jSpace
+    menuGroup: Kosmos
+    menuTitle: Porownanie grup satelitow
+    menuSubgroup: Orbity
+    category: analyses
+  - title: Mapa punktowa i statystyki regionalne
+    name: geomap
+    ns: jSpace
+    menuGroup: Kosmos
+    menuTitle: Mapa punktowa i statystyki regionalne
+    menuSubgroup: Dane przestrzenne
+    category: analyses
+  - title: Statystyki rastra (NDVI)
+    name: rasterstats
+    ns: jSpace
+    menuGroup: Kosmos
+    menuTitle: Statystyki rastra (NDVI)
+    menuSubgroup: Dane przestrzenne
+    category: analyses
+  - title: Klasyfikacja pokrycia terenu (k-NN / drzewo)
+    name: satclassify
+    ns: jSpace
+    menuGroup: Kosmos
+    menuTitle: Klasyfikacja pokrycia terenu (k-NN / drzewo)
+    menuSubgroup: Uczenie maszynowe
+    category: analyses
+datasets:
+  - name: Satelity — konstelacje i orbity
+    path: satelity.csv
+    description: >-
+      562 aktywne satelity z 11 konstelacji (GPS, Galileo, Starlink, GEO...):
+      inklinacja, ekscentrycznosc, wysokosc i okres orbity. Zrodlo: CelesTrak
+      (dane USSPACECOM), snapshot 2026-08-26
+  - name: Stacje pomiarowe Europy
+    path: stacje_pomiarowe.csv
+    description: >-
+      Stacje naziemne w miastach Europy: wspolrzedne geograficzne oraz
+      symulowane pomiary srednioroczne (temperatura, AOD, NDVI) z gradientem
+      szerokosci geograficznej. Wspolrzedne: Natural Earth (domena publiczna)
+  - name: Landsat — probki pikseli
+    path: landsat_probki.csv
+    description: >-
+      Probki pikseli z obrazow Landsat (UCI Statlog): 4 pasma spektralne, NDVI i
+      klasa pokrycia terenu — dane do klasyfikacji. Zrodlo: UCI ML Repository,
+      doi:10.24432/C55887, licencja CC BY 4.0
+  - name: NDVI — okolice Wroclawia (tabela)
+    path: ndvi_tabela.csv
+    description: >-
+      Symulowany raster wskaznika NDVI okolic Wroclawia (siatka 200x200,
+      widoczne centrum miasta i rzeka) jako tabela x, y, ndvi — raster w postaci
+      tabelarycznej
+usesNative: true
+minApp: 1.0.8
+
+...

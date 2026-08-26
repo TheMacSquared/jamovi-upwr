@@ -1,0 +1,85 @@
+---
+name: geomap
+title: Mapa punktowa i statystyki regionalne
+menuGroup: Kosmos
+version: '1.0.0'
+jas: '1.2'
+
+completeWhenFilled: true
+
+options:
+    - name: data
+      type: Data
+
+    - name: lon
+      title: Dlugosc geograficzna (lon)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: lat
+      title: Szerokosc geograficzna (lat)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: wartosc
+      title: Wartosc (opcjonalnie)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: grupa
+      title: Grupa (opcjonalnie)
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: zakres
+      title: Zakres mapy
+      type: List
+      options:
+        - name: auto
+          title: Dopasuj do danych
+        - name: europa
+          title: Europa
+        - name: swiat
+          title: Caly swiat
+      default: auto
+
+    - name: pokazRegiony
+      title: Statystyki wedlug panstw
+      type: Bool
+      default: true
+
+    - name: korelacja
+      title: Korelacja wartosci z szerokoscia geograficzna
+      type: Bool
+      default: false
+
+    - name: kartogram
+      title: Kartogram (panstwa)
+      type: Bool
+      default: false
+
+    - name: agregacja
+      title: Agregacja na kartogramie
+      type: List
+      options:
+        - name: srednia
+          title: Srednia
+        - name: mediana
+          title: Mediana
+        - name: n
+          title: Liczba punktow
+      default: srednia
+...

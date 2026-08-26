@@ -1,0 +1,82 @@
+---
+name: tleorbit
+title: Orbita satelity (TLE / SGP4)
+menuGroup: Kosmos
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: zrodlo
+      title: Zrodlo danych TLE
+      type: List
+      options:
+        - name: przyklad
+          title: Przykladowy satelita
+        - name: wlasne
+          title: Wlasne TLE (dwie linie)
+      default: przyklad
+
+    - name: satelita
+      title: Satelita
+      type: List
+      options:
+        - name: iss
+          title: ISS (stacja kosmiczna, LEO)
+        - name: noaa20
+          title: NOAA-20 (meteorologiczny, LEO)
+        - name: sentinel3a
+          title: Sentinel-3A (obserwacja Ziemi, LEO)
+        - name: hst
+          title: Teleskop Hubble'a (LEO)
+        - name: gps
+          title: GPS BIII-1 (nawigacyjny, MEO)
+        - name: galileo
+          title: Galileo PFM (nawigacyjny, MEO)
+        - name: meteosat10
+          title: Meteosat-10 (meteorologiczny, GEO)
+        - name: goes16
+          title: GOES-16 (meteorologiczny, GEO)
+      default: iss
+
+    - name: tle1
+      title: Linia 1 TLE
+      type: String
+      default: ''
+
+    - name: tle2
+      title: Linia 2 TLE
+      type: String
+      default: ''
+
+    - name: czasProp
+      title: Czas propagacji [h]
+      type: Number
+      min: 0.1
+      max: 72
+      default: 3
+
+    - name: krok
+      title: Krok czasowy [min]
+      type: Number
+      min: 0.1
+      max: 120
+      default: 1
+
+    - name: pokazStaty
+      title: Statystyki opisowe orbity
+      type: Bool
+      default: true
+
+    - name: pokazMape
+      title: Trasa naziemna na mapie
+      type: Bool
+      default: true
+
+    - name: pokazProfil
+      title: Profil wysokosci
+      type: Bool
+      default: true
+...

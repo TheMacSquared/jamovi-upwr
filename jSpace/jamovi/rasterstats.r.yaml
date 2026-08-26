@@ -1,0 +1,93 @@
+---
+name: rasterstats
+title: Statystyki rastra (NDVI)
+jrs: '1.1'
+
+items:
+    - name: staty
+      title: Statystyki opisowe rastra
+      type: Table
+      rows: 1
+      clearWith:
+        - zrodlo
+        - xKol
+        - yKol
+        - wartoscKol
+      columns:
+        - name: n
+          title: N komorek
+          type: integer
+        - name: mean
+          title: Srednia
+          type: number
+        - name: sd
+          title: SD
+          type: number
+        - name: min
+          title: Min
+          type: number
+        - name: q25
+          title: Q1
+          type: number
+        - name: median
+          title: Mediana
+          type: number
+        - name: q75
+          title: Q3
+          type: number
+        - name: max
+          title: Max
+          type: number
+
+    - name: progTab
+      title: Komorki powyzej progu
+      type: Table
+      rows: 1
+      visible: (pokazProg)
+      clearWith:
+        - zrodlo
+        - xKol
+        - yKol
+        - wartoscKol
+        - prog
+      columns:
+        - name: prog
+          title: Prog
+          type: number
+        - name: n
+          title: N powyzej
+          type: integer
+        - name: procent
+          title: Procent
+          type: number
+          format: pc
+
+    - name: histogram
+      title: Rozklad wartosci komorek
+      type: Image
+      visible: (pokazHist)
+      width: 600
+      height: 400
+      renderFun: .histPlot
+      clearWith:
+        - zrodlo
+        - xKol
+        - yKol
+        - wartoscKol
+        - klasyHist
+        - pokazProg
+        - prog
+
+    - name: mapa
+      title: Mapa rastra
+      type: Image
+      visible: (pokazMape)
+      width: 650
+      height: 500
+      renderFun: .mapaPlot
+      clearWith:
+        - zrodlo
+        - xKol
+        - yKol
+        - wartoscKol
+...

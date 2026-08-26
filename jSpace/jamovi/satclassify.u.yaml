@@ -1,0 +1,60 @@
+title: Klasyfikacja pokrycia terenu (k-NN / drzewo)
+name: satclassify
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Klasa (zmienna celu)
+        children:
+          - type: VariablesListBox
+            name: klasa
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Predyktory
+        children:
+          - type: VariablesListBox
+            name: predyktory
+            isTarget: true
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Model
+            children:
+              - type: ComboBox
+                name: metoda
+              - type: TextBox
+                name: k
+                format: number
+                enable: (metoda:knn)
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Podzial i wykres
+            children:
+              - type: TextBox
+                name: procTren
+                format: number
+                suffix: '%'
+              - type: TextBox
+                name: ziarno
+                format: number
+              - type: CheckBox
+                name: granica

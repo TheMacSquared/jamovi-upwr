@@ -1,0 +1,63 @@
+---
+name: satclassify
+title: Klasyfikacja pokrycia terenu (k-NN / drzewo)
+menuGroup: Kosmos
+version: '1.0.0'
+jas: '1.2'
+
+completeWhenFilled: true
+
+options:
+    - name: data
+      type: Data
+
+    - name: klasa
+      title: Klasa (zmienna celu)
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+
+    - name: predyktory
+      title: Predyktory
+      type: Variables
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: metoda
+      title: Metoda
+      type: List
+      options:
+        - name: knn
+          title: k najblizszych sasiadow (k-NN)
+        - name: drzewo
+          title: Drzewo decyzyjne
+      default: knn
+
+    - name: k
+      title: Liczba sasiadow (k)
+      type: Number
+      min: 1
+      max: 51
+      default: 5
+
+    - name: procTren
+      title: Procent danych treningowych
+      type: Number
+      min: 50
+      max: 90
+      default: 70
+
+    - name: ziarno
+      title: Ziarno losowe
+      type: Number
+      default: 1
+
+    - name: granica
+      title: Wykres granicy decyzyjnej (2 pierwsze predyktory)
+      type: Bool
+      default: false
+...

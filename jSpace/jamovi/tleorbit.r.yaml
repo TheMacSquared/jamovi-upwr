@@ -1,0 +1,88 @@
+---
+name: tleorbit
+title: Orbita satelity (TLE / SGP4)
+jrs: '1.1'
+
+items:
+    - name: elementy
+      title: Elementy orbitalne (z TLE)
+      type: Table
+      rows: -1
+      clearWith:
+        - zrodlo
+        - satelita
+        - tle1
+        - tle2
+      columns:
+        - name: parametr
+          title: Parametr
+          type: text
+        - name: wartosc
+          title: Wartosc
+          type: number
+        - name: jednostka
+          title: Jednostka
+          type: text
+
+    - name: staty
+      title: Statystyki opisowe propagowanej orbity
+      type: Table
+      rows: -1
+      visible: (pokazStaty)
+      clearWith:
+        - zrodlo
+        - satelita
+        - tle1
+        - tle2
+        - czasProp
+        - krok
+      columns:
+        - name: wielkosc
+          title: Wielkosc
+          type: text
+        - name: n
+          title: N punktow
+          type: integer
+        - name: mean
+          title: Srednia
+          type: number
+        - name: sd
+          title: SD
+          type: number
+        - name: min
+          title: Min
+          type: number
+        - name: max
+          title: Max
+          type: number
+
+    - name: mapa
+      title: Trasa naziemna
+      type: Image
+      visible: (pokazMape)
+      width: 700
+      height: 420
+      renderFun: .mapaPlot
+      clearWith:
+        - zrodlo
+        - satelita
+        - tle1
+        - tle2
+        - czasProp
+        - krok
+
+    - name: profil
+      title: Profil wysokosci orbity
+      type: Image
+      visible: (pokazProfil)
+      width: 650
+      height: 350
+      renderFun: .profilPlot
+      clearWith:
+        - zrodlo
+        - satelita
+        - tle1
+        - tle2
+        - czasProp
+        - krok
+...

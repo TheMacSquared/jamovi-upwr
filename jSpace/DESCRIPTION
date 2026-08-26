@@ -1,0 +1,21 @@
+Package: jSpace
+Type: Package
+Title: Statystyka danych kosmicznych dla jamovi
+Version: 0.1.0
+Author: jUPWR Team
+Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+Description: Statystyka na danych satelitarnych i geoprzestrzennych na potrzeby
+    kursu statystyki dla inzynierii danych satelitarnych i kosmicznych:
+    orbity satelitow (TLE/SGP4), mapy punktowe i statystyki regionalne (sf),
+    statystyki rastrow (terra) oraz prosta klasyfikacja pokrycia terenu.
+License: GPL (>= 2)
+Encoding: UTF-8
+Imports:
+    jmvcore (>= 2.4.2),
+    R6,
+    ggplot2,
+    asteRisk,
+    sf,
+    terra,
+    rpart,
+    class

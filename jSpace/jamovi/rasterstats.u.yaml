@@ -1,0 +1,76 @@
+title: Statystyki rastra (NDVI)
+name: rasterstats
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Zrodlo danych
+        children:
+          - type: ComboBox
+            name: zrodlo
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Kolumna x (lon)
+        children:
+          - type: VariablesListBox
+            name: xKol
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Kolumna y (lat)
+        children:
+          - type: VariablesListBox
+            name: yKol
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Kolumna wartosci
+        children:
+          - type: VariablesListBox
+            name: wartoscKol
+            isTarget: true
+            maxItemCount: 1
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Statystyki
+            children:
+              - type: CheckBox
+                name: pokazProg
+              - type: TextBox
+                name: prog
+                format: number
+                enable: (pokazProg)
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wykresy
+            children:
+              - type: CheckBox
+                name: pokazHist
+              - type: TextBox
+                name: klasyHist
+                format: number
+                enable: (pokazHist)
+              - type: CheckBox
+                name: pokazMape

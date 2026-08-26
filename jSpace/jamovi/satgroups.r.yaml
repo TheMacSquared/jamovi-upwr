@@ -1,0 +1,76 @@
+---
+name: satgroups
+title: Porownanie grup satelitow
+jrs: '1.1'
+
+items:
+    - name: desc
+      title: Statystyki opisowe wedlug grup
+      type: Table
+      rows: -1
+      clearWith:
+        - dep
+        - group
+      columns:
+        - name: grp
+          title: Grupa
+          type: text
+        - name: n
+          title: N
+          type: integer
+        - name: mean
+          title: Srednia
+          type: number
+        - name: sd
+          title: SD
+          type: number
+        - name: median
+          title: Mediana
+          type: number
+        - name: iqr
+          title: IQR
+          type: number
+
+    - name: tests
+      title: Testy roznic miedzy grupami
+      type: Table
+      rows: -1
+      visible: (testAnova || testKruskal)
+      clearWith:
+        - dep
+        - group
+        - testAnova
+        - testKruskal
+      columns:
+        - name: test
+          title: Test
+          type: text
+        - name: stat
+          title: Statystyka
+          type: number
+        - name: df1
+          title: df
+          type: number
+        - name: df2
+          title: df2
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: es
+          title: Wielkosc efektu
+          type: number
+
+    - name: plot
+      title: ''
+      type: Image
+      visible: (showPlot)
+      width: 650
+      height: 450
+      renderFun: .boxPlot
+      clearWith:
+        - dep
+        - group
+        - plotMeans
+...

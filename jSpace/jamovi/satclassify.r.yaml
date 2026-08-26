@@ -1,0 +1,90 @@
+---
+name: satclassify
+title: Klasyfikacja pokrycia terenu (k-NN / drzewo)
+jrs: '1.1'
+
+items:
+    - name: podzial
+      title: Podzial danych
+      type: Table
+      rows: 2
+      clearWith:
+        - klasa
+        - predyktory
+        - procTren
+        - ziarno
+      columns:
+        - name: zbior
+          title: Zbior
+          type: text
+        - name: n
+          title: N
+          type: integer
+
+    - name: macierz
+      title: Macierz pomylek (zbior testowy)
+      type: Table
+      rows: -1
+      clearWith:
+        - klasa
+        - predyktory
+        - metoda
+        - k
+        - procTren
+        - ziarno
+      columns:
+        - name: prawdziwa
+          title: Klasa prawdziwa
+          type: text
+
+    - name: miary
+      title: Jakosc klasyfikacji (zbior testowy)
+      type: Table
+      rows: -1
+      clearWith:
+        - klasa
+        - predyktory
+        - metoda
+        - k
+        - procTren
+        - ziarno
+      columns:
+        - name: klasa
+          title: Klasa
+          type: text
+        - name: n
+          title: N test
+          type: integer
+        - name: czulosc
+          title: Czulosc
+          type: number
+        - name: precyzja
+          title: Precyzja
+          type: number
+
+    - name: reguly
+      title: Drzewo decyzyjne
+      type: Preformatted
+      visible: (metoda:drzewo)
+      clearWith:
+        - klasa
+        - predyktory
+        - metoda
+        - procTren
+        - ziarno
+
+    - name: granicaPlot
+      title: Granica decyzyjna (2 pierwsze predyktory)
+      type: Image
+      visible: (granica)
+      width: 650
+      height: 500
+      renderFun: .granicaPlot
+      clearWith:
+        - klasa
+        - predyktory
+        - metoda
+        - k
+        - procTren
+        - ziarno
+...

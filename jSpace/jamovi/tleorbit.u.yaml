@@ -1,0 +1,62 @@
+title: Orbita satelity (TLE / SGP4)
+name: tleorbit
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Dane wejsciowe
+        children:
+          - type: ComboBox
+            name: zrodlo
+          - type: ComboBox
+            name: satelita
+            enable: (zrodlo:przyklad)
+          - type: TextBox
+            name: tle1
+            format: string
+            stretchFactor: 1
+            enable: (zrodlo:wlasne)
+          - type: TextBox
+            name: tle2
+            format: string
+            stretchFactor: 1
+            enable: (zrodlo:wlasne)
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Propagacja
+            children:
+              - type: TextBox
+                name: czasProp
+                format: number
+              - type: TextBox
+                name: krok
+                format: number
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wyniki
+            children:
+              - type: CheckBox
+                name: pokazStaty
+              - type: CheckBox
+                name: pokazMape
+              - type: CheckBox
+                name: pokazProfil

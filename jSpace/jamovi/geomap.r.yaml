@@ -1,0 +1,86 @@
+---
+name: geomap
+title: Mapa punktowa i statystyki regionalne
+jrs: '1.1'
+
+items:
+    - name: regiony
+      title: Statystyki wedlug panstw
+      type: Table
+      rows: -1
+      visible: (pokazRegiony)
+      clearWith:
+        - lon
+        - lat
+        - wartosc
+      columns:
+        - name: panstwo
+          title: Panstwo
+          type: text
+        - name: n
+          title: N punktow
+          type: integer
+        - name: mean
+          title: Srednia
+          type: number
+        - name: sd
+          title: SD
+          type: number
+
+    - name: kor
+      title: Korelacja wartosci z szerokoscia geograficzna
+      type: Table
+      rows: 1
+      visible: (korelacja)
+      clearWith:
+        - lon
+        - lat
+        - wartosc
+      columns:
+        - name: r
+          title: r Pearsona
+          type: number
+        - name: t
+          title: t
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: ciLow
+          title: 95% CI dolna
+          type: number
+        - name: ciUpp
+          title: 95% CI gorna
+          type: number
+
+    - name: mapa
+      title: Mapa punktowa
+      type: Image
+      width: 700
+      height: 480
+      renderFun: .mapaPlot
+      clearWith:
+        - lon
+        - lat
+        - wartosc
+        - grupa
+        - zakres
+
+    - name: mapaKart
+      title: Kartogram
+      type: Image
+      visible: (kartogram)
+      width: 700
+      height: 480
+      renderFun: .kartogramPlot
+      clearWith:
+        - lon
+        - lat
+        - wartosc
+        - zakres
+        - agregacja
+...
