@@ -1,7 +1,7 @@
 Package: jDane
 Type: Package
 Title: Zbiory danych do zajec dla jamovi
-Version: 0.1.0
+Version: 0.2.0
 Author: jUPWR Team
 Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 Description: Zbiory danych wykorzystywane na zajeciach ze statystyki

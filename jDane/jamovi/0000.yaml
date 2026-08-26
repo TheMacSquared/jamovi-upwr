@@ -1,7 +1,7 @@
 ---
 title: Zbiory danych do zajęć (UPWr)
 name: jDane
-version: 0.1.0
+version: 0.2.0
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -43,6 +43,26 @@ datasets:
     description: >-
       Pomiary 344 pingwinów trzech gatunków ze stacji Palmer na Antarktydzie
       (palmerpenguins)
+  - name: Wzrost roślin (PlantGrowth)
+    path: PlantGrowth.csv
+    description: >-
+      Sucha masa roślin w grupie kontrolnej i dwóch warunkach uprawy —
+      jednoczynnikowa ANOVA
+  - name: Nawożenie NPK (npk)
+    path: npk.csv
+    description: >-
+      Klasyczny eksperyment polowy Fishera — plon grochu przy nawożeniu N, P i K
+      w sześciu blokach
+  - name: Masa urodzeniowa (birthwt)
+    path: birthwt.csv
+    description: >-
+      189 noworodków — masa urodzeniowa i czynniki ryzyka niskiej masy; regresja
+      logistyczna i tabele 2×2
+  - name: Titanic (pasażerowie)
+    path: titanic.csv
+    description: >-
+      1309 pasażerów Titanica — przeżycie, płeć, wiek i klasa; tabele
+      wielodzielcze i regresja logistyczna
 usesNative: true
 minApp: 1.0.8
 
