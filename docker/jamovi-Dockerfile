@@ -71,12 +71,17 @@ RUN SETUP_SERVER_ONLY=1 python3 setup.py install --install-lib=/usr/lib/jamovi/s
 
 COPY $JAMOVI_ROOT/platform/env.conf /usr/lib/jamovi/bin/
 
-RUN echo [ENV]>/usr/lib/jamovi/bin/env.conf && \
+# JAMOVI_R_VERSION must use the arch naming jmc stamps into module metadata
+# ('x64'/'arm64', not Docker's 'amd64') — the server compares it against each
+# module's rVersion and an unequal string marks the module incompatible, which
+# silently drops its analyses and datasets (empty Analyses ribbon and Library)
+RUN JMC_ARCH=$(echo "$R_VERSION" | sed 's/-amd64$/-x64/') && \
+    echo [ENV]>/usr/lib/jamovi/bin/env.conf && \
     echo JAMOVI_HOME=/usr/lib/jamovi>>/usr/lib/jamovi/bin/env.conf && \
     echo JAMOVI_MODULES_PATH=/usr/lib/jamovi/modules>>/usr/lib/jamovi/bin/env.conf && \
     echo JAMOVI_CLIENT_PATH=/usr/lib/jamovi/client>>/usr/lib/jamovi/bin/env.conf && \
     echo JAMOVI_VERSION_PATH=/usr/lib/jamovi/version>>/usr/lib/jamovi/bin/env.conf && \
-    echo JAMOVI_R_VERSION=$R_VERSION>>/usr/lib/jamovi/bin/env.conf
+    echo JAMOVI_R_VERSION=$JMC_ARCH>>/usr/lib/jamovi/bin/env.conf
 
 
 ####### CLIENT #######
