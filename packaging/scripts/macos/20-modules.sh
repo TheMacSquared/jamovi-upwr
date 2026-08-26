@@ -48,7 +48,7 @@ log "Instalacja zależności ridge/hexbin/GGally (ggridges, hexbin, GGally) do $
 
 # Moduły w kolejności jak w docker/jamovi-Dockerfile.
 # R znajduje zależności w $R_HOME_SYS/library (systemowy R), jmvcore w base/R.
-MODULES=(jmv plots jperm jCI jboot jdistrACTION)   # jRISK: moduł opcjonalny -> 70-jmo-jrisk.sh
+MODULES=(jmv plots jperm jCI jboot jdistrACTION jDane)   # jRISK: moduł opcjonalny -> 70-jmo-jrisk.sh
 for m in "${MODULES[@]}"; do
     [ -d "$REPO_ROOT/$m" ] || { log "pomijam $m (brak katalogu)"; continue; }
     log "jmc --install $m ..."
@@ -64,7 +64,7 @@ done
 
 # stage/ jest przyrostowy — usuń moduły, których już nie preinstalujemy (np. jRISK),
 # inaczej stare katalogi przeciekają do .app (50-assemble-app.sh kopiuje cały payload).
-EXPECTED=(base jmv scatr jperm jCI jboot distrACTION)
+EXPECTED=(base jmv scatr jperm jCI jboot distrACTION jDane)
 for d in "$PAYLOAD/modules"/*/; do
     d="${d%/}"; name="$(basename "$d")"
     case " ${EXPECTED[*]} " in *" $name "*) ;; *) log "usuwam nieaktualny moduł z payloadu: $name"; rm -rf "$d";; esac

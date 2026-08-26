@@ -1,0 +1,49 @@
+---
+title: Zbiory danych do zajęć (UPWr)
+name: jDane
+version: 0.1.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: >
+  Zbiory danych wykorzystywane na zajęciach ze statystyki na Uniwersytecie
+  Przyrodniczym we Wrocławiu. Moduł nie zawiera analiz.
+analyses: []
+datasets:
+  - name: Wielka Piątka (Dolan, Oort, Stoel & Wicherts, 2009)
+    path: Big5.csv
+    description: Ciekawy zbiór danych do obliczania korelacji
+  - name: Wzrost zębów
+    path: ToothGrowth.csv
+    description: Niezbyt ciekawy zbiór danych do obliczania testu ANOVA
+  - name: Błędy (Ryan, Wilde i Crist, 2013)
+    path: bugs.csv
+    description: Zbiór danych do obliczania testu ANOVA dla powtórzonych pomiarów
+  - name: Zbiór danych Andersona (Irysy)
+    path: iris.csv
+    description: Zbiór danych "Iris" z R
+  - name: Kalifornijskie szkoły (CASchools)
+    path: CASchools.csv
+    description: >-
+      Wyniki testów i charakterystyki 420 kalifornijskich okręgów szkolnych
+      (Stock i Watson) — dane do regresji
+  - name: Romanse (Fair, 1978)
+    path: affairs.csv
+    description: >-
+      601 respondentów ankiety Psychology Today — romanse pozamałżeńskie i cechy
+      demograficzne
+  - name: Uprawy ryżu (RiceFarms)
+    path: RiceFarms.csv
+    description: >-
+      Dane panelowe 171 indonezyjskich gospodarstw ryżowych z 6 sezonów —
+      nakłady, plony i ceny
+  - name: Pingwiny (Palmer)
+    path: penguins.csv
+    description: >-
+      Pomiary 344 pingwinów trzech gatunków ze stacji Palmer na Antarktydzie
+      (palmerpenguins)
+usesNative: true
+minApp: 1.0.8
+
+...

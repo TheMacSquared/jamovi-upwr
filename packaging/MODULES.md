@@ -15,6 +15,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jCI/` | jCI | przedziały ufności | wbudowany | 0.1.0 |
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.1.0 |
 | `jboot/` | jboot | bootstrap | wbudowany | 0.2.2 |
+| `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.1.0 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
 
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
