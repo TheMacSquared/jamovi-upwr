@@ -74,7 +74,10 @@ foreach ($p in @(
     @{n='protoc';    t="$RtoolsMingw\bin\protoc.exe"},
     @{n='VS2022';    t=$Vcvars},
     @{n='Boost src'; t="$BoostRoot\bootstrap.bat"},
-    @{n='Boost MSVC';t="$BoostRoot\lib64-msvc-14.3"}
+    @{n='Boost MSVC';t="$BoostRoot\lib64-msvc-14.3"},
+    # server/setup.py (upstream) linkuje jamovi.core z Boost 1.88 MSVC (filesystem,
+    # system, locale) — sciezka zapieczona w setup.py, nie w tym skrypcie
+    @{n='Boost 1.88 MSVC (server/setup.py)'; t="C:\local\boost_1_88_0\lib64-msvc-14.3\libboost_locale-vc143-mt-x64-1_88.lib"}
 )) { if (-not (Test-Path $p.t)) { throw "BRAK $($p.n): $($p.t)" } ; Info "OK $($p.n)" }
 if (-not (Get-Command node -EA SilentlyContinue)) { throw "BRAK node" }
 if (-not (Get-Command cmake -EA SilentlyContinue)) { throw "BRAK cmake" }
@@ -196,7 +199,7 @@ foreach ($ph in '%PREFIX%','%LIBDIR%','%CFLAGS%','%MFLAGS%','%CXXFLAGS%','%R_PAT
 # lista abseil + utf8 (grupa) z RTools
 $absl = (Get-ChildItem "$RtoolsMingw\lib\libabsl_*.a" | ForEach-Object { '-l' + ($_.BaseName -replace '^lib','') }) -join ' '
 Use-Mingw
-$env:R_HOME          = $RHomeShort
+$env:R_HOME          = ($RHomeShort -replace '\\','/')   # backslashe gubi sh przy ekspansji w Makefile
 $env:BASE_MODULE_PATH= ($BaseR -replace '\\','/')
 $env:BOOST_LIBDIR    = "$($BoostRoot -replace '\\','/')/stage-mingw/lib"
 $env:NANOMSG_DIR     = "$($Deps -replace '\\','/')/nanomsg"
@@ -204,8 +207,10 @@ $env:PROTOBUF_DIR    = ($RtoolsMingw -replace '\\','/')
 $env:INCLUDES        = "-I$($BoostRoot -replace '\\','/') -I$($Deps -replace '\\','/')/nanomsg/include -I$($RtoolsMingw -replace '\\','/')/include"
 $env:EXTRA_LIBS      = "-Wl,--start-group $absl -lutf8_range -lutf8_validity -Wl,--end-group -lbcrypt -ldbghelp -lws2_32 -lmswsock -ladvapi32"
 Push-Location (Join-Path $RepoRoot "engine")
-& (Get-Command mingw32-make).Source 2>&1 | Out-Null   # uzywa make z RTools (sh dla mkdir -p)
-& make 2>&1 | Out-Null
+# make z RTools (usr\bin) + jawne CXX=g++: mingw32-make spoza RTools (np. Strawberry)
+# ma zapieczony domyslny CXX ze sciezka buildu, ktora nie istnieje na tej maszynie
+& "$RtoolsUsr\make.exe" CXX=g++ -j4 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0) { & "$RtoolsUsr\make.exe" CXX=g++ 2>&1 | Out-Null }
 Pop-Location
 if (-not (Test-Path (Join-Path $RepoRoot "engine\jamovi-engine.exe"))) { throw "silnik nieudany" }
 Info "OK silnik"
@@ -250,41 +255,12 @@ if (-not (Test-Path "$srv\nanomsg")) {
     foreach ($p in 'nanomsg','nanomsg_wrappers','_nanomsg_ctypes') { Copy-Item "$root\$p" "$srv\$p" -Recurse -Force }
 }
 # patch bind/connect str->bytes
+# UWAGA: sdist ma konce linii LF, a here-stringi w tym pliku CRLF — normalizujemy
+# wzorce do LF, inaczej .Replace() nic nie podmienia i patch pada
 $nmInit = "$srv\nanomsg\__init__.py"; $c = Get-Content $nmInit -Raw
-$c = $c.Replace(
-@"
-    def bind(self, address):
-        """Add a local endpoint to the socket"""
-        if self.uses_nanoconfig:
-            raise ValueError("Nanoconfig address must be sole endpoint")
-        endpoint_id = _nn_check_positive_rtn(
-"@,
-@"
-    def bind(self, address):
-        """Add a local endpoint to the socket"""
-        if self.uses_nanoconfig:
-            raise ValueError("Nanoconfig address must be sole endpoint")
-        if isinstance(address, str):
-            address = address.encode('utf-8')
-        endpoint_id = _nn_check_positive_rtn(
-"@)
-$c = $c.Replace(
-@"
-    def connect(self, address):
-        """Add a remote endpoint to the socket"""
-        if self.uses_nanoconfig:
-            raise ValueError("Nanoconfig address must be sole endpoint")
-        endpoint_id = _nn_check_positive_rtn(
-"@,
-@"
-    def connect(self, address):
-        """Add a remote endpoint to the socket"""
-        if self.uses_nanoconfig:
-            raise ValueError("Nanoconfig address must be sole endpoint")
-        if isinstance(address, str):
-            address = address.encode('utf-8')
-        endpoint_id = _nn_check_positive_rtn(
-"@)
+if ($c -notmatch [regex]::Escape("address = address.encode('utf-8')")) {
+    $c = $c -replace '(?m)^(    def (?:bind|connect)\(self, address\):\n.*\n.*\n            raise ValueError\("Nanoconfig address must be sole endpoint"\)\n)(        endpoint_id = _nn_check_positive_rtn\()', "`$1        if isinstance(address, str):`n            address = address.encode('utf-8')`n`$2"
+}
 [System.IO.File]::WriteAllText($nmInit, $c)
 if ((Select-String -Path $nmInit -Pattern "address = address.encode\('utf-8'\)").Count -lt 2) {
     throw "nanomsg python binding patch failed: bind/connect still accept str addresses"
