@@ -18,6 +18,25 @@ export enum Theme {
     JUPWR_JASNY = 'jupwrJasny'
 }
 
+// palettes offered in the app menu; must match the values understood by
+// jmvcore::colorPalette()
+export const PALETTES = ['jmv', 'okabeito', 'jupwrJasny', 'jupwrCiemny', 'greyscale'];
+
+export function defaultPaletteFor(theme: string): string {
+    if (theme === Theme.BW)
+        return 'greyscale';
+    if (theme === Theme.JUPWR_CIEMNY)
+        return 'jupwrCiemny';
+    return 'jupwrJasny';
+}
+
+// settings saved by older jUPWR versions may hold palette names that no
+// longer exist (e.g. brewer names like 'Dark2'); fall back to the palette
+// matching the theme
+export function sanitizePalette(palette: string, theme: string): string {
+    return PALETTES.includes(palette) ? palette : defaultPaletteFor(theme);
+}
+
 enum Mode {
     NORMAL = 'normal', 
 }

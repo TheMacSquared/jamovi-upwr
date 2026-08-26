@@ -15,7 +15,7 @@ import OptionsPB from './optionspb';
 import { IModuleMeta, Modules } from './modules';
 import I18ns from '../common/i18n';
 
-import Settings, { Theme } from './settings';
+import Settings, { Theme, defaultPaletteFor, sanitizePalette } from './settings';
 import ProgressStream from './utils/progressstream';
 
 import { UserFacingError } from './errors';
@@ -891,7 +891,8 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
     _optionsExtras() {
         let ppi = Math.trunc(72 * (window.devicePixelRatio || 1));
         let theme = this._settings.getSetting('theme', Theme.JUPWR_JASNY);
-        let palette = this._settings.getSetting('palette', 'jupwrJasny');
+        let palette = sanitizePalette(
+            this._settings.getSetting('palette', defaultPaletteFor(theme)), theme);
         const decSymbol = this._settings.getSetting('decSymbol', '.');
 
         return { '.ppi': ppi, theme, palette, decSymbol };

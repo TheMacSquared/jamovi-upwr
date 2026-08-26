@@ -8,7 +8,7 @@ import interactionManager, { type FocusLoop } from '../../common/interactionmana
 import host from '../host';
 import { h }  from '../../common/htmlelementcreator';
 import { RibbonModel } from "../ribbon";
-import { Theme } from "../settings";
+import { Theme, defaultPaletteFor } from "../settings";
 
 function selectOption(value: string, label: string) {
     return h('option', { value: value }, label);
@@ -403,8 +403,20 @@ export class AppMenuButton extends EventDistributor {
 
         let theme = settings.getSetting('theme', Theme.JUPWR_JASNY);
         this.$themeList.value = theme;
-        let palette = settings.getSetting('palette', 'jupwrJasny');
+        if (this.$themeList.selectedIndex === -1) {
+            // a theme saved by an older version that no longer exists
+            theme = Theme.JUPWR_JASNY;
+            this.$themeList.value = theme;
+            settings.setSetting('theme', theme);
+        }
+        let palette = settings.getSetting('palette', defaultPaletteFor(theme));
         this.$paletteList.value = palette;
+        if (this.$paletteList.selectedIndex === -1) {
+            // a palette saved by an older version that no longer exists
+            palette = defaultPaletteFor(theme);
+            this.$paletteList.value = palette;
+            settings.setSetting('palette', palette);
+        }
         let decSymbol = settings.getSetting('decSymbol', '.');
         this.$decSymbolList.value = decSymbol;
         let devMode = settings.getSetting('devMode', false);
