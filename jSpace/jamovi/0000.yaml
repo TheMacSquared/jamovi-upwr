@@ -56,8 +56,8 @@ datasets:
       (dane USSPACECOM), snapshot 2026-08-26
     tags:
       - kosmos
+      - orbity
       - ANOVA
-      - statystyki opisowe
   - name: Stacje pomiarowe Europy
     path: stacje_pomiarowe.csv
     description: >-
@@ -66,8 +66,8 @@ datasets:
       szerokosci geograficznej. Wspolrzedne: Natural Earth (domena publiczna)
     tags:
       - kosmos
+      - dane przestrzenne
       - korelacja
-      - regresja
   - name: Landsat — probki pikseli
     path: landsat_probki.csv
     description: >-
@@ -76,6 +76,7 @@ datasets:
       doi:10.24432/C55887, licencja CC BY 4.0
     tags:
       - kosmos
+      - uczenie maszynowe
       - klasyfikacja
   - name: NDVI — okolice Wroclawia (tabela)
     path: ndvi_tabela.csv
@@ -85,6 +86,7 @@ datasets:
       tabelarycznej
     tags:
       - kosmos
+      - dane przestrzenne
       - statystyki opisowe
 usesNative: true
 minApp: 1.0.8
