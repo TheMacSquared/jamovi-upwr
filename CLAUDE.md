@@ -149,7 +149,7 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   schemat Bernoulliego + zbiory danych Bananpol w bibliotece) jest modułem
   OPCJONALNYM: nie preinstalowany, budowany jako .jmo (macOS: 70-jmo-jrisk.sh,
   Windows: build.ps1 krok 4e), instalowany przez Moduły → Sideload
-- jSpace 0.1.0 (statystyka danych kosmicznych: orbity TLE/SGP4 przez asteRisk,
+- jSpace 0.2.0 (statystyka danych kosmicznych: orbity TLE/SGP4 przez asteRisk,
   mapy punktowe/kartogramy i statystyki regionalne przez sf, statystyki rastrów
   przez terra, klasyfikacja k-NN/drzewo; 4 zbiory danych w bibliotece) jest
   modułem OPCJONALNYM jak jRISK, ale budowanym BEZ --skip-deps (jmc bundluje

@@ -1,7 +1,7 @@
 Package: jSpace
 Type: Package
 Title: Statystyka danych kosmicznych dla jamovi
-Version: 0.1.0
+Version: 0.2.0
 Author: jUPWR Team
 Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 Description: Statystyka na danych satelitarnych i geoprzestrzennych na potrzeby
