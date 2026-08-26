@@ -7,7 +7,7 @@
 !define APPNAME    "jUPWR"
 !define COMPANY    "Uniwersytet Przyrodniczy we Wroclawiu"
 !ifndef VERSION
-  !define VERSION  "0.8.0"                 ; wersja jUPWR (client/common/jupwr.ts)
+  !define VERSION  "0.8.6"                 ; wersja jUPWR (client/common/jupwr.ts)
 !endif
 !define PAYLOAD    "..\..\build\dist\jUPWR"
 !define ICON       "..\..\..\platform\app-icon.ico"

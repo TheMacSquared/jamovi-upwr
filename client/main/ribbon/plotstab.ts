@@ -4,9 +4,7 @@
 import RibbonMenu from './ribbonmenu';
 import RibbonTab, { RibbonItem } from './ribbontab';
 import Placeholder from './placeholder';
-import RibbonButton from './ribbonbutton';
 import interactionManager from '../../common/interactionmanager';
-import RibbonSeparator from './ribbonseparator';
 import { Modules } from '../modules';
 import Settings from '../settings';
 import { RibbonModel } from '../ribbon';
@@ -20,7 +18,6 @@ class PlotsTab extends RibbonTab {
     modules: Modules;
     _moduleCount = 0;
     _analysesList = { };
-    _moreIndex: number = -1;
 
     constructor(modules: Modules, model: RibbonModel, public store: Store) {
         super('plots', 'P', _('Plots'));
@@ -128,8 +125,8 @@ class PlotsTab extends RibbonTab {
                     continue;
 
                 let groupName = analysis.menuGroup;
-                if ((groupName === '.' || groupName === 'More') && analysis.ns !== 'scatr')
-                    groupName = 'Other plots';
+                if (groupName === '.' || groupName === 'More' || groupName === 'Other plots')
+                    groupName = 'Other';
                 let subgroup = analysis.menuSubgroup;
                 let menu = groupName in menus ? menus[groupName] : { _title: _translate(groupName) };
                 if (analysis.ns === 'jmv' || menu.ns !== 'jmv')
@@ -157,59 +154,38 @@ class PlotsTab extends RibbonTab {
             }
         }
 
-        let shortcutIndex = 1;
-        for (let groupName in menus) {
+        // fixed didactic ordering of the plot categories; groups not listed
+        // here (from third-party modules) sort in just before 'Other'
+        const groupOrder = [ 'Distribution', 'Comparison', 'Ranking', 'Correlation', 'Evolution', 'Composition', 'Other' ];
+        let groupNames = Object.keys(menus).sort((a, b) => {
+            let ai = groupOrder.indexOf(a);
+            let bi = groupOrder.indexOf(b);
+            if (ai === -1) ai = groupOrder.length - 1.5;
+            if (bi === -1) bi = groupOrder.length - 1.5;
+            return ai - bi;
+        });
+
+        for (let groupName of groupNames) {
             let menu = menus[groupName];
-            if (groupName === '.') {
-                let buttons = [];
-                for (let subgroup in menu) {
-                    
-                    if (subgroup === '_new' || subgroup === '_title' || subgroup === 'ns')
-                        continue;
-                    
-                    for (let item of menu[subgroup].items) {
-                        let name = `${item.ns}-${item.name}`;
-                        let analysisButton = new RibbonButton({ class: 'jmv-analyses-button', title: _(item.title), name: name, size: 'large', /*keyTipKey: 'v', keyTipPosition: { x: '50%', y: '90%' }*/ });
-                        analysisButton.addEventListener('menuActioned', (event) => {
-                            let analysis = { name:item.name, ns:item.ns, title:item.title };
-                            this._analysisSelected(analysis);
-                        });
-                        buttons.push(analysisButton);
-                    }
-                }
-                buttons.push(new RibbonSeparator());
-                this._moreIndex = buttons.length + 1;  // the plus one is because of the library button
-                buttons.push(new RibbonSeparator());
-                this.buttons.push(...buttons);
+            let flattened = [ ];
+            let containsNew = menu._new;
+            for (let subgroup in menu) {
+                if (subgroup === '_new' || subgroup === '_title' || subgroup === 'ns')
+                    continue;
+                flattened.push({
+                    name: subgroup,
+                    title: menu[subgroup].title,
+                    type: 'group',
+                    items: menu[subgroup].items });
             }
-            else {
-                let flattened = [ ];
-                let containsNew = menu._new;
-                for (let subgroup in menu) {
-                    if (subgroup === '_new' || subgroup === '_title' || subgroup === 'ns')
-                        continue;
-                    flattened.push({
-                        name: subgroup,
-                        title: menu[subgroup].title,
-                        type: 'group',
-                        items: menu[subgroup].items });
-                }
 
-                if (flattened.length > 0 && flattened[0].name === '') {
-                    let items = flattened.shift().items;
-                    flattened = items.concat(flattened);
-                }
-
-                let keyTipKey = menu.ns === 'scatr' ?  'M' : null;
-                let buttonId2 = interactionManager.nextAriaId('button');
-                let buttonElement = document.createElement('button');
-                buttonElement.setAttribute('id', buttonId2);
-                let button = new RibbonMenu(menu._title, groupName, keyTipKey, flattened, false, containsNew);
-                if (menu.ns === 'scatr')
-                    this.buttons.splice(this._moreIndex, 0, button);
-                else
-                    this.buttons.push(button);
+            if (flattened.length > 0 && flattened[0].name === '') {
+                let items = flattened.shift().items;
+                flattened = items.concat(flattened);
             }
+
+            let button = new RibbonMenu(menu._title, groupName, null, flattened, false, containsNew);
+            this.buttons.push(button);
         }
 
         if (this.settings.attributes.settingsRecieved === false) {

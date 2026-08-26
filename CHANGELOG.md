@@ -3,6 +3,30 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.8.6 — 2026-08-26
+- Nowy wykres mozaikowy w kategorii Zależności (scatr 2.8.5): dwie zmienne
+  jakościowe, szerokości kolumn ∝ liczebnościom brzegowym X, podział kolumn
+  wg P(Y|X), opcjonalne wagi (liczności) i etykiety procentowe w polach;
+  geometria własna (geom_rect), pełne opcje tytułów/osi/legendy.
+
+## 0.8.5 — 2026-08-26
+- Zakładka „Wykresy" przeorganizowana w kategorie dydaktyczne wg zastosowań
+  (wzór: r-graph-gallery.com): Rozkład, Porównania, Ranking, Zależności, Trendy,
+  Części całości, Inne — stała kolejność menu, ikony kategorii; wykresy
+  z doinstalowanych modułów trafiają automatycznie do „Inne".
+- 17 nowych wykresów w module plots (scatr 2.8.4), wszystkie z pełnym zestawem
+  opcji tytułów/osi/legendy i czystym ggplot2 (zero nowych zależności R):
+  gęstości, Q-Q (facety), raincloud, skrzypcowy, punktowy grup (średnia±CI),
+  lizakowy, radarowy, współrzędne równoległe, chmura słów, kolisty słupkowy,
+  bąbelkowy, mapa ciepła, korelogram, warstwowy, skumulowany słupkowy
+  (100%/liczności, etykiety % wewnątrz lub obok słupka), waflowy (procenty
+  w legendzie/na wykresie, panele wg drugiej zmiennej), mapa drzewa
+  (zagnieżdżanie wg drugiej zmiennej); własne implementacje squarified treemap,
+  spirali chmury słów i geometrii radaru.
+- Ridgeline: pełne opcje legendy (jak histogram) + czytelny pasek gradientu.
+- Wykres słupkowy przeniesiony do kategorii Ranking; świadomie brak wykresu
+  kołowego (decyzja dydaktyczna — zamiast niego skumulowany 100%, waffle, treemap).
+
 ## 0.8.0 — 2026-08-24
 - Motywy wykresów przeprojektowane: „Default" realizuje konwencje APA 7 (czysta czerń,
   jeden rozmiar pisma, ticki na zewnątrz) i jest pozycją „APA" w menu; nowe motywy

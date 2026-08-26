@@ -155,6 +155,27 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   modułem OPCJONALNYM jak jRISK, ale budowanym BEZ --skip-deps (jmc bundluje
   sf/terra/asteRisk do .jmo; macOS: 71-jmo-jspace.sh, Windows: build.ps1
   krok 4f); szczegóły w packaging/MODULES.md
+- zakładka „Wykresy" podzielona na kategorie dydaktyczne wg zastosowań
+  (wzór: r-graph-gallery.com). Mechanizm: `menuGroup` w `plots/jamovi/*.a.yaml`
+  → jedno menu na wstążce (client/main/ribbon/plotstab.ts, stała kolejność);
+  tłumaczenia nazw grup w `plots/jamovi/i18n/pl.po`; ikony kategorii
+  `client/assets/analysis-plots-<kategoria>.svg` + `plotstab.css`.
+  Kategorie (klucz EN → nazwa PL) i wykresy (nazwy analiz w scatr):
+  Distribution→Rozkład (jmvhist, dens, qq, raincloud, ridge),
+  Comparison→Porównania (jmvbox, violin, stripmean), Ranking→Ranking
+  (jmvbar, lollipop, radar, parcoord, wordcloud, circbar),
+  Correlation→Zależności (scat, bubble, heatmap, corrgram, mosaic, hexbin),
+  Evolution→Trendy (jmvline, area), Composition→Części całości
+  (stackbar, waffle, treemap), Other→Inne (pareto; tu też lądują wykresy
+  z modułów zewnętrznych z menuGroup '.'/'More'/'Other plots').
+  Wykresy o własnej geometrii w czystym R (bez zależności): treemap
+  (squarify), wordcloud (spirala + AABB), radar (kartezjańska geometria,
+  nie coord_polar), raincloud (half-violin z gęstości).
+  Zarezerwowane nazwy przyszłych kategorii — tworzyć dopiero razem z pierwszym
+  wykresem i dopisać do groupOrder w plotstab.ts: Map→Mapy, Flow→Przepływy.
+  Plan dydaktyczny: bez wykresu kołowego (świadoma decyzja — oduczamy);
+  boxplot celowo tylko w Porównaniach (porównania między grupami),
+  a rozkładową rolę boxplota pełni raincloud w Rozkładach.
 - branding jUPWR: nazwa, ikony (icns/ico/iconset), wersja dystrybucji
   w client/common/jupwr.ts (patrz sekcja Wersje)
 
