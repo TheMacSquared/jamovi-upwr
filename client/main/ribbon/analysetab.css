@@ -98,6 +98,10 @@
     background-image: url("../../assets/analysis-jrisk.svg");
 }
 
+.jmv-ribbon-button[data-name="kosmos"] .jmv-ribbon-button-icon {
+    background-image: url("../../assets/analysis-jspace.svg");
+}
+
 .jmv-ribbon-button[data-name="linear models"] .jmv-ribbon-button-icon {
     background-image: url("../../assets/analysis-linearmodels.svg");
 }

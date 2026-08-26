@@ -54,24 +54,38 @@ datasets:
       562 aktywne satelity z 11 konstelacji (GPS, Galileo, Starlink, GEO...):
       inklinacja, ekscentrycznosc, wysokosc i okres orbity. Zrodlo: CelesTrak
       (dane USSPACECOM), snapshot 2026-08-26
+    tags:
+      - kosmos
+      - ANOVA
+      - statystyki opisowe
   - name: Stacje pomiarowe Europy
     path: stacje_pomiarowe.csv
     description: >-
       Stacje naziemne w miastach Europy: wspolrzedne geograficzne oraz
       symulowane pomiary srednioroczne (temperatura, AOD, NDVI) z gradientem
       szerokosci geograficznej. Wspolrzedne: Natural Earth (domena publiczna)
+    tags:
+      - kosmos
+      - korelacja
+      - regresja
   - name: Landsat — probki pikseli
     path: landsat_probki.csv
     description: >-
       Probki pikseli z obrazow Landsat (UCI Statlog): 4 pasma spektralne, NDVI i
       klasa pokrycia terenu — dane do klasyfikacji. Zrodlo: UCI ML Repository,
       doi:10.24432/C55887, licencja CC BY 4.0
+    tags:
+      - kosmos
+      - klasyfikacja
   - name: NDVI — okolice Wroclawia (tabela)
     path: ndvi_tabela.csv
     description: >-
       Symulowany raster wskaznika NDVI okolic Wroclawia (siatka 200x200,
       widoczne centrum miasta i rzeka) jako tabela x, y, ndvi — raster w postaci
       tabelarycznej
+    tags:
+      - kosmos
+      - statystyki opisowe
 usesNative: true
 minApp: 1.0.8
 
