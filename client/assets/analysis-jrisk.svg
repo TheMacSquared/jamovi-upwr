@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="44" width="74" viewBox="0 0 74 44" overflow="hidden">
+  <!-- jRISK module icon: survival/reliability step curve with censoring marks -->
+  <!-- axes -->
+  <path stroke="#9F9F9F" stroke-width="1.5" d="m8 2v40h64" fill="none"/>
+  <!-- step curve -->
+  <path stroke="#832034" stroke-width="2.5" fill="none"
+        d="m8 6h14v7h10v8h12v9h12v8h14"/>
+  <!-- censoring marks -->
+  <g stroke="#D99A5B" stroke-width="2" fill="none">
+    <path d="m28 9v8"/>
+    <path d="m49 26v8"/>
+  </g>
+</svg>

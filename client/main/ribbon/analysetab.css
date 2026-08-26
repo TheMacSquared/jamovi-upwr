@@ -79,6 +79,25 @@
     background-image: url("../../assets/analysis-distraction.svg");
 }
 
+/* jUPWR modules; both diacritic and ascii variants of the group names, as the
+   data-name comes from the (possibly translated) menu group title */
+.jmv-ribbon-button[data-name="przedzialy ufnosci"] .jmv-ribbon-button-icon,
+.jmv-ribbon-button[data-name="przedziały ufności"] .jmv-ribbon-button-icon {
+    background-image: url("../../assets/analysis-jci.svg");
+}
+
+.jmv-ribbon-button[data-name="testy permutacyjne"] .jmv-ribbon-button-icon {
+    background-image: url("../../assets/analysis-jperm.svg");
+}
+
+.jmv-ribbon-button[data-name="bootstrap"] .jmv-ribbon-button-icon {
+    background-image: url("../../assets/analysis-jboot.svg");
+}
+
+.jmv-ribbon-button[data-name="ryzyko"] .jmv-ribbon-button-icon {
+    background-image: url("../../assets/analysis-jrisk.svg");
+}
+
 .jmv-ribbon-button[data-name="linear models"] .jmv-ribbon-button-icon {
     background-image: url("../../assets/analysis-linearmodels.svg");
 }
