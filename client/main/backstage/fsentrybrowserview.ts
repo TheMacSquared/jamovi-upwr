@@ -13,6 +13,18 @@ import type { IBrowseType, IBackstagePanelView } from './fsentry';
 
 import { EventDistributor } from '../../common/eventmap';
 
+// pastel tints (85% white) of the jupwrJasny 'main' palette from
+// jmvcore/R/themes.R; the border keeps the full palette colour
+const TAG_COLORS = [
+    { bg: '#f0e2e4', border: '#9c3b4a' },
+    { bg: '#f9f0e6', border: '#d99a5b' },
+    { bg: '#e2e9f0', border: '#3f6f9e' },
+    { bg: '#ebf0ee', border: '#7a9b8e' },
+    { bg: '#f3ecf2', border: '#b183a8' },
+    { bg: '#f6e6dd', border: '#c2571f' },
+];
+const TAG_INK = '#2a1f24';
+
 function crc16(s) {
     if (s.length === 0)
         return 0;
@@ -631,8 +643,8 @@ export class FSEntryBrowserView extends EventDistributor implements IBackstagePa
                     if (item.tags) {
                         let tags = h('div', { class: 'tags' });
                         for (let tag of item.tags) {
-                            let hue = crc16(tag) % 360;
-                            tags.append(h('div', { class: 'tag', style: `background-color: hsl(${ hue }, 70%, 45%); border-color: hsl(${ hue }, 70%, 45%);` }, tag));
+                            let c = TAG_COLORS[crc16(tag) % TAG_COLORS.length];
+                            tags.append(h('div', { class: 'tag', style: `background-color: ${ c.bg }; border-color: ${ c.border }; color: ${ TAG_INK };` }, tag));
                         }
                         itemMeta.append(tags);
                     }
