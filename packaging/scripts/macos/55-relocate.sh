@@ -4,8 +4,8 @@
 #   1) Python  -> python-build-standalone (relokowalny)
 #   2) dylib-y Homebrew (silnik + core.so) -> Resources/jamovi/libs
 #   3) R.framework -> Resources/jamovi/R
-# Rozwiązywanie w runtime: DYLD_FALLBACK_LIBRARY_PATH (po NAZWIE pliku łapie brakujące
-# ścieżki absolutne /opt/homebrew i /Library/Frameworks/R.framework). Bez install_name_tool.
+# Zależności Mach-O są przepisywane przez install_name_tool na @rpath/<nazwa>.
+# Centralny katalog Resources/jamovi/libs zawiera dyliby Homebrew i runtime R.
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 APP="$DIST/$APP_NAME.app"
@@ -85,8 +85,78 @@ rsync -a --delete \
 log "R wbudowane ($(du -sh "$JRES/R" | cut -f1))"
 
 # ---------------------------------------------------------------------------
-# 4. env.conf — wszystkie ścieżki WZGLĘDNE + DYLD_FALLBACK na wbudowane liby
+# 4. install names Mach-O — wszystkie zależności wewnątrz bundla
 # ---------------------------------------------------------------------------
+# Rewrite Mach-O dependencies to paths inside the app bundle. This removes
+# runtime dependencies on Homebrew and the system R.framework.
+log "Przepisywanie zależności Mach-O (/opt/homebrew i R.framework -> @rpath) ..."
+
+# R runtime libraries referenced by absolute framework paths join the central dylib set.
+for rlib in libR.dylib libRblas.dylib libRlapack.dylib libgcc_s.1.1.dylib libgfortran.5.dylib libomp.dylib libquadmath.0.dylib; do
+    [ -e "$JRES/R/lib/$rlib" ] || die "Brak biblioteki R: $rlib"
+    cp -L "$JRES/R/lib/$rlib" "$LIBS/$rlib"
+done
+
+MACHO_LIST="$BUILD_DIR/macho-files.txt"
+: > "$MACHO_LIST"
+while IFS= read -r -d '' candidate; do
+    if file -b "$candidate" 2>/dev/null | grep -q 'Mach-O'; then
+        printf '%s\n' "$candidate" >> "$MACHO_LIST"
+    fi
+done < <(find "$APP/Contents" -type f -print0)
+
+rewrite_count=0
+while IFS= read -r macho; do
+    chmod u+w "$macho" 2>/dev/null || true
+    while IFS= read -r dep; do
+        [ -n "$dep" ] || continue
+        leaf="${dep##*/}"
+        target=""
+        case "$dep" in
+            /opt/homebrew/*) target="$LIBS/$leaf" ;;
+            /Library/Frameworks/R.framework/*) target="$LIBS/$leaf" ;;
+            *) continue ;;
+        esac
+        [ -e "$target" ] || die "Brak wbudowanej biblioteki dla $dep (oczekiwano: $target)"
+        replacement="@rpath/$leaf"
+        install_name_tool -change "$dep" "$replacement" "$macho"
+        rewrite_count=$((rewrite_count + 1))
+    done < <(otool -L "$macho" 2>/dev/null | tail -n +2 | awk '{print $1}')
+done < "$MACHO_LIST"
+
+# Each process that loads bundled extensions needs the central library directory in its run-path stack.
+ensure_rpath() {
+    local binary="$1" rpath="$2"
+    [ -f "$binary" ] || return 0
+    if ! otool -l "$binary" 2>/dev/null | awk '/cmd LC_RPATH/{f=1} f&&/path /{print $2;f=0}' | grep -Fxq "$rpath"; then
+        install_name_tool -add_rpath "$rpath" "$binary"
+    fi
+}
+ensure_rpath "$APP/Contents/MacOS/jamovi-engine" "@executable_path/../Resources/jamovi/libs"
+ensure_rpath "$JRES/python/bin/python3" "@executable_path/../../libs"
+ensure_rpath "$JRES/R/bin/exec/R" "@executable_path/../../../libs"
+
+# Give bundled dylibs portable IDs as well.
+while IFS= read -r dylib; do
+    file -b "$dylib" 2>/dev/null | grep -q 'Mach-O.*dynamically linked shared library' || continue
+    chmod u+w "$dylib" 2>/dev/null || true
+    install_name_tool -id "@rpath/$(basename "$dylib")" "$dylib"
+done < <(find "$LIBS" "$JRES/R/lib" -type f -name '*.dylib' 2>/dev/null)
+
+# Fail the build if an absolute Homebrew or system R dependency remains.
+absolute_refs="$BUILD_DIR/macho-absolute-deps.txt"
+: > "$absolute_refs"
+while IFS= read -r macho; do
+    otool -L "$macho" 2>/dev/null | tail -n +2 | awk '{print $1}' \
+        | grep -E '^(/opt/homebrew/|/Library/Frameworks/R\.framework/)' \
+        >> "$absolute_refs" || true
+done < "$MACHO_LIST"
+[ ! -s "$absolute_refs" ] || {
+    sed -n '1,20p' "$absolute_refs" >&2
+    die "Pozostaly absolutne zaleznosci Homebrew/R.framework"
+}
+log "Przepisano $rewrite_count zaleznosci; brak odwolan do Homebrew i systemowego R.framework."
+
 log "Zapis relokowalnego env.conf ..."
 # JAMOVI_R_VERSION = rVersion modułów (inaczej moduły 'incompatible' i pusta wstążka analiz).
 JAMOVI_R_VERSION="$(grep -E '^rVersion:' "$JRES/modules/jmv/jamovi-full.yaml" | awk '{print $2}')"
@@ -103,15 +173,13 @@ JAMOVI_SERVER_CMD=../Resources/jamovi/python/bin/python3 -m jamovi.server 0 --sl
 PYTHONPATH=../Resources/jamovi/server
 R_HOME=../Resources/jamovi/R
 R_LIBS=../Resources/jamovi/modules/base/R
-DYLD_LIBRARY_PATH=../Resources/jamovi/R/lib:../Resources/jamovi/R/library/RInside/lib:../Resources/jamovi/libs
-DYLD_FALLBACK_LIBRARY_PATH=../Resources/jamovi/R/lib:../Resources/jamovi/R/library/RInside/lib:../Resources/jamovi/libs:/usr/lib:/usr/local/lib
 EOF
 
 # ---------------------------------------------------------------------------
-# 5. podpis ad-hoc (bez hardened runtime, by DYLD_* działało)
+# 5. podpis ad-hoc (lokalny build bez certyfikatu i notaryzacji)
 # ---------------------------------------------------------------------------
 log "Podpis ad-hoc (--force --deep) ..."
 codesign --force --deep --sign - "$APP" >/dev/null 2>&1 || log "(codesign ad-hoc: ostrzeżenie)"
 
 log "OK — $APP jest teraz relokowalna ($(du -sh "$APP" | cut -f1))"
-log "Weryfikacja: żadna zależność nie powinna wskazywać /opt/homebrew po ustawieniu DYLD."
+log "Weryfikacja: żadna zależność nie wskazuje /opt/homebrew ani systemowego R.framework."

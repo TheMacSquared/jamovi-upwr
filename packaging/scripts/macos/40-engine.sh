@@ -36,7 +36,7 @@ ar rcs "$STUBLIB/libboost_system.a" "$STUBLIB/stub.o"
 # -lboost_nowide: kod używa boost::nowide::setenv w EngineR::initR (Makefile linkuje je tylko
 # w bloku Windows; na macOS musimy dodać sami).
 ENGINE_CXXFLAGS="-std=c++17 -DJAMOVI_ENGINE_SUPPORT_LOCAL_SOCKETS -mmacosx-version-min=11.0 \
--I$BREW_PREFIX/include $PROTO_CFLAGS -L$STUBLIB -L$BREW_PREFIX/lib -lboost_nowide $PROTO_LIBS"
+-Wl,-headerpad_max_install_names -I$BREW_PREFIX/include $PROTO_CFLAGS -L$STUBLIB -L$BREW_PREFIX/lib -lboost_nowide $PROTO_LIBS"
 
 log "make (C++17 + protobuf/abseil) ..."
 make clean >/dev/null 2>&1 || true

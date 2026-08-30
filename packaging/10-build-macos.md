@@ -13,8 +13,8 @@ Instrukcja budowania `jUPWR.app` (i `.dmg`) na macOS arm64. Komendy zebrane w sk
 > - `jUPWR-<wersja>-arm64.dmg` tworzy się i poprawnie montuje (~180 MB, bez wbudowanego R).
 >
 > **Relokowalność (Faza R) — ZROBIONE i przetestowane** (`55-relocate.sh`): wbudowany R +
-> python-build-standalone + dyliby Homebrew; w trybie wymuszonego bundla silnik ładuje R+jmv i
-> wszystkie natywne dyliby z bundla (potwierdzone `DYLD_PRINT_LIBRARIES`). `.app` ~1.5 GB, `.dmg`
+> python-build-standalone + dyliby Homebrew; zależności Mach-O są przepisywane na `@rpath`, a audyt
+> potwierdza brak odwołań do `/opt/homebrew` i systemowego R.framework. `.app` ~1.5 GB, `.dmg`
 > ~600 MB. Pozostaje walidacja na FIZYCZNIE czystym Macu + ograniczenie eksportu wektorowego (X11) —
 > patrz sekcja „Relokowalność".
 
@@ -128,7 +128,8 @@ echo 'static int s;' > stub.c && clang -c stub.c -o stub.o && ar rcs libboost_sy
 
 Po tych poprawkach `make` przechodzi i powstaje `jamovi-engine`. `otool -L` pokazuje zależności
 od Homebrew (abseil, protobuf, boost_filesystem, nanomsg), R.framework (`libR.dylib` po ścieżce
-absolutnej) oraz `libRInside.dylib` (sama nazwa — rozwiązywana przez `DYLD_FALLBACK_LIBRARY_PATH`).
+absolutnej) oraz `libRInside.dylib`. Są to zależności wariantu DEV; faza relokacji przepisuje je
+na `@rpath/<nazwa>` i osadza wymagane biblioteki w aplikacji.
 
 ---
 
@@ -218,8 +219,8 @@ Kroki:
 3. nasz kod: `@electron/asar pack electron/app Contents/Resources/app.asar` (zastępuje `default_app.asar`).
 4. payload → `Contents/Resources/jamovi/{client,server,python,modules,i18n,version}`;
    `jamovi-engine` → `Contents/MacOS/`.
-5. `env.conf` → `Contents/Resources/env.conf` (wariant DEV: `R_HOME` = absolutna ścieżka
-   systemowego R, `DYLD_FALLBACK_LIBRARY_PATH` → `R/lib` + `RInside/lib`).
+5. `env.conf` → `Contents/Resources/env.conf` (wariant DEV: `R_HOME` wskazuje systemowy R;
+   po fazie relokacji zostaje zastąpione ścieżką względną do R w bundlu).
 6. `codesign --force --deep --sign -` (podpis ad-hoc, bez certyfikatu).
 
 Uruchomienie do debugowania (widać logi serwera/silnika):
@@ -235,22 +236,13 @@ Wariant DEV zależy od ścieżek tej maszyny (`/opt/homebrew`, `/Library/Framewo
 `55-relocate.sh` przekształca gotową `.app` w **samowystarczalną**, działającą na czystym Macu
 (bez Homebrew, bez R). Uruchamiać PO `50-assemble-app.sh`, PRZED `60-package-dmg.sh`.
 
-### Mechanizm: DYLD zamiast install_name_tool
-Kluczowa obserwacja: gdy dyld nie znajdzie zależności pod jej **ścieżką absolutną** (bo na czystej
-maszynie `/opt/homebrew/...` ani `/Library/Frameworks/R.framework/...` nie istnieją), szuka jej w
-katalogach z `DYLD_LIBRARY_PATH` / `DYLD_FALLBACK_LIBRARY_PATH` **po samej nazwie pliku**. Wystarczy
-więc wrzucić wszystkie potrzebne dyliby do katalogów bundla i wskazać je w env.conf — bez przepisywania
-setek `install_name` (co byłoby konieczne dla ~hundred plików `.so` pakietów R linkujących `libR`).
-
-env.conf (relokowalny) ustawia (ścieżki względne wobec binarki):
-```
-DYLD_LIBRARY_PATH=../Resources/jamovi/R/lib:../Resources/jamovi/R/library/RInside/lib:../Resources/jamovi/libs
-DYLD_FALLBACK_LIBRARY_PATH=...te same...:/usr/lib:/usr/local/lib
-```
-`DYLD_LIBRARY_PATH` (a nie tylko FALLBACK) **wymusza nasze wersje** libów — chroni przed maszyną,
-która ma Homebrew/R w tych samych ścieżkach, ale w innej wersji (ryzyko ABI). Działa, bo `main.js`
-przekazuje env do serwera, a `engine.py` kopiuje `os.environ` do silnika; podpis **ad-hoc bez
-hardened runtime** nie blokuje zmiennych `DYLD_*`.
+### Mechanizm: `install_name_tool` + `@rpath`
+Skrypt kopiuje potrzebne dyliby do `Contents/Resources/jamovi/libs`, a następnie przepisuje
+zależności Mach-O wskazujące `/opt/homebrew/*` lub systemowy R.framework na `@rpath/<nazwa>`.
+Odpowiednie `LC_RPATH` są dodawane do silnika, bundlowanego Pythona i R. Identyfikatory samych
+dylibów również są ustawiane na `@rpath/<nazwa>`. Dzięki temu uruchomienie nie zależy od zmiennych
+`DYLD_*`, lokalnej instalacji Homebrew ani R. Skrypt kończy się błędem, jeśli audyt znajdzie
+pozostałe odwołanie do tych ścieżek absolutnych.
 
 ### Co skrypt wbudowuje
 1. **Python** → `python-build-standalone` 3.12.13 (relokowalny, bez zależności od Homebrew),
@@ -263,11 +255,11 @@ hardened runtime** nie blokuje zmiennych `DYLD_*`.
    IGNORUJĄ env `R_HOME` (mają wbudowaną ścieżkę), ale jamovi ich nie używa.
 
 ### Weryfikacja (przeprowadzona)
-- **Wymuszony bundle** (`DYLD_LIBRARY_PATH` = tylko katalogi bundla) — silnik inicjalizuje R,
-  ładuje `jmv` i wszystkie natywne dyliby **z bundla** (potwierdzone `DYLD_PRINT_LIBRARIES`:
-  `libR`, `libRInside`, `libabsl_*`, `libprotobuf`, `libboost_*` ładowane z `Resources/jamovi/...`).
-- Pełna `.app` w trybie wymuszonego bundla: serwer nasłuchuje, klient + i18n HTTP 200.
-- Statyczne domknięcie: **0** pakietów R linkuje `/opt/homebrew`; wszystkie linkują `R/lib` (w bundlu).
+- Statyczny audyt wszystkich plików Mach-O: **0** zależności wskazuje `/opt/homebrew` lub systemowy
+  R.framework; nie są też potrzebne wpisy `DYLD_*` w `env.conf`.
+- Bundlowany Python uruchamia się i importuje kluczowe zależności natywne (`numpy`, `scipy`,
+  `aiohttp`, `protobuf`).
+- Podpis ad-hoc przechodzi `codesign --verify --deep --strict`, a DMG przechodzi `hdiutil verify`.
 - Render PNG przez `ragg::agg_png` działa bez X11.
 
 ### Znane ograniczenie (bez podpisu/X11)

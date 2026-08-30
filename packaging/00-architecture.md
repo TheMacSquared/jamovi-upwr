@@ -123,8 +123,7 @@ JAMOVI_R_VERSION=4.6.0-arm64
 R_HOME=../jamovi/R
 R_LIBS=../jamovi/modules/base/R
 PYTHONPATH=../jamovi/server
-# macOS dodatkowo (dynamiczny linker):
-DYLD_FALLBACK_LIBRARY_PATH=../jamovi/R/lib
+# macOS: dyliby są osadzone w bundlu, a zależności Mach-O wskazują @rpath
 ```
 
 > Uwaga: dokładne ścieżki względne zależą od finalnego układu i są dopinane w fazie montażu
