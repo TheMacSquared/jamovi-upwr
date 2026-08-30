@@ -170,6 +170,14 @@
     background-image: url("../../assets/analysis-metajam.svg");
 }
 
+.jmv-ribbon-button[data-name="seda"] .jmv-ribbon-button-icon {
+    background-image: url("../../assets/analysis-seda.svg");
+}
+
+.jmv-ribbon-button[data-name="meda"] .jmv-ribbon-button-icon {
+    background-image: url("../../assets/analysis-meda.svg");
+}
+
 .jmv-analyses-button.jmv-modules-menu-item {
     background-color: #dddddd;
 }

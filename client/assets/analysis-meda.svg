@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="74" height="44" viewBox="0 0 74 44"><title>MEDA module icon</title><desc>A simplified multivariate factor map with axes, vectors, and two groups of observations.</desc><!-- MEDA module icon, MEDA project, CC0 1.0 -->
+<g fill="none" stroke="#9f9f9f" stroke-width="1.8" stroke-linecap="round"><path d="M5 23H69"/><path d="M37 4V40"/></g>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"><path d="M37 23 57 8" stroke="#6b9de8"/><path d="M37 23 18 9" stroke="#e6ac40"/></g>
+<path d="M61 5 57.8 13 52.8 7.1Z" fill="#6b9de8"/>
+<path d="M14 6 22.5 7.4 17.4 13Z" fill="#e6ac40"/>
+<g fill="#fff" stroke="#6b9de8" stroke-width="2.6">
+<circle cx="48.156" cy="32.066" r="3.2"/><circle cx="45.078" cy="7.598" r="3.2"/><circle cx="11.534" cy="16.017" r="3.2"/><circle cx="15.83" cy="38.732" r="3.2"/><circle cx="62.156" cy="29.066" r="3.2"/>
+</g>
+<g fill="#fff" stroke="#e6ac40" stroke-width="1.90665">
+<rect x="27.64" y="7.627" width="4.783" height="4.605" rx="0.598"/><rect x="24.043" y="28.614" width="4.783" height="4.605" rx="0.598"/><rect x="54.1" y="35.396" width="4.783" height="4.605" rx="0.598"/><rect x="58.72" y="14.669" width="4.783" height="4.605" rx="0.598"/><rect x="8.958" y="27.11" width="4.783" height="4.605" rx="0.598"/>
+</g>
+<circle cx="37" cy="23" r="2.6" fill="#fff" stroke="#6f6f6f" stroke-width="1.8"/>
+</svg>
