@@ -171,7 +171,9 @@
     margin: 0 0 6px 0;
     border: none;
     background: none;
-    align-self: flex-start;
+    /* full width so the retain-levels toggle can share this line */
+    align-self: stretch;
+    align-items: center;
 }
 
 .jmv-variable-computed-methods > .top {
@@ -207,4 +209,40 @@
 
 .jmv-variable-computed-options > .formula-box.hidden {
     display: none;
+}
+
+/* jUPWR: let the conditions builder scroll instead of being clipped by the
+   fixed-height editor panel — a flex column needs min-height:0 to shrink */
+.jmv-variable-computed-options {
+    min-height: 0;
+}
+
+/* jUPWR: reclaim a row — the retain-levels toggle is pulled up onto the
+   Formula / Conditions line. The footer keeps its DOM position (its switch
+   styling is scoped to it), so it is overlaid on the mode bar row: the widget
+   is the positioning context and the bar reserves the space on its end side. */
+.jmv-variable-computed-widget {
+    position: relative;
+}
+
+.jmv-variable-computed-methods > .top {
+    flex: 1 1 auto;
+}
+
+.jmv-variable-editor-main[data-type='computed'] .jmv-variable-editor-widget-body {
+    /* the overlaid toggle needs the row it sits on to stay clear on the end */
+    padding-top: 10px;
+}
+
+.jmv-variable-editor-main[data-type='computed'] .jmv-variable-editor-widget-footer {
+    position: absolute;
+    top: 10px;
+    /* clear the hide-editor button: its 12px offset + 40px width, plus a gap */
+    inset-inline-end: 62px;
+    margin: 0;
+    z-index: 2;
+}
+
+.jmv-variable-editor-main[data-type='computed'] .jmv-variable-editor-widget-footer > .status-box > .status {
+    font-size: 11px;
 }

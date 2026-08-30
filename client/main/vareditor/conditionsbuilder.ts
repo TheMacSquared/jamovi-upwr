@@ -17,8 +17,21 @@ export interface Clause {
     value: string;
 }
 
+// a parenthesised sub-condition; nesting lets the user override the
+// default precedence ("and" binds tighter than "or") explicitly
+export interface Group {
+    terms: Term[];
+    joins: Join[];
+}
+
+export type Term = Clause | Group;
+
+export function isGroup(term: Term): term is Group {
+    return (term as Group).terms !== undefined;
+}
+
 export interface Row {
-    clauses: Clause[];
+    clauses: Term[];
     joins: Join[];       // joins[i] sits between clauses[i] and clauses[i + 1]
     value: string;
 }
@@ -122,24 +135,42 @@ function displayValue(value: string): string {
     return t;
 }
 
+// serialise a list of terms joined by `joins`; returns '' when nothing in the
+// list is complete enough to contribute. `wrap` parenthesises a multi-term
+// result, which is what makes an explicit group override precedence.
+function termsToText(terms: Term[], joins: Join[], columnNames: string[], wrap: boolean): string {
+    let pieces: string[] = [];
+    let count = 0;
+    for (let i = 0; i < terms.length; i++) {
+        let term = terms[i];
+        let text: string;
+        if (isGroup(term))
+            text = termsToText(term.terms, term.joins, columnNames, true);
+        else if (term.variable === '' || term.value.trim() === '')
+            text = '';
+        else
+            text = quoteName(term.variable) + ' ' + term.op + ' ' + formatValue(term.value, columnNames);
+        if (text === '')
+            continue;
+        if (count > 0)
+            pieces.push(joins[i - 1] || 'and');
+        pieces.push(text);
+        count++;
+    }
+    if (count === 0)
+        return '';
+    let text = pieces.join(' ');
+    return (wrap && count > 1) ? '(' + text + ')' : text;
+}
+
 export function chainToFormula(chain: Chain, columnNames: string[]): string {
     let conds: string[] = [];
     let vals: string[] = [];
     for (let row of chain.rows) {
-        let pieces: string[] = [];
-        let any = false;
-        for (let i = 0; i < row.clauses.length; i++) {
-            let cl = row.clauses[i];
-            if (cl.variable === '' || cl.value.trim() === '')
-                continue;
-            if (any)
-                pieces.push(row.joins[i - 1] || 'and');
-            pieces.push(quoteName(cl.variable) + ' ' + cl.op + ' ' + formatValue(cl.value, columnNames));
-            any = true;
-        }
-        if ( ! any)
+        let cond = termsToText(row.clauses, row.joins, columnNames, false);
+        if (cond === '')
             continue;
-        conds.push(pieces.join(' '));
+        conds.push(cond);
         vals.push(formatValue(row.value, columnNames));
     }
     let formula = formatValue(chain.elseValue, columnNames);
@@ -159,16 +190,51 @@ function parseClause(text: string): Clause | null {
     return { variable: unquoteName(m[1]), op: m[2], value: displayValue(m[3]) };
 }
 
-function parseCondition(text: string): { clauses: Clause[], joins: Join[] } | null {
+// strip one layer of redundant wrapping parentheses, e.g. "(a == 1 or b == 2)"
+function unwrap(text: string): string | null {
+    let t = text.trim();
+    if (t.length < 2 || t[0] !== '(' || t[t.length - 1] !== ')')
+        return null;
+    // make sure the leading '(' actually closes at the very end, so that
+    // "(a == 1) or (b == 2)" is not mistaken for one wrapped group
+    let inner = t.slice(1, -1);
+    let depth = 0;
+    let quote: string | null = null;
+    for (let i = 0; i < inner.length; i++) {
+        let c = inner[i];
+        if (quote !== null) {
+            if (c === quote) quote = null;
+            continue;
+        }
+        if (c === '"' || c === "'" || c === '`') quote = c;
+        else if (c === '(') depth++;
+        else if (c === ')') { depth--; if (depth < 0) return null; }
+    }
+    return depth === 0 ? inner : null;
+}
+
+function parseCondition(text: string): { clauses: Term[], joins: Join[] } | null {
     let split = splitTopLevel(text, [' and ', ' or ']);
-    let clauses: Clause[] = [];
+    let terms: Term[] = [];
     for (let part of split.parts) {
+        let inner = unwrap(part);
+        if (inner !== null) {
+            let sub = parseCondition(inner);
+            if (sub === null)
+                return null;
+            // a group of one is just the clause itself
+            if (sub.clauses.length === 1 && ! isGroup(sub.clauses[0]))
+                terms.push(sub.clauses[0]);
+            else
+                terms.push({ terms: sub.clauses, joins: sub.joins });
+            continue;
+        }
         let cl = parseClause(part);
         if (cl === null)
             return null;
-        clauses.push(cl);
+        terms.push(cl);
     }
-    return { clauses, joins: split.seps as Join[] };
+    return { clauses: terms, joins: split.seps as Join[] };
 }
 
 // returns null when the formula is not a plain IF chain
@@ -209,6 +275,8 @@ export class ConditionsBuilder extends HTMLElement {
     currentName: () => string;
     onChange: (formula: string) => void;
     $rows: HTMLElement;
+    $addRow: HTMLButtonElement;
+    $elseRow: HTMLElement;
     $else: HTMLInputElement;
     lastFormula: string | null = null;
 
@@ -220,27 +288,24 @@ export class ConditionsBuilder extends HTMLElement {
         this.classList.add('jmv-conditions-builder');
         this.setAttribute('data-warning', _('The current formula cannot be shown as conditions; editing here will replace it.'));
 
-        let $add = h('button', { class: 'add-row' }, h('span', { class: 'plus' }), _('Add rule'));
-        $add.addEventListener('click', () => {
+        // the host places this in the mode bar, so it costs no vertical space here
+        this.$addRow = h('button', { class: 'add-row' }, h('span', { class: 'plus' }), _('Add rule')) as HTMLButtonElement;
+        this.$addRow.addEventListener('click', () => {
             this.chain.rows.push(this._emptyRow());
             this.render();
             this._commit();
         });
-        this.append($add);
 
         this.$rows = h('div', { class: 'rows' });
         this.append(this.$rows);
 
-        let $elseRow = h('div', { class: 'row else-row' });
-        $elseRow.append(h('span', { class: 'tag' }, _('else use')));
+        // the else row scrolls with the conditions rather than being pinned
+        this.$elseRow = h('div', { class: 'row else-row' });
+        this.$elseRow.append(h('span', { class: 'tag' }, _('else use')));
         this.$else = h('input', { type: 'text', class: 'value', placeholder: _('e.g. "other"') }) as HTMLInputElement;
         this.$else.addEventListener('change', () => { this.chain.elseValue = this.$else.value; this._commit(); });
         this.$else.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') this.$else.blur(); });
-        $elseRow.append(this.$else);
-        this.append($elseRow);
-
-        this.append(h('div', { class: 'hint' },
-            _('Values: numbers as is, text in quotes (added automatically), or a variable name. Within a row "and" binds tighter than "or".')));
+        this.$elseRow.append(this.$else);
     }
 
     _emptyRow(): Row {
@@ -281,28 +346,63 @@ export class ConditionsBuilder extends HTMLElement {
     render() {
         this.$rows.replaceChildren();
         this.chain.rows.forEach((row, ri) => this.$rows.append(this._renderRow(row, ri)));
+        this.$rows.append(this.$elseRow);
         this.$else.value = this.chain.elseValue;
     }
 
-    _renderRow(row: Row, ri: number): HTMLElement {
-        let $row = h('div', { class: 'row' });
-        let $clauses = h('div', { class: 'clauses' });
-        $row.append($clauses);
+    // renders one term list (a row body, or the inside of a group) with its
+    // join selectors; `path` keeps datalist ids unique across nesting levels
+    _renderTerms(terms: Term[], joins: Join[], path: string, isRoot: boolean): HTMLElement {
+        let $terms = h('div', { class: 'clauses' });
 
-        row.clauses.forEach((clause, ci) => {
-            let $line = h('div', { class: 'clause' });
-            if (ci === 0)
-                $line.append(h('span', { class: 'tag' }, _('if')));
+        let removeAt = (i: number) => {
+            terms.splice(i, 1);
+            joins.splice(Math.max(i - 1, 0), 1);
+            this.render();
+            this._commit();
+        };
+
+        terms.forEach((term, ti) => {
+            let $lead = h('div', { class: 'lead' });
+            if (ti === 0)
+                $lead.append(h('span', { class: 'tag' }, isRoot ? _('if') : ''));
             else {
                 let $join = h('select', { class: 'join' }) as HTMLSelectElement;
                 for (let j of ['and', 'or']) {
                     let $o = h('option', { value: j }, j) as HTMLOptionElement;
-                    if (row.joins[ci - 1] === j) $o.selected = true;
+                    if (joins[ti - 1] === j) $o.selected = true;
                     $join.append($o);
                 }
-                $join.addEventListener('change', () => { row.joins[ci - 1] = $join.value as Join; this._commit(); });
-                $line.append($join);
+                $join.addEventListener('change', () => { joins[ti - 1] = $join.value as Join; this._commit(); });
+                $lead.append($join);
             }
+
+            if (isGroup(term)) {
+                let $group = h('div', { class: 'group' });
+                $group.append($lead);
+                let $inner = h('div', { class: 'group-body' });
+                $inner.append(this._renderTerms(term.terms, term.joins, path + '-' + ti, false));
+                $group.append($inner);
+                let $ungroup = h('button', { class: 'remove-clause', title: _('Remove bracket (keep its parts)') }, '⌦');
+                $ungroup.addEventListener('click', () => {
+                    // splice the group's terms back into the parent list
+                    let args: any[] = [ti, 1, ...term.terms];
+                    terms.splice.apply(terms, args);
+                    joins.splice(ti, 0, ...term.joins);
+                    this.render();
+                    this._commit();
+                });
+                $group.append($ungroup);
+                let $rm = h('button', { class: 'remove-clause', title: _('Remove condition part') }, '×');
+                $rm.addEventListener('click', () => removeAt(ti));
+                $group.append($rm);
+                $terms.append($group);
+                return;
+            }
+
+            let clause = term as Clause;
+            let $line = h('div', { class: 'clause' });
+            $line.append($lead);
 
             let $var = h('select', { class: 'variable' }) as HTMLSelectElement;
             $var.append(h('option', { value: '' }, _('variable…')));
@@ -329,7 +429,7 @@ export class ConditionsBuilder extends HTMLElement {
             }
             $line.append($op);
 
-            let listId = 'jmv-cond-levels-' + ri + '-' + ci;
+            let listId = 'jmv-cond-levels-' + path + '-' + ti;
             let $val = h('input', { type: 'text', class: 'value', placeholder: _('value'), list: listId }) as HTMLInputElement;
             $val.value = clause.value;
             let $list = h('datalist', { id: listId });
@@ -351,26 +451,37 @@ export class ConditionsBuilder extends HTMLElement {
             $val.addEventListener('change', () => { clause.value = $val.value; this._commit(); });
             $val.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') $val.blur(); });
 
-            if (row.clauses.length > 1) {
+            if (terms.length > 1) {
                 let $rm = h('button', { class: 'remove-clause', title: _('Remove condition part') }, '×');
-                $rm.addEventListener('click', () => {
-                    row.clauses.splice(ci, 1);
-                    row.joins.splice(Math.max(ci - 1, 0), 1);
-                    this.render();
-                    this._commit();
-                });
+                $rm.addEventListener('click', () => removeAt(ti));
                 $line.append($rm);
             }
-            $clauses.append($line);
+            $terms.append($line);
         });
 
+        let $actions = h('div', { class: 'term-actions' });
         let $addClause = h('button', { class: 'add-clause' }, '+ ' + _('and / or condition'));
         $addClause.addEventListener('click', () => {
-            row.clauses.push({ variable: '', op: '==', value: '' });
-            row.joins.push('and');
+            terms.push({ variable: '', op: '==', value: '' });
+            joins.push('and');
             this.render();
         });
-        $clauses.append($addClause);
+        $actions.append($addClause);
+
+        let $addGroup = h('button', { class: 'add-clause' }, '+ ' + _('bracket'));
+        $addGroup.addEventListener('click', () => {
+            terms.push({ terms: [ { variable: '', op: '==', value: '' }, { variable: '', op: '==', value: '' } ], joins: [ 'or' ] });
+            joins.push('and');
+            this.render();
+        });
+        $actions.append($addGroup);
+        $terms.append($actions);
+        return $terms;
+    }
+
+    _renderRow(row: Row, ri: number): HTMLElement {
+        let $row = h('div', { class: 'row' });
+        $row.append(this._renderTerms(row.clauses, row.joins, String(ri), true));
 
         let $use = h('div', { class: 'use' });
         $use.append(h('span', { class: 'tag' }, _('use')));

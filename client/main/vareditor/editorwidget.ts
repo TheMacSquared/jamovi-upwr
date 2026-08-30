@@ -142,7 +142,9 @@ class EditorWidget extends HTMLElement {
         this.append(this.$footer);
 
         const statusBox = h('div', { class: 'status-box' });
-        const statusLabel = h('label', { class: 'status' }, _('Retain unused levels in analyses'));
+        // the caption is wrapped so a variable type can shorten it (see computed)
+        const statusLabel = h('label', { class: 'status' },
+            h('span', { class: 'status-caption' }, _('Retain unused levels in analyses')));
 
         this.$active = h('input', { class: 'active', type: 'checkbox' });
         const switchSpan = h('span', { class: 'switch' });

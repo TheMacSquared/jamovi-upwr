@@ -75,6 +75,10 @@ class ComputedVarWidget extends HTMLElement{
         this.builder.classList.add('hidden');
         $options.append(this.builder);
 
+        // "Add condition" sits in the mode bar to save a line in the panel
+        this.builder.$addRow.classList.add('hidden');
+        $top.append(this.builder.$addRow);
+
         this.model.on('columnChanging', () => {
             if (document.activeElement === this.$formula && this.model.attributes.formula !== this.$formula.textContent)
                 this.$formula.blur();
@@ -129,6 +133,7 @@ class ComputedVarWidget extends HTMLElement{
         this.$modeConditions.classList.toggle('selected', mode === 'conditions');
         this.$formulaBox.classList.toggle('hidden', mode !== 'formula');
         this.builder.classList.toggle('hidden', mode !== 'conditions');
+        this.builder.$addRow.classList.toggle('hidden', mode !== 'conditions');
         if (mode === 'conditions') {
             let formula = this.model.attributes.formula || '';
             let ok = this.builder.setFormula(formula);
@@ -201,16 +206,28 @@ class ComputedVarWidget extends HTMLElement{
         this.$formulaMessage.innerText = formulaMessage;
     }
 
+    // the retain-levels caption is shared with the other variable editors, so it
+    // is shortened only while the computed editor (which reuses its line) is up
+    _setStatusCaption(text: string) {
+        let $caption = this.closest('.jmv-variable-editor-main')?.querySelector('.status-caption');
+        if ($caption !== null && $caption !== undefined)
+            $caption.textContent = text;
+    }
+
     detach() {
         if ( ! this.attached)
             return;
 
+        this._setStatusCaption(_('Retain unused levels in analyses'));
         this.$formula.setAttribute('contenteditable', 'false');
         this.attached = false;
     }
 
     attach() {
         this.attached = true;
+
+        // the toggle shares the mode bar line here, so it needs a short caption
+        this._setStatusCaption(_('Retain unused levels'));
 
         this._setFormula(this.model.attributes.formula);
         this._setFormulaMessage(this.model.attributes.formulaMessage);

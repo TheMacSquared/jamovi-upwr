@@ -6,15 +6,34 @@
     padding: 2px 0;
     min-width: 0;
     max-width: 100%;
+    /* own the panel height so the rows can scroll rather than be clipped */
+    min-height: 0;
+    flex: 1 1 auto;
     box-sizing: border-box;
+}
+
+/* everything scrolls together — the conditions and the trailing else row */
+.jmv-conditions-builder > .rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-inline-end: 2px;
 }
 
 .jmv-conditions-builder.hidden {
     display: none;
 }
 
-.jmv-conditions-builder > .add-row {
-    align-self: flex-start;
+.add-row.hidden {
+    display: none;
+}
+
+.add-row {
+    align-self: center;
+    margin-inline-start: 8px;
     border: 1px solid transparent;
     border-radius: 2px;
     background: hsla(0, 0%, 99%, 1);
@@ -24,12 +43,12 @@
     cursor: default;
 }
 
-.jmv-conditions-builder > .add-row:hover {
+.add-row:hover {
     background: #F0F0F0;
     border-color: #CCCCCC;
 }
 
-.jmv-conditions-builder > .add-row > .plus::before {
+.add-row > .plus::before {
     content: '+';
     color: #3E6DA9;
     font-weight: bold;
@@ -144,14 +163,53 @@
     color: #C0392B;
 }
 
-.jmv-conditions-builder > .hint {
-    font-size: 11px;
-    color: #777777;
-    white-space: normal;
-}
-
 .jmv-conditions-builder.not-representable::before {
     content: attr(data-warning);
     font-size: 11px;
     color: #A05A00;
+}
+
+/* jUPWR: explicit brackets — a group is drawn as a bracketed block so the
+   grouping is visible, not just implied by operator precedence */
+.jmv-conditions-builder .lead {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.jmv-conditions-builder .group {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+}
+
+.jmv-conditions-builder .group > .lead {
+    padding-top: 3px;
+}
+
+.jmv-conditions-builder .group-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    border-inline-start: 2px solid #3E6DA9;
+    border-radius: 3px 0 0 3px;
+    background: hsla(212, 46%, 45%, 0.05);
+    padding: 3px 4px;
+}
+
+.jmv-conditions-builder .group-body > .clauses > .clause > .lead > .tag {
+    min-width: 0;
+}
+
+.jmv-conditions-builder .group > .remove-clause {
+    align-self: center;
+}
+
+.jmv-conditions-builder .term-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
 }
