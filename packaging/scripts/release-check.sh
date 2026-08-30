@@ -41,7 +41,7 @@ for d in */jamovi/0000.yaml; do
     m="${d%%/*}"
     [ -f "$m/DESCRIPTION" ] || continue
     echo " $MAC " | grep -q " $m " && continue
-    # jmc czyta wersję modułu wyłącznie z jamovi/0000.yaml (index.js:285-290);
+    # jmc czyta wersję modułu wyłącznie z jamovi/0000.yaml (index.js:299-306);
     # DESCRIPTION jest tylko dla R CMD i musi się z nią zgadzać
     v="$(grep -m1 -oE '^version: *[0-9.]+' "$d" | grep -oE '[0-9.]+')"
     jmo="packaging/build/dist/${m}_${v}-${PLAT}.jmo"

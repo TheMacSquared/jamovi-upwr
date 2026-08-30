@@ -173,7 +173,7 @@ foreach ($m in $Modules) {
 
 # 4e. jRISK jako modul OPCJONALNY — nie preinstalowany; budujemy .jmo do sideloadu
 #     (Moduly -> Sideload w jUPWR). .jmo zawiera pakiet R skompilowany pod Windows.
-# wersja modulu: jmc czyta ja wylacznie z jamovi/0000.yaml (index.js:285-290)
+# wersja modulu: jmc czyta ja wylacznie z jamovi/0000.yaml (index.js:299-306)
 $JriskVer = ((Select-String -Path (Join-Path $RepoRoot "jRISK\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
 $Jmo = "$Dist\jRISK_$JriskVer-win64.jmo"
 node $jmc --build (Join-Path $RepoRoot "jRISK") --jmo $Jmo --rhome $RHome --rlibs "$BaseR;$UserLib" --assume-app-version $JamoviVer --skip-deps | Out-Null
@@ -186,7 +186,7 @@ Info "jRISK .jmo OK ($Jmo)"
 #     i pakuje je do .jmo — modul jest samowystarczalny po sideloadzie.
 #     Binaria CRAN sf/terra maja wbudowane GDAL/GEOS/PROJ. buildDir jest
 #     cache'owany miedzy buildami (instalacja tylko za pierwszym razem).
-# wersja modulu: jmc czyta ja wylacznie z jamovi/0000.yaml (index.js:285-290)
+# wersja modulu: jmc czyta ja wylacznie z jamovi/0000.yaml (index.js:299-306)
 $JspaceVer = ((Select-String -Path (Join-Path $RepoRoot "jSpace\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
 $JmoS = "$Dist\jSpace_$JspaceVer-win64.jmo"
 node $jmc --build (Join-Path $RepoRoot "jSpace") --jmo $JmoS --rhome $RHome --rlibs "$BaseR;$UserLib" --assume-app-version $JamoviVer | Out-Null
