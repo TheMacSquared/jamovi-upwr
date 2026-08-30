@@ -57,6 +57,19 @@ $Modules    = @('jmv','plots','jperm','jCI','jboot','jdistrACTION','jDane')   # 
 $ProgressPreference = 'SilentlyContinue'
 function Step($m){ Write-Host "`n==> $m" -ForegroundColor Cyan }
 function Info($m){ Write-Host "    $m" -ForegroundColor DarkGray }
+
+# Uruchamia jmc i PRZERYWA build, gdy zwroci blad kodem wyjscia.
+# Bez tego `| Out-Null` polykal komunikat jmc, a jedynym straznikiem byl
+# `Test-Path` na pliku wyjsciowym — ktory przechodzil na STARYM .jmo z poprzedniego
+# buildu. Efekt: build konczyl sie zielono z nieaktualnym artefaktem w dist\.
+function Invoke-Jmc {
+    param([Parameter(Mandatory)][string[]]$JmcArgs, [Parameter(Mandatory)][string]$What)
+    $out = & node @JmcArgs 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        $out | Select-Object -Last 25 | ForEach-Object { Write-Host "    $_" -ForegroundColor Red }
+        throw "$What — jmc zwrocil kod $LASTEXITCODE (patrz komunikat wyzej)"
+    }
+}
 New-Item -ItemType Directory -Force -Path $Payload,$Dist,$Deps,$Scratch | Out-Null
 
 # Srodowisko mingw (RTools): UWAGA — wyczyscic NoDefaultCurrentDirectoryInExePath,
@@ -167,7 +180,9 @@ Pop-Location
 $jmc = Join-Path $RepoRoot "jamovi-compiler\index.js"
 foreach ($m in $Modules) {
     if (-not (Test-Path (Join-Path $RepoRoot $m))) { Info "pomijam $m (brak)"; continue }
-    node $jmc --install (Join-Path $RepoRoot $m) --to "$Payload\modules" --rhome $RHome --rlibs "$BaseR;$UserLib" --assume-app-version $JamoviVer --patch-version --skip-deps | Out-Null
+    Invoke-Jmc @($jmc, '--install', (Join-Path $RepoRoot $m), '--to', "$Payload\modules",
+                 '--rhome', $RHome, '--rlibs', "$BaseR;$UserLib",
+                 '--assume-app-version', $JamoviVer, '--patch-version', '--skip-deps') "jmc --install $m"
     Info "jmc $m OK"
 }
 
@@ -176,7 +191,10 @@ foreach ($m in $Modules) {
 # wersja modulu: jmc czyta ja wylacznie z jamovi/0000.yaml (index.js:299-306)
 $JriskVer = ((Select-String -Path (Join-Path $RepoRoot "jRISK\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
 $Jmo = "$Dist\jRISK_$JriskVer-win64.jmo"
-node $jmc --build (Join-Path $RepoRoot "jRISK") --jmo $Jmo --rhome $RHome --rlibs "$BaseR;$UserLib" --assume-app-version $JamoviVer --skip-deps | Out-Null
+if (Test-Path $Jmo) { Remove-Item $Jmo -Force }   # stary artefakt nie moze udawac udanego buildu
+Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jRISK"), '--jmo', $Jmo,
+             '--rhome', $RHome, '--rlibs', "$BaseR;$UserLib",
+             '--assume-app-version', $JamoviVer, '--skip-deps') "jRISK .jmo"
 if (-not (Test-Path $Jmo)) { throw "jRISK: plik .jmo nie powstal" }
 Info "jRISK .jmo OK ($Jmo)"
 
@@ -189,7 +207,10 @@ Info "jRISK .jmo OK ($Jmo)"
 # wersja modulu: jmc czyta ja wylacznie z jamovi/0000.yaml (index.js:299-306)
 $JspaceVer = ((Select-String -Path (Join-Path $RepoRoot "jSpace\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
 $JmoS = "$Dist\jSpace_$JspaceVer-win64.jmo"
-node $jmc --build (Join-Path $RepoRoot "jSpace") --jmo $JmoS --rhome $RHome --rlibs "$BaseR;$UserLib" --assume-app-version $JamoviVer | Out-Null
+if (Test-Path $JmoS) { Remove-Item $JmoS -Force }   # stary artefakt nie moze udawac udanego buildu
+Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jSpace"), '--jmo', $JmoS,
+             '--rhome', $RHome, '--rlibs', "$BaseR;$UserLib",
+             '--assume-app-version', $JamoviVer) "jSpace .jmo"
 if (-not (Test-Path $JmoS)) { throw "jSpace: plik .jmo nie powstal" }
 Info "jSpace .jmo OK ($JmoS)"
 
