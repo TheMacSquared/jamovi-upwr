@@ -1,0 +1,58 @@
+name: Spójność wydania
+
+# Celowo NIE budujemy tu obrazu Dockera. Build i tak jest uruchamiany lokalnie
+# przed każdym wydaniem (jest wtedy szybszy — ciepły cache warstw), więc na CI
+# tylko dublowałby tę pracę: ~40-60 min na zimnym runnerze, przy obrazie ~3.9 GB
+# przekraczającym limit cache GHA. Zostaje to, czego oko nie wyłapuje: spójność
+# metadanych. Rozjazd wersji między jamovi/0000.yaml a DESCRIPTION przetrwał
+# w repo miesiącami, bo nikt nie porównywał tych plików ręcznie.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Wersje i metadane
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # submodules: recursive — plots/jmv wnoszą własne 0000.yaml i DESCRIPTION
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # jmc czyta wersję modułu wyłącznie z jamovi/0000.yaml
+      # (jamovi-compiler/index.js:285-290) i do DESCRIPTION nie zagląda.
+      # Rozjazd = moduł ma inną wersję niż deklarujemy w MODULES.md, a dla
+      # modułów opcjonalnych (--build bez --patch-version) trafia to wprost
+      # do .jmo, które studenci sideloadują.
+      - name: Wersje modułów (0000.yaml = DESCRIPTION)
+        run: |
+          fail=0
+          for d in */jamovi/0000.yaml; do
+            m="${d%%/*}"
+            [ -f "$m/DESCRIPTION" ] || continue
+            vy="$(grep -m1 -oE '^version: *[0-9.]+' "$d" | grep -oE '[0-9.]+')"
+            vd="$(grep -m1 '^Version:' "$m/DESCRIPTION" | grep -oE '[0-9.]+')"
+            if [ "$vy" != "$vd" ]; then
+              echo "::error file=$d::$m: 0000.yaml=$vy != DESCRIPTION=$vd (jmc użyje $vy)"
+              fail=1
+            else
+              echo "ok: $m $vy"
+            fi
+          done
+          exit $fail
+
+      # Skrypt zgłasza też brak .jmo dla platformy hosta (budowane na
+      # Windows/macOS, nie na CI) — stąd `|| true`. Zadanie wyżej jest
+      # twardą bramką; ten krok służy za czytelny raport wydania.
+      - name: release-check.sh (raport)
+        run: bash packaging/scripts/release-check.sh || true
