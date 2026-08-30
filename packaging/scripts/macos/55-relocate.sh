@@ -96,6 +96,9 @@ for rlib in libR.dylib libRblas.dylib libRlapack.dylib libgcc_s.1.1.dylib libgfo
     [ -e "$JRES/R/lib/$rlib" ] || die "Brak biblioteki R: $rlib"
     cp -L "$JRES/R/lib/$rlib" "$LIBS/$rlib"
 done
+rinside="$JRES/R/library/RInside/lib/libRInside.dylib"
+[ -e "$rinside" ] || die "Brak biblioteki RInside: $rinside"
+cp -L "$rinside" "$LIBS/libRInside.dylib"
 
 MACHO_LIST="$BUILD_DIR/macho-files.txt"
 : > "$MACHO_LIST"
@@ -115,6 +118,7 @@ while IFS= read -r macho; do
         case "$dep" in
             /opt/homebrew/*) target="$LIBS/$leaf" ;;
             /Library/Frameworks/R.framework/*) target="$LIBS/$leaf" ;;
+            libRInside.dylib) target="$LIBS/$leaf" ;;
             *) continue ;;
         esac
         [ -e "$target" ] || die "Brak wbudowanej biblioteki dla $dep (oczekiwano: $target)"
@@ -133,7 +137,11 @@ ensure_rpath() {
     fi
 }
 ensure_rpath "$APP/Contents/MacOS/jamovi-engine" "@executable_path/../Resources/jamovi/libs"
-ensure_rpath "$JRES/python/bin/python3" "@executable_path/../../libs"
+python_exe="$JRES/python/bin/python3"
+if [ -L "$python_exe" ]; then
+    python_exe="$(dirname "$python_exe")/$(readlink "$python_exe")"
+fi
+ensure_rpath "$python_exe" "@executable_path/../../libs"
 ensure_rpath "$JRES/R/bin/exec/R" "@executable_path/../../../libs"
 
 # Give bundled dylibs portable IDs as well.
@@ -178,8 +186,17 @@ EOF
 # ---------------------------------------------------------------------------
 # 5. podpis ad-hoc (lokalny build bez certyfikatu i notaryzacji)
 # ---------------------------------------------------------------------------
-log "Podpis ad-hoc (--force --deep) ..."
-codesign --force --deep --sign - "$APP" >/dev/null 2>&1 || log "(codesign ad-hoc: ostrzeżenie)"
+# install_name_tool invalidates existing signatures. Re-sign every Mach-O first,
+# then the enclosing app bundle. Any signing or verification error is fatal.
+log "Ponowne podpisywanie zmodyfikowanych plikow Mach-O ..."
+while IFS= read -r macho; do
+    codesign --force --sign - "$macho" >/dev/null
+    codesign --verify --strict "$macho" >/dev/null
+done < "$MACHO_LIST"
+
+log "Podpis ad-hoc calej aplikacji (--force --deep) ..."
+codesign --force --deep --sign - "$APP" >/dev/null
+codesign --verify --deep --strict "$APP" >/dev/null
 
 log "OK — $APP jest teraz relokowalna ($(du -sh "$APP" | cut -f1))"
 log "Weryfikacja: żadna zależność nie wskazuje /opt/homebrew ani systemowego R.framework."
