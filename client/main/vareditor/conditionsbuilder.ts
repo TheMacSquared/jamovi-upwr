@@ -220,7 +220,7 @@ export class ConditionsBuilder extends HTMLElement {
         this.classList.add('jmv-conditions-builder');
         this.setAttribute('data-warning', _('The current formula cannot be shown as conditions; editing here will replace it.'));
 
-        let $add = h('button', { class: 'add-row' }, h('span', { class: 'plus' }), _('Add condition'));
+        let $add = h('button', { class: 'add-row' }, h('span', { class: 'plus' }), _('Add rule'));
         $add.addEventListener('click', () => {
             this.chain.rows.push(this._emptyRow());
             this.render();
@@ -364,7 +364,7 @@ export class ConditionsBuilder extends HTMLElement {
             $clauses.append($line);
         });
 
-        let $addClause = h('button', { class: 'add-clause' }, '+ ' + _('and / or'));
+        let $addClause = h('button', { class: 'add-clause' }, '+ ' + _('and / or condition'));
         $addClause.addEventListener('click', () => {
             row.clauses.push({ variable: '', op: '==', value: '' });
             row.joins.push('and');
@@ -379,7 +379,7 @@ export class ConditionsBuilder extends HTMLElement {
         $useVal.addEventListener('change', () => { row.value = $useVal.value; this._commit(); });
         $useVal.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') $useVal.blur(); });
         $use.append($useVal);
-        let $rmRow = h('button', { class: 'remove-row', title: _('Remove condition') }, '×');
+        let $rmRow = h('button', { class: 'remove-row', title: _('Remove rule') }, '×');
         $rmRow.addEventListener('click', () => {
             this.chain.rows.splice(ri, 1);
             this.render();
