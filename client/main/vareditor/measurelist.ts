@@ -11,10 +11,12 @@ export default class MeasureList extends HTMLElement implements DropdownContent 
     private $middle: HTMLDivElement;
     private $parent?: ParentElement;
     private includeAuto: boolean;
+    private includeId: boolean;
 
-    constructor(includeAuto: boolean = true) {
+    constructor(includeAuto: boolean = true, includeId: boolean = true) {
         super();
         this.includeAuto = includeAuto;
+        this.includeId = includeId;
         this.id = interactionManager.nextAriaId('list');
 
         this.classList.add('jmv-measure-list');
@@ -72,7 +74,10 @@ export default class MeasureList extends HTMLElement implements DropdownContent 
         items.push(new MeasureListItem(MeasureType.NOMINAL, _('Nominal')));
         items.push(new MeasureListItem(MeasureType.ORDINAL, _('Ordinal')));
         items.push(new MeasureListItem(MeasureType.CONTINUOUS, _('Continuous')));
-        items.push(new MeasureListItem(MeasureType.ID, _('ID')));
+
+        if (this.includeId) {
+            items.push(new MeasureListItem(MeasureType.ID, _('ID')));
+        }
 
         for (const item of items) {
             this.$middle.appendChild(item);

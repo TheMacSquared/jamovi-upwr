@@ -4,11 +4,13 @@
 import dropdown from './dropdown';
 import TransformList from './transformlist';
 import VariableList from './variablelist';
+import MeasureList from './measurelist';
 import ColourPalette from '../editors/colourpalette';
 import Notify from '../notification';
 import VariableModel from './variablemodel';
+import ConditionsBuilder from './conditionsbuilder';
 import { h }  from '../../common/htmlelementcreator';
-import { Column, Transform } from '../dataset';
+import { Column, ColumnType, MeasureType, Transform } from '../dataset';
 import interactionManager from '../../common/interactionmanager';
 
 let instanceID = 0;
@@ -25,9 +27,16 @@ class RecodedVarWidget extends HTMLElement {
     $transformList: HTMLSelectElement;
     $editTransform: HTMLButtonElement;
     $errorMessage: HTMLElement;
+    $measureList: HTMLSelectElement;
+    $measureIcon: HTMLElement;
 
     variableList: VariableList;
     transformList: TransformList;
+    measureList: MeasureList;
+    builder: ConditionsBuilder;
+
+    // guards the builder's onChange while we are the ones writing the formula
+    _applying: boolean = false;
 
     constructor(model: VariableModel) {
         super();
@@ -39,33 +48,54 @@ class RecodedVarWidget extends HTMLElement {
         dropdown.init();
 
         this.classList.add('jmv-variable-recoded-widget', 'RecodedVarWidget');
-        let id1 = `transform-var-list-${instanceID}`;
         let $top = h('div', { class: 'jmv-variable-recoded-top' });
         this.append($top);
-        $top.append(h('label', { for: id1, class: 'variable-list-label single-variable-support' }, _('Source variable')));
-        this.$variableIcon = h('div', { class: 'variable-type-icon single-variable-support' });
-        $top.append(this.$variableIcon);
-        this.$variableList = h('select', { id: id1, class: 'recoded-from single-variable-support' });
-        $top.append(this.$variableList);
 
+        // The source variable is kept out of sight too. It never reaches the
+        // result -- RECODE only falls back to it when there is no else branch,
+        // and the builder always writes one -- but the server blanks the
+        // formula when parentId is 0 (column.py, ColumnType.RECODED), so one
+        // still has to be set. _ensureParent picks it.
+        let id1 = `transform-var-list-${instanceID}`;
+        this.$variableIcon = h('div', { class: 'variable-type-icon single-variable-support' });
+        this.$variableList = h('select', { id: id1, class: 'recoded-from single-variable-support' });
+
+        // the transform picker stays in the DOM but out of sight: the rules now
+        // belong to the variable, so there is nothing to pick. The list widgets
+        // are still wired up below, which keeps the (untouched) transform editor
+        // and its list working for anyone who opens them.
         let id2 = `transform-list-${instanceID}`;
-        $top.append(h('label', { for: id2, class: 'transform-label' }, _('using transform')));
         this.$transformIcon = h('div', { class: 'transform-icon' });
-        $top.append(this.$transformIcon);
         this.$transformList = h('select', { id: id2 },
             h('option', { value: 'None' }, _('None')));
-        $top.append(this.$transformList);
         this.$editTransform = h('button', { class: 'edit-button' }, _('Edit...'));
-        $top.append(this.$editTransform);
+
+        let id3 = `recoded-measure-type-${instanceID}`;
+        $top.append(h('label', { for: id3, class: 'measure-label' }, _('Measure type')));
+        this.$measureIcon = h('div', { class: 'recoded-measure-icon' });
+        $top.append(this.$measureIcon);
+        this.$measureList = h('select', { id: id3 },
+            h('option', { value: 'none' }, _('Auto')),
+            h('option', { value: 'nominal' }, _('Nominal')),
+            h('option', { value: 'ordinal' }, _('Ordinal')),
+            h('option', { value: 'continuous' }, _('Continuous')));
+        $top.append(this.$measureList);
+        this.$measureList.value = 'none';
+
         this.$errorMessage = h('div', { class: 'error-msg' }, _('This transform is in error and should be edited.'));
         $top.append(this.$errorMessage);
-        this.$editTransform.addEventListener('click', (event) => {
-            let transformId = this.model.get('transform');
-            if (transformId !== null && transformId !== 0)
-                this.dispatchEvent(new CustomEvent('edit:transform', { detail: transformId, bubbles: true }));
-        });
+
+        this.builder = new ConditionsBuilder(
+            () => this.model.dataset.get('columns') || [],
+            () => this.model.get('name'),
+            (formula) => this._applyFormula(formula));
+        // the builder is always on here, so its add-rule button lives in the
+        // top bar rather than being toggled with a mode
+        $top.append(this.builder.$addRow);
+        this.append(this.builder);
 
         this._updateChannelList();
+        this._setupMeasureList();
 
         this.variableList = new VariableList();
         this.$variableList.setAttribute('aria-owns', this.variableList.id);
@@ -244,6 +274,14 @@ class RecodedVarWidget extends HTMLElement {
                 }
             }
             this._updateTransformColour();
+            this._loadFromTransform();
+        });
+
+        // the formula may change without the transform id changing (our own
+        // writes come back this way, as do edits made in the transform editor)
+        this.model.dataset.on('transformsChanged', () => {
+            if (this.attached)
+                this._loadFromTransform();
         });
 
         this.model.on('change:parentId', event => {
@@ -280,6 +318,161 @@ class RecodedVarWidget extends HTMLElement {
             this.$transformIcon.style.backgroundColor = ColourPalette.get(transform.colourIndex);
             this.$transformIcon.style.opacity = '1';
         }
+    }
+
+    // Write the builder's formula to this variable's transform, creating one on
+    // first use. A single-element formula array is deliberate: the server only
+    // prefixes the source column onto elements before the last one
+    // (transform.py produce_formula), so a lone element reaches the parser
+    // untouched and may reference any variable, not just $source.
+    // The source column is a formality (see the constructor), but it has to
+    // point somewhere or the server drops the formula. Anything real will do,
+    // so take the first data column that isn't this variable.
+    _ensureParent() {
+        let parentId = this.model.get('parentId');
+        if (parentId !== null && parentId !== 0
+                && this.model.dataset.getColumnById(parentId) !== undefined)
+            return;
+
+        let columns = this.model.dataset.get('columns') || [];
+        let ownId = this.model.get('id');
+        for (let column of columns) {
+            if (column.id === ownId)
+                continue;
+            if (column.columnType === ColumnType.FILTER
+                    || column.columnType === ColumnType.NONE)
+                continue;
+            this.model.set('parentId', column.id);
+            return;
+        }
+    }
+
+    _applyFormula(formula: string) {
+        if (this._applying)
+            return;
+
+        this._ensureParent();
+
+        let dataset = this.model.dataset;
+        let transformId = this.model.get('transform');
+        let transform = (transformId !== null && transformId !== 0)
+            ? dataset.getTransformById(transformId)
+            : undefined;
+
+        if (transform === undefined) {
+            this._createOwnTransform(formula);
+            return;
+        }
+
+        dataset.setTransforms([ { id: transform.id, values: { formula: [ formula ] } } ])
+            .catch((error) => {
+                this._notifyEditProblem({
+                    title: error.message,
+                    message: error.cause,
+                    type: 'error',
+                });
+            });
+    }
+
+    // a transform owned by this variable alone; it is not meant to be picked
+    // from the transform list, so it carries the variable's name and no suffix
+    _createOwnTransform(formula: string, measureType?: MeasureType) {
+        let dataset = this.model.dataset;
+        let values: Partial<Transform> = {
+            name: this.model.get('name'),
+            description: '',
+            suffix: '',
+            formula: [ formula ],
+        };
+        if (measureType !== undefined)
+            values.measureType = measureType;
+        dataset.setTransforms([ { id: 0, values: values } ]).then(() => {
+            let transforms = dataset.get('transforms');
+            let transformId = transforms[transforms.length - 1].id;
+            this.model.set('transform', transformId);
+        }).catch((error) => {
+            this._notifyEditProblem({
+                title: error.message,
+                message: error.cause,
+                type: 'error',
+            });
+        });
+    }
+
+    // Pull the transform's state into the builder and the measure-type control.
+    // Formulas written by the old transform editor are multi-element arrays of
+    // source-relative fragments; those cannot be shown as rules, so the builder
+    // falls back to its "cannot be shown as conditions" warning.
+    _loadFromTransform() {
+        let transformId = this.model.get('transform');
+        let transform = (transformId !== null && transformId !== 0)
+            ? this.model.dataset.getTransformById(transformId)
+            : undefined;
+
+        let formula = '';
+        if (transform !== undefined && transform.formula.length === 1)
+            formula = transform.formula[0] === '$source' ? '' : transform.formula[0];
+
+        this._applying = true;
+        try {
+            let ok = this.builder.setFormula(formula);
+            this.builder.classList.toggle('not-representable', ! ok && formula.trim() !== '');
+        }
+        finally {
+            this._applying = false;
+        }
+
+        let measureType = transform === undefined ? 'none' : transform.measureType;
+        this.$measureList.value = measureType;
+        this.$measureIcon.setAttribute('measure-type', measureType);
+    }
+
+    _setupMeasureList() {
+        // no ID here: a recode produces categories or numbers, never a row
+        // identifier. Auto stays -- it lets the type follow the values, which
+        // is what you want when recoding to numbers.
+        this.measureList = new MeasureList(true, false);
+        this.$measureList.setAttribute('aria-owns', this.measureList.id);
+        this.$measureList.addEventListener('mousedown', (event) => {
+            if (dropdown.isVisible() === true && dropdown.focusedOn() === this.$measureList)
+                dropdown.hide();
+            else
+                dropdown.show(this.$measureList, this.measureList);
+            event.preventDefault();
+            event.stopPropagation();
+            this.$measureList.focus();
+        });
+
+        this.measureList.addEventListener('selected-measure-type', (event: CustomEvent<MeasureType>) => {
+            let measureType = event.detail;
+            dropdown.hide();
+
+            // show the choice straight away; the reload below confirms it
+            this.$measureList.value = measureType;
+            this.$measureIcon.setAttribute('measure-type', measureType);
+
+            // the type can be picked before any rule exists, so there may be
+            // no transform to write to yet
+            this._ensureParent();
+            let transformId = this.model.get('transform');
+            let transform = (transformId !== null && transformId !== 0)
+                ? this.model.dataset.getTransformById(transformId)
+                : undefined;
+
+            if (transform === undefined) {
+                this._createOwnTransform('', measureType);
+                return;
+            }
+
+            this.model.dataset.setTransforms([ { id: transform.id, values: { measureType: measureType } } ])
+                .catch((error) => {
+                    this._notifyEditProblem({
+                        title: error.message,
+                        message: error.cause,
+                        type: 'error',
+                    });
+                });
+        });
     }
 
     _createTransform(values?: Partial<Transform>) {
@@ -412,19 +605,32 @@ class RecodedVarWidget extends HTMLElement {
         this._updateErrorMessage();
     }
 
+    // the retain-levels caption is shared with the other variable editors, so
+    // it is shortened only while this editor (which reuses its line) is up
+    _setStatusCaption(text: string) {
+        let $caption = this.closest('.jmv-variable-editor-main')?.querySelector('.status-caption');
+        if ($caption !== null && $caption !== undefined)
+            $caption.textContent = text;
+    }
+
     detach() {
         if ( ! this.attached)
             return;
 
+        this._setStatusCaption(_('Retain unused levels in analyses'));
         this.attached = false;
     }
 
     attach() {
         this.attached = true;
+
+        // the toggle shares the top row here, so it needs a short caption
+        this._setStatusCaption(_('Retain unused levels'));
         this._updateChannelList();
         this._updateTransformList();
         this._updateTransformColour();
         this._updateErrorMessage();
+        this._loadFromTransform();
     }
 
 }

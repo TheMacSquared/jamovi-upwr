@@ -188,20 +188,6 @@
     display: none;
 }
 
-.jmv-variable-computed-methods .item {
-    cursor: default;
-    padding: 3px 12px;
-    border: 1px solid #CCCCCC;
-    border-radius: 3px;
-    background-color: #FFFFFF;
-}
-
-.jmv-variable-computed-methods .item.selected {
-    background-color: #E6EEF7;
-    border-color: #3E6DA9;
-    font-weight: bold;
-}
-
 .jmv-variable-computed-options {
     min-width: 0;
     width: 100%;
