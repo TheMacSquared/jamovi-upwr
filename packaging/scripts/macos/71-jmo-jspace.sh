@@ -17,7 +17,8 @@ BASE_R="$PAYLOAD/modules/base/R"
 [ -d "$BASE_R/jmvcore" ] || die "Brak jmvcore w $BASE_R — uruchom najpierw 20-modules.sh"
 [ -d "$REPO_ROOT/jamovi-compiler/node_modules" ] || ( cd "$REPO_ROOT/jamovi-compiler" && npm install )
 
-JSPACE_VERSION="$(grep -oE '^Version: *[0-9.]+' "$REPO_ROOT/jSpace/DESCRIPTION" | grep -oE '[0-9.]+')"
+# wersja modułu: jmc czyta ją wyłącznie z jamovi/0000.yaml (index.js:285-290)
+JSPACE_VERSION="$(grep -m1 -oE '^version: *[0-9.]+' "$REPO_ROOT/jSpace/jamovi/0000.yaml" | grep -oE '[0-9.]+')"
 JMO="$DIST/jSpace_${JSPACE_VERSION}-macos-arm64.jmo"
 mkdir -p "$DIST"
 

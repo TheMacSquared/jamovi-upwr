@@ -2,6 +2,8 @@ Package: distrACTION
 Type: Package
 Title: distrACTION
 Version: 1.3.1
+# UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
+# przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
 Author: Rihs, M. & Mayer, B. (upstream); jUPWR Team (fork)
 Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 Description: A tool for calculating and plotting the cumulative distribution function (CDF) and the quantile function (Inverse CDF) for a number of discrete and continuous distributions. Fork of the upstream distrACTION module (Rihs & Mayer) with Polish labels, moments tables and additional distributions (exponential, gamma, Weibull, negative binomial).

@@ -2,6 +2,8 @@ Package: jSpace
 Type: Package
 Title: Statystyka danych kosmicznych dla jamovi
 Version: 0.2.0
+# UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
+# przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
 Author: jUPWR Team
 Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 Description: Statystyka na danych satelitarnych i geoprzestrzennych na potrzeby

@@ -24,13 +24,26 @@ else bad "listy wbudowanych różnią się — Docker: [$DOCKER] macOS: [$MAC] W
 
 grep -qE "^## $JUPWR( |$)" CHANGELOG.md && ok "CHANGELOG.md ma wpis $JUPWR" || bad "brak wpisu '## $JUPWR' w CHANGELOG.md"
 
+# spójność wersji: jmc stempluje moduł wersją z jamovi/0000.yaml i nie zagląda
+# do DESCRIPTION — rozjazd oznacza, że .jmo/moduł ma inną wersję niż deklarujemy
+for d in */jamovi/0000.yaml; do
+    m="${d%%/*}"
+    [ -f "$m/DESCRIPTION" ] || continue
+    vy="$(grep -m1 -oE '^version: *[0-9.]+' "$d" | grep -oE '[0-9.]+')"
+    vd="$(grep -m1 '^Version:' "$m/DESCRIPTION" | grep -oE '[0-9.]+')"
+    [ "$vy" = "$vd" ] && ok "$m: wersja $vy (0000.yaml = DESCRIPTION)" \
+        || bad "$m: rozjazd wersji — 0000.yaml=$vy, DESCRIPTION=$vd (jmc użyje $vy)"
+done
+
 # moduły opcjonalne = katalogi z jamovi/0000.yaml spoza listy wbudowanych
 case "$(uname -s)" in Darwin) PLAT="macos-arm64";; MINGW*|MSYS*|CYGWIN*) PLAT="win64";; *) PLAT="linux";; esac
 for d in */jamovi/0000.yaml; do
     m="${d%%/*}"
     [ -f "$m/DESCRIPTION" ] || continue
     echo " $MAC " | grep -q " $m " && continue
-    v="$(grep -m1 '^Version:' "$m/DESCRIPTION" | grep -oE '[0-9.]+')"
+    # jmc czyta wersję modułu wyłącznie z jamovi/0000.yaml (index.js:285-290);
+    # DESCRIPTION jest tylko dla R CMD i musi się z nią zgadzać
+    v="$(grep -m1 -oE '^version: *[0-9.]+' "$d" | grep -oE '[0-9.]+')"
     jmo="packaging/build/dist/${m}_${v}-${PLAT}.jmo"
     echo "moduł opcjonalny: $m $v"
     [ -f "$jmo" ] && ok "$jmo" || bad "brak $jmo — zbuduj (macOS: 70-jmo-*.sh, Windows: build.ps1)"

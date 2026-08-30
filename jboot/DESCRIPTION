@@ -1,7 +1,9 @@
 Package: jboot
 Type: Package
 Title: Wnioskowanie Bootstrapowe dla jamovi
-Version: 0.2.2
+Version: 0.3.0
+# UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
+# przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
 Author: Maciej Dzikowski
 Maintainer: Maciej Dzikowski <email@example.com>
 Description: Metody bootstrapowe do wnioskowania statystycznego w jamovi.
