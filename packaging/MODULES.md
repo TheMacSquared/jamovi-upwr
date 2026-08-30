@@ -11,7 +11,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 |---|---|---|---|---|
 | `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.4 |
 | `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 26 wykresów) | wbudowany | 2.9.0 |
-| `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.3.1 |
+| `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.3.2 |
 | `jCI/` | jCI | przedziały ufności | wbudowany | 0.1.0 |
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.1.0 |
 | `jboot/` | jboot | bootstrap | wbudowany | 0.3.0 |

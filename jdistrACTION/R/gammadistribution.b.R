@@ -167,7 +167,21 @@ GammaDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             LowerSegmentLength <- ((max(Datas$Prob, na.rm = TRUE)) / 18)
             HigherSegmentLength <- ((max(Datas$Prob, na.rm = TRUE)) / 18)}}}
 
-      Dataset <- cbind(Datas, MainCurveData[, 2], MainCurveData)
+      # shaded area under the density between the quantile bounds, so students
+      # can see p as an area rather than just the dashed lines
+      QuantileAreaData <- as.data.frame(Datas)
+      if (QuantileFunction == "TRUE") {
+        QuantileLower <- if (QuantileFunctionType == "central") LowerSegment else LowerTail
+        QuantileAreaData$Prob[QuantileAreaData$X < QuantileLower] <- NA
+        QuantileAreaData$X[QuantileAreaData$X < QuantileLower] <- NA
+        QuantileAreaData$Prob[QuantileAreaData$X > HigherSegment] <- NA
+        QuantileAreaData$X[QuantileAreaData$X > HigherSegment] <- NA
+      } else {
+        QuantileAreaData$Prob <- NA
+        QuantileAreaData$X <- NA
+      }
+
+      Dataset <- cbind(Datas, MainCurveData[, 2], MainCurveData, QuantileAreaData[, 2])
       Dataset[, 4:5] <- NA
       Dataset[1, 4] <- HigherSegment
       Dataset[2, 4] <- LowerSegment
@@ -190,8 +204,8 @@ GammaDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
     .plot = function(image, ggtheme, theme, ...) {
       Dataset <- image$state
-      PlotData <- Dataset[, 1:3]
-      colnames(PlotData) <- c("X", "Prob", "CurveProb")
+      PlotData <- Dataset[, c(1:3, 6)]
+      colnames(PlotData) <- c("X", "Prob", "CurveProb", "QuantileAreaProb")
       HigherSegment <- as.numeric(Dataset[1, 4])
       LowerSegment <- as.numeric(Dataset[2, 4])
       HigherSegmentLength <- as.numeric(Dataset[3, 4])
@@ -227,6 +241,7 @@ GammaDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       if (QuantileFunction == "TRUE")
         Plot <- Plot +
+          geom_area(PlotData, mapping = aes(x = PlotData$X, y = PlotData$QuantileAreaProb), fill = Color[2], alpha = 0.3) +
           geom_segment(aes(x = LowerSegment, y = 0, xend = LowerSegment, yend = LowerSegmentLength, linetype = QuantileLabel), colour = Color[2], size = Linewidth, alpha = QuantileAlphaLow) +
           geom_segment(aes(x = HigherSegment, y = 0, xend = HigherSegment, yend = HigherSegmentLength, linetype = QuantileLabel), colour = Color[2], size = Linewidth, alpha = QuantileAlphaHigh) +
           scale_linetype_manual(values = TypeOfLine)

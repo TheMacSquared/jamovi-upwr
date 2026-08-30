@@ -287,11 +287,27 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             Textsize <- 10
             HigherSegment <- HigherAxisSegment
             LowerSegment <- HigherAxisSegment}}}
-      
-      
+
+
+      ##### 1.3.4b) Shaded area for the quantile #####
+      # Shaded area under the density between the quantile bounds, so students
+      # can see p as an area rather than just the dashed lines
+      QuantileAreaData <- as.data.frame(Datas)
+      if (QuantileFunction=="TRUE") {
+        QuantileLower <- if (QuantileFunctionType=="central") LowerSegment else LowerAxisSegment
+        QuantileAreaData$Prob[QuantileAreaData$X < QuantileLower] <- NA
+        QuantileAreaData$X[QuantileAreaData$X < QuantileLower] <- NA
+        QuantileAreaData$Prob[QuantileAreaData$X > HigherSegment] <- NA
+        QuantileAreaData$X[QuantileAreaData$X > HigherSegment] <- NA
+      } else {
+        QuantileAreaData$Prob <- NA
+        QuantileAreaData$X <- NA
+      }
+
+
       ##### 1.3.5) Submit datas for plot #####
-      # The variables that are needed for the plot function are combined to a new variable      
-      Dataset <- cbind(Datas, MainCurveData[,2], MainCurveData)
+      # The variables that are needed for the plot function are combined to a new variable
+      Dataset <- cbind(Datas, MainCurveData[,2], MainCurveData, QuantileAreaData[,2])
       # The last two rows of the dataset are cleared
       Dataset[,4:5] <- NA
       # The plotvalues are assigned to the dataset
@@ -326,8 +342,8 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       # The main dataset for the plot is extracted
       Dataset <- image$state
       # The datas are recreated as a variable for the plot
-      PlotData <- Dataset[,1:3]
-      colnames(PlotData) <- c("X", "Prob", "CurveProb")
+      PlotData <- Dataset[,c(1:3, 6)]
+      colnames(PlotData) <- c("X", "Prob", "CurveProb", "QuantileAreaProb")
       # The x-axis point of the higher quantile segment
       HigherSegment <- as.numeric(Dataset[1,4])
       # The x-axis point of the lower quantile segment
@@ -394,6 +410,8 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       ##### 2.3.3) Quantile #####
       if (QuantileFunction=="TRUE") {
           Plot <- Plot+
+            # The shaded area under the density between the quantile bounds
+            geom_area(PlotData, mapping = aes(x=PlotData$X, y=PlotData$QuantileAreaProb), fill = Color[2], alpha = 0.3)+
             # The lines of the quantiles are added
             geom_segment(aes(x=LowerSegment, y=0, xend=LowerSegment, yend=LowerSegmentLength,linetype=QuantileLabel),colour = Color[2], size = Linewidth,  alpha = QuantileAlphaLow)+
             geom_segment(aes(x=HigherSegment, y=0, xend=HigherSegment, yend=HigherSegmentLength, linetype=QuantileLabel),colour = Color[2], size = Linewidth,  alpha = QuantileAlphaHigh)+
