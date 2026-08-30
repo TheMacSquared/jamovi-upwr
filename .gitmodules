@@ -5,6 +5,7 @@
 [submodule "jamovi-readstat"]
 	path = readstat
 	url = https://github.com/TheMacSquared/jamovi-readstat.git
+	branch = sync-28
 [submodule "i18n"]
 	path = i18n
 	url = https://github.com/TheMacSquared/jamovi-i18n.git
