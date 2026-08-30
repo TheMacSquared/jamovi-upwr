@@ -183,11 +183,25 @@ try {
         platName = 'win64';
     }
     else if (process.platform === 'darwin') {
-        let exe = installer.find(args.home);
-        let bin  = path.dirname(exe);
-        let home = path.dirname(bin);
-        let rHome = path.join(home, 'Frameworks', 'R.framework', 'Versions', 'Current', 'Resources');
-        const rExe = path.join(rHome, 'bin', 'R');
+        let home, rHome, rExe;
+        if (args.rhome) {
+            // native (dockerless) build: compile against an explicit R, no
+            // installed jamovi required (mirrors the win32/--rhome branch);
+            // pass the value through unresolved so it matches R's own idea
+            // of R_HOME (a 'Versions/Current' path makes the R launcher
+            // print a warning to stdout, which then pollutes Makevars
+            // $(shell ...) captures)
+            rHome = path.resolve(args.rhome);
+            rExe  = path.join(rHome, 'bin', 'R');
+            home = args.home ? path.resolve(args.home) : path.dirname(path.dirname(rHome));
+        }
+        else {
+            let exe = installer.find(args.home);
+            let bin  = path.dirname(exe);
+            home = path.dirname(bin);
+            rHome = path.join(home, 'Frameworks', 'R.framework', 'Versions', 'Current', 'Resources');
+            rExe = path.join(rHome, 'bin', 'R');
+        }
         let rLibs = `${ path.join(home, 'Resources', 'modules', 'base', 'R')}`;
         paths = { home, rHome, rExe, rLibs };
         platName = 'macos';
