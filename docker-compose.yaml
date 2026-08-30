@@ -18,7 +18,7 @@ services:
       - donotstart
 
   jamovi: &base
-    image: jupwr/jupwr:0.9.0
+    image: jupwr/jupwr:0.9.1
     container_name: jamovi
     profiles: [main]
     build:
@@ -71,6 +71,10 @@ services:
     <<: *base
     container_name: jamovi-dev
     profiles: [dev]
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     environment:
       <<: *base_env
       JAMOVI_DEV_SERVER: "http://vite:5173"
@@ -85,22 +89,37 @@ services:
       image: jonathonlove/vite:latest
       container_name: vite
       profiles: [dev]
-      privileged: true
-      command: [ 'mkdir -p /source/merged && unionfs-fuse -o cow /source/server:/source/client=RW /source/merged && cd /source/merged && echo installing npm deps && npm install && echo starting vite server && vite --host' ]
+      user: '1000:1000'
+      read_only: true
+      cap_drop:
+        - ALL
+      security_opt:
+        - no-new-privileges:true
+      environment:
+        HOME: /tmp/dev-home
+      tmpfs:
+        - /tmp:mode=1777
+        # esbuild installs a native executable in node_modules.
+        - /source/client/node_modules:exec,mode=1777
+      # The old unionfs-fuse overlay required a fully privileged container.
+      # Mount the generated-protocol source directly into client/assets instead;
+      # Vite only needs read access to the repository and writes node_modules
+      # into the container filesystem.
+      command: [ 'mkdir -p /tmp/dev-home && cd /source/client && echo installing npm deps && npm install --no-package-lock && echo starting vite server && vite --host' ]
       volumes:
-        - './client/main:/source/client/main'
-        - './client/resultsview:/source/client/resultsview'
-        - './client/analysisui:/source/client/analysisui'
-        - './client/lib:/source/client/lib'
-        - './client/assets:/source/client/assets'
-        - './client/common:/source/client/common'
-        - './client/index.html:/source/client/index.html'
-        - './client/resultsview.html:/source/client/resultsview.html'
-        - './client/analysisui.html:/source/client/analysisui.html'
-        - './client/tsconfig.json:/source/client/tsconfig.json'
-        - './client/vite.config.mts:/source/client/vite.config.mts'
-        - './client/package.json:/source/client/package.json'
-        - './server/jamovi/server/jamovi.proto:/source/server/assets/coms.proto'
+        - './client/main:/source/client/main:ro'
+        - './client/resultsview:/source/client/resultsview:ro'
+        - './client/analysisui:/source/client/analysisui:ro'
+        - './client/lib:/source/client/lib:ro'
+        - './client/assets:/source/client/assets:ro'
+        - './client/common:/source/client/common:ro'
+        - './client/index.html:/source/client/index.html:ro'
+        - './client/resultsview.html:/source/client/resultsview.html:ro'
+        - './client/analysisui.html:/source/client/analysisui.html:ro'
+        - './client/tsconfig.json:/source/client/tsconfig.json:ro'
+        - './client/vite.config.mts:/source/client/vite.config.mts:ro'
+        - './client/package.json:/source/client/package.json:ro'
+        - './server/jamovi/server/jamovi.proto:/source/client/assets/coms.proto:ro'
       ports:
         - '127.0.0.1:5173:5173'
         - '127.0.0.1:24678:24678'

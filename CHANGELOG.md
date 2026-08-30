@@ -3,6 +3,13 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.1 — 2026-08-30
+- Utwardzony profil deweloperski Dockera: Vite działa bez trybu uprzywilejowanego,
+  jako nieuprzywilejowany użytkownik, z systemem plików tylko do odczytu,
+  bez capabilities i bez możliwości uzyskania dodatkowych uprawnień.
+- Dodane testy jednostkowe modułów jCI, jboot i jperm oraz smoke test analiz
+  z tych modułów w kompletnej aplikacji.
+
 ## 0.9.0 — 2026-08-30
 - Merge upstreamu jamovi 28.2 (z 28.1): zaktualizowane tłumaczenia wbudowane,
   poprawki fokusa list rozwijanych, nowe ikony modułów.
