@@ -24,10 +24,14 @@ services:
     build:
       context: .
       dockerfile: docker/jamovi-Dockerfile
+    # bind tylko do pętli zwrotnej: serwer startuje z --if=* i pustym
+    # JAMOVI_ACCESS_KEY, a kontener ma podmontowany katalog Dokumenty — bez
+    # adresu hosta Docker wystawiłby to na 0.0.0.0, czyli całej sieci lokalnej
+    # (uczelniane wifi, sala komputerowa). Dziedziczą to też jamovi-dev i test.
     ports:
-      - '41337:41337'
-      - '41338:41338'
-      - '41339:41339'
+      - '127.0.0.1:41337:41337'
+      - '127.0.0.1:41338:41338'
+      - '127.0.0.1:41339:41339'
     command: ["/usr/bin/python3 -u -m jamovi.server 41337 --if=*"]
     stdin_open: true
     stop_grace_period: 0.1s
@@ -98,5 +102,5 @@ services:
         - './client/package.json:/source/client/package.json'
         - './server/jamovi/server/jamovi.proto:/source/server/assets/coms.proto'
       ports:
-        - '5173:5173'
-        - '24678:24678'
+        - '127.0.0.1:5173:5173'
+        - '127.0.0.1:24678:24678'
