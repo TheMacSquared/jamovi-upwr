@@ -81,8 +81,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 2. Wpis w `CHANGELOG.md` (wersja, data, zmiany, wersje modułów).
 3. Docker: `docker compose --profile main build` + smoke test.
 4. Build natywny dla bieżącej maszyny (macOS: `00`→`60`, **plus `70-jmo-*` dla każdego modułu
-   opcjonalnego**; Windows: `build.ps1`, który robi `.jmo` w krokach 4e i 4f).
-   Windows — pełna procedura z testami: [`docs/handouts/build-windows.md`](../docs/handouts/build-windows.md).
+   opcjonalnego**; Windows: `build.ps1`, który robi `.jmo` w kroku 4e).
 5. Uzupełnij macierz zgodności wyżej (które `.jmo` zbudowano, na jakiej platformie).
 6. `packaging/scripts/release-check.sh` — zero ostrzeżeń.
 7. `git status` bez artefaktów builda → commit → push.
