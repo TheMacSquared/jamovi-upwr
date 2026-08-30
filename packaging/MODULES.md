@@ -10,11 +10,11 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | Moduł (katalog) | Nazwa w jamovi | Rola | Dystrybucja | Wersja |
 |---|---|---|---|---|
 | `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.4 |
-| `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 26 wykresów) | wbudowany | 2.8.5 |
+| `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 26 wykresów) | wbudowany | 2.9.0 |
 | `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.3.1 |
 | `jCI/` | jCI | przedziały ufności | wbudowany | 0.1.0 |
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.1.0 |
-| `jboot/` | jboot | bootstrap | wbudowany | 0.2.2 |
+| `jboot/` | jboot | bootstrap | wbudowany | 0.3.0 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.3.0 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.2.0 |
@@ -57,6 +57,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.0 | 28.2 | 0.3.2 | ⬜ do zbudowania | ✅ 2026-08-30 |
 | 0.8.6 | 28.1 | 0.3.2 | ⬜ do zbudowania | ✅ 2026-08-26 |
 | 0.8.5 | 28.1 | 0.3.2 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.8.0 | 28.1 | 0.3.2 | ✅ 2026-08-23 (z 0.7.8, bez zmian) | ⬜ do zbudowania |
@@ -68,6 +69,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.0 | 28.2 | 0.2.0 | ⬜ do zbudowania | ✅ 2026-08-30 |
 | 0.8.6 | 28.1 | 0.2.0 | ⬜ do zbudowania | ✅ 2026-08-26 |
 | 0.8.5 | 28.1 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.8.0 | 28.1 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |

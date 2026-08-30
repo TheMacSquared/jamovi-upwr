@@ -3,6 +3,19 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.0 — 2026-08-30
+- Merge upstreamu jamovi 28.2 (z 28.1): zaktualizowane tłumaczenia wbudowane,
+  poprawki fokusa list rozwijanych, nowe ikony modułów.
+- Electron podbity z 32.3.3 (bez wsparcia od marca 2025) do 43.4.1 (EOL 2027-01);
+  build i testy regresji wykonane na Windows x64. Linia 43 wybrana świadomie:
+  44+ zmienia API schowka na W3C (Promise), na czym opiera się kopiowanie tabel
+  i wklejanie z Excela.
+- scatr 2.9.0: merge upstreamu (składnia tidyverse, `linewidth`, poprawki osi).
+- Wersje modułów w `.jmo` naprawione: `jamovi/0000.yaml` jest jedynym źródłem
+  prawdy — sideload jRISK/jSpace pokazuje teraz wersję modułu, nie 28.x.
+- Moduły: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.1, jCI 0.1.0, jperm 0.1.0,
+  jboot 0.3.0, jDane 0.3.0; opcjonalne: jRISK 0.3.2, jSpace 0.2.0.
+
 ## 0.8.6 — 2026-08-26
 - Nowy wykres mozaikowy w kategorii Zależności (scatr 2.8.5): dwie zmienne
   jakościowe, szerokości kolumn ∝ liczebnościom brzegowym X, podział kolumn
