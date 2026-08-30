@@ -3,6 +3,31 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.2 — 2026-08-30
+- Zmienna przekształcona dostaje builder reguł „jeżeli … użyj …" — ten sam,
+  który wcześniej był trybem zmiennej obliczonej. Warunki mogą odwoływać się
+  do dowolnych zmiennych (nie tylko do źródłowej), łączyć się przez and/or
+  i grupować nawiasami. Zmienna obliczona wraca do samej formuły, więc reguły
+  mają jedno miejsce zamiast dwóch.
+- W panelu przekształconej znika wybór zmiennej źródłowej (nie wpływał na
+  wynik) i wybór transformacji z listy; zostaje typ pomiaru, bez opcji ID.
+  Lista transformacji i jej edytor działają jak dotąd.
+- Builder warunków: nawiasy do grupowania członów i zmiana kolejności wiązania
+  (domyślnie „and" wiąże silniej niż „or"), plus testy jednostkowe serializacji
+  i parsowania formuł. Rozróżnienie w nazwach: „reguła" to para jeżeli…użyj,
+  „warunek" to jej człon.
+- Panel informacji o zbiorze danych w jDane 0.4.0: opis, szczegóły i objaśnienia
+  zmiennych czytane z metadanych modułu, dostępne po wczytaniu zbioru
+  z biblioteki (na razie dla zbioru CASchools).
+- jdistrACTION 1.3.2: zacieniowany obszar p pod krzywą gęstości między granicami
+  kwantyla w siedmiu rozkładach ciągłych — kwantyl widać jako pole, nie tylko
+  jako linie przerywane.
+- macOS: relokowane biblioteki uruchomieniowe są ponownie podpisywane po zmianie
+  ścieżek (`install_name_tool` unieważnia podpis), więc paczka nie wymaga
+  obchodzenia Gatekeepera.
+- Moduły: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.2, jCI 0.1.0, jperm 0.1.0,
+  jboot 0.3.0, jDane 0.4.0; opcjonalne: jRISK 0.3.2, jSpace 0.2.0.
+
 ## 0.9.1 — 2026-08-30
 - Utwardzony profil deweloperski Dockera: Vite działa bez trybu uprzywilejowanego,
   jako nieuprzywilejowany użytkownik, z systemem plików tylko do odczytu,
