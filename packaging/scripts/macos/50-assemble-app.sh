@@ -3,13 +3,17 @@
 # tej maszyny — NIE relokowalny). Relokowalność do .dmg: patrz 60-package-dmg.sh / docs.
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-ELECTRON_VERSION="${ELECTRON_VERSION:-32.3.3}"
+# Electron 43 to najstarsza linia z aktualnym wsparciem (EOL 2027-01); 32.x wyszło
+# ze wsparcia w marcu 2025. Świadomie NIE idziemy na 44+: tam moduł clipboard przeszedł
+# na W3C (metody zwracają Promise, readHTML/writeHTML usunięte), co wymaga przepisania
+# obsługi kopiowania w electron/app/main.js — osobne zadanie.
+ELECTRON_VERSION="${ELECTRON_VERSION:-43.4.1}"
 APP="$DIST/$APP_NAME.app"
 RES="$APP/Contents/Resources"
 MACOS="$APP/Contents/MacOS"
 
 # --- 1. pobranie Electrona (ZIP z GitHub releases — niezawodniej niż postinstall npm) ---
-EDIR="$BUILD_DIR/electron"
+EDIR="$BUILD_DIR/electron-$ELECTRON_VERSION"   # wersja w ścieżce: bump nie użyje starego cache
 ELECTRON_APP="$EDIR/extracted/Electron.app"
 if [ ! -d "$ELECTRON_APP" ]; then
     log "Pobieranie Electron $ELECTRON_VERSION (darwin-arm64) ..."

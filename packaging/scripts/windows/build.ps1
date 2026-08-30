@@ -46,7 +46,9 @@ $RtoolsUsr  = "C:\rtools45\usr\bin"
 $BoostRoot  = "C:\local\boost_1_84_0"                      # zrodla + prebuilt MSVC (lib64-msvc-14.3)
 $Vcvars     = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
 
-$ElectronVer= "32.3.3"
+# Electron 43 = najstarsza wspierana linia (EOL 2027-01); 32.x poza wsparciem od 03.2025.
+# NIE 44+: tam clipboard przeszedl na W3C (Promise, brak readHTML) -> wymaga zmian w main.js
+$ElectronVer= "43.4.1"
 $PbsUrl     = "https://github.com/astral-sh/python-build-standalone/releases/download/20250612/cpython-3.12.11+20250612-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
 $NanomsgUrl = "https://github.com/nanomsg/nanomsg/archive/refs/tags/1.2.tar.gz"
 $CranRepo   = "https://packagemanager.posit.co/cran/latest"
@@ -303,8 +305,10 @@ $AppDir = "$Dist\$AppName"; $Bin = "$AppDir\bin"
 if (Test-Path $AppDir) { Remove-Item $AppDir -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $Bin,"$AppDir\Frameworks","$AppDir\Resources\i18n" | Out-Null
 # Electron
-if (-not (Test-Path "$Scratch\electron.zip")) { Invoke-WebRequest "https://github.com/electron/electron/releases/download/v$ElectronVer/electron-v$ElectronVer-win32-x64.zip" -OutFile "$Scratch\electron.zip" -MaximumRedirection 10 }
-Expand-Archive "$Scratch\electron.zip" -DestinationPath $Bin -Force
+# wersja w nazwie pliku: po bumpie nie uzyje zcache'owanego starego Electrona
+$ElectronZip = "$Scratch\electron-$ElectronVer.zip"
+if (-not (Test-Path $ElectronZip)) { Invoke-WebRequest "https://github.com/electron/electron/releases/download/v$ElectronVer/electron-v$ElectronVer-win32-x64.zip" -OutFile $ElectronZip -MaximumRedirection 10 }
+Expand-Archive $ElectronZip -DestinationPath $Bin -Force
 Rename-Item "$Bin\electron.exe" "$AppName.exe" -Force
 Remove-Item "$Bin\resources\default_app.asar" -Force -EA SilentlyContinue
 & "$env:WINDIR\System32\cmd.exe" /c "set NoDefaultCurrentDirectoryInExePath=&& npx --yes @electron/asar pack `"$RepoRoot\electron\app`" `"$Bin\resources\app.asar`"" | Out-Null

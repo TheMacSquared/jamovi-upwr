@@ -641,7 +641,6 @@ const createWindow = function(open) {
         frame: process.platform !== 'win32',
         icon: config.iconPath,
         webPreferences: {
-            enableRemoteModule: true,
             contextIsolation: true,
             preload: path.join(__dirname, 'preload.js'),
         },
