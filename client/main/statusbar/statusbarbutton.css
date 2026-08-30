@@ -29,6 +29,20 @@
     background-image: url('../../assets/filters-visible.svg');
 }
 
+.jmv-statusbar-button[data-name=datasetinfo] {
+    width: 26px;
+    padding: 0;
+}
+
+.jmv-statusbar-button[data-name=datasetinfo]::before {
+    content: '\24D8';
+    font-size: 16px;
+}
+
+.jmv-statusbar-button[data-name=datasetinfo][aria-disabled] {
+    display: none;
+}
+
 .jmv-statusbar-button[aria-disabled] {
     filter: grayscale(100%);
 }

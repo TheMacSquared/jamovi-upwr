@@ -220,6 +220,7 @@ class TableView extends HTMLElement implements DataSetView {
         this.statusbar.addActionButton('editFilters', { dock: 'left', label: _('Edit filters') });
         this.statusbar.addActionButton('toggleFilterVisible', { dock: 'left', label: _('Toggle filters visibility') });
         this.statusbar.addInfoLabel('activeFilters', { dock: 'left', label: _('Filters'), value: 0 });
+        this.statusbar.addActionButton('datasetInfo', { dock: 'left', label: 'O zbiorze' });
 
         this.$container = this.querySelector('.jmv-table-container');
         this.$header    = this.querySelector('.jmv-table-header');

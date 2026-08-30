@@ -1,0 +1,102 @@
+.jmv-dataset-info {
+    position: fixed;
+    z-index: 210;
+    inset-block: 0;
+    inset-inline-end: 0;
+    width: min(520px, 92vw);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-background, #fff);
+    color: var(--color-foreground, #333);
+    border-inline-start: 1px solid #b8b8b8;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, .18);
+    transform: translateX(105%);
+    visibility: hidden;
+    transition: transform 160ms ease, visibility 0s linear 160ms;
+}
+
+[dir='rtl'] .jmv-dataset-info {
+    transform: translateX(-105%);
+}
+
+.jmv-dataset-info.open {
+    transform: translateX(0);
+    visibility: visible;
+    transition-delay: 0s;
+}
+
+.jmv-dataset-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-block-end: 1px solid #d6d6d6;
+}
+
+.jmv-dataset-info-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.jmv-dataset-info-close {
+    min-width: 36px;
+    min-height: 36px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.jmv-dataset-info-close:hover,
+.jmv-dataset-info-close:focus-visible {
+    background: rgba(0, 0, 0, .08);
+}
+
+.jmv-dataset-info-content {
+    overflow: auto;
+    padding: 4px 20px 28px;
+    line-height: 1.45;
+}
+
+.jmv-dataset-info-summary {
+    font-size: 15px;
+}
+
+.jmv-dataset-info section {
+    margin-block-start: 22px;
+}
+
+.jmv-dataset-info h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+}
+
+.jmv-dataset-info p,
+.jmv-dataset-info ul {
+    margin-block: 6px;
+}
+
+.jmv-dataset-info-variables {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.jmv-dataset-info-variables th,
+.jmv-dataset-info-variables td {
+    padding: 7px 8px;
+    border-block-end: 1px solid #e2e2e2;
+    text-align: start;
+    vertical-align: top;
+}
+
+.jmv-dataset-info-variables th {
+    width: 28%;
+    font-weight: normal;
+}
+
+.jmv-dataset-info a {
+    color: #2167a5;
+}

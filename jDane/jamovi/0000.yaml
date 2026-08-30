@@ -1,7 +1,7 @@
 ---
 title: Zbiory danych do zajęć (UPWr)
 name: jDane
-version: 0.3.0
+version: 0.4.0
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -80,6 +80,61 @@ datasets:
     description: >-
       Wyniki testów i charakterystyki 420 kalifornijskich okręgów szkolnych
       (Stock i Watson) — dane do regresji
+    documentation:
+      summary: >-
+        Dane o wynikach testów, charakterystykach szkół i tle demograficznym
+        uczniów w kalifornijskich okręgach szkolnych.
+      details: >-
+        Dane obejmują wszystkie 420 kalifornijskich okręgów K-6 i K-8, dla
+        których były dostępne informacje z lat 1998 i 1999. Wyniki pochodzą ze
+        standaryzowanego testu Stanford 9 przeprowadzanego w klasie piątej.
+        Charakterystyki szkół i dane demograficzne są uśrednione na poziomie
+        okręgu.
+      variables:
+        - name: district
+          description: Kod okręgu szkolnego.
+        - name: school
+          description: Nazwa okręgu szkolnego.
+        - name: county
+          description: Hrabstwo.
+        - name: grades
+          description: Zakres klas prowadzonych w okręgu.
+        - name: students
+          description: Łączna liczba uczniów.
+        - name: teachers
+          description: Liczba nauczycieli w przeliczeniu na pełne etaty.
+        - name: calworks
+          description: >-
+            Odsetek uczniów kwalifikujących się do programu pomocy dochodowej
+            CalWorks.
+        - name: lunch
+          description: >-
+            Odsetek uczniów kwalifikujących się do posiłków po obniżonej cenie.
+        - name: computer
+          description: Liczba komputerów.
+        - name: expenditure
+          description: Wydatki na jednego ucznia.
+        - name: income
+          description: Średni dochód w okręgu, w tysiącach USD.
+        - name: english
+          description: Odsetek uczniów uczących się języka angielskiego.
+        - name: read
+          description: Średni wynik testu z czytania.
+        - name: math
+          description: Średni wynik testu z matematyki.
+      source: Materiały internetowe do Stocka i Watsona (2007).
+      references:
+        - >-
+          Stock, J. H. i Watson, M. W. (2007). Introduction to Econometrics,
+          wyd. 2. Boston: Addison Wesley.
+      provenance:
+        package: AER
+        dataset: CASchools
+        url: https://search.r-project.org/CRAN/refmans/AER/html/CASchools.html
+      changes:
+        - >-
+          Wartości liczbowe zaokrąglono do czterech miejsc po przecinku, aby
+          usunąć szum precyzji odziedziczony z pliku źródłowego Stata.
     tags:
       - społeczne
       - regresja

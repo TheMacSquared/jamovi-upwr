@@ -1,7 +1,7 @@
 Package: jDane
 Type: Package
 Title: Zbiory danych do zajec dla jamovi
-Version: 0.3.0
+Version: 0.4.0
 # UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
 # przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
 Author: jUPWR Team

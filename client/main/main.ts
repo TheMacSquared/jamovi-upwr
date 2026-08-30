@@ -43,6 +43,7 @@ import type { InfoBox } from './infobox';
 import keyboardJS  from 'keyboardjs';
 import HighContrast from '../common/highcontrast';
 import Store from './store';
+import DatasetInfo from './datasetinfo';
 
 declare global {
     interface Window {
@@ -694,6 +695,7 @@ ready(async() => {
     viewController.focusView('spreadsheet');
 
     let variablesTable = new VariablesView(viewController, dataSetModel);
+    document.body.append(new DatasetInfo(instance));
     variablesTable.id = 'variablelist';
     $mainTable.append(variablesTable);
 

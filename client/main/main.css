@@ -53,6 +53,7 @@
 @import "notifications.css";
 @import "statusbar/statusbar.css";
 @import "statusbar/statusbarbutton.css";
+@import "datasetinfo.css";
 
 @import "../common/toolbar/toolbar.css";
 @import "../common/toolbar/toolbarbutton.css";
