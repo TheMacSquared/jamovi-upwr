@@ -14,8 +14,15 @@ BASE_R="$PAYLOAD/modules/base/R"
 
 # wersja modułu: jmc czyta ją wyłącznie z jamovi/0000.yaml (index.js:299-306)
 JRISK_VERSION="$(grep -m1 -oE '^version: *[0-9.]+' "$REPO_ROOT/jRISK/jamovi/0000.yaml" | grep -oE '[0-9.]+')"
+# Strażnik: 0000.yaml nadpisany przez wcześniejszy przebieg jmc (--patch-version)
+# dałby wersję aplikacji zamiast wersji modułu, a więc .jmo o złej nazwie.
+JRISK_DESC="$(grep -m1 -oE '^Version: *[0-9.]+' "$REPO_ROOT/jRISK/DESCRIPTION" | grep -oE '[0-9.]+')"
+[ "${JRISK_VERSION}" = "$JRISK_DESC" ] || die "jRISK: 0000.yaml ma wersję ${JRISK_VERSION}, DESCRIPTION $JRISK_DESC — 0000.yaml jest nadpisany przez jmc (przywróć: git checkout -- jRISK/jamovi/0000.yaml)"
+
 JMO="$DIST/jRISK_${JRISK_VERSION}-macos-arm64.jmo"
 mkdir -p "$DIST"
+
+src_guard jRISK   # jmc nadpisuje pliki źródłowe — trap przywraca je po buildzie
 
 log "jmc --build jRISK $JRISK_VERSION -> $JMO ..."
 node "$JMC" --build "$REPO_ROOT/jRISK" \

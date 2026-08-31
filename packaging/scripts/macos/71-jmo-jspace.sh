@@ -19,8 +19,15 @@ BASE_R="$PAYLOAD/modules/base/R"
 
 # wersja modułu: jmc czyta ją wyłącznie z jamovi/0000.yaml (index.js:299-306)
 JSPACE_VERSION="$(grep -m1 -oE '^version: *[0-9.]+' "$REPO_ROOT/jSpace/jamovi/0000.yaml" | grep -oE '[0-9.]+')"
+# Strażnik: 0000.yaml nadpisany przez wcześniejszy przebieg jmc (--patch-version)
+# dałby wersję aplikacji zamiast wersji modułu, a więc .jmo o złej nazwie.
+JSPACE_DESC="$(grep -m1 -oE '^Version: *[0-9.]+' "$REPO_ROOT/jSpace/DESCRIPTION" | grep -oE '[0-9.]+')"
+[ "${JSPACE_VERSION}" = "$JSPACE_DESC" ] || die "jSpace: 0000.yaml ma wersję ${JSPACE_VERSION}, DESCRIPTION $JSPACE_DESC — 0000.yaml jest nadpisany przez jmc (przywróć: git checkout -- jSpace/jamovi/0000.yaml)"
+
 JMO="$DIST/jSpace_${JSPACE_VERSION}-macos-arm64.jmo"
 mkdir -p "$DIST"
+
+src_guard jSpace   # jmc nadpisuje pliki źródłowe — trap przywraca je po buildzie
 
 log "jmc --build jSpace $JSPACE_VERSION -> $JMO (bez --skip-deps: bundluje sf/terra/asteRisk) ..."
 node "$JMC" --build "$REPO_ROOT/jSpace" \

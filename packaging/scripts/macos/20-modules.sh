@@ -49,6 +49,7 @@ log "Instalacja zależności ridge/hexbin/GGally (ggridges, hexbin, GGally) do $
 # Moduły w kolejności jak w docker/jamovi-Dockerfile.
 # R znajduje zależności w $R_HOME_SYS/library (systemowy R), jmvcore w base/R.
 MODULES=(jmv plots jperm jCI jboot jdistrACTION jDane)   # jRISK: moduł opcjonalny -> 70-jmo-jrisk.sh
+src_guard "${MODULES[@]}"   # jmc nadpisuje pliki źródłowe — trap przywraca je po pętli
 for m in "${MODULES[@]}"; do
     [ -d "$REPO_ROOT/$m" ] || { log "pomijam $m (brak katalogu)"; continue; }
     log "jmc --install $m ..."
