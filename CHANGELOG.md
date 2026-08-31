@@ -3,6 +3,19 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.2.2 — 2026-08-31
+- jCI i jperm dostają polskie znaki w interfejsie. Oba moduły miały teksty
+  zapisane bez znaków diakrytycznych („CI dla sredniej (jedna proba)",
+  „Zmienna grupujaca", „Za malo obserwacji") — inaczej niż jboot czy
+  jdistrACTION. Poprawione tytuły analiz, etykiety opcji i paneli, nagłówki
+  tabel, opisy w dokumentacji R i komunikaty błędów (37 plików).
+- Menu jRISK trafia na koniec wstążki „Analizy". Wcześniej wchodziło między
+  Rozkłady a Przedziały ufności, bo `groupOrder` w kliencie miał wpis dla
+  grupy „Ryzyko" z czasów, gdy jRISK był modułem wbudowanym. Po sideloadzie
+  moduł zachowuje się teraz jak jSpace i inne moduły doinstalowane.
+- Moduły bez zmian: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.2, jCI 0.1.0,
+  jperm 0.1.0, jboot 0.3.0, jDane 0.4.0; opcjonalne: jRISK 0.3.2, jSpace 0.2.0.
+
 ## 0.9.2.1 — 2026-08-31
 - Krótkie etykiety w menu wracają do jboot, jCI i jperm. Były wpisane tylko
   w `jamovi/0000.yaml`, który `jmc` regeneruje przy każdym buildzie z plików
