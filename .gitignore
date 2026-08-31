@@ -36,6 +36,8 @@ __pycache__
 *.jmo
 **/build/
 **/R/*.h.R
+# jmc rozpakowuje modul do <modul>/temp/ na czas budowania .jmo
+**/temp/
 
 # build artifacts (native packaging)
 /engine/jamovi-engine

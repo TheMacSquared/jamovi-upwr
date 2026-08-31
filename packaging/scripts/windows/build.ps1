@@ -178,6 +178,21 @@ Push-Location (Join-Path $RepoRoot "jamovi-compiler")
 if (-not (Test-Path node_modules)) { npm install | Out-Null }
 Pop-Location
 $jmc = Join-Path $RepoRoot "jamovi-compiler\index.js"
+
+# jmc przepisuje ZRODLOWY <modul>/jamovi/0000.yaml (index.js:576-593): --patch-version
+# podmienia `version` na wersje aplikacji, a sama serializacja YAML zmienia cudzyslowy
+# i zawijanie tekstu. To artefakt builda, nie zmiana w kodzie — po krokach 4d-4f
+# przywracamy pliki bajt w bajt, zeby `git status` pokazywal tylko swiadome zmiany.
+# Bajty (a nie Get-Content/Set-Content), bo skrypt bywa uruchamiany pod Windows
+# PowerShell 5.1, gdzie `-Encoding UTF8` dopisuje BOM i psuje pliki.
+$YamlBackup = @{}
+foreach ($m in ($Modules + @('jRISK','jSpace'))) {
+    $y = Join-Path $RepoRoot "$m\jamovi\0000.yaml"
+    if (Test-Path $y) { $YamlBackup[$y] = [System.IO.File]::ReadAllBytes($y) }
+}
+
+try {
+
 foreach ($m in $Modules) {
     if (-not (Test-Path (Join-Path $RepoRoot $m))) { Info "pomijam $m (brak)"; continue }
     Invoke-Jmc @($jmc, '--install', (Join-Path $RepoRoot $m), '--to', "$Payload\modules",
@@ -213,6 +228,15 @@ Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jSpace"), '--jmo', $JmoS,
              '--assume-app-version', $JamoviVer) "jSpace .jmo"
 if (-not (Test-Path $JmoS)) { throw "jSpace: plik .jmo nie powstal" }
 Info "jSpace .jmo OK ($JmoS)"
+
+}
+finally {
+    # takze po bledzie — inaczej nieudany build zostawia przepisane zrodla
+    foreach ($kv in $YamlBackup.GetEnumerator()) {
+        [System.IO.File]::WriteAllBytes($kv.Key, $kv.Value)
+    }
+    Info "przywrocono zrodlowe 0000.yaml ($($YamlBackup.Count) plikow)"
+}
 
 # ---------------------------------------------------------------------------
 # FAZA 5 — i18n
