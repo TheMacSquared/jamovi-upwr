@@ -64,9 +64,22 @@ function Info($m){ Write-Host "    $m" -ForegroundColor DarkGray }
 # buildu. Efekt: build konczyl sie zielono z nieaktualnym artefaktem w dist\.
 function Invoke-Jmc {
     param([Parameter(Mandatory)][string[]]$JmcArgs, [Parameter(Mandatory)][string]$What)
+    # UWAGA Windows PowerShell 5.1: przy $ErrorActionPreference='Stop' (ustawionym na
+    # gorze tego skryptu) `2>&1` zamienia KAZDA linie stderr w blad PRZERYWAJACY — juz
+    # przy przypisaniu do $out, zanim dojdziemy do sprawdzenia $LASTEXITCODE. Efekt:
+    # wyjatek z pustym komunikatem (jmc zaczyna stderr od pustej linii) zamiast
+    # diagnostyki, a udany jmc piszacy ostrzezenie na stderr wywalilby build.
+    # Ponizsze przypisanie jest LOKALNE dla funkcji; `throw` nizej przerywa build tak
+    # czy tak, bo throw nie podlega ErrorActionPreference. PS 7 dziala tak samo.
+    $ErrorActionPreference = 'Continue'
     $out = & node @JmcArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
-        $out | Select-Object -Last 25 | ForEach-Object { Write-Host "    $_" -ForegroundColor Red }
+        # pod 5.1 linie stderr sa obiektami ErrorRecord — bez tego pusta linia
+        # wypisalaby sie jako "System.Management.Automation.RemoteException"
+        $out | Select-Object -Last 25 | ForEach-Object {
+            $line = if ($_ -is [System.Management.Automation.ErrorRecord]) { $_.Exception.Message } else { "$_" }
+            Write-Host "    $line" -ForegroundColor Red
+        }
         throw "$What — jmc zwrocil kod $LASTEXITCODE (patrz komunikat wyzej)"
     }
 }

@@ -68,8 +68,15 @@ zmiany: `cd ..\jamovi-upwr-OLD; git status --short; git stash list`.
 
 ```powershell
 cd D:\praca\jamovi-upwr
-powershell -ExecutionPolicy Bypass -File packaging\scripts\windows\build.ps1
+pwsh -ExecutionPolicy Bypass -File packaging\scripts\windows\build.ps1
 ```
+
+**Uruchamiaj przez `pwsh` (PowerShell 7), nie `powershell` (Windows PowerShell 5.1).**
+Skrypt ma znaki spoza ASCII w łańcuchach, a 5.1 czyta pliki `.ps1` bez BOM jako ANSI —
+myślnik `—` rozpada się wtedy na trzy znaki, z których ostatni (`U+201D`) jest dla
+parsera cudzysłowem zamykającym. Pod 5.1 skrypt **nie parsuje się w ogóle**, dając
+mylące błędy typu `Unexpected token 'jmc' in expression or statement`. Nie da się tego
+złagodzić wewnątrz skryptu — 5.1 przerywa na parsowaniu, przed pierwszą instrukcją.
 
 Prereqs sprawdzane na starcie: VS2022 Build Tools (VCTools), RTools45, R 4.6.0,
 Boost 1.84, Node 20+, cmake, protoc.
