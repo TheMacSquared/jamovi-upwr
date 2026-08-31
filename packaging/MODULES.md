@@ -57,7 +57,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 0.9.2.1 | 28.2 | 0.3.2 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 0.9.2.1 | 28.2 | 0.3.2 | ⬜ do zbudowania | ✅ 2026-08-31 |
 | 0.9.2 | 28.2 | 0.3.2 | ⬜ do zbudowania | ✅ 2026-08-30 |
 | 0.9.1 | 28.2 | 0.3.2 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.9.0 | 28.2 | 0.3.2 | ⬜ do zbudowania | ✅ 2026-08-30 |
@@ -72,7 +72,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 0.9.2.1 | 28.2 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 0.9.2.1 | 28.2 | 0.2.0 | ⬜ do zbudowania | ✅ 2026-08-31 |
 | 0.9.2 | 28.2 | 0.2.0 | ⬜ do zbudowania | ✅ 2026-08-30 |
 | 0.9.1 | 28.2 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.9.0 | 28.2 | 0.2.0 | ⬜ do zbudowania | ✅ 2026-08-30 |
@@ -88,7 +88,8 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 3. Docker: `docker compose --profile main build` + smoke test.
 4. Build natywny dla bieżącej maszyny (macOS: `00`→`60`, **plus `70-jmo-*` dla każdego modułu
    opcjonalnego**; Windows: `build.ps1`, który robi `.jmo` w krokach 4e i 4f).
-   Windows — pełna procedura z testami: [`docs/handouts/build-windows.md`](../docs/handouts/build-windows.md).
+   Pełna procedura z testami: Windows — [`docs/handouts/build-windows.md`](../docs/handouts/build-windows.md),
+   macOS — [`docs/handouts/build-macos.md`](../docs/handouts/build-macos.md).
 5. Uzupełnij macierz zgodności wyżej (które `.jmo` zbudowano, na jakiej platformie).
 6. `packaging/scripts/release-check.sh` — zero ostrzeżeń.
 7. `git status` bez artefaktów builda → commit → push.

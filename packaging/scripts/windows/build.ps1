@@ -191,6 +191,14 @@ foreach ($m in ($Modules + @('jRISK','jSpace'))) {
     if (Test-Path $y) { $YamlBackup[$y] = [System.IO.File]::ReadAllBytes($y) }
 }
 
+# Przerwany `R CMD INSTALL` zostawia katalog 00LOCK-* w <modul>/build/R<ver>-<platforma>/
+# i kazdy kolejny build tego modulu konczy sie "failed to lock directory". To czysty
+# artefakt (build/ jest w .gitignore), wiec kasujemy go, zamiast wymagac recznego
+# sprzatania po nieudanym przebiegu.
+$locks = Get-ChildItem -Path $RepoRoot -Directory -Filter '00LOCK*' -Recurse -Depth 3 -EA SilentlyContinue |
+         Where-Object { $_.FullName -like '*\build\*' }
+foreach ($l in $locks) { Remove-Item $l.FullName -Recurse -Force -EA SilentlyContinue; Info "usunieto zaschnieta blokade: $($l.FullName)" }
+
 try {
 
 foreach ($m in $Modules) {
