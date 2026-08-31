@@ -1,11 +1,11 @@
 ---
 name: permtesttwo
-title: Test permutacyjny - dwie proby niezalezne
+title: Test permutacyjny - dwie próby niezależne
 jrs: '1.1'
 
 items:
     - name: table
-      title: Test permutacyjny - dwie proby niezalezne
+      title: Test permutacyjny - dwie próby niezależne
       type: Table
       rows: 1
       clearWith:
@@ -42,7 +42,7 @@ items:
           type: integer
 
     - name: plot
-      title: Rozklad permutacyjny
+      title: Rozkład permutacyjny
       type: Image
       visible: (showPlot)
       width: 550

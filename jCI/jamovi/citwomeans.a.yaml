@@ -1,8 +1,8 @@
 ---
 name: citwomeans
-title: CI dla roznicy srednich (dwie proby)
-menuGroup: Przedzialy ufnosci
-menuTitle: "Roznica srednich (dwie proby)"
+title: CI dla różnicy średnich (dwie próby)
+menuGroup: Przedziały ufności
+menuTitle: "Różnica średnich (dwie próby)"
 version: '1.0.0'
 jas: '1.2'
 
@@ -13,7 +13,7 @@ options:
       type: Data
 
     - name: dep
-      title: Zmienna zalezna
+      title: Zmienna zależna
       type: Variable
       suggested:
         - continuous
@@ -21,7 +21,7 @@ options:
         - numeric
 
     - name: group
-      title: Zmienna grupujaca
+      title: Zmienna grupująca
       type: Variable
       suggested:
         - nominal
@@ -40,7 +40,7 @@ options:
       variable: (group)
 
     - name: ciWidth
-      title: Poziom ufnosci
+      title: Poziom ufności
       type: Number
       min: 50
       max: 99.9

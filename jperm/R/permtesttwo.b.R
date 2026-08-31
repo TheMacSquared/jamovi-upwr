@@ -26,7 +26,7 @@ permtesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             if (length(levs) != 2) {
                 self$results$table$setNote(
                     "err",
-                    "Zmienna grupujaca musi miec dokladnie 2 poziomy."
+                    "Zmienna grupująca musi mieć dokładnie 2 poziomy."
                 )
                 return()
             }
@@ -36,7 +36,7 @@ permtesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             if (n1 < 1 || n2 < 1) {
                 self$results$table$setNote(
                     "err",
-                    "Kazda grupa musi miec co najmniej 1 obserwacje."
+                    "Każda grupa musi mieć co najmniej 1 obserwację."
                 )
                 return()
             }
@@ -64,11 +64,11 @@ permtesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             table$setNote("hyp", hypNote)
 
             if (isTRUE(attr(permDist, "exact")))
-                table$setNote("exact", "Test dokladny (wszystkie permutacje)")
+                table$setNote("exact", "Test dokładny (wszystkie permutacje)")
             else if (exact)
                 table$setNote("exact", paste0(
-                    "Test dokladny niedostepny dla tej liczby kombinacji; ",
-                    "uzyto przyblizenia Monte Carlo."
+                    "Test dokładny niedostępny dla tej liczby kombinacji; ",
+                    "użyto przybliżenia Monte Carlo."
                 ))
 
             self$results$plot$setState(list(

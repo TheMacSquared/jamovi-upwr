@@ -5,7 +5,7 @@ jrs: '1.1'
 
 items:
     - name: table
-      title: Przedzial ufnosci dla korelacji
+      title: Przedział ufności dla korelacji
       type: Table
       rows: 1
       clearWith:
@@ -31,7 +31,7 @@ items:
           type: number
 
         - name: upper
-          title: Gorna granica
+          title: Górna granica
           type: number
 
     - name: plot

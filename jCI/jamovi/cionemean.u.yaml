@@ -1,4 +1,4 @@
-title: CI dla sredniej (jedna proba)
+title: CI dla średniej (jedna próba)
 name: cionemean
 jus: '3.0'
 stage: 0
@@ -37,7 +37,7 @@ children:
             children:
               - type: TextBox
                 name: ciWidth
-                label: Poziom ufnosci
+                label: Poziom ufności
                 suffix: '%'
                 format: number
       - type: LayoutBox

@@ -1,11 +1,11 @@
 ---
 name: permtestpaired
-title: Test permutacyjny - proby sparowane
+title: Test permutacyjny - próby sparowane
 jrs: '1.1'
 
 items:
     - name: table
-      title: Test permutacyjny - proby sparowane
+      title: Test permutacyjny - próby sparowane
       type: Table
       rows: 1
       clearWith:
@@ -38,7 +38,7 @@ items:
           type: integer
 
     - name: plot
-      title: Rozklad permutacyjny
+      title: Rozkład permutacyjny
       type: Image
       visible: (showPlot)
       width: 550

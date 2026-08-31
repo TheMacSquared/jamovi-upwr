@@ -1,8 +1,8 @@
 ---
 name: permtestpaired
-title: Test permutacyjny - proby sparowane
+title: Test permutacyjny - próby sparowane
 menuGroup: Testy permutacyjne
-menuTitle: "Proby sparowane"
+menuTitle: "Próby sparowane"
 version: '1.0.0'
 jas: '1.2'
 
@@ -46,7 +46,7 @@ options:
           title: "Pomiar 1 < Pomiar 2"
       default: twoSided
       description:
-          R: "'twoSided' (domyslnie), 'greater' lub 'less'"
+          R: "'twoSided' (domyślnie), 'greater' lub 'less'"
 
     - name: nPerm
       title: Liczba permutacji
@@ -65,16 +65,16 @@ options:
           R: ziarno generatora liczb losowych; 0 = brak ustawiania ziarna
 
     - name: exact
-      title: Test dokladny
+      title: Test dokładny
       type: Bool
       default: false
       description:
           R: TRUE - wylicz wszystkie permutacje
 
     - name: showPlot
-      title: Wykres rozkladu permutacyjnego
+      title: Wykres rozkładu permutacyjnego
       type: Bool
       default: true
       description:
-          R: TRUE - pokaz histogram rozkladu permutacyjnego
+          R: TRUE - pokaż histogram rozkładu permutacyjnego
 ...

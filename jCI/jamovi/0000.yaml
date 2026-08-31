@@ -1,5 +1,5 @@
 ---
-title: Przedzialy ufnosci
+title: Przedziały ufności
 name: jCI
 version: 0.1.0
 jms: '1.0'
@@ -7,47 +7,47 @@ authors:
   - jUPWR Team
 maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 description: >
-  Przedzialy ufnosci dla srednich, proporcji i korelacji.
+  Przedziały ufności dla średnich, proporcji i korelacji.
 analyses:
-  - title: CI dla sredniej (jedna proba)
+  - title: CI dla średniej (jedna próba)
     name: cionemean
     ns: jCI
-    menuGroup: Przedzialy ufnosci
-    menuTitle: Srednia (jedna proba)
-    menuSubgroup: Srednie
+    menuGroup: Przedziały ufności
+    menuTitle: Średnia (jedna próba)
+    menuSubgroup: Średnie
     category: analyses
-  - title: CI dla roznicy srednich (dwie proby)
+  - title: CI dla różnicy średnich (dwie próby)
     name: citwomeans
     ns: jCI
-    menuGroup: Przedzialy ufnosci
-    menuTitle: Roznica srednich (dwie proby)
-    menuSubgroup: Srednie
+    menuGroup: Przedziały ufności
+    menuTitle: Różnica średnich (dwie próby)
+    menuSubgroup: Średnie
     category: analyses
-  - title: CI dla srednich (proby sparowane)
+  - title: CI dla średnich (próby sparowane)
     name: cipairedmeans
     ns: jCI
-    menuGroup: Przedzialy ufnosci
-    menuTitle: Srednie (proby sparowane)
-    menuSubgroup: Srednie
+    menuGroup: Przedziały ufności
+    menuTitle: Średnie (próby sparowane)
+    menuSubgroup: Średnie
     category: analyses
   - title: CI dla proporcji
     name: ciproportion
     ns: jCI
-    menuGroup: Przedzialy ufnosci
+    menuGroup: Przedziały ufności
     menuTitle: Proporcja
     menuSubgroup: Proporcje
     category: analyses
-  - title: CI dla roznicy proporcji
+  - title: CI dla różnicy proporcji
     name: cidiffprop
     ns: jCI
-    menuGroup: Przedzialy ufnosci
-    menuTitle: Roznica proporcji
+    menuGroup: Przedziały ufności
+    menuTitle: Różnica proporcji
     menuSubgroup: Proporcje
     category: analyses
   - title: CI dla korelacji
     name: cicorrelation
     ns: jCI
-    menuGroup: Przedzialy ufnosci
+    menuGroup: Przedziały ufności
     menuTitle: Korelacja
     menuSubgroup: Korelacja i regresja
     category: analyses

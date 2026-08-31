@@ -1,11 +1,11 @@
 ---
 name: permtestone
-title: Test permutacyjny - jedna proba
+title: Test permutacyjny - jedna próba
 jrs: '1.1'
 
 items:
     - name: table
-      title: Test permutacyjny - jedna proba
+      title: Test permutacyjny - jedna próba
       type: Table
       rows: 1
       clearWith:
@@ -34,7 +34,7 @@ items:
           type: integer
 
     - name: plot
-      title: Rozklad permutacyjny
+      title: Rozkład permutacyjny
       type: Image
       visible: (showPlot)
       width: 550

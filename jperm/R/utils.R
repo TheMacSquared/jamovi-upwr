@@ -152,7 +152,7 @@ buildPermPlot <- function(permDist, observed, hypothesis, ggtheme, theme) {
         ) +
         ggplot2::labs(
             x = "Statystyka permutacyjna",
-            y = "Liczebnosc"
+            y = "Liczebność"
         ) +
         ggtheme
 

@@ -1,7 +1,7 @@
 ---
 name: ciproportion
 title: CI dla proporcji
-menuGroup: Przedzialy ufnosci
+menuGroup: Przedziały ufności
 menuTitle: "Proporcja"
 version: '1.0.0'
 jas: '1.2'
@@ -35,11 +35,11 @@ options:
         - name: wald
           title: Wald
         - name: clopperPearson
-          title: Clopper-Pearson (dokladna)
+          title: Clopper-Pearson (dokładna)
       default: wilson
 
     - name: ciWidth
-      title: Poziom ufnosci
+      title: Poziom ufności
       type: Number
       min: 50
       max: 99.9

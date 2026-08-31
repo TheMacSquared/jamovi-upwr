@@ -1,4 +1,4 @@
-title: CI dla srednich (proby sparowane)
+title: CI dla średnich (próby sparowane)
 name: cipairedmeans
 jus: '3.0'
 stage: 0
@@ -41,7 +41,7 @@ children:
             children:
               - type: TextBox
                 name: ciWidth
-                label: Poziom ufnosci
+                label: Poziom ufności
                 suffix: '%'
                 format: number
       - type: LayoutBox

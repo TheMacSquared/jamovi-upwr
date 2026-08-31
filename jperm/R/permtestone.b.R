@@ -20,7 +20,7 @@ permtestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             if (length(x) < 2) {
                 self$results$table$setNote(
                     "err",
-                    "Za malo obserwacji do przeprowadzenia testu."
+                    "Za mało obserwacji do przeprowadzenia testu."
                 )
                 return()
             }
@@ -46,11 +46,11 @@ permtestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             table$setNote("hyp", hypNote)
 
             if (isTRUE(attr(permDist, "exact")))
-                table$setNote("exact", "Test dokladny (wszystkie permutacje)")
+                table$setNote("exact", "Test dokładny (wszystkie permutacje)")
             else if (exact)
                 table$setNote("exact", paste0(
-                    "Test dokladny niedostepny dla tej liczby obserwacji; ",
-                    "uzyto przyblizenia Monte Carlo."
+                    "Test dokładny niedostępny dla tej liczby obserwacji; ",
+                    "użyto przybliżenia Monte Carlo."
                 ))
 
             self$results$plot$setState(list(

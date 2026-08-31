@@ -1,11 +1,11 @@
 ---
 name: cipairedmeans
-title: CI dla srednich (proby sparowane)
+title: CI dla średnich (próby sparowane)
 jrs: '1.1'
 
 items:
     - name: table
-      title: Przedzial ufnosci dla sredniej roznicy
+      title: Przedział ufności dla średniej różnicy
       type: Table
       rows: 1
       clearWith:
@@ -22,7 +22,7 @@ items:
           type: text
 
         - name: estimate
-          title: Srednia roznic
+          title: Średnia różnic
           type: number
 
         - name: se
@@ -34,7 +34,7 @@ items:
           type: number
 
         - name: upper
-          title: Gorna granica
+          title: Górna granica
           type: number
 
     - name: plot

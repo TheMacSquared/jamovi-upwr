@@ -5,7 +5,7 @@ jrs: '1.1'
 
 items:
     - name: table
-      title: Przedzial ufnosci dla proporcji
+      title: Przedział ufności dla proporcji
       type: Table
       rows: 1
       clearWith:
@@ -23,7 +23,7 @@ items:
           type: text
 
         - name: count
-          title: Liczebnosc
+          title: Liczebność
           type: integer
 
         - name: total
@@ -39,7 +39,7 @@ items:
           type: number
 
         - name: upper
-          title: Gorna granica
+          title: Górna granica
           type: number
 
     - name: plot

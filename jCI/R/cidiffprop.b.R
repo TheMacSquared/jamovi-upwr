@@ -47,12 +47,12 @@ cidiffpropClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 lev2 <- as.character(gLev2)
                 if (lev1 == lev2) {
                     self$results$table$setNote("err",
-                        "Grupa 1 i Grupa 2 musza byc rozne.")
+                        "Grupa 1 i Grupa 2 muszą być różne.")
                     return()
                 }
                 if (!(lev1 %in% allLevs) || !(lev2 %in% allLevs)) {
                     self$results$table$setNote("err",
-                        "Wybrane grupy nie istnieja w zmiennej.")
+                        "Wybrane grupy nie istnieją w zmiennej.")
                     return()
                 }
             } else if (length(allLevs) == 2) {
@@ -60,13 +60,13 @@ cidiffpropClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 lev2 <- allLevs[2]
             } else if (length(allLevs) < 2) {
                 self$results$table$setNote("err",
-                    "Zmienna grupujaca musi miec co najmniej 2 poziomy.")
+                    "Zmienna grupująca musi mieć co najmniej 2 poziomy.")
                 return()
             } else {
                 lev1 <- allLevs[1]
                 lev2 <- allLevs[2]
                 self$results$table$setNote("info",
-                    paste0("Wiecej niz 2 grupy. Uzyto pierwszych dwoch: ",
+                    paste0("Więcej niż 2 grupy. Użyto pierwszych dwóch: ",
                         lev1, " vs ", lev2, ". Wybierz r\u0119cznie w opcjach."))
             }
 
@@ -77,7 +77,7 @@ cidiffpropClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
 
             if (n1 < 1 || n2 < 1) {
                 self$results$table$setNote("err",
-                    "Kazda grupa musi miec co najmniej 1 obserwacje.")
+                    "Każda grupa musi mieć co najmniej 1 obserwację.")
                 return()
             }
 

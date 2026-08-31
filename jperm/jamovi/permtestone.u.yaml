@@ -1,4 +1,4 @@
-title: Test permutacyjny - jedna proba
+title: Test permutacyjny - jedna próba
 name: permtestone
 jus: '3.0'
 stage: 0
@@ -34,7 +34,7 @@ children:
             children:
               - type: TextBox
                 name: mu
-                label: Wartosc referencyjna
+                label: Wartość referencyjna
                 format: number
               - type: RadioButton
                 name: hypothesis_twoSided
@@ -61,7 +61,7 @@ children:
                 format: number
               - type: CheckBox
                 name: exact
-                label: Test dokladny (wszystkie permutacje)
+                label: Test dokładny (wszystkie permutacje)
       - type: LayoutBox
         cell:
           column: 1
@@ -73,4 +73,4 @@ children:
             children:
               - type: CheckBox
                 name: showPlot
-                label: Rozklad permutacyjny
+                label: Rozkład permutacyjny

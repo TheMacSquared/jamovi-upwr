@@ -1,8 +1,8 @@
 ---
 name: permtesttwo
-title: Test permutacyjny - dwie proby niezalezne
+title: Test permutacyjny - dwie próby niezależne
 menuGroup: Testy permutacyjne
-menuTitle: "Dwie proby niezalezne"
+menuTitle: "Dwie próby niezależne"
 version: '1.0.0'
 jas: '1.2'
 
@@ -15,17 +15,17 @@ options:
           R: dane w postaci ramki danych
 
     - name: dep
-      title: Zmienna zalezna
+      title: Zmienna zależna
       type: Variable
       suggested:
         - continuous
       permitted:
         - numeric
       description:
-          R: nazwa zmiennej zaleznej
+          R: nazwa zmiennej zależnej
 
     - name: group
-      title: Zmienna grupujaca
+      title: Zmienna grupująca
       type: Variable
       suggested:
         - nominal
@@ -33,7 +33,7 @@ options:
       permitted:
         - factor
       description:
-          R: zmienna grupujaca z dokladnie dwoma poziomami
+          R: zmienna grupująca z dokładnie dwoma poziomami
 
     - name: hypothesis
       title: Hipoteza alternatywna
@@ -47,7 +47,7 @@ options:
           title: "Grupa 1 < Grupa 2"
       default: twoSided
       description:
-          R: "'twoSided' (domyslnie), 'greater' lub 'less'"
+          R: "'twoSided' (domyślnie), 'greater' lub 'less'"
 
     - name: nPerm
       title: Liczba permutacji
@@ -66,16 +66,16 @@ options:
           R: ziarno generatora liczb losowych; 0 = brak ustawiania ziarna
 
     - name: exact
-      title: Test dokladny
+      title: Test dokładny
       type: Bool
       default: false
       description:
           R: TRUE - wylicz wszystkie permutacje
 
     - name: showPlot
-      title: Wykres rozkladu permutacyjnego
+      title: Wykres rozkładu permutacyjnego
       type: Bool
       default: true
       description:
-          R: TRUE - pokaz histogram rozkladu permutacyjnego
+          R: TRUE - pokaż histogram rozkładu permutacyjnego
 ...

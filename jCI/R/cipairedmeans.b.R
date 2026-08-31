@@ -21,7 +21,7 @@ cipairedmeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
 
             if (n < 2) {
                 self$results$table$setNote("err",
-                    "Za malo kompletnych par.")
+                    "Za mało kompletnych par.")
                 return()
             }
 

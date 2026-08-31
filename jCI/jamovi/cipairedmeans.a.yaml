@@ -1,8 +1,8 @@
 ---
 name: cipairedmeans
-title: CI dla srednich (proby sparowane)
-menuGroup: Przedzialy ufnosci
-menuTitle: "Srednie (proby sparowane)"
+title: CI dla średnich (próby sparowane)
+menuGroup: Przedziały ufności
+menuTitle: "Średnie (próby sparowane)"
 version: '1.0.0'
 jas: '1.2'
 
@@ -29,7 +29,7 @@ options:
         - numeric
 
     - name: ciWidth
-      title: Poziom ufnosci
+      title: Poziom ufności
       type: Number
       min: 50
       max: 99.9

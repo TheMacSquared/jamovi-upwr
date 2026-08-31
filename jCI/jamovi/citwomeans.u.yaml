@@ -1,4 +1,4 @@
-title: CI dla roznicy srednich (dwie proby)
+title: CI dla różnicy średnich (dwie próby)
 name: citwomeans
 jus: '3.0'
 stage: 0
@@ -9,14 +9,14 @@ children:
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Zmienna zalezna
+        label: Zmienna zależna
         children:
           - type: VariablesListBox
             name: dep
             isTarget: true
             maxItemCount: 1
       - type: TargetLayoutBox
-        label: Zmienna grupujaca
+        label: Zmienna grupująca
         children:
           - type: VariablesListBox
             name: group
@@ -45,7 +45,7 @@ children:
                 enable: (group)
               - type: TextBox
                 name: ciWidth
-                label: Poziom ufnosci
+                label: Poziom ufności
                 suffix: '%'
                 format: number
       - type: LayoutBox

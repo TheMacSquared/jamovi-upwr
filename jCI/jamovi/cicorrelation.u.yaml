@@ -44,7 +44,7 @@ children:
                 label: Metoda
               - type: TextBox
                 name: ciWidth
-                label: Poziom ufnosci
+                label: Poziom ufności
                 suffix: '%'
                 format: number
       - type: LayoutBox

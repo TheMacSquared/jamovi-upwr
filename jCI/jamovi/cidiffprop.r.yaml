@@ -1,11 +1,11 @@
 ---
 name: cidiffprop
-title: CI dla roznicy proporcji
+title: CI dla różnicy proporcji
 jrs: '1.1'
 
 items:
     - name: table
-      title: Przedzial ufnosci dla roznicy proporcji
+      title: Przedział ufności dla różnicy proporcji
       type: Table
       rows: 1
       clearWith:
@@ -36,7 +36,7 @@ items:
           type: number
 
         - name: estimate
-          title: Roznica
+          title: Różnica
           type: number
 
         - name: lower
@@ -44,7 +44,7 @@ items:
           type: number
 
         - name: upper
-          title: Gorna granica
+          title: Górna granica
           type: number
 
     - name: plot

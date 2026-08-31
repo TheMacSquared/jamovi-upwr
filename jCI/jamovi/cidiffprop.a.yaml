@@ -1,8 +1,8 @@
 ---
 name: cidiffprop
-title: CI dla roznicy proporcji
-menuGroup: Przedzialy ufnosci
-menuTitle: "Roznica proporcji"
+title: CI dla różnicy proporcji
+menuGroup: Przedziały ufności
+menuTitle: "Różnica proporcji"
 version: '1.0.0'
 jas: '1.2'
 
@@ -13,7 +13,7 @@ options:
       type: Data
 
     - name: dep
-      title: Zmienna zalezna
+      title: Zmienna zależna
       type: Variable
       suggested:
         - nominal
@@ -22,7 +22,7 @@ options:
         - factor
 
     - name: group
-      title: Zmienna grupujaca
+      title: Zmienna grupująca
       type: Variable
       suggested:
         - nominal
@@ -56,7 +56,7 @@ options:
       default: newcombe
 
     - name: ciWidth
-      title: Poziom ufnosci
+      title: Poziom ufności
       type: Number
       min: 50
       max: 99.9

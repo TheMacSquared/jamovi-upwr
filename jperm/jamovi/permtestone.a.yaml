@@ -1,8 +1,8 @@
 ---
 name: permtestone
-title: Test permutacyjny - jedna proba
+title: Test permutacyjny - jedna próba
 menuGroup: Testy permutacyjne
-menuTitle: "Jedna proba"
+menuTitle: "Jedna próba"
 version: '1.0.0'
 jas: '1.2'
 
@@ -25,25 +25,25 @@ options:
           R: nazwa zmiennej
 
     - name: mu
-      title: Wartosc referencyjna
+      title: Wartość referencyjna
       type: Number
       default: 0
       description:
-          R: wartosc testowana (mu0)
+          R: wartość testowana (mu0)
 
     - name: hypothesis
       title: Hipoteza alternatywna
       type: List
       options:
         - name: twoSided
-          title: "Srednia ≠ wartosc referencyjna"
+          title: "Średnia ≠ wartość referencyjna"
         - name: greater
-          title: "Srednia > wartosc referencyjna"
+          title: "Średnia > wartość referencyjna"
         - name: less
-          title: "Srednia < wartosc referencyjna"
+          title: "Średnia < wartość referencyjna"
       default: twoSided
       description:
-          R: "'twoSided' (domyslnie), 'greater' lub 'less'"
+          R: "'twoSided' (domyślnie), 'greater' lub 'less'"
 
     - name: nPerm
       title: Liczba permutacji
@@ -62,16 +62,16 @@ options:
           R: ziarno generatora liczb losowych; 0 = brak ustawiania ziarna
 
     - name: exact
-      title: Test dokladny
+      title: Test dokładny
       type: Bool
       default: false
       description:
           R: TRUE - wylicz wszystkie permutacje
 
     - name: showPlot
-      title: Wykres rozkladu permutacyjnego
+      title: Wykres rozkładu permutacyjnego
       type: Bool
       default: true
       description:
-          R: TRUE - pokaz histogram rozkladu permutacyjnego
+          R: TRUE - pokaż histogram rozkładu permutacyjnego
 ...

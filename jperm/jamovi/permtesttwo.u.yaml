@@ -1,4 +1,4 @@
-title: Test permutacyjny - dwie proby niezalezne
+title: Test permutacyjny - dwie próby niezależne
 name: permtesttwo
 jus: '3.0'
 stage: 0
@@ -9,14 +9,14 @@ children:
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Zmienna zalezna
+        label: Zmienna zależna
         children:
           - type: VariablesListBox
             name: dep
             isTarget: true
             maxItemCount: 1
       - type: TargetLayoutBox
-        label: Zmienna grupujaca
+        label: Zmienna grupująca
         children:
           - type: VariablesListBox
             name: group
@@ -60,7 +60,7 @@ children:
                 format: number
               - type: CheckBox
                 name: exact
-                label: Test dokladny (wszystkie permutacje)
+                label: Test dokładny (wszystkie permutacje)
       - type: LayoutBox
         cell:
           column: 1
@@ -72,4 +72,4 @@ children:
             children:
               - type: CheckBox
                 name: showPlot
-                label: Rozklad permutacyjny
+                label: Rozkład permutacyjny

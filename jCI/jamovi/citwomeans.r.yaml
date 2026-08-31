@@ -1,11 +1,11 @@
 ---
 name: citwomeans
-title: CI dla roznicy srednich (dwie proby)
+title: CI dla różnicy średnich (dwie próby)
 jrs: '1.1'
 
 items:
     - name: table
-      title: Przedzial ufnosci dla roznicy srednich
+      title: Przedział ufności dla różnicy średnich
       type: Table
       rows: 1
       clearWith:
@@ -26,7 +26,7 @@ items:
           type: text
 
         - name: estimate
-          title: Roznica srednich
+          title: Różnica średnich
           type: number
 
         - name: se
@@ -38,7 +38,7 @@ items:
           type: number
 
         - name: upper
-          title: Gorna granica
+          title: Górna granica
           type: number
 
     - name: plot

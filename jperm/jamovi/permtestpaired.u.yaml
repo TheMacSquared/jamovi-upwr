@@ -1,4 +1,4 @@
-title: Test permutacyjny - proby sparowane
+title: Test permutacyjny - próby sparowane
 name: permtestpaired
 jus: '3.0'
 stage: 0
@@ -64,7 +64,7 @@ children:
                 format: number
               - type: CheckBox
                 name: exact
-                label: Test dokladny (wszystkie permutacje)
+                label: Test dokładny (wszystkie permutacje)
       - type: LayoutBox
         cell:
           column: 1
@@ -76,4 +76,4 @@ children:
             children:
               - type: CheckBox
                 name: showPlot
-                label: Rozklad permutacyjny
+                label: Rozkład permutacyjny

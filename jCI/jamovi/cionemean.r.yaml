@@ -1,11 +1,11 @@
 ---
 name: cionemean
-title: CI dla sredniej (jedna proba)
+title: CI dla średniej (jedna próba)
 jrs: '1.1'
 
 items:
     - name: table
-      title: Przedzial ufnosci dla sredniej
+      title: Przedział ufności dla średniej
       type: Table
       rows: -1
       clearWith:
@@ -22,7 +22,7 @@ items:
           type: text
 
         - name: estimate
-          title: Srednia
+          title: Średnia
           type: number
 
         - name: se
@@ -34,7 +34,7 @@ items:
           type: number
 
         - name: upper
-          title: Gorna granica
+          title: Górna granica
           type: number
 
     - name: plot

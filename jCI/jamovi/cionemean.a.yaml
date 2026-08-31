@@ -1,8 +1,8 @@
 ---
 name: cionemean
-title: CI dla sredniej (jedna proba)
-menuGroup: Przedzialy ufnosci
-menuTitle: "Srednia (jedna proba)"
+title: CI dla średniej (jedna próba)
+menuGroup: Przedziały ufności
+menuTitle: "Średnia (jedna próba)"
 version: '1.0.0'
 jas: '1.2'
 
@@ -21,14 +21,14 @@ options:
         - numeric
 
     - name: ciWidth
-      title: Poziom ufnosci
+      title: Poziom ufności
       type: Number
       min: 50
       max: 99.9
       default: 95
 
     - name: group
-      title: Zmienna grupujaca
+      title: Zmienna grupująca
       type: Variable
       suggested:
         - nominal

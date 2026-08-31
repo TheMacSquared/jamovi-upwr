@@ -25,7 +25,7 @@ permtestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cl
             if (length(x1) < 2) {
                 self$results$table$setNote(
                     "err",
-                    "Za malo kompletnych par do przeprowadzenia testu."
+                    "Za mało kompletnych par do przeprowadzenia testu."
                 )
                 return()
             }
@@ -53,11 +53,11 @@ permtestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cl
             table$setNote("hyp", hypNote)
 
             if (isTRUE(attr(permDist, "exact")))
-                table$setNote("exact", "Test dokladny (wszystkie permutacje)")
+                table$setNote("exact", "Test dokładny (wszystkie permutacje)")
             else if (exact)
                 table$setNote("exact", paste0(
-                    "Test dokladny niedostepny dla tej liczby par; ",
-                    "uzyto przyblizenia Monte Carlo."
+                    "Test dokładny niedostępny dla tej liczby par; ",
+                    "użyto przybliżenia Monte Carlo."
                 ))
 
             self$results$plot$setState(list(

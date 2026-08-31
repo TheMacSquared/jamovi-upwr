@@ -73,7 +73,7 @@ cionemeanClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 n <- length(x)
 
                 if (n < 2) {
-                    self$results$table$setNote("err", "Za malo obserwacji.")
+                    self$results$table$setNote("err", "Za mało obserwacji.")
                     return()
                 }
 

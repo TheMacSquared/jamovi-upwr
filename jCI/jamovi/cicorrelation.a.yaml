@@ -1,7 +1,7 @@
 ---
 name: cicorrelation
 title: CI dla korelacji
-menuGroup: Przedzialy ufnosci
+menuGroup: Przedziały ufności
 menuTitle: "Korelacja"
 version: '1.0.0'
 jas: '1.2'
@@ -39,7 +39,7 @@ options:
       default: pearson
 
     - name: ciWidth
-      title: Poziom ufnosci
+      title: Poziom ufności
       type: Number
       min: 50
       max: 99.9
