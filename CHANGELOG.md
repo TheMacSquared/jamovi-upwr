@@ -3,6 +3,23 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.2.1 — 2026-08-31
+- Krótkie etykiety w menu wracają do jboot, jCI i jperm. Były wpisane tylko
+  w `jamovi/0000.yaml`, który `jmc` regeneruje przy każdym buildzie z plików
+  `.a.yaml` — brak `menuTitle` w źródle powodował, że do wydań trafiał pełny
+  tytuł analizy („Bootstrapowy CI dla mediany" zamiast „CI dla mediany").
+  Etykiety przeniesione do `.a.yaml` (18 analiz), więc przeżywają regenerację.
+- Build natywny Windows przerywa się, gdy `jmc` zwróci błąd. Wcześniej błąd
+  ginął w `| Out-Null`, a jedyny strażnik (`Test-Path`) przechodził na starym
+  `.jmo` z poprzedniego wydania — build kończył się zielono z nieaktualnym
+  modułem opcjonalnym w paczce.
+- Build nie zostawia przepisanych plików źródłowych: `0000.yaml` modułów jest
+  odtwarzany po kompilacji, a `<moduł>/temp/` trafił do `.gitignore`.
+- macOS: odczyt wersji jUPWR obsługuje numery czteroczłonowe (wcześniej
+  `0.9.2.1` skracało się do `0.9.2` w nazwach artefaktów).
+- Moduły bez zmian: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.2, jCI 0.1.0,
+  jperm 0.1.0, jboot 0.3.0, jDane 0.4.0; opcjonalne: jRISK 0.3.2, jSpace 0.2.0.
+
 ## 0.9.2 — 2026-08-30
 - Zmienna przekształcona dostaje builder reguł „jeżeli … użyj …" — ten sam,
   który wcześniej był trybem zmiennej obliczonej. Warunki mogą odwoływać się

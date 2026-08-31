@@ -25,7 +25,7 @@ APP_NAME="jUPWR"
 # wersja bazowego jamovi (plik version) — używana wewnętrznie przez jamovi
 JAMOVI_VERSION="$(cat "$REPO_ROOT/version" 2>/dev/null || echo 0.0.0.0)"
 # wersja DYSTRYBUCJI jUPWR (single source of truth: client/common/jupwr.ts) — do nazw installek
-JUPWR_VERSION="$(grep -oE "JUPWR_VERSION *= *'[0-9.]+'" "$REPO_ROOT/client/common/jupwr.ts" 2>/dev/null | grep -oE "[0-9]+\.[0-9]+\.[0-9]+")"
+JUPWR_VERSION="$(grep -oE "JUPWR_VERSION *= *'[0-9.]+'" "$REPO_ROOT/client/common/jupwr.ts" 2>/dev/null | grep -oE "[0-9]+(\.[0-9]+)+")"
 [ -n "$JUPWR_VERSION" ] || JUPWR_VERSION="$JAMOVI_VERSION"
 # VERSION = wersja widoczna w nazwie installki (jUPWR)
 VERSION="$JUPWR_VERSION"
