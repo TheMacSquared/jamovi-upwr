@@ -56,7 +56,7 @@ citwomeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 lev2 <- allLevs[2]
                 self$results$table$setNote("info",
                     paste0("Więcej niż 2 grupy w zmiennej. Użyto pierwszych dwóch: ",
-                        lev1, " vs ", lev2, ". Wybierz r\u0119cznie w opcjach."))
+                        lev1, " vs ", lev2, ". Wybierz ręcznie w opcjach."))
             }
 
             # Filter to just the two selected levels
