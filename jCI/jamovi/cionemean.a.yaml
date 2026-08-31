@@ -2,6 +2,7 @@
 name: cionemean
 title: CI dla sredniej (jedna proba)
 menuGroup: Przedzialy ufnosci
+menuTitle: "Srednia (jedna proba)"
 version: '1.0.0'
 jas: '1.2'
 

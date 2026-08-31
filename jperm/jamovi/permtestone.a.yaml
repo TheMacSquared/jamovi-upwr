@@ -2,6 +2,7 @@
 name: permtestone
 title: Test permutacyjny - jedna proba
 menuGroup: Testy permutacyjne
+menuTitle: "Jedna proba"
 version: '1.0.0'
 jas: '1.2'
 

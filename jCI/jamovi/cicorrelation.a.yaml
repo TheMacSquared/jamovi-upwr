@@ -2,6 +2,7 @@
 name: cicorrelation
 title: CI dla korelacji
 menuGroup: Przedzialy ufnosci
+menuTitle: "Korelacja"
 version: '1.0.0'
 jas: '1.2'
 

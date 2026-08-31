@@ -2,6 +2,7 @@
 name:  bootTrimmed
 title: "Bootstrapowy CI dla średniej uciętej"
 menuGroup: Bootstrap
+menuTitle: "CI dla średniej uciętej"
 version: '0.1.0'
 jas: '1.2'
 

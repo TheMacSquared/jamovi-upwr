@@ -2,6 +2,7 @@
 name:  bootCI
 title: "Bootstrapowy CI dla miary centralnej"
 menuGroup: Bootstrap
+menuTitle: "CI dla miary centralnej"
 version: '0.2.0'
 jas: '1.2'
 

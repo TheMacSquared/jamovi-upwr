@@ -2,6 +2,7 @@
 name: cipairedmeans
 title: CI dla srednich (proby sparowane)
 menuGroup: Przedzialy ufnosci
+menuTitle: "Srednie (proby sparowane)"
 version: '1.0.0'
 jas: '1.2'
 

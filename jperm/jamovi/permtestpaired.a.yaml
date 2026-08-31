@@ -2,6 +2,7 @@
 name: permtestpaired
 title: Test permutacyjny - proby sparowane
 menuGroup: Testy permutacyjne
+menuTitle: "Proby sparowane"
 version: '1.0.0'
 jas: '1.2'
 

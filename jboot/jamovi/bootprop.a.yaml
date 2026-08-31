@@ -2,6 +2,7 @@
 name:  bootProp
 title: "Bootstrapowy CI dla proporcji"
 menuGroup: Bootstrap
+menuTitle: "CI dla proporcji"
 version: '0.1.0'
 jas: '1.2'
 

@@ -2,6 +2,7 @@
 name:  bootTest2
 title: "Bootstrapowe porównanie dwóch grup"
 menuGroup: Bootstrap
+menuTitle: "Porównanie dwóch grup"
 version: '0.1.0'
 jas: '1.2'
 

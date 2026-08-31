@@ -2,6 +2,7 @@
 name: permtesttwo
 title: Test permutacyjny - dwie proby niezalezne
 menuGroup: Testy permutacyjne
+menuTitle: "Dwie proby niezalezne"
 version: '1.0.0'
 jas: '1.2'
 
