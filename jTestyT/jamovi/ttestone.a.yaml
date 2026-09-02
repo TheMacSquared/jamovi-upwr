@@ -36,13 +36,18 @@ options:
           name: less
       default: different
 
+    - name: student
+      title: t Studenta
+      type: Bool
+      default: true
+
     - name: nonpar
-      title: Nieparametrycznie (rangi)
+      title: Wilcoxona (rangowanych znaków)
       type: Bool
       default: false
 
     - name: plot
-      title: Wykres estymacyjny
+      title: Wykres średniej z przedziałem ufności
       type: Bool
       default: true
 
@@ -58,16 +63,6 @@ options:
       type: Bool
       default: false
 
-    - name: perm
-      title: Test permutacyjny
-      type: Bool
-      default: false
-
-    - name: boot
-      title: Przedział bootstrapowy
-      type: Bool
-      default: false
-
     - name: norm
       title: Normalność (Shapiro-Wilk)
       type: Bool
@@ -78,8 +73,4 @@ options:
       type: Bool
       default: false
 
-    - name: signTest
-      title: Test znaków
-      type: Bool
-      default: false
 ...

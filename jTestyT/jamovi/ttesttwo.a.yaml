@@ -29,7 +29,7 @@ options:
         - factor
 
     - name: welch
-      title: Nierówne wariancje (Welch)
+      title: t Welcha (nierówne wariancje)
       type: Bool
       default: false
 
@@ -45,13 +45,18 @@ options:
           name: less
       default: different
 
+    - name: student
+      title: t Studenta
+      type: Bool
+      default: true
+
     - name: nonpar
-      title: Nieparametrycznie (rangi)
+      title: Manna-Whitneya U
       type: Bool
       default: false
 
     - name: plot
-      title: Wykres estymacyjny
+      title: Wykres grup i różnicy
       type: Bool
       default: true
 
@@ -74,16 +79,6 @@ options:
 
     - name: desc
       title: Statystyki opisowe
-      type: Bool
-      default: false
-
-    - name: perm
-      title: Test permutacyjny
-      type: Bool
-      default: false
-
-    - name: boot
-      title: Przedział bootstrapowy
       type: Bool
       default: false
 

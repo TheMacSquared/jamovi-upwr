@@ -28,14 +28,15 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   przy jednym czynniku i test Welcha-Jamesa (Johansen) przy kilku, zgodny
   z welchADF. Ukryte w menu także jmv::anovanp i jmv::anovarmnp.
 - Nowy moduł jTestyT 0.1.0 (wbudowany) zastępuje w menu testy t z jmv (ukryte
-  w kliencie): jedna próba, dwie grupy, próby sparowane z tym samym prostym
-  płaskim panelem jak w jmv (testy, hipoteza z listy, dodatkowe statystyki,
-  wykres, założenia), zawsze
-  z różnicą i d Cohena z przedziałami ufności (niecentralny t); wykres
-  estymacyjny Gardnera-Altmana z punktami, średnimi z CI i osią różnicy,
-  dla par z liniami łączącymi pomiary, dla jednej próby z linią H₀; opcjonalnie
-  wykres pudełkowy z punktami. Dodatkowo test permutacyjny, przedział
-  bootstrapowy, test znaków, K-S dwóch prób.
+  w kliencie): jedna próba, dwie grupy, próby sparowane z płaskim panelem jak
+  w jmv — każdy test to osobny checkbox (t Studenta, t Welcha, Mann-Whitney /
+  Wilcoxon, K-S), więc odznaczenie Studenta usuwa jego wiersz z tabeli;
+  hipoteza alternatywna i wartość testowa w jednej sekcji, poziom ufności,
+  opisowe, sprawdzenie założeń (Shapiro, Q-Q, Levene). Zawsze różnica
+  i d Cohena z przedziałami ufności (niecentralny t). Wykresy: grup i różnicy
+  (Gardner-Altman z osią różnicy po prawej), par i różnicy z liniami
+  łączącymi pomiary, średniej z przedziałem i linią H₀; opcjonalnie pudełkowy
+  z punktami. Bez czynnika Bayesa, permutacji i bootstrapu (osobne moduły).
 - jRol 0.1.0 (doświadczalnictwo rolnicze) jako nowy moduł OPCJONALNY `.jmo`:
   układ całkowicie losowy, losowanych bloków, kwadrat łaciński i split-plot
   z tabelą ANOVA o właściwych błędach, porównania wielokrotne z literami

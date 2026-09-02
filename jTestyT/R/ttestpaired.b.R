@@ -19,18 +19,14 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             pairs <- Filter(function(p) !is.null(p$i1) && !is.null(p$i2), o$pairs)
             if (length(pairs) == 0) return()
             level <- o$ciWidth / 100
-            tt <- self$results$ttest; ex <- self$results$extra
+            tt <- self$results$ttest
             for (p in pairs) {
                 k <- paste(p$i1, "−", p$i2)
                 a <- jmvcore::toNumeric(self$data[[p$i1]]); b <- jmvcore::toNumeric(self$data[[p$i2]])
                 ok <- !is.na(a) & !is.na(b); a <- a[ok]; b <- b[ok]; dif <- a - b
                 if (length(dif) < 2) { tt$setNote(paste0("n", k), sprintf("%s: za mało par.", k)); next }
-                r <- oneSampleT(dif, 0, o$hypothesis, level); r$test <- "t Studenta (pary)"
-                addTestRow(tt, paste(k, "t"), k, r)
+                if (isTRUE(o$student)) { r <- oneSampleT(dif, 0, o$hypothesis, level); r$test <- "t Studenta (pary)"; addTestRow(tt, paste(k, "t"), k, r) }
                 if (isTRUE(o$nonpar)) addTestRow(tt, paste(k, "w"), k, wilcoxOne(dif, 0, o$hypothesis, level))
-                if (isTRUE(o$signTest)) addExtraRow(ex, paste(k, "s"), k, signTest(dif, 0, o$hypothesis))
-                if (isTRUE(o$perm)) addExtraRow(ex, paste(k, "p"), k, permOne(dif, 0, o$hypothesis))
-                if (isTRUE(o$boot)) { bb <- bootOne(dif, level = level); bb$test <- "bootstrap (percentylowy CI średniej różnicy)"; addExtraRow(ex, paste(k, "b"), k, bb) }
                 if (isTRUE(o$desc)) {
                     self$results$desc$addRow(rowKey = paste(k, 1), values = c(list(var = k, group = p$i1), descRow(a)))
                     self$results$desc$addRow(rowKey = paste(k, 2), values = c(list(var = k, group = p$i2), descRow(b)))

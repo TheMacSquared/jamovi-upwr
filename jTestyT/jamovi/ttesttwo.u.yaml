@@ -35,16 +35,17 @@ children:
             label: Testy
             children:
               - type: CheckBox
-                name: welch
+                name: student
               - type: CheckBox
-                name: ks
+                name: welch
               - type: CheckBox
                 name: nonpar
               - type: CheckBox
-                name: perm
+                name: ks
           - type: Label
             label: Hipoteza
             children:
+
               - type: ComboBox
                 name: hypothesis
       - type: LayoutBox
@@ -62,9 +63,6 @@ children:
                 suffix: '%'
               - type: CheckBox
                 name: desc
-              - type: CheckBox
-                name: boot
-
           - type: Label
             label: Wykres
             children:

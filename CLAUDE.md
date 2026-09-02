@@ -284,12 +284,13 @@ nietknięty, stare pliki .omv otwierają się. MANCOVA jmv pozostaje widoczna.
 ### Zadanie 15: jTestyT — testy t jUPWR zamiast testów t jmv — ZREALIZOWANE 0.1.0
 Katalog `jTestyT/` (wbudowany, menuGroup T-Tests): `ttestone`, `ttesttwo`,
 `ttestpaired` z PŁASKIM panelem w stylu jmv (decyzja: testy t są zbyt proste
-na podział rdzeń/zaawansowane): „Testy" (Welch [dwie grupy], „Nieparametrycznie
-(rangi)" = Mann-Whitney/Wilcoxon, permutacje, test znaków / K-S), „Hipoteza"
-(lista), „Dodatkowe statystyki" (poziom ufności, opisowe, bootstrap), „Wykres",
-„Sprawdzenie założeń" (Shapiro, Q-Q, Levene). Bez czynnika Bayesa (osobny moduł
-w planach). Zawsze: różnica
-z CI i d Cohena z CI (niecentralny t, `dInterval`). Wykresy: estymacyjny
-Gardnera-Altmana (oś różnicy przy średniej drugiej grupy, jak w jCI), linie par,
-punkty z H₀. Ukryte w kliencie: jmv::ttestis, ttestps, ttestones. Zadanie 10:
-test znaków i K-S są tu, nie w jmv.
+na podział rdzeń/zaawansowane; każdy test to osobny checkbox, żeby dało się
+odznaczyć Studenta i zostawić Wilcoxona): „Testy" (t Studenta, t Welcha [dwie
+grupy], Mann-Whitney / Wilcoxon, K-S [dwie grupy]), „Hipoteza" (wartość
+testowa + lista), „Dodatkowe statystyki" (poziom ufności, opisowe), „Wykres",
+„Sprawdzenie założeń" (Shapiro, Q-Q, Levene). Zawsze: różnica z CI i d Cohena
+z CI (niecentralny t, `dInterval`). Wykresy: grup i różnicy (Gardner-Altman,
+oś różnicy po prawej zakotwiczona w średniej drugiej grupy), par i różnicy,
+średniej z H₀. Usunięte świadomie: czynnik Bayesa (osobny moduł w planach),
+permutacje i bootstrap (są w jperm/jboot), test znaków. Ukryte w kliencie:
+jmv::ttestis, ttestps, ttestones.

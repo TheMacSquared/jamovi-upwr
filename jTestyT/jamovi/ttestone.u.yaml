@@ -27,18 +27,16 @@ children:
           - type: Label
             label: Testy
             children:
-              - type: TextBox
-                name: testValue
-                format: number
               - type: CheckBox
-                name: signTest
+                name: student
               - type: CheckBox
                 name: nonpar
-              - type: CheckBox
-                name: perm
           - type: Label
             label: Hipoteza
             children:
+              - type: TextBox
+                name: testValue
+                format: number
               - type: ComboBox
                 name: hypothesis
       - type: LayoutBox
@@ -56,9 +54,6 @@ children:
                 suffix: '%'
               - type: CheckBox
                 name: desc
-              - type: CheckBox
-                name: boot
-
           - type: Label
             label: Wykres
             children:

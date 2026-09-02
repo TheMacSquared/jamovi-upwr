@@ -13,16 +13,12 @@ ttestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             o <- self$options
             if (length(o$vars) == 0) return()
             level <- o$ciWidth / 100; mu <- o$testValue
-            tt <- self$results$ttest; ex <- self$results$extra
+            tt <- self$results$ttest
             for (v in o$vars) {
                 x <- jmvcore::toNumeric(self$data[[v]]); x <- x[!is.na(x)]
                 if (length(x) < 2) { tt$setNote(paste0("n", v), sprintf("%s: za mało obserwacji.", v)); next }
-                addTestRow(tt, paste(v, "t"), v, oneSampleT(x, mu, o$hypothesis, level))
+                if (isTRUE(o$student)) addTestRow(tt, paste(v, "t"), v, oneSampleT(x, mu, o$hypothesis, level))
                 if (isTRUE(o$nonpar)) addTestRow(tt, paste(v, "w"), v, wilcoxOne(x, mu, o$hypothesis, level))
-                if (isTRUE(o$signTest)) addExtraRow(ex, paste(v, "s"), v, signTest(x, mu, o$hypothesis))
-                if (isTRUE(o$perm)) addExtraRow(ex, paste(v, "p"), v, permOne(x, mu, o$hypothesis))
-                if (isTRUE(o$boot)) { b <- bootOne(x, level = level); b$stat <- b$stat - mu; b$lower <- b$lower - mu; b$upper <- b$upper - mu
-                    b$test <- "bootstrap (percentylowy CI średniej − wartość testowa)"; addExtraRow(ex, paste(v, "b"), v, b) }
                 if (isTRUE(o$desc)) self$results$desc$addRow(rowKey = v, values = c(list(var = v, group = ""), descRow(x)))
                 if (isTRUE(o$norm)) self$results$norm$addRow(rowKey = v, values = c(list(var = v, group = ""), shapiroRow(x)))
                 m <- stats::t.test(x, conf.level = level)

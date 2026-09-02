@@ -47,30 +47,6 @@ wilcoxOne <- function(x, mu = 0, hypothesis = "different", level = 0.95) {
         es = r, esLower = NA, esUpper = NA, esLabel = "r rangowo-dwuseryjne")
 }
 
-signTest <- function(x, mu = 0, hypothesis = "different") {
-    dif <- x - mu; dif <- dif[dif != 0]
-    b <- stats::binom.test(sum(dif > 0), length(dif), alternative = altR(hypothesis))
-    list(test = "znaków", stat = sum(dif > 0), p = b$p.value, lower = NA, upper = NA,
-        note = sprintf("%d dodatnich z %d różnic niezerowych", sum(dif > 0), length(dif)))
-}
-
-permOne <- function(x, mu = 0, hypothesis = "different", B = 5000, seed = 1) {
-    set.seed(seed)
-    dif <- x - mu; obs <- mean(dif); n <- length(dif)
-    sims <- vapply(seq_len(B), function(i) mean(dif * sample(c(-1, 1), n, replace = TRUE)), 1)
-    p <- switch(hypothesis, greater = mean(sims >= obs), less = mean(sims <= obs), mean(abs(sims) >= abs(obs)))
-    list(test = "permutacyjny (odwracanie znaków)", stat = obs, p = (sum(p * B) + 1) / (B + 1), lower = NA, upper = NA,
-        note = sprintf("%d permutacji", B))
-}
-
-bootOne <- function(x, B = 2000, level = 0.95, seed = 1) {
-    set.seed(seed)
-    sims <- vapply(seq_len(B), function(i) mean(sample(x, replace = TRUE)), 1)
-    q <- stats::quantile(sims, c((1 - level) / 2, 1 - (1 - level) / 2), names = FALSE)
-    list(test = "bootstrap (percentylowy CI)", stat = mean(x), p = NA, lower = q[1], upper = q[2],
-        note = sprintf("%d prób bootstrapowych", B))
-}
-
 # ---------------------------------------------------------------------------
 # Two independent groups
 # ---------------------------------------------------------------------------
@@ -100,27 +76,8 @@ mannWhitney <- function(y, g, hypothesis = "different", level = 0.95) {
 ksTwo <- function(y, g) {
     lv <- levels(g)
     k <- suppressWarnings(stats::ks.test(y[g == lv[1]], y[g == lv[2]]))
-    list(test = "Kołmogorowa-Smirnowa (dwie próby)", stat = unname(k$statistic), p = k$p.value,
-        lower = NA, upper = NA, note = "różnica rozkładów (kształt, położenie, rozrzut)")
-}
-
-permTwo <- function(y, g, hypothesis = "different", B = 5000, seed = 1) {
-    set.seed(seed)
-    lv <- levels(g); i1 <- g == lv[1]
-    obs <- mean(y[i1]) - mean(y[!i1])
-    sims <- vapply(seq_len(B), function(i) { s <- sample(y); mean(s[i1]) - mean(s[!i1]) }, 1)
-    p <- switch(hypothesis, greater = mean(sims >= obs), less = mean(sims <= obs), mean(abs(sims) >= abs(obs)))
-    list(test = "permutacyjny (różnica średnich)", stat = obs, p = (sum(p * B) + 1) / (B + 1), lower = NA, upper = NA,
-        note = sprintf("%d permutacji przydziału do grup", B))
-}
-
-bootTwo <- function(y, g, B = 2000, level = 0.95, seed = 1) {
-    set.seed(seed)
-    lv <- levels(g); x1 <- y[g == lv[1]]; x2 <- y[g == lv[2]]
-    sims <- vapply(seq_len(B), function(i) mean(sample(x1, replace = TRUE)) - mean(sample(x2, replace = TRUE)), 1)
-    q <- stats::quantile(sims, c((1 - level) / 2, 1 - (1 - level) / 2), names = FALSE)
-    list(test = "bootstrap (percentylowy CI różnicy)", stat = mean(x1) - mean(x2), p = NA, lower = q[1], upper = q[2],
-        note = sprintf("%d prób bootstrapowych w każdej grupie", B))
+    list(test = "Kołmogorowa-Smirnowa D", stat = unname(k$statistic), df = NA, p = k$p.value,
+        est = NA, lower = NA, upper = NA, es = NA, esLower = NA, esUpper = NA, esLabel = "")
 }
 
 leveneTwo <- function(y, g) {
@@ -233,10 +190,4 @@ qqPlotResid <- function(image, ggtheme, theme) {
 addTestRow <- function(table, key, var, r) {
     table$addRow(rowKey = key, values = list(var = var, test = r$test, stat = r$stat, df = r$df, p = r$p,
         est = r$est, lower = r$lower, upper = r$upper, es = r$es, esLower = r$esLower, esUpper = r$esUpper))
-}
-
-addExtraRow <- function(table, key, var, r) {
-    if (is.null(r)) return(invisible())
-    table$addRow(rowKey = key, values = list(var = var, test = r$test, stat = r$stat, p = r$p,
-        lower = r$lower, upper = r$upper, note = r$note %||% ""))
 }
