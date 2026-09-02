@@ -3,7 +3,6 @@ name: anovarm
 title: ANOVA powtórzonych pomiarów
 menuGroup: ANOVA
 menuTitle: ANOVA powtórzonych pomiarów
-menuSubtitle: format długi, sferyczność, split-plot
 version: '1.0.0'
 jas: '1.2'
 

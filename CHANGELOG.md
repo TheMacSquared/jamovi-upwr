@@ -26,7 +26,8 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   z porównaniami efektów głównych przy kilku czynnikach, Friedman z W Kendalla
   i Nemenyim w powtórzonych pomiarach. Przełącznik Welcha daje test Welcha
   przy jednym czynniku i test Welcha-Jamesa (Johansen) przy kilku, zgodny
-  z welchADF. Ukryte w menu także jmv::anovanp i jmv::anovarmnp.
+  z welchADF. Ukryte w menu także Kruskal-Wallis i Friedman z jmv; MANCOVA
+  z jmv zostaje widoczna, bo jANOVA jej nie obsługuje.
 - Nowy moduł jTestyT 0.1.0 (wbudowany) zastępuje w menu testy t z jmv (ukryte
   w kliencie): jedna próba, dwie grupy, próby sparowane z płaskim panelem jak
   w jmv — każdy test to osobny checkbox (t Studenta, t Welcha, Mann-Whitney /
@@ -41,10 +42,11 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   układ całkowicie losowy, losowanych bloków, kwadrat łaciński i split-plot
   z tabelą ANOVA o właściwych błędach, porównania wielokrotne z literami
   i NIR, wykresy średnich z literami, generator planu doświadczenia z mapą
-  pola. Budowa: macOS `72-jmo-jrol.sh`, Windows `build.ps1` krok 4g.
-- jDane 0.5.0: nowe zbiory owies Yatesa (split-plot) i syntetyczny kwadrat
-  łaciński z pszenicą; panel dokumentacji „O zbiorze" dla wszystkich 14
-  zbiorów (streszczenie, szczegóły z podpowiedzią analizy, zmienne, źródło,
+  pola; w bibliotece zbiory owies Yatesa (split-plot) i syntetyczny kwadrat
+  łaciński z pszenicą z pełną dokumentacją. Budowa: macOS `72-jmo-jrol.sh`,
+  Windows `build.ps1` krok 4g.
+- jDane 0.5.0: panel dokumentacji „O zbiorze" dla wszystkich 12 zbiorów
+  (streszczenie, szczegóły z podpowiedzią analizy, zmienne, źródło,
   bibliografia, pochodzenie, zmiany); krótsze opisy w bibliotece; przycisk
   „O zbiorze" z ikoną SVG w stylu paska stanu.
 - CLAUDE.md: kolejka zadań 8–13 (Eksploracja, testy nieparametryczne,

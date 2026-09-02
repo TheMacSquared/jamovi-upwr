@@ -16,14 +16,15 @@ export const JUPWR_VERSION = '0.9.3';
 //   (Friedman) analyses, which jANOVA offers as switches in the same panels.
 // Key: `${ns}::${name}`.
 export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
-    'jmv::anovaonew',
+    // NB: jmv analysis names are camelCase (name: in the .a.yaml), not file names.
+    'jmv::anovaOneW',
     'jmv::anova',
     'jmv::ancova',
-    'jmv::anovarm',
-    'jmv::anovanp',
-    'jmv::anovarmnp',
+    'jmv::anovaRM',
+    'jmv::anovaNP',
+    'jmv::anovaRMNP',
     // jTestyT replaces the jmv t-tests.
-    'jmv::ttestis',
-    'jmv::ttestps',
-    'jmv::ttestones',
+    'jmv::ttestIS',
+    'jmv::ttestPS',
+    'jmv::ttestOneS',
 ]);

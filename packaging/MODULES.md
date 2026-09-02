@@ -20,7 +20,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem, d Cohena z CI, wykresem estymacyjnym; zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.1.0 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.2.0 |
-| `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.0 |
+| `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.0 |
 
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
 jeden kurs jest **opcjonalny** i trafia do studentów jako plik `.jmo` (Moduły → Sideload).

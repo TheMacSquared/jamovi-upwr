@@ -46,6 +46,92 @@ analyses:
     menuTitle: Plan doświadczenia (randomizacja)
     menuSubgroup: Planowanie
     category: analyses
+datasets:
+  - name: Owies Yatesa — split-plot (oats)
+    path: oats.csv
+    description: Plon owsa (Y), 3 odmiany (V) × 4 dawki N, 6 bloków (B) — split-plot
+    documentation:
+      summary: >-
+        Klasyczne doświadczenie polowe Yatesa (1935) z owsem w układzie
+        split-plot: odmiany na dużych poletkach, dawki azotu na małych.
+      details: >-
+        Doświadczenie założono w 6 blokach. Każdy blok podzielono na 3 duże
+        poletka, na których wysiano po jednej odmianie owsa; każde duże poletko
+        podzielono na 4 małe poletka, na których zastosowano jedną z czterech
+        dawek nawożenia azotem (0, 0,2, 0,4 i 0,6 cwt na akr). Łącznie 72
+        obserwacje plonu. Zbiór jest wzorcowym przykładem układu zależnego
+        (split-plot): czynnik „odmiana" testuje się wobec błędu dużych poletek
+        (błąd a), a czynnik „azot" i interakcję wobec błędu małych poletek (błąd
+        b). Analiza: Doświadczalnictwo → Split-plot (zależny), czynnik A = V,
+        czynnik B = N, blok = B.
+      variables:
+        - name: B
+          description: Blok (I–VI).
+        - name: V
+          description: >-
+            Odmiana owsa (czynnik dużych poletek): Golden.rain, Marvellous,
+            Victory.
+        - name: 'N'
+          description: >-
+            Dawka azotu w cwt na akr (czynnik małych poletek): 0.0cwt, 0.2cwt,
+            0.4cwt, 0.6cwt.
+        - name: 'Y'
+          description: Plon ziarna w ćwierćfuntach (1/4 lb) z małego poletka.
+      source: Yates (1935), za dokumentacją pakietu MASS.
+      references:
+        - >-
+          Yates, F. (1935). Complex experiments. Journal of the Royal
+          Statistical Society Supplement, 2, 181–247.
+        - >-
+          Venables, W. N. i Ripley, B. D. (2002). Modern Applied Statistics with
+          S, wyd. 4. New York: Springer.
+      provenance:
+        package: MASS
+        dataset: oats
+        url: https://search.r-project.org/CRAN/refmans/MASS/html/oats.html
+      changes:
+        - Dane wyeksportowane bez zmian (nazwy zmiennych jak w R).
+    tags:
+      - rolnictwo
+      - ANOVA
+      - doświadczalnictwo
+  - name: Pszenica — kwadrat łaciński (syntetyczny)
+    path: pszenica_latin.csv
+    description: Plon pszenicy (t/ha), 4 warianty nawożenia, kwadrat 4×4 (dane syntetyczne)
+    documentation:
+      summary: >-
+        Plon pszenicy ozimej w doświadczeniu nawozowym założonym jako kwadrat
+        łaciński 4 × 4. Dane wygenerowane na potrzeby zajęć.
+      details: >-
+        Pole podzielono na 4 wiersze i 4 kolumny, czyli 16 poletek. Wiersze
+        odpowiadają gradientowi wilgotności gleby, kolumny gradientowi
+        nachylenia stoku. Każdy z czterech wariantów nawożenia występuje
+        dokładnie raz w każdym wierszu i w każdej kolumnie, dzięki czemu oba
+        kierunki zmienności pola są wyeliminowane z błędu. Dane wygenerowano z
+        modelu addytywnego (efekt wiersza + efekt kolumny + efekt nawożenia +
+        błąd losowy) z ustalonym ziarnem, więc plik jest odtwarzalny. Analiza:
+        Doświadczalnictwo → Kwadrat łaciński, czynnik = nawoz, wiersz = wiersz,
+        kolumna = kolumna.
+      variables:
+        - name: wiersz
+          description: Numer wiersza pola (1–4), gradient wilgotności.
+        - name: kolumna
+          description: Numer kolumny pola (1–4), gradient nachylenia.
+        - name: nawoz
+          description: 'Wariant nawożenia: kontrola, NPK, obornik, NPK+obornik.'
+        - name: plon
+          description: Plon ziarna w tonach z hektara.
+      source: >-
+        Dane syntetyczne zespołu jUPWR; skrypt generujący w
+        jDane/data-raw/datasets.R.
+      changes:
+        - >-
+          Zbiór wygenerowany, nie pochodzi z rzeczywistego doświadczenia;
+          wartości zaokrąglono do dwóch miejsc po przecinku.
+    tags:
+      - rolnictwo
+      - ANOVA
+      - doświadczalnictwo
 usesNative: true
 minApp: 1.0.8
 

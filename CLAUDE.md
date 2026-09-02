@@ -201,8 +201,9 @@ różnicą graniczną per para (jedna NIR w nocie, gdy liczebności równe), wyk
 średnich z literami (SE/CI/SD), interakcji, reszt, testami Levene'a/Bartletta
 i Shapiro reszt. W split-plot porównania A przy różnych B używają błędu łączonego
 z df Satterthwaite'a (klasyczne wzory). Analiza `plan`: randomizacja układu +
-mapa pola. Zależności: base R + mvtnorm + car (w modules/base/R). Zbiory w jDane
-0.5.0: oats (Yates, split-plot), pszenica_latin (syntetyczny kwadrat łaciński).
+mapa pola. Zależności: base R + mvtnorm + car (w modules/base/R). Zbiory
+w bibliotece jRol (`jRol/data`, `data-raw/datasets.R`): oats (Yates, split-plot),
+pszenica_latin (syntetyczny kwadrat łaciński) — przeniesione z jDane.
 Testy: `jRol/tests/testthat` (silnik vs aov/TukeyHSD/multcomp + integracyjne).
 
 ### Zadanie 9: Eksploracja — rozszerzenia statystyk opisowych (wariant B)
@@ -277,9 +278,11 @@ UI warunkowe: `jamovi/js/anova.js`, `anovarm.js` (jus 3.0: handlery
 `<kontrolka>_changed`, `view_updated`, `ui.x.setPropertyValue('enable', …)`).
 PUŁAPKA: wrapper analizy `anova()` zasłania `stats::anova` — w kodzie modułu
 zawsze `stats::anova(...)`. Ukrywanie analiz jmv: `JUPWR_HIDDEN_ANALYSES`
-w `client/common/jupwr.ts` (jmv::anovaonew, anova, ancova, anovarm) filtrowane
-w `client/main/ribbon/analysetab.ts` (także jmv::anovanp, anovarmnp); kod jmv
-nietknięty, stare pliki .omv otwierają się. MANCOVA jmv pozostaje widoczna.
+w `client/common/jupwr.ts` (jmv::anovaOneW, anova, ancova, anovaRM, …) filtrowane
+w `client/main/ribbon/analysetab.ts`; UWAGA: klucze to `ns::name` z pola `name:`
+w .a.yaml jmv, czyli camelCase (anovaOneW, anovaRM, anovaNP, anovaRMNP, ttestIS,
+ttestPS, ttestOneS), nie nazwy plików. Kod jmv nietknięty, stare pliki .omv
+otwierają się. MANCOVA jmv zostaje widoczna (jANOVA jej nie obsługuje).
 
 ### Zadanie 15: jTestyT — testy t jUPWR zamiast testów t jmv — ZREALIZOWANE 0.1.0
 Katalog `jTestyT/` (wbudowany, menuGroup T-Tests): `ttestone`, `ttesttwo`,
