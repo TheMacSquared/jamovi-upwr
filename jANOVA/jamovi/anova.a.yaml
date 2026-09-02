@@ -48,6 +48,31 @@ options:
         - numeric
       default: null
 
+    - name: welch
+      title: Nierówne wariancje (Welch)
+      type: Bool
+      default: false
+
+    - name: nonpar
+      title: Nieparametrycznie (rangi)
+      type: Bool
+      default: false
+
+    - name: partEta
+      title: Wielkość efektu (η²p)
+      type: Bool
+      default: false
+
+    - name: eta
+      title: η²
+      type: Bool
+      default: false
+
+    - name: omega
+      title: ω²
+      type: Bool
+      default: false
+
     - name: interactions
       title: Interakcje między czynnikami
       type: Bool
@@ -65,63 +90,6 @@ options:
           name: '1'
       default: '3'
 
-    - name: welch
-      title: Welch / Welch-James (nierówne wariancje)
-      type: Bool
-      default: false
-
-    - name: robust
-      title: Odporne błędy standardowe (HC3)
-      type: Bool
-      default: false
-
-    - name: kruskal
-      title: Kruskala-Wallisa
-      type: Bool
-      default: false
-
-    - name: jonckheere
-      title: Jonckheere'a-Terpstry (trend)
-      type: Bool
-      default: false
-
-    - name: medianTest
-      title: Test mediany (Mooda)
-      type: Bool
-      default: false
-
-    - name: art
-      title: ART (wyrównane rangi)
-      type: Bool
-      default: false
-
-    - name: npPostHoc
-      title: Porównania (Kruskal-Wallis)
-      type: List
-      options:
-        - title: Dunna, Holm
-          name: holm
-        - title: Dunna, Bonferroni
-          name: bonferroni
-        - title: Dunna, bez poprawki
-          name: none
-      default: holm
-
-    - name: eta
-      title: η²
-      type: Bool
-      default: false
-
-    - name: partEta
-      title: η² cząstkowe
-      type: Bool
-      default: false
-
-    - name: omega
-      title: ω²
-      type: Bool
-      default: false
-
     - name: alpha
       title: Poziom istotności α
       type: Number
@@ -130,37 +98,30 @@ options:
       default: 0.05
 
     - name: postHoc
-      title: Porównania (ANOVA, ART)
+      title: Metoda porównań
       type: List
       options:
         - title: Tukeya (HSD)
           name: tukey
         - title: NIR (LSD Fishera)
           name: lsd
-        - title: Scheffégo
-          name: scheffe
+        - title: Holma
+          name: holm
         - title: Dunnetta (vs pierwszy poziom)
           name: dunnett
-        - title: t z poprawką Holma
-          name: holm
-        - title: t z poprawką Bonferroniego
-          name: bonf
+        - title: Scheffégo
+          name: scheffe
         - title: Brak (tylko średnie)
           name: none
       default: tukey
 
-    - name: phMain
-      title: Efekty główne
-      type: Bool
-      default: true
-
-    - name: phInter
-      title: Interakcje (komórki)
+    - name: showPairs
+      title: Tabela porównań parami
       type: Bool
       default: false
 
-    - name: showPairs
-      title: Tabela porównań parami
+    - name: phInter
+      title: Porównuj komórki interakcji
       type: Bool
       default: false
 
@@ -201,6 +162,11 @@ options:
       type: Bool
       default: true
 
+    - name: plotInteraction
+      title: Wykres interakcji
+      type: Bool
+      default: false
+
     - name: errorBars
       title: Słupki błędów
       type: List
@@ -212,11 +178,6 @@ options:
         - title: Brak
           name: none
       default: se
-
-    - name: plotInteraction
-      title: Wykres interakcji
-      type: Bool
-      default: false
 
     - name: homog
       title: Jednorodność wariancji

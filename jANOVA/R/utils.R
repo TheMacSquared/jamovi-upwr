@@ -23,7 +23,6 @@ phMethodLabel <- function(method) {
         scheffe = "test Scheffégo",
         dunnett = "test Dunnetta (vs kontrola)",
         holm    = "test t z poprawką Holma",
-        bonf    = "test t z poprawką Bonferroniego",
         none    = "",
         method)
 }
@@ -98,8 +97,8 @@ welchTable <- function(d, dep, factor) {
 # ---------------------------------------------------------------------------
 
 # term: character vector of factor names (1 = main effect, 2 = cells)
-termMeans <- function(fit, term, alpha = 0.05, vcov = NULL) {
-    emm <- emmFor(fit, term, vcov)
+termMeans <- function(fit, term, alpha = 0.05) {
+    emm <- emmFor(fit, term)
     s <- as.data.frame(summary(emm, level = 1 - alpha, infer = c(TRUE, FALSE)))
     levs <- do.call(paste, c(lapply(term, function(v) as.character(s[[v]])), sep = " × "))
     ciCols <- grep("^(lower|upper)\\.", names(s), value = TRUE)
@@ -150,11 +149,8 @@ pairwiseFromEmm <- function(means, V, method, alpha, control = NULL, mse = NULL)
     } else if (method == "scheffe") {
         out$p <- stats::pf(t^2 / (k - 1), k - 1, dfp, lower.tail = FALSE)
         out$crit <- sqrt((k - 1) * stats::qf(1 - alpha, k - 1, dfp)) * se
-    } else if (method %in% c("holm", "bonf")) {
-        raw <- 2 * stats::pt(-abs(t), dfp)
-        out$p <- stats::p.adjust(raw, method = if (method == "holm") "holm" else "bonferroni")
-        if (method == "bonf")
-            out$crit <- stats::qt(1 - alpha / (2 * n), dfp) * se
+    } else if (method == "holm") {
+        out$p <- stats::p.adjust(2 * stats::pt(-abs(t), dfp), method = "holm")
     } else if (method == "dunnett") {
         R <- dunnettCorrFromV(V, match(out$g1, levs), match(control, levs))
         dfi <- max(1L, as.integer(round(dfp[1])))
@@ -205,8 +201,8 @@ cldLetters <- function(levs, sigPairs) {
 }
 
 # Full comparison bundle for one term.
-compareTerm <- function(fit, term, method, alpha, control = NULL, mse = NULL, vcov = NULL) {
-    tm <- termMeans(fit, term, alpha, vcov)
+compareTerm <- function(fit, term, method, alpha, control = NULL, mse = NULL) {
+    tm <- termMeans(fit, term, alpha)
     means <- tm$means
     if (method == "none") {
         means$letters <- ""
@@ -232,8 +228,6 @@ compareTerm <- function(fit, term, method, alpha, control = NULL, mse = NULL, vc
                 phCritLabel(method), alpha)
     } else if (method == "holm") {
         critNote <- sprintf("p skorygowane metodą Holma; α = %g", alpha)
-    } else if (method == "bonf") {
-        critNote <- sprintf("p skorygowane metodą Bonferroniego; α = %g", alpha)
     }
     list(means = means, pairs = pairs, critNote = critNote)
 }
@@ -381,10 +375,8 @@ qqPlot <- function(image, ggtheme, theme) {
 # Shared emmeans entry point: afex models use the univariate (aov) model so
 # that df and pooled errors match the ANOVA table; within-factor levels come
 # back as syntactic names (make.names), which we map back to the originals.
-emmFor <- function(fit, term, vcov = NULL) {
+emmFor <- function(fit, term) {
     spec <- stats::as.formula(paste("~", paste(bt(term), collapse = " * ")))
-    if (!is.null(vcov) && !inherits(fit, "afex_aov"))
-        return(suppressMessages(emmeans::emmeans(fit, specs = spec, vcov. = vcov)))
     if (inherits(fit, "afex_aov")) {
         emm <- suppressMessages(emmeans::emmeans(fit, specs = spec, model = "univariate"))
         origLevels <- attr(fit, "jupwrLevels")
@@ -468,36 +460,6 @@ kruskalTable <- function(y, g) {
         p = k$p.value, es = unname(k$statistic) / (n - 1))   # ε² = H / (n − 1)
 }
 
-# Jonckheere-Terpstra: trend across levels in factor order; normal approximation
-# with the tie-corrected variance (Hollander & Wolfe).
-jonckheereTable <- function(y, g) {
-    g <- droplevels(factor(g)); levs <- levels(g); k <- length(levs)
-    if (k < 3) return(NULL)
-    ys <- split(y, g); ns <- lengths(ys); N <- sum(ns)
-    JT <- 0
-    for (i in 1:(k - 1)) for (j in (i + 1):k) {
-        a <- ys[[i]]; b <- ys[[j]]
-        JT <- JT + sum(outer(a, b, "<")) + 0.5 * sum(outer(a, b, "=="))
-    }
-    tj <- as.numeric(table(y))
-    mu <- (N^2 - sum(ns^2)) / 4
-    v <- (N * (N - 1) * (2 * N + 5) - sum(ns * (ns - 1) * (2 * ns + 5)) - sum(tj * (tj - 1) * (2 * tj + 5))) / 72 +
-        sum(ns * (ns - 1) * (ns - 2)) * sum(tj * (tj - 1) * (tj - 2)) / (36 * N * (N - 1) * (N - 2)) +
-        sum(ns * (ns - 1)) * sum(tj * (tj - 1)) / (8 * N * (N - 1))
-    z <- (JT - mu) / sqrt(v)
-    list(test = "Jonckheere'a-Terpstry (trend)", stat = JT, z = z, df = NA,
-        p = 2 * stats::pnorm(-abs(z)), es = NA)
-}
-
-# Mood's median test: chi-square on counts above the grand median
-medianTable <- function(y, g) {
-    med <- stats::median(y)
-    tab <- table(factor(y > med, levels = c(FALSE, TRUE)), g)
-    ct <- suppressWarnings(stats::chisq.test(tab, correct = FALSE))
-    list(test = "mediany (Mooda)", stat = unname(ct$statistic), df = unname(ct$parameter),
-        p = ct$p.value, es = NA, median = med)
-}
-
 # Dunn's pairwise z tests on mean ranks (tie-corrected), p adjusted by `adjust`
 dunnPairs <- function(y, g, adjust = "holm", alpha = 0.05) {
     g <- droplevels(factor(g)); levs <- levels(g); k <- length(levs)
@@ -536,39 +498,17 @@ friedmanTable <- function(m) {
         p = f$p.value, es = unname(f$statistic) / (n * (k - 1)))   # W Kendalla
 }
 
-# Page's L for a monotone trend in level order (normal approximation)
-pageTable <- function(m) {
-    n <- nrow(m); k <- ncol(m)
-    if (k < 3) return(NULL)
-    R <- t(apply(m, 1, rank))
-    L <- sum(seq_len(k) * colSums(R))
-    mu <- n * k * (k + 1)^2 / 4
-    v <- n * k^2 * (k + 1) * (k^2 - 1) / 144
-    z <- (L - mu) / sqrt(v)
-    list(test = "Page'a (trend)", stat = L, z = z, df = NA, p = 2 * stats::pnorm(-abs(z)), es = NA)
-}
-
-# Pairwise after Friedman: Nemenyi (studentized range, no adjustment needed)
-# or Conover (t on rank sums, p adjusted by `adjust`)
-friedmanPairs <- function(m, method = "nemenyi", adjust = "holm", alpha = 0.05) {
+# Pairwise after Friedman: Nemenyi test (studentized range on mean ranks)
+friedmanPairs <- function(m, alpha = 0.05) {
     n <- nrow(m); k <- ncol(m); levs <- colnames(m)
     R <- t(apply(m, 1, rank))
-    Rsum <- colSums(R); Rmean <- Rsum / n
+    Rmean <- colSums(R) / n
     pairs <- t(utils::combn(levs, 2))
     out <- data.frame(g1 = pairs[, 1], g2 = pairs[, 2], stringsAsFactors = FALSE)
     out$diff <- Rmean[out$g1] - Rmean[out$g2]
-    if (method == "nemenyi") {
-        out$se <- sqrt(k * (k + 1) / (6 * n))
-        out$stat <- out$diff / out$se
-        out$p <- stats::ptukey(abs(out$stat) * sqrt(2), k, Inf, lower.tail = FALSE)
-    } else {
-        A1 <- sum(R^2); B1 <- sum(Rsum^2) / n
-        dfC <- (n - 1) * (k - 1)
-        seSum <- sqrt(2 * (A1 - B1) / dfC)     # for rank-sum differences
-        out$se <- seSum / n
-        out$stat <- (Rsum[out$g1] - Rsum[out$g2]) / seSum
-        out$p <- stats::p.adjust(2 * stats::pt(-abs(out$stat), dfC), method = adjust)
-    }
+    out$se <- sqrt(k * (k + 1) / (6 * n))
+    out$stat <- out$diff / out$se
+    out$p <- stats::ptukey(abs(out$stat) * sqrt(2), k, Inf, lower.tail = FALSE)
     out$sig <- out$p < alpha
     rownames(out) <- NULL
     levelsTab <- data.frame(level = levs, n = n, median = apply(m, 2, stats::median),
@@ -665,7 +605,7 @@ artMainEffectComparisons <- function(d, dep, factors, term, method, alpha,
 }
 
 # ---------------------------------------------------------------------------
-# Heteroscedasticity: Welch-James (Johansen) test and HC3-robust ANOVA
+# Heteroscedasticity: Welch-James (Johansen) test
 # ---------------------------------------------------------------------------
 
 # Successive-difference contrast rows for a factor with k levels
@@ -721,15 +661,4 @@ welchJamesTable <- function(d, dep, factors) {
             p = stats::pf(Fst, q, df2, lower.tail = FALSE), stringsAsFactors = FALSE)
     }
     out <- do.call(rbind, rows); rownames(out) <- NULL; out
-}
-
-# HC3 (White) heteroscedasticity-consistent covariance for an lm
-robustVcov <- function(fit) car::hccm(fit, type = "hc3")
-
-robustAnovaTable <- function(fit, ssType = "3") {
-    type <- if (ssType == "2") 2 else 3
-    an <- suppressMessages(car::Anova(fit, type = type, white.adjust = "hc3"))
-    an <- an[!rownames(an) %in% c("(Intercept)", "Residuals"), , drop = FALSE]
-    data.frame(term = rownames(an), source = termLabel(rownames(an)), df = an[["Df"]],
-        F = an[["F"]], p = an[["Pr(>F)"]], type = type, stringsAsFactors = FALSE)
 }

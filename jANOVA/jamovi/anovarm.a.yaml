@@ -58,16 +58,6 @@ options:
         - numeric
       default: null
 
-    - name: ss
-      title: Sumy kwadratów
-      type: List
-      options:
-        - title: Typ III
-          name: '3'
-        - title: Typ II
-          name: '2'
-      default: '3'
-
     - name: spherCorr
       title: Poprawka na sferyczność
       type: List
@@ -80,45 +70,35 @@ options:
           name: HF
       default: none
 
-    - name: spherTests
-      title: Test Mauchly'ego
-      type: Bool
-      default: true
-
-    - name: friedman
-      title: Friedmana (z W Kendalla)
+    - name: nonpar
+      title: Nieparametrycznie (rangi)
       type: Bool
       default: false
 
-    - name: page
-      title: Page'a (trend)
+    - name: pes
+      title: Wielkość efektu (η²p)
       type: Bool
       default: false
-
-    - name: art
-      title: ART (wyrównane rangi)
-      type: Bool
-      default: false
-
-    - name: npPostHoc
-      title: Porównania (Friedman)
-      type: List
-      options:
-        - title: Nemenyiego
-          name: nemenyi
-        - title: Conovera, Holm
-          name: conover
-      default: nemenyi
 
     - name: ges
       title: η² uogólnione
       type: Bool
       default: false
 
-    - name: pes
-      title: η² cząstkowe
+    - name: spherTests
+      title: Test Mauchly'ego
       type: Bool
-      default: false
+      default: true
+
+    - name: ss
+      title: Sumy kwadratów
+      type: List
+      options:
+        - title: Typ III
+          name: '3'
+        - title: Typ II
+          name: '2'
+      default: '3'
 
     - name: alpha
       title: Poziom istotności α
@@ -128,42 +108,30 @@ options:
       default: 0.05
 
     - name: postHoc
-      title: Porównania (ANOVA, ART)
+      title: Metoda porównań
       type: List
       options:
         - title: Tukeya (HSD)
           name: tukey
         - title: NIR (LSD Fishera)
           name: lsd
-        - title: Scheffégo
-          name: scheffe
+        - title: Holma
+          name: holm
         - title: Dunnetta (vs pierwszy poziom)
           name: dunnett
-        - title: t z poprawką Holma
-          name: holm
-        - title: t z poprawką Bonferroniego
-          name: bonf
+        - title: Scheffégo
+          name: scheffe
         - title: Brak (tylko średnie)
           name: none
       default: tukey
 
-    - name: phWithin
-      title: Czynniki wewnątrzobiektowe
-      type: Bool
-      default: true
-
-    - name: phBetween
-      title: Czynniki międzyobiektowe
-      type: Bool
-      default: true
-
-    - name: phInter
-      title: Interakcje (komórki)
+    - name: showPairs
+      title: Tabela porównań parami
       type: Bool
       default: false
 
-    - name: showPairs
-      title: Tabela porównań parami
+    - name: phInter
+      title: Porównuj komórki interakcji
       type: Bool
       default: false
 
@@ -204,6 +172,11 @@ options:
       type: Bool
       default: true
 
+    - name: plotInteraction
+      title: Wykres interakcji
+      type: Bool
+      default: false
+
     - name: errorBars
       title: Słupki błędów
       type: List
@@ -215,11 +188,6 @@ options:
         - title: Brak
           name: none
       default: se
-
-    - name: plotInteraction
-      title: Wykres interakcji
-      type: Bool
-      default: false
 
     - name: homog
       title: Jednorodność wariancji (Levene)

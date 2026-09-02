@@ -71,23 +71,14 @@ test_that("repeated measures via afex reproduces aov(Error()) strata", {
     expect_equal(m$level, levels(oats$N))
 })
 
-test_that("nonparametric one-factor tests match stats and formulas", {
+test_that("Kruskal-Wallis and Dunn", {
     y <- PlantGrowth$weight; g <- PlantGrowth$group
     kw <- kruskalTable(y, g)
     expect_equal(kw$p, kruskal.test(y, g)$p.value)
     expect_equal(kw$es, unname(kruskal.test(y, g)$statistic) / (length(y) - 1))
-    md <- medianTable(y, g)
-    expect_equal(md$df, 2)
-    dn <- dunnPairs(y, g, "none")
-    # z for a pair from the textbook formula (no ties correction needed here: check magnitude)
+    dn <- dunnPairs(y, g, "holm")
     expect_equal(nrow(dn$pairs), 3)
-    expect_true(all(nchar(dn$levels$letters) >= 1))
-    skip_if_not_installed("clinfun")
-    jt <- jonckheereTable(y, g)
-    ref <- clinfun::jonckheere.test(y, as.integer(g))
-    expect_equal(jt$stat, unname(ref$statistic))
-    # clinfun handles ties in the variance slightly differently; JT itself is identical
-    expect_equal(jt$p, ref$p.value, tolerance = 1e-3)
+    expect_equal(dn$levels$letters, c("ab", "a", "b"))
 })
 
 test_that("Friedman family matches stats::friedman.test", {
@@ -98,12 +89,9 @@ test_that("Friedman family matches stats::friedman.test", {
     fr <- friedmanTable(m)
     expect_equal(fr$p, friedman.test(m)$p.value)
     expect_equal(fr$es, fr$stat / (12 * 2))
-    pg <- pageTable(m)
-    expect_gt(pg$z, 0)
-    ne <- friedmanPairs(m, "nemenyi")
+    ne <- friedmanPairs(m)
     expect_equal(ne$levels$level, c("t1", "t2", "t3"))
-    co <- friedmanPairs(m, "conover")
-    expect_equal(nrow(co$pairs), 3)
+    expect_equal(nrow(ne$pairs), 3)
 })
 
 test_that("ART reproduces ARTool (fixed and repeated measures)", {
@@ -138,14 +126,4 @@ test_that("Welch-James reduces to Welch for one factor and matches welchADF for 
         expect_equal(row$df2, ref2[[nm]]$denominatorDF, tolerance = 1e-6, info = nm)
         expect_equal(row$p, ref2[[nm]]$pval, tolerance = 1e-6, info = nm)
     }
-})
-
-test_that("HC3 table matches car::Anova with white.adjust", {
-    tg <- ToothGrowth; tg$dose <- factor(tg$dose)
-    r <- fitAnova(tg, "len", c("supp", "dose"), ssType = "3")
-    rb <- robustAnovaTable(r$fit, "3")
-    ref <- car::Anova(r$fit, type = 3, white.adjust = "hc3")
-    expect_equal(rb$F, ref[c("supp", "dose", "supp:dose"), "F"])
-    tm <- termMeans(r$fit, "dose", vcov = robustVcov(r$fit))
-    expect_false(isTRUE(all.equal(tm$means$se, termMeans(r$fit, "dose")$means$se)))
 })

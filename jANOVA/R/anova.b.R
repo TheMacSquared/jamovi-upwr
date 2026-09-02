@@ -6,8 +6,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         .termKeys = function() {
             factors <- self$options$factors
             keys <- list()
-            if (isTRUE(self$options$phMain))
-                for (f in factors) keys[[f]] <- f
+            for (f in factors) keys[[f]] <- f
             if (isTRUE(self$options$phInter) && isTRUE(self$options$interactions) && length(factors) >= 2)
                 for (pr in utils::combn(factors, 2, simplify = FALSE))
                     keys[[paste(pr, collapse = ":")]] <- pr
@@ -23,13 +22,48 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 self$results$means$get(key = k)$setTitle(paste("Średnie:", lab))
                 self$results$pairs$get(key = k)$setTitle(paste("Porównania parami:", lab))
             }
-            for (f in self$options$factors)
-                self$results$contrasts$addItem(key = f)
             for (f in self$options$factors) {
+                self$results$contrasts$addItem(key = f)
                 self$results$artMeans$addItem(key = f)
                 self$results$artPairs$addItem(key = f)
                 self$results$artMeans$get(key = f)$setTitle(paste("ART, średnie rang:", f))
                 self$results$artPairs$get(key = f)$setTitle(paste("ART, porównania parami:", f))
+            }
+        },
+        .fillComparison = function(mt, pt, cmp, method, alpha, what) {
+            for (i in seq_len(nrow(cmp$means))) {
+                r <- cmp$means[i, ]
+                vals <- list(level = r$level, mean = r$mean, se = r$se, letters = r$letters)
+                if (what == "means") { vals$lower <- r$lower; vals$upper <- r$upper }
+                mt$addRow(rowKey = r$level, values = vals)
+            }
+            if (method == "none") {
+                mt$getColumn("letters")$setVisible(FALSE)
+                mt$setNote("emm", sprintf("Średnie brzegowe z modelu (emmeans), %g%% CI.", 100 * (1 - alpha)))
+            } else if (method == "dunnett") {
+                mt$getColumn("letters")$setTitle("vs kontrola")
+                mt$setNote("dun", paste0("Kontrola = pierwszy poziom; * różni się istotnie od kontroli; ", cmp$critNote))
+            } else {
+                mt$setNote("cld", paste0(if (what == "means") "Średnie brzegowe z modelu; " else "",
+                    phMethodLabel(method), "; ", cmp$critNote,
+                    ". Poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią."))
+            }
+            if (!is.null(cmp$pairs)) {
+                for (i in seq_len(nrow(cmp$pairs))) {
+                    r <- cmp$pairs[i, ]
+                    vals <- list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se, df = r$df, stat = r$stat, p = r$p)
+                    if (what == "means") { vals$crit <- r$crit; vals$lower <- r$lower; vals$upper <- r$upper; vals$d <- r$d }
+                    pt$addRow(rowKey = i, values = vals)
+                }
+                if (what == "means") {
+                    if (method == "holm") {
+                        for (cn in c("crit", "lower", "upper")) pt$getColumn(cn)$setVisible(FALSE)
+                        pt$setNote("holm", "p skorygowane metodą Holma.")
+                    } else {
+                        pt$setNote("crit", sprintf("%s; przedział ufności = różnica ± %s (poziom %g%%).",
+                            phMethodLabel(method), phCritLabel(method), 100 * (1 - alpha)))
+                    }
+                }
             }
         },
         .run = function() {
@@ -62,25 +96,28 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 self$results$anova$setNote("err", "Brak stopni swobody dla błędu (za mało obserwacji na komórkę).")
                 return()
             }
+            method <- opts$postHoc; alpha <- opts$alpha
+            oneFactor <- length(factors) == 1 && length(blocks) == 0 && length(covs) == 0
+            factorsOnly <- length(blocks) == 0 && length(covs) == 0
 
+            # --- ANOVA table
             at <- self$results$anova
             for (i in seq_len(nrow(res$anova))) {
                 r <- res$anova[i, ]
                 at$addRow(rowKey = r$term, values = list(source = r$source, ss = r$ss, df = r$df,
                     ms = r$ms, F = r$F, p = r$p, eta = r$eta, partEta = r$partEta, omega = r$omega))
             }
-            ssNote <- switch(opts$ss, '1' = "Sumy kwadratów typu I (sekwencyjne, w kolejności wierszy).",
-                '2' = "Sumy kwadratów typu II.", '3' = "Sumy kwadratów typu III.")
-            at$setNote("ss", ssNote)
+            at$setNote("ss", switch(opts$ss, '1' = "Sumy kwadratów typu I (sekwencyjne, w kolejności wierszy).",
+                '2' = "Sumy kwadratów typu II.", '3' = "Sumy kwadratów typu III."))
             cells <- cellsFactor(d, factors)
             if (length(unique(table(cells))) > 1 && opts$ss == "1")
                 at$setNote("unbal", "Układ niezrównoważony: przy typie I wynik zależy od kolejności czynników.")
 
-            # Welch / Welch-James (factors only)
+            # --- Welch / Welch-James
             if (isTRUE(opts$welch)) {
                 wt <- self$results$welch
-                if (length(blocks) > 0 || length(covs) > 0) {
-                    wt$setNote("na", "Test Welcha-Jamesa jest dostępny tylko dla modelu z samymi czynnikami (bez bloków i kowariant).")
+                if (!factorsOnly) {
+                    wt$setNote("na", "Test Welcha jest dostępny tylko dla modelu z samymi czynnikami (bez bloków i kowariant).")
                 } else {
                     w <- tryCatch(welchJamesTable(d, dep, factors), error = function(e) e)
                     if (inherits(w, "error")) wt$setNote("err", conditionMessage(w))
@@ -89,154 +126,82 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                             r <- w[i, ]
                             wt$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
                         }
-                        wt$setNote("wj", if (length(factors) == 1) "Test Welcha (oneway.test) — jeden czynnik."
-                            else "Test Welcha-Jamesa (Johansen, 1980) z przybliżonymi stopniami swobody; osobne wariancje komórek, pełny model czynnikowy.")
+                        wt$setNote("wj", if (length(factors) == 1) "Test Welcha: osobne wariancje grup, przybliżone stopnie swobody."
+                            else "Test Welcha-Jamesa (Johansen, 1980): osobne wariancje komórek, przybliżone stopnie swobody, pełny model czynnikowy.")
                     }
                 }
             }
 
-            # HC3-robust ANOVA table
-            robustV <- NULL
-            if (isTRUE(opts$robust)) {
-                rt <- self$results$robust
-                rb <- tryCatch(robustAnovaTable(res$fit, opts$ss), error = function(e) e)
-                if (inherits(rb, "error")) rt$setNote("err", conditionMessage(rb))
-                else {
-                    for (i in seq_len(nrow(rb))) {
-                        r <- rb[i, ]
-                        rt$addRow(rowKey = r$term, values = list(source = r$source, df = r$df, F = r$F, p = r$p))
-                    }
-                    rt$setNote("hc3", sprintf("Testy F z macierzą kowariancji HC3 (White); sumy kwadratów typu %s. Średnie brzegowe i porównania parami poniżej używają odpornych SE.", rb$type[1]))
-                    robustV <- tryCatch(robustVcov(res$fit), error = function(e) NULL)
-                }
+            # --- nonparametric: Kruskal-Wallis + Dunn (one factor) or ART (factorial)
+            useKW <- isTRUE(opts$nonpar) && oneFactor
+            useART <- isTRUE(opts$nonpar) && !oneFactor && factorsOnly
+            self$results$npTests$setVisible(useKW || (isTRUE(opts$nonpar) && !factorsOnly))
+            self$results$npMeans$setVisible(useKW)
+            self$results$npPairs$setVisible(useKW && isTRUE(opts$showPairs))
+            self$results$art$setVisible(useART)
+            self$results$artMeans$setVisible(useART && method != "none")
+            self$results$artPairs$setVisible(useART && method != "none" && isTRUE(opts$showPairs))
+            if (isTRUE(opts$nonpar) && !factorsOnly) {
+                self$results$npTests$setNote("na", "Analiza nieparametryczna jest dostępna tylko dla modelu z samymi czynnikami (bez bloków i kowariant).")
             }
-
-            # nonparametric (one factor, no blocks/covariates)
-            oneFactor <- length(factors) == 1 && length(blocks) == 0 && length(covs) == 0
-            if (isTRUE(opts$kruskal) || isTRUE(opts$jonckheere) || isTRUE(opts$medianTest)) {
+            if (useKW) {
+                y <- d[[dep]]; g <- d[[factors]]
+                kw <- kruskalTable(y, g)
                 npt <- self$results$npTests
-                if (!oneFactor) {
-                    npt$setNote("na", "Testy nieparametryczne są dostępne tylko dla jednego czynnika bez bloków i kowariant.")
-                } else {
-                    y <- d[[dep]]; g <- d[[factors]]
-                    addNp <- function(key, r) if (!is.null(r))
-                        npt$addRow(rowKey = key, values = list(test = r$test, stat = r$stat, df = r$df,
-                            z = r$z %||% NA, p = r$p, es = r$es))
-                    if (isTRUE(opts$kruskal)) addNp("kw", kruskalTable(y, g))
-                    if (isTRUE(opts$jonckheere)) {
-                        jt <- jonckheereTable(y, g)
-                        if (is.null(jt)) npt$setNote("jt", "Test Jonckheere'a-Terpstry wymaga co najmniej 3 poziomów.")
-                        else addNp("jt", jt)
-                    }
-                    if (isTRUE(opts$medianTest)) addNp("md", medianTable(y, g))
-                    npt$setNote("es", paste0("ε² = H/(n − 1). Trend Jonckheere'a: kierunek wg kolejności poziomów ",
-                        "czynnika (z > 0 = rosnący), p dwustronne."))
-                    if (isTRUE(opts$kruskal)) {
-                        dn <- dunnPairs(y, g, adjust = opts$npPostHoc, alpha = opts$alpha)
-                        nm <- self$results$npMeans
-                        for (i in seq_len(nrow(dn$levels))) {
-                            r <- dn$levels[i, ]
-                            nm$addRow(rowKey = r$level, values = list(level = r$level, n = r$n, median = r$median,
-                                meanRank = r$meanRank, letters = r$letters))
-                        }
-                        nm$setNote("dunn", sprintf(paste0("Test Dunna (%s); poziomy z tą samą literą nie różnią się ",
-                            "istotnie; litera a = grupa z najniższą średnią rangą."),
-                            switch(opts$npPostHoc, holm = "poprawka Holma", bonferroni = "poprawka Bonferroniego", none = "bez poprawki")))
-                        np <- self$results$npPairs
-                        for (i in seq_len(nrow(dn$pairs))) {
-                            r <- dn$pairs[i, ]
-                            np$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se,
-                                stat = r$stat, p = r$p))
-                        }
-                    }
+                npt$addRow(rowKey = "kw", values = list(test = kw$test, stat = kw$stat, df = kw$df, p = kw$p, es = kw$es))
+                npt$setNote("es", "Test Kruskala-Wallisa na rangach; ε² = H/(n − 1).")
+                dn <- dunnPairs(y, g, adjust = "holm", alpha = alpha)
+                nm <- self$results$npMeans
+                for (i in seq_len(nrow(dn$levels))) {
+                    r <- dn$levels[i, ]
+                    nm$addRow(rowKey = r$level, values = list(level = r$level, n = r$n, median = r$median,
+                        meanRank = r$meanRank, letters = r$letters))
+                }
+                nm$setNote("dunn", "Test Dunna z poprawką Holma; poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią rangą.")
+                np <- self$results$npPairs
+                for (i in seq_len(nrow(dn$pairs))) {
+                    r <- dn$pairs[i, ]
+                    np$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se, stat = r$stat, p = r$p))
                 }
             }
-            if (isTRUE(opts$art)) {
+            if (useART) {
                 artT <- self$results$art
-                if (length(covs) > 0 || length(blocks) > 0) {
-                    artT$setNote("na", "ART wymaga modelu z samymi czynnikami (bez bloków i kowariant).")
-                } else {
-                    at2 <- tryCatch(artTable(d, dep, factors), error = function(e) e)
-                    if (inherits(at2, "error")) artT$setNote("err", conditionMessage(at2))
-                    else {
-                        for (i in seq_len(nrow(at2))) {
-                            r <- at2[i, ]
-                            artT$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
-                        }
-                        artT$setNote("art", paste0("Aligned Rank Transform (Wobbrock i in., 2011): dla każdego efektu odpowiedź ",
-                            "wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE typu III; ",
-                            "raportowany jest F tego efektu. Pełny model czynnikowy z interakcjami."))
-                        # post-hoc for main effects on the ranks aligned for each factor
-                        method <- opts$postHoc; alpha <- opts$alpha
-                        if (method != "none")
-                        for (f in factors) {
-                            mt <- self$results$artMeans$get(key = f)
-                            pt <- self$results$artPairs$get(key = f)
-                            cmp <- tryCatch(artMainEffectComparisons(d, dep, factors, f, method, alpha), error = function(e) e)
-                            if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
-                            for (i in seq_len(nrow(cmp$means))) {
-                                r <- cmp$means[i, ]
-                                mt$addRow(rowKey = r$level, values = list(level = r$level, mean = r$mean, se = r$se, letters = r$letters))
-                            }
-                            if (method == "dunnett") mt$getColumn("letters")$setTitle("vs kontrola")
-                            mt$setNote("cld", paste0("Rangi wyrównane dla efektu ", f, "; ", phMethodLabel(method), "; ",
-                                cmp$critNote %||% "", ". Poziomy z tą samą literą nie różnią się istotnie."))
-                            if (!is.null(cmp$pairs)) for (i in seq_len(nrow(cmp$pairs))) {
-                                r <- cmp$pairs[i, ]
-                                pt$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se,
-                                    df = r$df, stat = r$stat, p = r$p))
-                            }
-                        }
+                at2 <- tryCatch(artTable(d, dep, factors), error = function(e) e)
+                if (inherits(at2, "error")) artT$setNote("err", conditionMessage(at2))
+                else {
+                    for (i in seq_len(nrow(at2))) {
+                        r <- at2[i, ]
+                        artT$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
+                    }
+                    artT$setNote("art", paste0("Aligned Rank Transform (Wobbrock i in., 2011): dla każdego efektu odpowiedź ",
+                        "wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE typu III; raportowany jest F tego efektu. ",
+                        "Przy kilku czynnikach to nieparametryczny odpowiednik ANOVY czynnikowej."))
+                    if (method != "none") for (f in factors) {
+                        mt <- self$results$artMeans$get(key = f)
+                        pt <- self$results$artPairs$get(key = f)
+                        cmp <- tryCatch(artMainEffectComparisons(d, dep, factors, f, method, alpha), error = function(e) e)
+                        if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
+                        private$.fillComparison(mt, pt, cmp, method, alpha, "art")
+                        mt$setNote("cld", paste0("Rangi wyrównane dla efektu ", f, "; ", phMethodLabel(method), "; ",
+                            cmp$critNote %||% "", ". Poziomy z tą samą literą nie różnią się istotnie."))
                     }
                 }
             }
 
-            # comparisons
+            # --- parametric comparisons
             keys <- private$.termKeys()
-            method <- opts$postHoc; alpha <- opts$alpha
             for (k in names(keys)) {
                 term <- keys[[k]]
                 mt <- self$results$means$get(key = k)
                 pt <- self$results$pairs$get(key = k)
                 img <- self$results$plotMeans$get(key = k)
-                cmp <- tryCatch(compareTerm(res$fit, term, method, alpha, control = NULL, mse = res$mse, vcov = robustV),
+                cmp <- tryCatch(compareTerm(res$fit, term, method, alpha, control = NULL, mse = res$mse),
                     error = function(e) e)
                 if (inherits(cmp, "error")) {
                     mt$setNote("err", paste("Nie można policzyć średnich:", conditionMessage(cmp)))
                     next
                 }
-                for (i in seq_len(nrow(cmp$means))) {
-                    r <- cmp$means[i, ]
-                    mt$addRow(rowKey = r$level, values = list(level = r$level, mean = r$mean, se = r$se,
-                        lower = r$lower, upper = r$upper, letters = r$letters))
-                }
-                if (method == "none") {
-                    mt$getColumn("letters")$setVisible(FALSE)
-                    mt$setNote("emm", sprintf("Średnie brzegowe z modelu (emmeans), %g%% CI.", 100 * (1 - alpha)))
-                } else if (method == "dunnett") {
-                    mt$getColumn("letters")$setTitle("vs kontrola")
-                    mt$setNote("dun", paste0("Kontrola = pierwszy poziom; * różni się istotnie od kontroli; ", cmp$critNote))
-                } else {
-                    mt$setNote("cld", paste0("Średnie brzegowe z modelu; ", phMethodLabel(method), "; ", cmp$critNote,
-                        ". Poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią."))
-                }
-                if (!is.null(robustV)) mt$setNote("hc3", "SE i przedziały z odpornej macierzy HC3.")
-                if (!is.null(cmp$pairs)) {
-                    for (i in seq_len(nrow(cmp$pairs))) {
-                        r <- cmp$pairs[i, ]
-                        pt$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se,
-                            df = r$df, stat = r$stat, p = r$p, crit = r$crit, lower = r$lower, upper = r$upper,
-                            d = r$d))
-                    }
-                    if (method == "holm") {
-                        for (cn in c("crit", "lower", "upper")) pt$getColumn(cn)$setVisible(FALSE)
-                        pt$setNote("holm", "p skorygowane metodą Holma.")
-                    } else {
-                        pt$setNote("crit", sprintf("%s; przedział ufności = różnica ± %s (poziom %g%%).",
-                            phMethodLabel(method), if (method == "bonf") "różnica graniczna Bonferroniego" else phCritLabel(method),
-                            100 * (1 - alpha)))
-                    }
-                }
+                private$.fillComparison(mt, pt, cmp, method, alpha, "means")
                 m <- cmp$means
                 if (length(term) == 2) {
                     st <- list(means = data.frame(xf = m[[term[1]]], gf = m[[term[2]]], mean = m$mean, se = m$se,
@@ -250,7 +215,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 img$setState(st)
             }
 
-            # contrasts
+            # --- contrasts
             if (opts$contrastType != "none") {
                 for (f in factors) {
                     ct <- tryCatch(contrastTable(res$fit, f, opts$contrastType), error = function(e) NULL)
@@ -265,14 +230,11 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 }
             }
 
-            # descriptives
+            # --- descriptives and assumptions
             if (isTRUE(opts$desc)) {
                 ds <- descriptivesTable(d, dep, factors)
-                for (i in seq_len(nrow(ds)))
-                    self$results$desc$addRow(rowKey = i, values = as.list(ds[i, ]))
+                for (i in seq_len(nrow(ds))) self$results$desc$addRow(rowKey = i, values = as.list(ds[i, ]))
             }
-
-            # assumptions
             if (isTRUE(opts$homog)) {
                 ht <- self$results$homog
                 for (r in homogeneityTable(d[[dep]], cells)) ht$addRow(rowKey = r$test, values = r)
@@ -292,7 +254,6 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 full <- rep(NA_real_, length(complete)); full[complete] <- resid
                 self$results$residsOV$setValues(full)
             }
-
             if (length(factors) >= 2) {
                 tm <- tryCatch(termMeans(res$fit, factors[1:2], alpha), error = function(e) NULL)
                 if (!is.null(tm)) {
@@ -301,8 +262,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                         means = data.frame(A = m[[factors[1]]], B = m[[factors[2]]], mean = m$mean, stringsAsFactors = FALSE),
                         A = factors[1], B = factors[2], dep = dep))
                     if (length(factors) > 2)
-                        self$results$plotInteraction$setTitle(sprintf("Wykres interakcji: %s × %s (pierwsze dwa czynniki)",
-                            factors[1], factors[2]))
+                        self$results$plotInteraction$setTitle(sprintf("Wykres interakcji: %s × %s (pierwsze dwa czynniki)", factors[1], factors[2]))
                 }
             }
         },

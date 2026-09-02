@@ -111,7 +111,10 @@ do pakowania na konkretny system i nie powinny być źródłem zmian w kodzie.
 
 ### Bezpieczeństwo
 - NIGDY nie modyfikuj `engine/` ani `server/` bez wyraźnego polecenia
-- NIGDY nie usuwaj istniejących opcji — tylko dodawaj nowe
+- Opcji analiz jmv nie usuwaj z kodu: gdy jUPWR je zastępuje, ukrywaj je w kliencie
+  (`JUPWR_HIDDEN_ANALYSES`). W modułach jUPWR opcje wolno usuwać i upraszczać —
+  priorytetem jest dydaktyczna prostota panelu (rdzeń widoczny od razu, reszta
+  w sekcji „Zaawansowane")
 - Przed każdą modyfikacją `.b.R` przeczytaj cały plik i zrozum kontekst
 - Zachowuj istniejące domyślne zachowanie (default: false dla nowych opcji)
 
@@ -257,22 +260,21 @@ Q-Q, reszty do arkusza) i `anovarm` (format DŁUGI: zależna, jednostka, czynnik
 wewnątrz- i międzyobiektowe, kowarianty; afex::aov_ez z include_aov; Mauchly,
 poprawki GG/HF; emmeans model="univariate", poziomy wewnątrzobiektowe mapowane
 z make.names). Silnik wspólny w `R/utils.R` (wywodzi się z jRol).
-Nieparametryczne jako przełączniki: w „ANOVA" (jeden czynnik) Kruskal-Wallis
-z ε² i Dunnem (litery), Jonckheere-Terpstra, test mediany; w RM (jeden czynnik
-wewnątrz) Friedman z W Kendalla, Page, Nemenyi/Conover; ART (Wobbrock 2011)
-w obu — wyrównanie przez inkluzję-ekskluzję średnich komórkowych, rangi,
-ANOVA typu III (lm) lub afex na rangach; zgodne z ARTool (walidacja w testach);
-post-hoc po ART tylko dla efektów głównych (rangi wyrównane dla czynnika,
-silnik compareTerm), bez kontrastów interakcji. UI warunkowe: `jamovi/js/anova.js`
-i `anovarm.js` (jus 3.0: handlery `<kontrolka>_changed`, `view_updated`,
-`ui.x.setPropertyValue('enable', …)`) włączają testy jednoczynnikowe/Welch przy
-jednym czynniku, ART i interakcje przy ≥ 2; metody porównań (parametryczne,
-Dunn, Nemenyi/Conover) w jednej sekcji „Porównania wielokrotne".
-Niejednorodność wariancji: `welchJamesTable` (Johansen 1980: kontrasty
-Kroneckera z macierzy różnic, Σ = diag(s²/n), F = T/(q+2A−6A/(q+2)),
-df2 = q(q+2)/(3A); przy 1 czynniku = oneway.test; walidacja z welchADF,
-którego nie ma na CRAN dla R 4.6 — instalować z archiwum) i `robustAnovaTable`
-(car::Anova white.adjust="hc3", car::hccm do emmeans przez `vcov`).
+Panel „streamline" (decyzja 2026-09-02): rdzeń = zmienne, „Nierówne wariancje
+(Welch)", „Nieparametrycznie (rangi)", „Wielkość efektu (η²p)", metoda porównań,
+α, tabela par, wykresy; „Założenia" i „Zaawansowane" (bloki, kowarianty, typ SS,
+interakcje, η²/ω², komórki interakcji, d Cohena, kontrasty, opisowe, słupki
+błędów, reszty do arkusza) zwinięte. Jeden przełącznik `nonpar` sam wybiera:
+1 czynnik → Kruskal-Wallis z ε² i Dunnem-Holmem (litery); ≥ 2 czynniki → ART
+(Wobbrock 2011: inkluzja-ekskluzja średnich komórkowych, rangi, ANOVA typu III
+lub afex na rangach, zgodne z ARTool) z porównaniami efektów głównych na
+wyrównanych rangach; w RM 1 czynnik wewnątrz → Friedman z W Kendalla i Nemenyim.
+`welch` = Welch (1 czynnik, = oneway.test) lub Welch-James (Johansen 1980:
+kontrasty Kroneckera, Σ = diag(s²/n), F = T/(q+2A−6A/(q+2)), df2 = q(q+2)/(3A);
+walidacja z welchADF, na CRAN brak wydania dla R 4.6 — instalować z archiwum).
+Usunięte świadomie: test mediany, Jonckheere, Page, Bonferroni, Conover, HC3.
+UI warunkowe: `jamovi/js/anova.js`, `anovarm.js` (jus 3.0: handlery
+`<kontrolka>_changed`, `view_updated`, `ui.x.setPropertyValue('enable', …)`).
 PUŁAPKA: wrapper analizy `anova()` zasłania `stats::anova` — w kodzie modułu
 zawsze `stats::anova(...)`. Ukrywanie analiz jmv: `JUPWR_HIDDEN_ANALYSES`
 w `client/common/jupwr.ts` (jmv::anovaonew, anova, ancova, anovarm) filtrowane

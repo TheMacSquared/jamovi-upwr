@@ -52,7 +52,7 @@ items:
           visible: (omega)
 
     - name: welch
-      title: Test Welcha-Jamesa (bez założenia równych wariancji)
+      title: Test Welcha (bez założenia równych wariancji)
       type: Table
       visible: (welch)
       rows: 0
@@ -75,31 +75,10 @@ items:
           type: number
           format: zto,pvalue
 
-    - name: robust
-      title: ANOVA z odpornymi błędami standardowymi (HC3)
-      type: Table
-      visible: (robust)
-      rows: 0
-      clearWith: *cw
-      columns:
-        - name: source
-          title: Źródło zmienności
-          type: text
-        - name: df
-          title: df
-          type: integer
-        - name: F
-          title: F
-          type: number
-        - name: p
-          title: p
-          type: number
-          format: zto,pvalue
-
     - name: npTests
-      title: Testy nieparametryczne
+      title: Test Kruskala-Wallisa
       type: Table
-      visible: (kruskal || jonckheere || medianTest)
+      visible: (nonpar)
       rows: 0
       clearWith: *cw
       columns:
@@ -107,14 +86,11 @@ items:
           title: Test
           type: text
         - name: stat
-          title: Statystyka
+          title: χ²
           type: number
         - name: df
           title: df
           type: integer
-        - name: z
-          title: z
-          type: number
         - name: p
           title: p
           type: number
@@ -127,15 +103,15 @@ items:
     - name: npMeans
       title: Mediany, średnie rang i grupy jednorodne (Dunn)
       type: Table
-      visible: (kruskal)
+      visible: (nonpar)
       rows: 0
-      clearWith:
+      clearWith: &cwnp
         - dep
         - factors
         - blocks
         - covs
         - alpha
-        - npPostHoc
+        - postHoc
       columns:
         - name: level
           title: Poziom
@@ -156,15 +132,9 @@ items:
     - name: npPairs
       title: Porównania parami (Dunn)
       type: Table
-      visible: (kruskal && showPairs)
+      visible: (nonpar && showPairs)
       rows: 0
-      clearWith:
-        - dep
-        - factors
-        - blocks
-        - covs
-        - alpha
-        - npPostHoc
+      clearWith: *cwnp
       columns:
         - name: g1
           title: Poziom 1
@@ -189,7 +159,7 @@ items:
     - name: art
       title: ART — ANOVA na wyrównanych rangach
       type: Table
-      visible: (art)
+      visible: (nonpar)
       rows: 0
       clearWith: *cw
       columns:
@@ -213,16 +183,15 @@ items:
     - name: artMeans
       title: ART — średnie wyrównanych rang i grupy jednorodne
       type: Array
-      visible: (art)
-      clearWith:
+      visible: (nonpar)
+      clearWith: &cwart
         - dep
         - factors
         - blocks
         - covs
         - alpha
         - postHoc
-        - phMain
-        - art
+        - interactions
       template:
         title: ''
         type: Table
@@ -244,16 +213,8 @@ items:
     - name: artPairs
       title: ART — porównania parami
       type: Array
-      visible: (art && showPairs)
-      clearWith:
-        - dep
-        - factors
-        - blocks
-        - covs
-        - alpha
-        - postHoc
-        - phMain
-        - art
+      visible: (nonpar && showPairs)
+      clearWith: *cwart
       template:
         title: ''
         type: Table
@@ -294,10 +255,7 @@ items:
         - ss
         - alpha
         - postHoc
-        - phMain
         - phInter
-        - robust
-        - robust
       template:
         title: ''
         type: Table
@@ -486,7 +444,6 @@ items:
         - ss
         - alpha
         - postHoc
-        - phMain
         - phInter
         - errorBars
       template:

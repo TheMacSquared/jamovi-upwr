@@ -75,9 +75,9 @@ items:
           type: number
 
     - name: npTests
-      title: Testy nieparametryczne
+      title: Test Friedmana
       type: Table
-      visible: (friedman || page)
+      visible: (nonpar)
       rows: 0
       clearWith: *cw
       columns:
@@ -85,14 +85,11 @@ items:
           title: Test
           type: text
         - name: stat
-          title: Statystyka
+          title: χ²
           type: number
         - name: df
           title: df
           type: integer
-        - name: z
-          title: z
-          type: number
         - name: p
           title: p
           type: number
@@ -103,18 +100,18 @@ items:
           format: zto
 
     - name: npMeans
-      title: Mediany, średnie rang i grupy jednorodne
+      title: Mediany, średnie rang i grupy jednorodne (Nemenyi)
       type: Table
-      visible: (friedman)
+      visible: (nonpar)
       rows: 0
-      clearWith:
+      clearWith: &cwnp
         - dep
         - subject
         - within
         - between
         - covs
         - alpha
-        - npPostHoc
+        - postHoc
       columns:
         - name: level
           title: Poziom
@@ -133,18 +130,11 @@ items:
           type: text
 
     - name: npPairs
-      title: Porównania parami (nieparametryczne)
+      title: Porównania parami (Nemenyi)
       type: Table
-      visible: (friedman && showPairs)
+      visible: (nonpar && showPairs)
       rows: 0
-      clearWith:
-        - dep
-        - subject
-        - within
-        - between
-        - covs
-        - alpha
-        - npPostHoc
+      clearWith: *cwnp
       columns:
         - name: g1
           title: Poziom 1
@@ -159,7 +149,7 @@ items:
           title: SE
           type: number
         - name: stat
-          title: Statystyka
+          title: q
           type: number
         - name: p
           title: p
@@ -169,7 +159,7 @@ items:
     - name: art
       title: ART — ANOVA na wyrównanych rangach
       type: Table
-      visible: (art)
+      visible: (nonpar)
       rows: 0
       clearWith: *cw
       columns:
@@ -193,8 +183,8 @@ items:
     - name: artMeans
       title: ART — średnie wyrównanych rang i grupy jednorodne
       type: Array
-      visible: (art)
-      clearWith:
+      visible: (nonpar)
+      clearWith: &cwart
         - dep
         - subject
         - within
@@ -203,9 +193,6 @@ items:
         - ss
         - alpha
         - postHoc
-        - phWithin
-        - phBetween
-        - art
       template:
         title: ''
         type: Table
@@ -227,19 +214,8 @@ items:
     - name: artPairs
       title: ART — porównania parami
       type: Array
-      visible: (art && showPairs)
-      clearWith:
-        - dep
-        - subject
-        - within
-        - between
-        - covs
-        - ss
-        - alpha
-        - postHoc
-        - phWithin
-        - phBetween
-        - art
+      visible: (nonpar && showPairs)
+      clearWith: *cwart
       template:
         title: ''
         type: Table
@@ -280,8 +256,6 @@ items:
         - ss
         - alpha
         - postHoc
-        - phWithin
-        - phBetween
         - phInter
       template:
         title: ''
@@ -472,8 +446,6 @@ items:
         - ss
         - alpha
         - postHoc
-        - phWithin
-        - phBetween
         - phInter
         - errorBars
       template:

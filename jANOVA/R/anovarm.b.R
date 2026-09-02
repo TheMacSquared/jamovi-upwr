@@ -6,8 +6,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         .termKeys = function() {
             o <- self$options
             keys <- list()
-            if (isTRUE(o$phWithin)) for (f in o$within) keys[[f]] <- f
-            if (isTRUE(o$phBetween)) for (f in o$between) keys[[f]] <- f
+            for (f in c(o$within, o$between)) keys[[f]] <- f
             all <- c(o$within, o$between)
             if (isTRUE(o$phInter) && length(all) >= 2)
                 for (pr in utils::combn(all, 2, simplify = FALSE))
@@ -24,13 +23,48 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 self$results$means$get(key = k)$setTitle(paste("Średnie:", lab))
                 self$results$pairs$get(key = k)$setTitle(paste("Porównania parami:", lab))
             }
-            for (f in c(self$options$within, self$options$between))
-                self$results$contrasts$addItem(key = f)
             for (f in c(self$options$within, self$options$between)) {
+                self$results$contrasts$addItem(key = f)
                 self$results$artMeans$addItem(key = f)
                 self$results$artPairs$addItem(key = f)
                 self$results$artMeans$get(key = f)$setTitle(paste("ART, średnie rang:", f))
                 self$results$artPairs$get(key = f)$setTitle(paste("ART, porównania parami:", f))
+            }
+        },
+        .fillComparison = function(mt, pt, cmp, method, alpha, what) {
+            for (i in seq_len(nrow(cmp$means))) {
+                r <- cmp$means[i, ]
+                vals <- list(level = r$level, mean = r$mean, se = r$se, letters = r$letters)
+                if (what == "means") { vals$lower <- r$lower; vals$upper <- r$upper }
+                mt$addRow(rowKey = r$level, values = vals)
+            }
+            if (method == "none") {
+                mt$getColumn("letters")$setVisible(FALSE)
+                mt$setNote("emm", sprintf("Średnie brzegowe z modelu, %g%% CI.", 100 * (1 - alpha)))
+            } else if (method == "dunnett") {
+                mt$getColumn("letters")$setTitle("vs kontrola")
+                mt$setNote("dun", paste0("Kontrola = pierwszy poziom; * różni się istotnie od kontroli; ", cmp$critNote))
+            } else {
+                mt$setNote("cld", paste0(if (what == "means") "Średnie brzegowe z modelu; " else "",
+                    phMethodLabel(method), "; ", cmp$critNote,
+                    ". Poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią."))
+            }
+            if (!is.null(cmp$pairs)) {
+                for (i in seq_len(nrow(cmp$pairs))) {
+                    r <- cmp$pairs[i, ]
+                    vals <- list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se, df = r$df, stat = r$stat, p = r$p)
+                    if (what == "means") { vals$crit <- r$crit; vals$lower <- r$lower; vals$upper <- r$upper; vals$d <- r$d }
+                    pt$addRow(rowKey = i, values = vals)
+                }
+                if (what == "means") {
+                    if (method == "holm") {
+                        for (cn in c("crit", "lower", "upper")) pt$getColumn(cn)$setVisible(FALSE)
+                        pt$setNote("holm", "p skorygowane metodą Holma.")
+                    } else {
+                        pt$setNote("crit", sprintf("%s; przedział ufności = różnica ± %s (poziom %g%%).",
+                            phMethodLabel(method), phCritLabel(method), 100 * (1 - alpha)))
+                    }
+                }
             }
         },
         .run = function() {
@@ -52,7 +86,6 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             for (v in c(within, between)) if (nlevels(d[[v]]) < 2) {
                 at$setNote("err", sprintf("Zmienna %s musi mieć co najmniej 2 poziomy.", v)); return()
             }
-            # every subject must appear in every within cell
             wcells <- cellsFactor(d, within)
             tab <- table(d[[subject]], wcells)
             if (any(tab == 0)) {
@@ -73,6 +106,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (inherits(res, "error")) {
                 at$setNote("err", paste("Błąd dopasowania modelu:", conditionMessage(res))); return()
             }
+            method <- o$postHoc; alpha <- o$alpha
             tb <- rmTable(res, o$spherCorr)
             for (i in seq_len(nrow(tb))) {
                 r <- tb[i, ]
@@ -82,8 +116,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             corrNote <- switch(o$spherCorr, none = "bez poprawki na sferyczność",
                 GG = "stopnie swobody z poprawką Greenhouse'a-Geissera",
                 HF = "stopnie swobody z poprawką Huynha-Feldta")
-            at$setNote("ss", sprintf("Sumy kwadratów typu %s; %s. Efekty wewnątrzobiektowe testowane wobec błędu swojej warstwy (MS błędu, df błędu).",
-                o$ss, corrNote))
+            at$setNote("ss", sprintf("Sumy kwadratów typu %s; %s. Każdy efekt testowany wobec błędu swojej warstwy (MS błędu, df błędu).", o$ss, corrNote))
 
             if (isTRUE(o$spherTests)) {
                 st <- self$results$spher
@@ -99,126 +132,77 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 }
             }
 
-            # nonparametric (one within factor, nothing else)
+            # --- nonparametric: Friedman + Nemenyi (one within factor) or ART
             oneWithin <- length(within) == 1 && length(between) == 0 && length(covs) == 0
-            if (isTRUE(o$friedman) || isTRUE(o$page)) {
+            factorsOnly <- length(covs) == 0
+            useFr <- isTRUE(o$nonpar) && oneWithin
+            useART <- isTRUE(o$nonpar) && !oneWithin && factorsOnly
+            self$results$npTests$setVisible(useFr || (isTRUE(o$nonpar) && !factorsOnly))
+            self$results$npMeans$setVisible(useFr)
+            self$results$npPairs$setVisible(useFr && isTRUE(o$showPairs))
+            self$results$art$setVisible(useART)
+            self$results$artMeans$setVisible(useART && method != "none")
+            self$results$artPairs$setVisible(useART && method != "none" && isTRUE(o$showPairs))
+            if (isTRUE(o$nonpar) && !factorsOnly)
+                self$results$npTests$setNote("na", "Analiza nieparametryczna jest dostępna tylko dla modelu bez kowariant.")
+            if (useFr) {
+                m <- rmMatrix(d, dep, subject, within)
+                fr <- friedmanTable(m)
                 npt <- self$results$npTests
-                if (!oneWithin) {
-                    npt$setNote("na", "Testy Friedmana i Page'a są dostępne tylko dla jednego czynnika wewnątrzobiektowego bez czynników międzyobiektowych i kowariant.")
-                } else {
-                    m <- rmMatrix(d, dep, subject, within)
-                    addNp <- function(key, r) if (!is.null(r))
-                        npt$addRow(rowKey = key, values = list(test = r$test, stat = r$stat, df = r$df,
-                            z = r$z %||% NA, p = r$p, es = r$es))
-                    if (isTRUE(o$friedman)) addNp("fr", friedmanTable(m))
-                    if (isTRUE(o$page)) {
-                        pg <- pageTable(m)
-                        if (is.null(pg)) npt$setNote("pg", "Test Page'a wymaga co najmniej 3 poziomów.")
-                        else addNp("pg", pg)
-                    }
-                    npt$setNote("es", "W Kendalla = χ²/(n(k − 1)). Trend Page'a: kierunek wg kolejności poziomów (z > 0 = rosnący), p dwustronne.")
-                    if (isTRUE(o$friedman)) {
-                        fp <- friedmanPairs(m, method = o$npPostHoc, adjust = "holm", alpha = o$alpha)
-                        nm <- self$results$npMeans
-                        for (i in seq_len(nrow(fp$levels))) {
-                            r <- fp$levels[i, ]
-                            nm$addRow(rowKey = r$level, values = list(level = r$level, n = r$n, median = r$median,
-                                meanRank = r$meanRank, letters = r$letters))
-                        }
-                        nm$setNote("np", sprintf("Test %s; poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią rangą (rangi w obrębie jednostki).",
-                            if (o$npPostHoc == "nemenyi") "Nemenyiego" else "Conovera z poprawką Holma"))
-                        np <- self$results$npPairs
-                        for (i in seq_len(nrow(fp$pairs))) {
-                            r <- fp$pairs[i, ]
-                            np$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se, stat = r$stat, p = r$p))
-                        }
-                        np$getColumn("stat")$setTitle(if (o$npPostHoc == "nemenyi") "q" else "t")
-                    }
+                npt$addRow(rowKey = "fr", values = list(test = fr$test, stat = fr$stat, df = fr$df, p = fr$p, es = fr$es))
+                npt$setNote("es", "Test Friedmana na rangach w obrębie jednostki; W Kendalla = χ²/(n(k − 1)).")
+                fp <- friedmanPairs(m, alpha = alpha)
+                nm <- self$results$npMeans
+                for (i in seq_len(nrow(fp$levels))) {
+                    r <- fp$levels[i, ]
+                    nm$addRow(rowKey = r$level, values = list(level = r$level, n = r$n, median = r$median,
+                        meanRank = r$meanRank, letters = r$letters))
+                }
+                nm$setNote("np", "Test Nemenyiego; poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią rangą.")
+                np <- self$results$npPairs
+                for (i in seq_len(nrow(fp$pairs))) {
+                    r <- fp$pairs[i, ]
+                    np$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se, stat = r$stat, p = r$p))
                 }
             }
-            if (isTRUE(o$art)) {
+            if (useART) {
                 artT <- self$results$art
-                if (length(covs) > 0) {
-                    artT$setNote("na", "ART wymaga modelu z samymi czynnikami (bez kowariant).")
-                } else {
-                    at2 <- tryCatch(artTableRm(d, dep, subject, within, between, o$ss), error = function(e) e)
-                    if (inherits(at2, "error")) artT$setNote("err", conditionMessage(at2))
-                    else {
-                        for (i in seq_len(nrow(at2))) {
-                            r <- at2[i, ]
-                            artT$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
-                        }
-                        artT$setNote("art", paste0("Aligned Rank Transform (Wobbrock i in., 2011): dla każdego efektu odpowiedź ",
-                            "wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE powtórzonych pomiarów ",
-                            "z właściwymi warstwami błędu; raportowany jest F tego efektu."))
-                        # post-hoc for main effects on the ranks aligned for each factor
-                        method <- o$postHoc; alpha <- o$alpha
-                        if (method != "none")
-                        for (f in c(within, between)) {
-                            mt <- self$results$artMeans$get(key = f)
-                            pt <- self$results$artPairs$get(key = f)
-                            cmp <- tryCatch(artMainEffectComparisons(d, dep, c(within, between), f, method, o$alpha, subject = subject, within = within, between = between, ssType = o$ss), error = function(e) e)
-                            if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
-                            for (i in seq_len(nrow(cmp$means))) {
-                                r <- cmp$means[i, ]
-                                mt$addRow(rowKey = r$level, values = list(level = r$level, mean = r$mean, se = r$se, letters = r$letters))
-                            }
-                            if (method == "dunnett") mt$getColumn("letters")$setTitle("vs kontrola")
-                            mt$setNote("cld", paste0("Rangi wyrównane dla efektu ", f, "; ", phMethodLabel(method), "; ",
-                                cmp$critNote %||% "", ". Poziomy z tą samą literą nie różnią się istotnie."))
-                            if (!is.null(cmp$pairs)) for (i in seq_len(nrow(cmp$pairs))) {
-                                r <- cmp$pairs[i, ]
-                                pt$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se,
-                                    df = r$df, stat = r$stat, p = r$p))
-                            }
-                        }
+                at2 <- tryCatch(artTableRm(d, dep, subject, within, between, o$ss), error = function(e) e)
+                if (inherits(at2, "error")) artT$setNote("err", conditionMessage(at2))
+                else {
+                    for (i in seq_len(nrow(at2))) {
+                        r <- at2[i, ]
+                        artT$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
+                    }
+                    artT$setNote("art", paste0("Aligned Rank Transform (Wobbrock i in., 2011): dla każdego efektu odpowiedź ",
+                        "wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE powtórzonych pomiarów ",
+                        "z właściwymi warstwami błędu; raportowany jest F tego efektu."))
+                    if (method != "none") for (f in c(within, between)) {
+                        mt <- self$results$artMeans$get(key = f)
+                        pt <- self$results$artPairs$get(key = f)
+                        cmp <- tryCatch(artMainEffectComparisons(d, dep, c(within, between), f, method, alpha,
+                            subject = subject, within = within, between = between, ssType = o$ss), error = function(e) e)
+                        if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
+                        private$.fillComparison(mt, pt, cmp, method, alpha, "art")
+                        mt$setNote("cld", paste0("Rangi wyrównane dla efektu ", f, "; ", phMethodLabel(method), "; ",
+                            cmp$critNote %||% "", ". Poziomy z tą samą literą nie różnią się istotnie."))
                     }
                 }
             }
 
+            # --- parametric comparisons
             keys <- private$.termKeys()
-            method <- o$postHoc; alpha <- o$alpha
             for (k in names(keys)) {
                 term <- keys[[k]]
                 mt <- self$results$means$get(key = k)
                 pt <- self$results$pairs$get(key = k)
                 img <- self$results$plotMeans$get(key = k)
                 mse <- rmMseFor(res$an0, term)
-                cmp <- tryCatch(compareTerm(res$fit, term, method, alpha, control = NULL, mse = mse),
-                    error = function(e) e)
+                cmp <- tryCatch(compareTerm(res$fit, term, method, alpha, control = NULL, mse = mse), error = function(e) e)
                 if (inherits(cmp, "error")) {
                     mt$setNote("err", paste("Nie można policzyć średnich:", conditionMessage(cmp))); next
                 }
-                for (i in seq_len(nrow(cmp$means))) {
-                    r <- cmp$means[i, ]
-                    mt$addRow(rowKey = r$level, values = list(level = r$level, mean = r$mean, se = r$se,
-                        lower = r$lower, upper = r$upper, letters = r$letters))
-                }
-                if (method == "none") {
-                    mt$getColumn("letters")$setVisible(FALSE)
-                    mt$setNote("emm", sprintf("Średnie brzegowe z modelu, %g%% CI.", 100 * (1 - alpha)))
-                } else if (method == "dunnett") {
-                    mt$getColumn("letters")$setTitle("vs kontrola")
-                    mt$setNote("dun", paste0("Kontrola = pierwszy poziom; * różni się istotnie od kontroli; ", cmp$critNote))
-                } else {
-                    mt$setNote("cld", paste0("Średnie brzegowe z modelu; ", phMethodLabel(method), "; ", cmp$critNote,
-                        ". Poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią."))
-                }
-                if (!is.null(cmp$pairs)) {
-                    for (i in seq_len(nrow(cmp$pairs))) {
-                        r <- cmp$pairs[i, ]
-                        pt$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se,
-                            df = r$df, stat = r$stat, p = r$p, crit = r$crit, lower = r$lower, upper = r$upper, d = r$d))
-                    }
-                    if (method == "holm") {
-                        for (cn in c("crit", "lower", "upper")) pt$getColumn(cn)$setVisible(FALSE)
-                        pt$setNote("holm", "p skorygowane metodą Holma.")
-                    } else {
-                        pt$setNote("crit", sprintf("%s; przedział ufności = różnica ± %s (poziom %g%%).",
-                            phMethodLabel(method), if (method == "bonf") "różnica graniczna Bonferroniego" else phCritLabel(method),
-                            100 * (1 - alpha)))
-                    }
-                }
+                private$.fillComparison(mt, pt, cmp, method, alpha, "means")
                 m <- cmp$means
                 if (length(term) == 2) {
                     st <- list(means = data.frame(xf = m[[term[1]]], gf = m[[term[2]]], mean = m$mean, se = m$se,
@@ -245,12 +229,10 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     }
                 }
             }
-
             if (isTRUE(o$desc)) {
                 ds <- descriptivesTable(d, dep, c(within, between))
                 for (i in seq_len(nrow(ds))) self$results$desc$addRow(rowKey = i, values = as.list(ds[i, ]))
             }
-
             if (isTRUE(o$homog)) {
                 ht <- self$results$homog
                 if (length(between)) {
@@ -268,7 +250,6 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 } else nt$setNote("n", "Test Shapiro-Wilka wymaga od 3 do 5000 reszt.")
             }
             if (!is.null(resid)) self$results$qq$setState(list(resid = resid))
-
             all <- c(within, between)
             if (length(all) >= 2) {
                 tm <- tryCatch(termMeans(res$fit, all[1:2], alpha), error = function(e) NULL)
