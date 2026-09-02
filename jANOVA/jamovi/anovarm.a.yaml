@@ -140,7 +140,7 @@ options:
     - name: showPairs
       title: Tabela porównań parami
       type: Bool
-      default: false
+      default: true
 
     - name: phES
       title: d Cohena w tabeli par
