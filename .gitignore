@@ -47,3 +47,4 @@ __pycache__
 # Claude Code local permissions (machine-specific)
 .claude/settings.local.json
 .claude/
+Rplots.pdf

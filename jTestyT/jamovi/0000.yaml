@@ -1,0 +1,37 @@
+---
+title: Testy t jUPWR
+name: jTestyT
+version: 0.1.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: >
+  Testy t z prostym panelem, przedziałami ufności, d Cohena i czytelnymi
+  wykresami estymacyjnymi.
+analyses:
+  - title: Test t dla jednej próby
+    name: ttestone
+    ns: jTestyT
+    menuGroup: T-Tests
+    menuTitle: Jedna próba
+    menuSubtitle: średnia vs wartość testowa
+    category: analyses
+  - title: Test t dla dwóch grup
+    name: ttesttwo
+    ns: jTestyT
+    menuGroup: T-Tests
+    menuTitle: Dwie grupy
+    menuSubtitle: próby niezależne
+    category: analyses
+  - title: Test t dla prób sparowanych
+    name: ttestpaired
+    ns: jTestyT
+    menuGroup: T-Tests
+    menuTitle: Próby sparowane
+    menuSubtitle: dwa pomiary tej samej jednostki
+    category: analyses
+usesNative: true
+minApp: 1.0.8
+
+...

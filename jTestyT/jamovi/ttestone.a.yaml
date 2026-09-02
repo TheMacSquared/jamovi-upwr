@@ -1,0 +1,90 @@
+---
+name: ttestone
+title: Test t dla jednej próby
+menuGroup: T-Tests
+menuTitle: Jedna próba
+menuSubtitle: średnia vs wartość testowa
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: vars
+      title: Zmienne
+      type: Variables
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: testValue
+      title: Wartość testowa
+      type: Number
+      default: 0
+
+    - name: hypothesis
+      title: Hipoteza alternatywna
+      type: List
+      options:
+        - title: Dwustronna (≠)
+          name: different
+        - title: Większa (>)
+          name: greater
+        - title: Mniejsza (<)
+          name: less
+      default: different
+
+    - name: nonpar
+      title: Nieparametrycznie (rangi)
+      type: Bool
+      default: false
+
+    - name: plot
+      title: Wykres estymacyjny
+      type: Bool
+      default: true
+
+    - name: ciWidth
+      title: Poziom ufności
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+
+    - name: desc
+      title: Statystyki opisowe
+      type: Bool
+      default: false
+
+    - name: perm
+      title: Test permutacyjny
+      type: Bool
+      default: false
+
+    - name: boot
+      title: Przedział bootstrapowy
+      type: Bool
+      default: false
+
+    - name: bf
+      title: Czynnik Bayesa
+      type: Bool
+      default: false
+
+    - name: norm
+      title: Normalność (Shapiro-Wilk)
+      type: Bool
+      default: false
+
+    - name: qq
+      title: Wykres Q-Q
+      type: Bool
+      default: false
+
+    - name: signTest
+      title: Test znaków
+      type: Bool
+      default: false
+...

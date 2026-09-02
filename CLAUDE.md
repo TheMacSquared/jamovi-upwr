@@ -280,3 +280,14 @@ zawsze `stats::anova(...)`. Ukrywanie analiz jmv: `JUPWR_HIDDEN_ANALYSES`
 w `client/common/jupwr.ts` (jmv::anovaonew, anova, ancova, anovarm) filtrowane
 w `client/main/ribbon/analysetab.ts` (także jmv::anovanp, anovarmnp); kod jmv
 nietknięty, stare pliki .omv otwierają się. MANCOVA jmv pozostaje widoczna.
+
+### Zadanie 15: jTestyT — testy t jUPWR zamiast testów t jmv — ZREALIZOWANE 0.1.0
+Katalog `jTestyT/` (wbudowany, menuGroup T-Tests): `ttestone`, `ttesttwo`,
+`ttestpaired` z panelem jak jANOVA (rdzeń: zmienne, Welch [dwie grupy],
+„Nieparametrycznie (rangi)" = Mann-Whitney/Wilcoxon, hipoteza, wykres;
+„Założenia": Shapiro, Q-Q, Levene; „Zaawansowane": poziom ufności, opisowe,
+permutacje, bootstrap, czynnik Bayesa, test znaków / K-S). Zawsze: różnica
+z CI i d Cohena z CI (niecentralny t, `dInterval`). Wykresy: estymacyjny
+Gardnera-Altmana (oś różnicy przy średniej drugiej grupy, jak w jCI), linie par,
+punkty z H₀. Ukryte w kliencie: jmv::ttestis, ttestps, ttestones. Zadanie 10:
+test znaków i K-S są tu, nie w jmv.

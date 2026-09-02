@@ -22,4 +22,8 @@ export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
     'jmv::anovarm',
     'jmv::anovanp',
     'jmv::anovarmnp',
+    // jTestyT replaces the jmv t-tests.
+    'jmv::ttestis',
+    'jmv::ttestps',
+    'jmv::ttestones',
 ]);

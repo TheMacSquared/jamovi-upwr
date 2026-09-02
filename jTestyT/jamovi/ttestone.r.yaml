@@ -1,0 +1,169 @@
+---
+name: ttestone
+title: Test t dla jednej próby
+jrs: '1.1'
+
+items:
+    - name: ttest
+      title: Test t dla jednej próby
+      type: Table
+      rows: 0
+      clearWith: &cw
+        - vars
+        - testValue
+        - hypothesis
+        - nonpar
+        - ciWidth
+      columns:
+        - name: var
+          title: ''
+          type: text
+          combineBelow: true
+        - name: test
+          title: Test
+          type: text
+        - name: stat
+          title: Statystyka
+          type: number
+        - name: df
+          title: df
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: est
+          title: Średnia − wartość testowa
+          type: number
+        - name: lower
+          title: Dolna
+          type: number
+          superTitle: Przedział ufności
+        - name: upper
+          title: Górna
+          type: number
+          superTitle: Przedział ufności
+        - name: es
+          title: Wielkość efektu
+          type: number
+        - name: esLower
+          title: Dolna
+          type: number
+          superTitle: CI efektu
+        - name: esUpper
+          title: Górna
+          type: number
+          superTitle: CI efektu
+
+    - name: extra
+      title: Dodatkowe testy i przedziały
+      type: Table
+      visible: (perm || boot || bf || signTest)
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: var
+          title: ''
+          type: text
+          combineBelow: true
+        - name: test
+          title: Test
+          type: text
+        - name: stat
+          title: Statystyka
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: lower
+          title: Dolna
+          type: number
+          superTitle: Przedział ufności
+        - name: upper
+          title: Górna
+          type: number
+          superTitle: Przedział ufności
+        - name: note
+          title: Uwagi
+          type: text
+
+    - name: desc
+      title: Statystyki opisowe
+      type: Table
+      visible: (desc)
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: var
+          title: ''
+          type: text
+          combineBelow: true
+        - name: group
+          title: Grupa
+          type: text
+        - name: n
+          title: n
+          type: integer
+        - name: mean
+          title: Średnia
+          type: number
+        - name: median
+          title: Mediana
+          type: number
+        - name: sd
+          title: SD
+          type: number
+        - name: se
+          title: SE
+          type: number
+
+    - name: norm
+      title: Normalność (Shapiro-Wilk)
+      type: Table
+      visible: (norm)
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: var
+          title: ''
+          type: text
+          combineBelow: true
+        - name: group
+          title: Grupa
+          type: text
+        - name: w
+          title: W
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: plots
+      title: Wykresy
+      type: Array
+      visible: (plot)
+      clearWith:
+        - vars
+        - testValue
+        - ciWidth
+      template:
+        title: ''
+        type: Image
+        width: 520
+        height: 400
+        renderFun: .plot
+
+    - name: qq
+      title: Wykresy Q-Q
+      type: Array
+      visible: (qq)
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 380
+        height: 340
+        renderFun: .qq
+...

@@ -27,6 +27,14 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   i Nemenyim w powtórzonych pomiarach. Przełącznik Welcha daje test Welcha
   przy jednym czynniku i test Welcha-Jamesa (Johansen) przy kilku, zgodny
   z welchADF. Ukryte w menu także jmv::anovanp i jmv::anovarmnp.
+- Nowy moduł jTestyT 0.1.0 (wbudowany) zastępuje w menu testy t z jmv (ukryte
+  w kliencie): jedna próba, dwie grupy, próby sparowane z tym samym prostym
+  panelem co jANOVA (przełączniki Welcha i rang, hipoteza, wykres), zawsze
+  z różnicą i d Cohena z przedziałami ufności (niecentralny t); wykres
+  estymacyjny Gardnera-Altmana z punktami, średnimi z CI i osią różnicy,
+  dla par z liniami łączącymi pomiary, dla jednej próby z linią H₀; opcjonalnie
+  wykres pudełkowy z punktami. W „Zaawansowanych": test permutacyjny, przedział
+  bootstrapowy, czynnik Bayesa, test znaków, K-S dwóch prób.
 - jRol 0.1.0 (doświadczalnictwo rolnicze) jako nowy moduł OPCJONALNY `.jmo`:
   układ całkowicie losowy, losowanych bloków, kwadrat łaciński i split-plot
   z tabelą ANOVA o właściwych błędach, porównania wielokrotne z literami
@@ -40,7 +48,7 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - CLAUDE.md: kolejka zadań 8–13 (Eksploracja, testy nieparametryczne,
   jSzereg, jMoc, jML) i zadanie 14 (jANOVA).
 - Moduły: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.2, jCI 0.1.0, jperm 0.1.0,
-  jboot 0.3.0, jDane 0.5.0, jANOVA 0.2.0; opcjonalne: jRISK 0.3.2,
+  jboot 0.3.0, jDane 0.5.0, jANOVA 0.2.0, jTestyT 0.1.0; opcjonalne: jRISK 0.3.2,
   jSpace 0.2.0, jRol 0.1.0.
 
 ## 0.9.2.2 — 2026-08-31

@@ -225,6 +225,10 @@ COPY $JAMOVI_ROOT/jANOVA/ /tmp/source/jANOVA
 WORKDIR /tmp/source/jANOVA
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
+COPY $JAMOVI_ROOT/jTestyT/ /tmp/source/jTestyT
+WORKDIR /tmp/source/jTestyT
+RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
+
 
 
 ##### I18N #####
