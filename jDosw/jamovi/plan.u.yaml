@@ -1,0 +1,58 @@
+title: Plan doświadczenia
+name: plan
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Układ i rozmiar
+            children:
+              - type: ComboBox
+                name: design
+              - type: TextBox
+                name: nTreat
+                format: number
+              - type: TextBox
+                name: nRep
+                format: number
+                enable: (design:crd || design:rcbd || design:splitplot)
+              - type: TextBox
+                name: nSub
+                format: number
+                enable: (design:splitplot)
+              - type: TextBox
+                name: seed
+                format: number
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Etykiety
+            children:
+              - type: TextBox
+                name: labelsA
+                format: string
+                width: large
+              - type: TextBox
+                name: labelsB
+                format: string
+                width: large
+                enable: (design:splitplot)
+          - type: Label
+            label: Wyniki
+            children:
+              - type: CheckBox
+                name: showMap

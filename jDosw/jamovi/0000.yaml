@@ -1,0 +1,52 @@
+---
+title: Doświadczalnictwo rolnicze
+name: jDosw
+version: 0.1.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: >
+  Klasyczne układy doświadczalne: ANOVA z właściwymi błędami, porównania
+  wielokrotne z grupami jednorodnymi i NIR, wykresy średnich, plan
+  doświadczenia.
+analyses:
+  - title: Układ całkowicie losowy
+    name: crd
+    ns: jDosw
+    menuGroup: Doświadczalnictwo
+    menuTitle: Układ całkowicie losowy
+    menuSubgroup: Układy doświadczalne
+    category: analyses
+  - title: Układ losowanych bloków
+    name: rcbd
+    ns: jDosw
+    menuGroup: Doświadczalnictwo
+    menuTitle: Układ losowanych bloków
+    menuSubgroup: Układy doświadczalne
+    category: analyses
+  - title: Kwadrat łaciński
+    name: latin
+    ns: jDosw
+    menuGroup: Doświadczalnictwo
+    menuTitle: Kwadrat łaciński
+    menuSubgroup: Układy doświadczalne
+    category: analyses
+  - title: Układ split-plot
+    name: splitplot
+    ns: jDosw
+    menuGroup: Doświadczalnictwo
+    menuTitle: Split-plot (zależny)
+    menuSubgroup: Układy doświadczalne
+    category: analyses
+  - title: Plan doświadczenia
+    name: plan
+    ns: jDosw
+    menuGroup: Doświadczalnictwo
+    menuTitle: Plan doświadczenia (randomizacja)
+    menuSubgroup: Planowanie
+    category: analyses
+usesNative: true
+minApp: 1.0.8
+
+...

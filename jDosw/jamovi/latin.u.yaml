@@ -1,0 +1,114 @@
+title: Kwadrat łaciński
+name: latin
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Zmienna zależna
+        children:
+          - type: VariablesListBox
+            name: dep
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Czynnik
+        children:
+          - type: VariablesListBox
+            name: factorA
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Wiersz
+        children:
+          - type: VariablesListBox
+            name: row
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Kolumna
+        children:
+          - type: VariablesListBox
+            name: col
+            isTarget: true
+            maxItemCount: 1
+  - type: CollapseBox
+    label: Porównania wielokrotne
+    collapsed: false
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: ComboBox
+                name: postHoc
+              - type: TextBox
+                name: alpha
+                format: number
+              - type: LevelSelector
+                name: controlA
+                enable: (postHoc:dunnett && factorA)
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Porównuj poziomy
+                children:
+                  - type: CheckBox
+                    name: phA
+              - type: CheckBox
+                name: showPairs
+  - type: CollapseBox
+    label: Wykresy
+    collapsed: false
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: CheckBox
+                name: plotMeans
+              - type: ComboBox
+                name: errorBars
+                enable: (plotMeans)
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: CheckBox
+                name: residPlot
+  - type: CollapseBox
+    label: Założenia
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        children:
+          - type: CheckBox
+            name: homog
+          - type: CheckBox
+            name: norm

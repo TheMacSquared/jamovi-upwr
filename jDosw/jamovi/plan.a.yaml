@@ -1,0 +1,70 @@
+---
+name: plan
+title: Plan doświadczenia
+menuGroup: Doświadczalnictwo
+menuSubgroup: Planowanie
+menuTitle: Plan doświadczenia (randomizacja)
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: design
+      title: Układ
+      type: List
+      options:
+        - title: Całkowicie losowy
+          name: crd
+        - title: Losowanych bloków
+          name: rcbd
+        - title: Kwadrat łaciński
+          name: latin
+        - title: Split-plot
+          name: splitplot
+      default: rcbd
+
+    - name: nTreat
+      title: Liczba obiektów (czynnik A)
+      type: Integer
+      min: 2
+      max: 30
+      default: 4
+
+    - name: nRep
+      title: Liczba powtórzeń / bloków
+      type: Integer
+      min: 1
+      max: 30
+      default: 3
+
+    - name: nSub
+      title: Liczba poziomów czynnika B (split-plot)
+      type: Integer
+      min: 2
+      max: 20
+      default: 3
+
+    - name: labelsA
+      title: Nazwy obiektów A (po przecinku)
+      type: String
+      default: ''
+
+    - name: labelsB
+      title: Nazwy poziomów B (po przecinku)
+      type: String
+      default: ''
+
+    - name: seed
+      title: Ziarno losowania
+      type: Integer
+      min: 1
+      max: 999999
+      default: 1
+
+    - name: showMap
+      title: Mapa pola
+      type: Bool
+      default: true
+...

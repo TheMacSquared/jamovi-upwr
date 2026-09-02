@@ -1,0 +1,221 @@
+---
+name: crd
+title: Układ całkowicie losowy
+jrs: '1.1'
+
+items:
+    - name: anova
+      title: Analiza wariancji
+      type: Table
+      rows: 0
+      clearWith:
+        - dep
+        - factorA
+        - factorB
+      columns:
+        - name: source
+          title: Źródło zmienności
+          type: text
+        - name: ss
+          title: SS
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: ms
+          title: MS
+          type: number
+        - name: F
+          title: F
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: err
+          title: Błąd
+          type: text
+          visible: false
+
+    - name: means
+      title: Średnie i grupy jednorodne
+      type: Array
+      clearWith:
+        - dep
+        - factorA
+        - factorB
+        - alpha
+        - postHoc
+        - controlA
+        - controlB
+        - phA
+        - phB
+        - phAB
+      template:
+        title: ''
+        type: Table
+        rows: 0
+        columns:
+          - name: level
+            title: Poziom
+            type: text
+          - name: n
+            title: n
+            type: integer
+          - name: mean
+            title: Średnia
+            type: number
+          - name: se
+            title: SE
+            type: number
+          - name: letters
+            title: Grupa
+            type: text
+
+    - name: pairs
+      title: Porównania parami
+      type: Array
+      visible: (showPairs)
+      clearWith:
+        - dep
+        - factorA
+        - factorB
+        - alpha
+        - postHoc
+        - controlA
+        - controlB
+        - phA
+        - phB
+        - phAB
+      template:
+        title: ''
+        type: Table
+        rows: 0
+        columns:
+          - name: g1
+            title: Poziom 1
+            type: text
+          - name: g2
+            title: Poziom 2
+            type: text
+          - name: diff
+            title: Różnica
+            type: number
+          - name: se
+            title: SE
+            type: number
+          - name: df
+            title: df
+            type: number
+          - name: stat
+            title: t
+            type: number
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+          - name: crit
+            title: Różnica graniczna
+            type: number
+          - name: lower
+            title: Dolna
+            type: number
+            superTitle: Przedział ufności
+          - name: upper
+            title: Górna
+            type: number
+            superTitle: Przedział ufności
+
+    - name: homog
+      title: Jednorodność wariancji
+      type: Table
+      visible: (homog)
+      rows: 0
+      clearWith:
+        - dep
+        - factorA
+        - factorB
+      columns:
+        - name: test
+          title: Test
+          type: text
+        - name: stat
+          title: Statystyka
+          type: number
+        - name: df1
+          title: df1
+          type: integer
+        - name: df2
+          title: df2
+          type: integer
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: norm
+      title: Normalność reszt (Shapiro-Wilk)
+      type: Table
+      visible: (norm)
+      rows: 1
+      clearWith:
+        - dep
+        - factorA
+        - factorB
+      columns:
+        - name: w
+          title: W
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: plotMeans
+      title: Wykresy średnich
+      type: Array
+      visible: (plotMeans)
+      clearWith:
+        - dep
+        - factorA
+        - factorB
+        - alpha
+        - postHoc
+        - controlA
+        - controlB
+        - phA
+        - phB
+        - phAB
+        - errorBars
+      template:
+        title: ''
+        type: Image
+        width: 500
+        height: 380
+        renderFun: .meansPlot
+
+    - name: plotInteraction
+      title: Wykres interakcji
+      type: Image
+      visible: (plotInteraction)
+      width: 500
+      height: 380
+      renderFun: .interactionPlot
+      clearWith:
+        - dep
+        - factorA
+        - factorB
+
+    - name: residPlot
+      title: Reszty
+      type: Image
+      visible: (residPlot)
+      width: 450
+      height: 350
+      renderFun: .residPlot
+      clearWith:
+        - dep
+        - factorA
+        - factorB
+
+...

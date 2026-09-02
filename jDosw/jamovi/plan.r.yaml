@@ -1,0 +1,63 @@
+---
+name: plan
+title: Plan doświadczenia
+jrs: '1.1'
+
+items:
+    - name: info
+      title: Opis układu
+      type: Html
+      clearWith:
+        - design
+        - nTreat
+        - nRep
+        - nSub
+
+    - name: plan
+      title: Przydział obiektów do poletek
+      type: Table
+      rows: 0
+      clearWith:
+        - design
+        - nTreat
+        - nRep
+        - nSub
+        - labelsA
+        - labelsB
+        - seed
+      columns:
+        - name: plot
+          title: Poletko
+          type: integer
+        - name: block
+          title: Blok
+          type: integer
+        - name: row
+          title: Wiersz
+          type: integer
+        - name: col
+          title: Kolumna
+          type: integer
+        - name: A
+          title: Obiekt A
+          type: text
+        - name: B
+          title: Poziom B
+          type: text
+
+    - name: map
+      title: Mapa pola
+      type: Image
+      visible: (showMap)
+      width: 560
+      height: 420
+      renderFun: .planPlot
+      clearWith:
+        - design
+        - nTreat
+        - nRep
+        - nSub
+        - labelsA
+        - labelsB
+        - seed
+...

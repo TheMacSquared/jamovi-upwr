@@ -1,0 +1,142 @@
+---
+name: rcbd
+title: Układ losowanych bloków
+menuGroup: Doświadczalnictwo
+menuSubgroup: Układy doświadczalne
+menuTitle: Układ losowanych bloków
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: dep
+      title: Zmienna zależna
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: factorA
+      title: Czynnik A
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: factorB
+      title: Czynnik B (opcjonalnie)
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: block
+      title: Blok
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: alpha
+      title: Poziom istotności α
+      type: Number
+      min: 0.001
+      max: 0.5
+      default: 0.05
+
+    - name: postHoc
+      title: Test porównań wielokrotnych
+      type: List
+      options:
+        - title: Tukeya (HSD)
+          name: tukey
+        - title: NIR (LSD Fishera)
+          name: lsd
+        - title: Scheffégo
+          name: scheffe
+        - title: Dunnetta (vs kontrola)
+          name: dunnett
+        - title: t z poprawką Holma
+          name: holm
+        - title: Brak (tylko średnie)
+          name: none
+      default: tukey
+
+    - name: controlA
+      title: Kontrola (czynnik A)
+      type: Level
+      variable: (factorA)
+
+    - name: phA
+      title: Czynnik A
+      type: Bool
+      default: true
+
+    - name: controlB
+      title: Kontrola (czynnik B)
+      type: Level
+      variable: (factorB)
+
+    - name: phB
+      title: Czynnik B
+      type: Bool
+      default: true
+
+    - name: phAB
+      title: Kombinacje A × B
+      type: Bool
+      default: false
+
+    - name: showPairs
+      title: Tabela porównań parami
+      type: Bool
+      default: false
+
+    - name: homog
+      title: Jednorodność wariancji (Levene, Bartlett)
+      type: Bool
+      default: false
+
+    - name: norm
+      title: Normalność reszt (Shapiro-Wilk)
+      type: Bool
+      default: false
+
+    - name: residPlot
+      title: Reszty vs wartości dopasowane
+      type: Bool
+      default: false
+
+    - name: plotMeans
+      title: Wykres średnich z literami
+      type: Bool
+      default: true
+
+    - name: errorBars
+      title: Słupki błędów
+      type: List
+      options:
+        - title: Błąd standardowy (SE)
+          name: se
+        - title: Przedział ufności
+          name: ci
+        - title: Odchylenie standardowe (SD)
+          name: sd
+        - title: Brak
+          name: none
+      default: se
+
+    - name: plotInteraction
+      title: Wykres interakcji
+      type: Bool
+      default: false
+...

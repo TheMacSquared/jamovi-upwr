@@ -43,6 +43,7 @@ za wybraną paletą. Czcionki dołączone do dystrybucji.
 | **jperm** | Testy permutacyjne |
 | **jCI** | Przedziały ufności z wykresami dydaktycznymi (waffle, Gardner–Altman, scatter + regresja); wybór 2 kategorii z wielu poziomów; grupowanie |
 | **jDane** | Zbiory danych do zajęć, z tagami tematycznymi (Otwórz → Biblioteka). Sam moduł nie wnosi analiz |
+| **jDosw** | Doświadczalnictwo rolnicze: układ całkowicie losowy, losowanych bloków, kwadrat łaciński i split-plot (ANOVA z właściwymi błędami), porównania wielokrotne (Tukey, NIR, Scheffé, Dunnett, Holm) z grupami jednorodnymi i wartością NIR, wykresy średnich z literami i interakcji, diagnostyka (Levene, Bartlett, Shapiro reszt) oraz generator planu doświadczenia z mapą pola |
 
 ### Moduły opcjonalne (`.jmo`, sideload)
 Moduł obsługujący **jeden kurs** nie jest preinstalowany — studenci tego kursu
