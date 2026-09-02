@@ -183,7 +183,7 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   a rozkładową rolę boxplota pełni raincloud w Rozkładach.
 - branding jUPWR: nazwa, ikony (icns/ico/iconset), wersja dystrybucji
   w client/common/jupwr.ts (patrz sekcja Wersje)
-- jANOVA 0.1.0 (wbudowany) zastępuje w menu ANOVA analizy jmv (jednoczynnikowa,
+- jANOVA 0.2.0 (wbudowany) zastępuje w menu ANOVA analizy jmv (jednoczynnikowa,
   ANOVA, ANCOVA, powtórzonych pomiarów) — lista ukrytych w client/common/jupwr.ts
 
 Nowe zadania dopisuj poniżej jako "### Zadanie N: ..." z plikiem docelowym
@@ -249,7 +249,7 @@ metryki (dokładność, precyzja, czułość, F1, kappa; RMSE, MAE, R²). Zależ
 class, rpart, cluster, MASS, nnet (recommended, w R jamovi). Analiza klasyfikacji
 w jSpace zostaje bez zmian (kontekst kosmiczny). Biplot PCA jako opcja w jmv pca.
 
-### Zadanie 14: jANOVA — ANOVA jUPWR zamiast ANOVY jmv (wariant D) — ZREALIZOWANE 0.1.0
+### Zadanie 14: jANOVA — ANOVA jUPWR zamiast ANOVY jmv (wariant D) — ZREALIZOWANE 0.2.0
 Katalog `jANOVA/` (wbudowany), menuGroup ANOVA (pozycje lądują w menu ANOVA obok
 testów nieparametrycznych jmv). Analizy: `anova` (zależna, czynniki, czynniki
 blokujące addytywne, kowarianty; SS typu I/II/III przez car::Anova z contr.sum;
