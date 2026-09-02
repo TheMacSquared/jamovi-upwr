@@ -120,3 +120,32 @@ test_that("ART reproduces ARTool (fixed and repeated measures)", {
     refF <- setNames(refRm[["F value"]], key(as.character(refRm$Term)))
     expect_equal(rm$F, unname(refF[key(rm$term)]), tolerance = 1e-8)
 })
+
+test_that("Welch-James reduces to Welch for one factor and matches welchADF for two", {
+    w1 <- welchJamesTable(PlantGrowth, "weight", "group")
+    ref <- oneway.test(weight ~ group, PlantGrowth)
+    expect_equal(w1$F, unname(ref$statistic))
+    expect_equal(w1$df2, unname(ref$parameter[2]))
+    expect_equal(w1$p, ref$p.value)
+    skip_if_not_installed("welchADF")
+    tg <- ToothGrowth; tg$dose <- factor(tg$dose)
+    w2 <- welchJamesTable(tg, "len", c("supp", "dose"))
+    ref2 <- welchADF::welchADF.test(len ~ supp * dose, data = tg)
+    for (nm in setdiff(names(ref2), c("call", "model"))) {
+        row <- w2[vapply(w2$term, function(t) setequal(strsplit(t, ":", fixed = TRUE)[[1]],
+            strsplit(nm, ":", fixed = TRUE)[[1]]), TRUE), ]
+        expect_equal(row$F, ref2[[nm]]$welch.T, tolerance = 1e-6, info = nm)
+        expect_equal(row$df2, ref2[[nm]]$denominatorDF, tolerance = 1e-6, info = nm)
+        expect_equal(row$p, ref2[[nm]]$pval, tolerance = 1e-6, info = nm)
+    }
+})
+
+test_that("HC3 table matches car::Anova with white.adjust", {
+    tg <- ToothGrowth; tg$dose <- factor(tg$dose)
+    r <- fitAnova(tg, "len", c("supp", "dose"), ssType = "3")
+    rb <- robustAnovaTable(r$fit, "3")
+    ref <- car::Anova(r$fit, type = 3, white.adjust = "hc3")
+    expect_equal(rb$F, ref[c("supp", "dose", "supp:dose"), "F"])
+    tm <- termMeans(r$fit, "dose", vcov = robustVcov(r$fit))
+    expect_false(isTRUE(all.equal(tm$means$se, termMeans(r$fit, "dose")$means$se)))
+})

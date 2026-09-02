@@ -52,12 +52,15 @@ items:
           visible: (omega)
 
     - name: welch
-      title: ANOVA Welcha (bez założenia równych wariancji)
+      title: Test Welcha-Jamesa (bez założenia równych wariancji)
       type: Table
       visible: (welch)
-      rows: 1
+      rows: 0
       clearWith: *cw
       columns:
+        - name: source
+          title: Efekt
+          type: text
         - name: F
           title: F
           type: number
@@ -66,6 +69,27 @@ items:
           type: number
         - name: df2
           title: df2
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: robust
+      title: ANOVA z odpornymi błędami standardowymi (HC3)
+      type: Table
+      visible: (robust)
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: source
+          title: Źródło zmienności
+          type: text
+        - name: df
+          title: df
+          type: integer
+        - name: F
+          title: F
           type: number
         - name: p
           title: p
@@ -272,6 +296,8 @@ items:
         - postHoc
         - phMain
         - phInter
+        - robust
+        - robust
       template:
         title: ''
         type: Table

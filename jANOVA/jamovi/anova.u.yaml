@@ -54,6 +54,8 @@ children:
                 name: interactions
               - type: CheckBox
                 name: welch
+              - type: CheckBox
+                name: robust
               - type: Label
                 label: Nieparametryczne
                 children:

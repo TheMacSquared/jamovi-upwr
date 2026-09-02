@@ -25,7 +25,11 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   rangach z literami (jak art.con). Panele włączają opcje warunkowo: testy
   jednoczynnikowe i Welch tylko przy jednym czynniku, ART i interakcje przy
   co najmniej dwóch; metody porównań w jednej sekcji. Ukryte w menu także
-  jmv::anovanp i jmv::anovarmnp.
+  jmv::anovanp i jmv::anovarmnp. Niejednorodność wariancji: test Welcha-
+  Jamesa (Johansen, ADF) dla pełnych układów czynnikowych — przy jednym
+  czynniku to zwykły Welch (własna implementacja zgodna z welchADF) oraz
+  ANOVA z odpornymi błędami HC3 (car::Anova), z odpornymi SE w średnich
+  brzegowych i porównaniach parami.
 - jRol 0.1.0 (doświadczalnictwo rolnicze) jako nowy moduł OPCJONALNY `.jmo`:
   układ całkowicie losowy, losowanych bloków, kwadrat łaciński i split-plot
   z tabelą ANOVA o właściwych błędach, porównania wielokrotne z literami

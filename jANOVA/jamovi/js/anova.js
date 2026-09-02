@@ -15,7 +15,7 @@ const refresh = function(ui) {
     let oneFactor = nFactors === 1 && extra === 0;
     let factorial = nFactors >= 2;
 
-    ui.welch.setPropertyValue('enable', oneFactor);
+    ui.welch.setPropertyValue('enable', nFactors >= 1 && extra === 0);
     ui.kruskal.setPropertyValue('enable', oneFactor);
     ui.jonckheere.setPropertyValue('enable', oneFactor);
     ui.medianTest.setPropertyValue('enable', oneFactor);

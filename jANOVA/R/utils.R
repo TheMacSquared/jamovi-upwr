@@ -98,8 +98,8 @@ welchTable <- function(d, dep, factor) {
 # ---------------------------------------------------------------------------
 
 # term: character vector of factor names (1 = main effect, 2 = cells)
-termMeans <- function(fit, term, alpha = 0.05) {
-    emm <- emmFor(fit, term)
+termMeans <- function(fit, term, alpha = 0.05, vcov = NULL) {
+    emm <- emmFor(fit, term, vcov)
     s <- as.data.frame(summary(emm, level = 1 - alpha, infer = c(TRUE, FALSE)))
     levs <- do.call(paste, c(lapply(term, function(v) as.character(s[[v]])), sep = " × "))
     ciCols <- grep("^(lower|upper)\\.", names(s), value = TRUE)
@@ -205,8 +205,8 @@ cldLetters <- function(levs, sigPairs) {
 }
 
 # Full comparison bundle for one term.
-compareTerm <- function(fit, term, method, alpha, control = NULL, mse = NULL) {
-    tm <- termMeans(fit, term, alpha)
+compareTerm <- function(fit, term, method, alpha, control = NULL, mse = NULL, vcov = NULL) {
+    tm <- termMeans(fit, term, alpha, vcov)
     means <- tm$means
     if (method == "none") {
         means$letters <- ""
@@ -381,8 +381,10 @@ qqPlot <- function(image, ggtheme, theme) {
 # Shared emmeans entry point: afex models use the univariate (aov) model so
 # that df and pooled errors match the ANOVA table; within-factor levels come
 # back as syntactic names (make.names), which we map back to the originals.
-emmFor <- function(fit, term) {
+emmFor <- function(fit, term, vcov = NULL) {
     spec <- stats::as.formula(paste("~", paste(bt(term), collapse = " * ")))
+    if (!is.null(vcov) && !inherits(fit, "afex_aov"))
+        return(suppressMessages(emmeans::emmeans(fit, specs = spec, vcov. = vcov)))
     if (inherits(fit, "afex_aov")) {
         emm <- suppressMessages(emmeans::emmeans(fit, specs = spec, model = "univariate"))
         origLevels <- attr(fit, "jupwrLevels")
@@ -660,4 +662,74 @@ artMainEffectComparisons <- function(d, dep, factors, term, method, alpha,
         mse <- rmMseFor(res$an0, term)
     }
     compareTerm(fit, term, method, alpha, control = NULL, mse = mse)
+}
+
+# ---------------------------------------------------------------------------
+# Heteroscedasticity: Welch-James (Johansen) test and HC3-robust ANOVA
+# ---------------------------------------------------------------------------
+
+# Successive-difference contrast rows for a factor with k levels
+diffMatrix <- function(k) {
+    D <- matrix(0, k - 1, k)
+    for (i in seq_len(k - 1)) { D[i, i] <- 1; D[i, i + 1] <- -1 }
+    D
+}
+
+# Welch-James / Johansen (1980) approximate df F tests for every effect of a
+# full factorial on cell means with separate cell variances. With a single
+# factor this is exactly Welch's ANOVA (oneway.test).
+welchJamesTable <- function(d, dep, factors) {
+    for (v in factors) d[[v]] <- droplevels(factor(d[[v]]))
+    levs <- lapply(factors, function(v) levels(d[[v]])); names(levs) <- factors
+    ks <- vapply(levs, length, 1L)
+    # cell order: first factor slowest (Kronecker order)
+    grid <- expand.grid(rev(levs), stringsAsFactors = FALSE)[, rev(seq_along(factors)), drop = FALSE]
+    names(grid) <- factors
+    key <- function(df) do.call(paste, c(lapply(factors, function(v) as.character(df[[v]])), sep = "\r"))
+    cellKey <- key(grid); dataKey <- key(d)
+    y <- d[[dep]]
+    n <- as.numeric(table(factor(dataKey, levels = cellKey)))
+    if (any(n < 2)) stop("Test Welcha-Jamesa wymaga co najmniej 2 obserwacji w każdej komórce.")
+    m <- as.numeric(tapply(y, factor(dataKey, levels = cellKey), mean))
+    s2 <- as.numeric(tapply(y, factor(dataKey, levels = cellKey), stats::var))
+    Sigma <- diag(s2 / n, length(n))
+    J <- length(n)
+    termSets <- unlist(lapply(seq_along(factors), function(o) utils::combn(factors, o, simplify = FALSE)), recursive = FALSE)
+    rows <- list()
+    for (ts in termSets) {
+        C <- 1
+        for (v in factors) {
+            blk <- if (v %in% ts) diffMatrix(ks[[v]]) else matrix(1 / ks[[v]], 1, ks[[v]])
+            C <- kronecker(C, blk)
+        }
+        q <- nrow(C)
+        CSC <- C %*% Sigma %*% t(C)
+        T <- as.numeric(t(C %*% m) %*% solve(CSC, C %*% m))
+        M <- Sigma %*% t(C) %*% solve(CSC) %*% C
+        A <- 0
+        for (j in seq_len(J)) {
+            Qj <- diag(0, J); Qj[j, j] <- 1
+            MQ <- M %*% Qj
+            tr <- sum(diag(MQ))
+            A <- A + (sum(diag(MQ %*% MQ)) + tr^2) / (n[j] - 1)
+        }
+        A <- A / 2
+        Fst <- T / (q + 2 * A - 6 * A / (q + 2))
+        df2 <- q * (q + 2) / (3 * A)
+        term <- paste(ts, collapse = ":")
+        rows[[term]] <- data.frame(term = term, source = termLabel(term), F = Fst, df1 = q, df2 = df2,
+            p = stats::pf(Fst, q, df2, lower.tail = FALSE), stringsAsFactors = FALSE)
+    }
+    out <- do.call(rbind, rows); rownames(out) <- NULL; out
+}
+
+# HC3 (White) heteroscedasticity-consistent covariance for an lm
+robustVcov <- function(fit) car::hccm(fit, type = "hc3")
+
+robustAnovaTable <- function(fit, ssType = "3") {
+    type <- if (ssType == "2") 2 else 3
+    an <- suppressMessages(car::Anova(fit, type = type, white.adjust = "hc3"))
+    an <- an[!rownames(an) %in% c("(Intercept)", "Residuals"), , drop = FALSE]
+    data.frame(term = rownames(an), source = termLabel(rownames(an)), df = an[["Df"]],
+        F = an[["F"]], p = an[["Pr(>F)"]], type = type, stringsAsFactors = FALSE)
 }

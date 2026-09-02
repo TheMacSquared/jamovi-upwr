@@ -76,14 +76,38 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (length(unique(table(cells))) > 1 && opts$ss == "1")
                 at$setNote("unbal", "Układ niezrównoważony: przy typie I wynik zależy od kolejności czynników.")
 
-            # Welch
+            # Welch / Welch-James (factors only)
             if (isTRUE(opts$welch)) {
                 wt <- self$results$welch
-                if (length(factors) == 1 && length(blocks) == 0 && length(covs) == 0) {
-                    w <- welchTable(d, dep, factors)
-                    wt$setRow(rowNo = 1, values = as.list(w))
+                if (length(blocks) > 0 || length(covs) > 0) {
+                    wt$setNote("na", "Test Welcha-Jamesa jest dostępny tylko dla modelu z samymi czynnikami (bez bloków i kowariant).")
                 } else {
-                    wt$setNote("na", "Test Welcha jest dostępny tylko dla jednego czynnika bez bloków i kowariant.")
+                    w <- tryCatch(welchJamesTable(d, dep, factors), error = function(e) e)
+                    if (inherits(w, "error")) wt$setNote("err", conditionMessage(w))
+                    else {
+                        for (i in seq_len(nrow(w))) {
+                            r <- w[i, ]
+                            wt$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
+                        }
+                        wt$setNote("wj", if (length(factors) == 1) "Test Welcha (oneway.test) — jeden czynnik."
+                            else "Test Welcha-Jamesa (Johansen, 1980) z przybliżonymi stopniami swobody; osobne wariancje komórek, pełny model czynnikowy.")
+                    }
+                }
+            }
+
+            # HC3-robust ANOVA table
+            robustV <- NULL
+            if (isTRUE(opts$robust)) {
+                rt <- self$results$robust
+                rb <- tryCatch(robustAnovaTable(res$fit, opts$ss), error = function(e) e)
+                if (inherits(rb, "error")) rt$setNote("err", conditionMessage(rb))
+                else {
+                    for (i in seq_len(nrow(rb))) {
+                        r <- rb[i, ]
+                        rt$addRow(rowKey = r$term, values = list(source = r$source, df = r$df, F = r$F, p = r$p))
+                    }
+                    rt$setNote("hc3", sprintf("Testy F z macierzą kowariancji HC3 (White); sumy kwadratów typu %s. Średnie brzegowe i porównania parami poniżej używają odpornych SE.", rb$type[1]))
+                    robustV <- tryCatch(robustVcov(res$fit), error = function(e) NULL)
                 }
             }
 
@@ -175,7 +199,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 mt <- self$results$means$get(key = k)
                 pt <- self$results$pairs$get(key = k)
                 img <- self$results$plotMeans$get(key = k)
-                cmp <- tryCatch(compareTerm(res$fit, term, method, alpha, control = NULL, mse = res$mse),
+                cmp <- tryCatch(compareTerm(res$fit, term, method, alpha, control = NULL, mse = res$mse, vcov = robustV),
                     error = function(e) e)
                 if (inherits(cmp, "error")) {
                     mt$setNote("err", paste("Nie można policzyć średnich:", conditionMessage(cmp)))
@@ -196,6 +220,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     mt$setNote("cld", paste0("Średnie brzegowe z modelu; ", phMethodLabel(method), "; ", cmp$critNote,
                         ". Poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią."))
                 }
+                if (!is.null(robustV)) mt$setNote("hc3", "SE i przedziały z odpornej macierzy HC3.")
                 if (!is.null(cmp$pairs)) {
                     for (i in seq_len(nrow(cmp$pairs))) {
                         r <- cmp$pairs[i, ]

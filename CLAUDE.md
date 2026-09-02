@@ -268,6 +268,11 @@ i `anovarm.js` (jus 3.0: handlery `<kontrolka>_changed`, `view_updated`,
 `ui.x.setPropertyValue('enable', …)`) włączają testy jednoczynnikowe/Welch przy
 jednym czynniku, ART i interakcje przy ≥ 2; metody porównań (parametryczne,
 Dunn, Nemenyi/Conover) w jednej sekcji „Porównania wielokrotne".
+Niejednorodność wariancji: `welchJamesTable` (Johansen 1980: kontrasty
+Kroneckera z macierzy różnic, Σ = diag(s²/n), F = T/(q+2A−6A/(q+2)),
+df2 = q(q+2)/(3A); przy 1 czynniku = oneway.test; walidacja z welchADF,
+którego nie ma na CRAN dla R 4.6 — instalować z archiwum) i `robustAnovaTable`
+(car::Anova white.adjust="hc3", car::hccm do emmeans przez `vcov`).
 PUŁAPKA: wrapper analizy `anova()` zasłania `stats::anova` — w kodzie modułu
 zawsze `stats::anova(...)`. Ukrywanie analiz jmv: `JUPWR_HIDDEN_ANALYSES`
 w `client/common/jupwr.ts` (jmv::anovaonew, anova, ancova, anovarm) filtrowane
