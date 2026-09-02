@@ -96,7 +96,7 @@ options:
     - name: showPairs
       title: Tabela porównań parami
       type: Bool
-      default: true
+      default: false
 
     - name: homog
       title: Jednorodność wariancji (Levene, Bartlett)

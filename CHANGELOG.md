@@ -11,8 +11,7 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   „ANOVA": czynniki, czynniki blokujące (addytywne), kowarianty, SS typu
   I/II/III, Welch dla jednego czynnika, η²/η²p/ω², porównania wielokrotne
   na średnich brzegowych (Tukey, NIR, Scheffé, Dunnett, Holm, Bonferroni)
-  z grupami jednorodnymi (litery), tabelą par z p-value (domyślnie włączoną),
-  różnicą graniczną i d Cohena, kontrasty,
+  z grupami jednorodnymi (litery), różnicą graniczną i d Cohena, kontrasty,
   Levene/Bartlett/Shapiro, Q-Q, reszty do arkusza, wykresy średnich z literami
   i interakcji. „ANOVA powtórzonych pomiarów" pracuje na danych w formacie
   długim (afex): jednostka, czynniki wewnątrz- i międzyobiektowe, kowarianty,
