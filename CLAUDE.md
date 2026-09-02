@@ -286,11 +286,11 @@ Katalog `jTestyT/` (wbudowany, menuGroup T-Tests): `ttestone`, `ttesttwo`,
 `ttestpaired` z PŁASKIM panelem w stylu jmv (decyzja: testy t są zbyt proste
 na podział rdzeń/zaawansowane; każdy test to osobny checkbox, żeby dało się
 odznaczyć Studenta i zostawić Wilcoxona): „Testy" (t Studenta, t Welcha [dwie
-grupy], Mann-Whitney / Wilcoxon, K-S [dwie grupy]), „Hipoteza" (wartość
+grupy], Mann-Whitney / Wilcoxon), „Hipoteza" (wartość
 testowa + lista), „Dodatkowe statystyki" (poziom ufności, opisowe), „Wykres",
 „Sprawdzenie założeń" (Shapiro, Q-Q, Levene). Zawsze: różnica z CI i d Cohena
 z CI (niecentralny t, `dInterval`). Wykresy: grup i różnicy (Gardner-Altman,
 oś różnicy po prawej zakotwiczona w średniej drugiej grupy), par i różnicy,
 średniej z H₀. Usunięte świadomie: czynnik Bayesa (osobny moduł w planach),
-permutacje i bootstrap (są w jperm/jboot), test znaków. Ukryte w kliencie:
+permutacje i bootstrap (są w jperm/jboot), test znaków, K-S. Ukryte w kliencie:
 jmv::ttestis, ttestps, ttestones.

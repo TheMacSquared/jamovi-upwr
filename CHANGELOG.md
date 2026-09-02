@@ -30,7 +30,7 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - Nowy moduł jTestyT 0.1.0 (wbudowany) zastępuje w menu testy t z jmv (ukryte
   w kliencie): jedna próba, dwie grupy, próby sparowane z płaskim panelem jak
   w jmv — każdy test to osobny checkbox (t Studenta, t Welcha, Mann-Whitney /
-  Wilcoxon, K-S), więc odznaczenie Studenta usuwa jego wiersz z tabeli;
+  Wilcoxon), więc odznaczenie Studenta usuwa jego wiersz z tabeli;
   hipoteza alternatywna i wartość testowa w jednej sekcji, poziom ufności,
   opisowe, sprawdzenie założeń (Shapiro, Q-Q, Levene). Zawsze różnica
   i d Cohena z przedziałami ufności (niecentralny t). Wykresy: grup i różnicy

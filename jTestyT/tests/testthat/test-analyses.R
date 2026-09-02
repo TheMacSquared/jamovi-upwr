@@ -12,9 +12,9 @@ test_that("one-sample analysis fills tables and plots", {
 
 test_that("two-group analysis: Welch, Mann-Whitney, Levene, plots", {
     res <- jTestyT:::ttesttwo(data = sleep, vars = "extra", group = "group", welch = TRUE, nonpar = TRUE,
-                             homog = TRUE, ks = TRUE)
+                             homog = TRUE)
     tt <- res$ttest$asDF
-    expect_equal(tt$test, c("t Studenta", "t Welcha", "Manna-Whitneya U", "Kołmogorowa-Smirnowa D"))
+    expect_equal(tt$test, c("t Studenta", "t Welcha", "Manna-Whitneya U"))
     expect_equal(tt$p[2], t.test(extra ~ group, sleep)$p.value)
     expect_equal(tt$p[1], t.test(extra ~ group, sleep, var.equal = TRUE)$p.value)
     expect_equal(nrow(res$homog$asDF), 1)

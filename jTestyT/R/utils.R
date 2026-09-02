@@ -73,13 +73,6 @@ mannWhitney <- function(y, g, hypothesis = "different", level = 0.95) {
         es = 1 - 2 * U / (length(x1) * length(x2)), esLower = NA, esUpper = NA, esLabel = "r rangowo-dwuseryjne")
 }
 
-ksTwo <- function(y, g) {
-    lv <- levels(g)
-    k <- suppressWarnings(stats::ks.test(y[g == lv[1]], y[g == lv[2]]))
-    list(test = "Kołmogorowa-Smirnowa D", stat = unname(k$statistic), df = NA, p = k$p.value,
-        est = NA, lower = NA, upper = NA, es = NA, esLower = NA, esUpper = NA, esLabel = "")
-}
-
 leveneTwo <- function(y, g) {
     lev <- car::leveneTest(y, g, center = "median")
     list(F = lev[["F value"]][1], df1 = lev[["Df"]][1], df2 = lev[["Df"]][2], p = lev[["Pr(>F)"]][1])
@@ -151,10 +144,10 @@ estimationPlot <- function(image, ggtheme, theme) {
             width = 0.22, linewidth = 1.1, colour = acc) +
         ggplot2::geom_point(data = diffDF, ggplot2::aes(x = group, y = y), inherit.aes = FALSE, shape = 18, size = 6, colour = acc) +
         ggplot2::scale_x_discrete(drop = FALSE) +
-        ggplot2::scale_y_continuous(sec.axis = ggplot2::sec_axis(~ . - ref, name = "Różnica")) +
+        ggplot2::scale_y_continuous(sec.axis = ggplot2::sec_axis(~ . - ref,
+            name = sprintf("Różnica względem średniej „%s\"", labs[2]))) +
         ggplot2::labs(x = NULL, y = s$ylab,
-            subtitle = sprintf("Różnica = %.3g, %g%% CI [%.3g; %.3g]\nOś różnicy (prawa): 0 = średnia „%s\" (linia przerywana)",
-                s$est, 100 * s$level, s$lower, s$upper, labs[2]))
+            subtitle = sprintf("Różnica = %.3g, %g%% CI [%.3g; %.3g]", s$est, 100 * s$level, s$lower, s$upper))
     p + ggtheme
 }
 

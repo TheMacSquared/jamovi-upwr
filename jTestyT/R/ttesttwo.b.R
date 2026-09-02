@@ -25,7 +25,6 @@ ttesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 if (isTRUE(o$student)) addTestRow(tt, paste(v, "t"), v, twoSampleT(y, g, FALSE, o$hypothesis, level))
                 if (isTRUE(o$welch)) addTestRow(tt, paste(v, "tw"), v, twoSampleT(y, g, TRUE, o$hypothesis, level))
                 if (isTRUE(o$nonpar)) addTestRow(tt, paste(v, "mw"), v, mannWhitney(y, g, o$hypothesis, level))
-                if (isTRUE(o$ks)) addTestRow(tt, paste(v, "ks"), v, ksTwo(y, g))
                 x1 <- y[g == lv[1]]; x2 <- y[g == lv[2]]
                 if (isTRUE(o$desc)) for (l in lv)
                     self$results$desc$addRow(rowKey = paste(v, l), values = c(list(var = v, group = l), descRow(y[g == l])))
@@ -40,10 +39,9 @@ ttesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     est = mean(x1) - mean(x2), lower = td$conf.int[1], upper = td$conf.int[2], level = level, ylab = v))
                 self$results$qq$get(key = v)$setState(list(x = c(x1 - mean(x1), x2 - mean(x2)), label = paste(v, "(reszty w grupach)")))
             }
-            tt$setNote("h", sprintf("Różnica = %s − %s; H₁: %s; przedziały ufności %g%%. d Cohena z łączonym SD i przedziałem (niecentralny t)%s%s.",
+            tt$setNote("h", sprintf("Różnica = %s − %s; H₁: %s; przedziały ufności %g%%. d Cohena z łączonym SD i przedziałem (niecentralny t)%s.",
                 lv[1], lv[2], altLabel(o$hypothesis), o$ciWidth,
-                if (isTRUE(o$nonpar)) "; dla Manna-Whitneya r rangowo-dwuseryjne i przesunięcie Hodgesa-Lehmanna z CI" else "",
-                if (isTRUE(o$ks)) "; K-S porównuje całe rozkłady (kształt, położenie, rozrzut)" else ""))
+                if (isTRUE(o$nonpar)) "; dla Manna-Whitneya r rangowo-dwuseryjne i przesunięcie Hodgesa-Lehmanna z CI" else ""))
         },
         .plot = function(image, ggtheme, theme, ...) {
             if (self$options$plotType == "box") boxPlotTwo(image, ggtheme, theme) else estimationPlot(image, ggtheme, theme)

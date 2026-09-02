@@ -40,8 +40,6 @@ children:
                 name: welch
               - type: CheckBox
                 name: nonpar
-              - type: CheckBox
-                name: ks
           - type: Label
             label: Hipoteza
             children:

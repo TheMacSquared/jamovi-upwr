@@ -97,8 +97,4 @@ options:
       type: Bool
       default: false
 
-    - name: ks
-      title: Kołmogorowa-Smirnowa (dwie próby)
-      type: Bool
-      default: false
 ...

@@ -17,11 +17,9 @@ test_that("t tests match stats::t.test and d intervals are sane", {
     expect_equal(mw$es, 1 - 2 * unname(wilcox.test(x, y, exact = FALSE)$statistic) / 100)
 })
 
-test_that("one-sided hypotheses, K-S and d intervals", {
+test_that("one-sided hypotheses and d intervals", {
     x <- c(1.2, 0.8, 2.1, 1.7, 0.3, 1.1, 2.4, 0.9)
     expect_equal(oneSampleT(x, 0, "greater")$p, t.test(x, alternative = "greater")$p.value)
-    g <- factor(rep(c("a", "b"), each = 4))
-    expect_equal(ksTwo(x, g)$p, suppressWarnings(ks.test(x[1:4], x[5:8]))$p.value)
     d <- dInterval(0.5, 20, 20); expect_true(d[1] < 0.5 && d[2] > 0.5)
     d0 <- dInterval(0, 30); expect_equal(mean(d0), 0, tolerance = 1e-3)
 })
