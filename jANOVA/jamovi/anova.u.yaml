@@ -55,7 +55,7 @@ children:
               - type: CheckBox
                 name: welch
               - type: Label
-                label: Nieparametryczne (1 czynnik)
+                label: Nieparametryczne
                 children:
                   - type: CheckBox
                     name: kruskal
@@ -63,12 +63,6 @@ children:
                     name: jonckheere
                   - type: CheckBox
                     name: medianTest
-                  - type: ComboBox
-                    name: npPostHoc
-                    enable: (kruskal)
-              - type: Label
-                label: Nieparametryczne (czynnikowe)
-                children:
                   - type: CheckBox
                     name: art
           - type: LayoutBox
@@ -103,6 +97,8 @@ children:
             children:
               - type: ComboBox
                 name: postHoc
+              - type: ComboBox
+                name: npPostHoc
               - type: TextBox
                 name: alpha
                 format: number

@@ -91,7 +91,7 @@ options:
       default: false
 
     - name: npPostHoc
-      title: Porównania
+      title: Porównania (Kruskal-Wallis)
       type: List
       options:
         - title: Dunna, Holm
@@ -125,7 +125,7 @@ options:
       default: 0.05
 
     - name: postHoc
-      title: Test porównań wielokrotnych
+      title: Porównania (ANOVA, ART)
       type: List
       options:
         - title: Tukeya (HSD)

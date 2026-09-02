@@ -101,7 +101,7 @@ options:
       default: false
 
     - name: npPostHoc
-      title: Porównania
+      title: Porównania (Friedman)
       type: List
       options:
         - title: Nemenyiego
@@ -128,7 +128,7 @@ options:
       default: 0.05
 
     - name: postHoc
-      title: Test porównań wielokrotnych
+      title: Porównania (ANOVA, ART)
       type: List
       options:
         - title: Tukeya (HSD)

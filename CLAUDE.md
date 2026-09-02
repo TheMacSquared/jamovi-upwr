@@ -261,7 +261,13 @@ Nieparametryczne jako przełączniki: w „ANOVA" (jeden czynnik) Kruskal-Wallis
 z ε² i Dunnem (litery), Jonckheere-Terpstra, test mediany; w RM (jeden czynnik
 wewnątrz) Friedman z W Kendalla, Page, Nemenyi/Conover; ART (Wobbrock 2011)
 w obu — wyrównanie przez inkluzję-ekskluzję średnich komórkowych, rangi,
-ANOVA typu III (lm) lub afex na rangach; zgodne z ARTool (walidacja w testach).
+ANOVA typu III (lm) lub afex na rangach; zgodne z ARTool (walidacja w testach);
+post-hoc po ART tylko dla efektów głównych (rangi wyrównane dla czynnika,
+silnik compareTerm), bez kontrastów interakcji. UI warunkowe: `jamovi/js/anova.js`
+i `anovarm.js` (jus 3.0: handlery `<kontrolka>_changed`, `view_updated`,
+`ui.x.setPropertyValue('enable', …)`) włączają testy jednoczynnikowe/Welch przy
+jednym czynniku, ART i interakcje przy ≥ 2; metody porównań (parametryczne,
+Dunn, Nemenyi/Conover) w jednej sekcji „Porównania wielokrotne".
 PUŁAPKA: wrapper analizy `anova()` zasłania `stats::anova` — w kodzie modułu
 zawsze `stats::anova(...)`. Ukrywanie analiz jmv: `JUPWR_HIDDEN_ANALYSES`
 w `client/common/jupwr.ts` (jmv::anovaonew, anova, ancova, anovarm) filtrowane

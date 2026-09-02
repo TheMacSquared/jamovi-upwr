@@ -54,3 +54,12 @@ test_that("Friedman and ART in the repeated-measures analysis", {
     expect_equal(res$npMeans$asDF$level, c("t1", "t2", "t3"))
     expect_equal(res$art$asDF$source, "czas")
 })
+
+test_that("ART main-effect comparisons produce letters", {
+    tg <- ToothGrowth; tg$dose <- factor(tg$dose)
+    res <- jANOVA:::anova(data = tg, dep = "len", factors = c("supp", "dose"), art = TRUE, showPairs = TRUE)
+    m <- res$artMeans$get(key = "dose")$asDF
+    expect_equal(nrow(m), 3)
+    expect_true(all(nchar(m$letters) >= 1))
+    expect_equal(nrow(res$artPairs$get(key = "dose")$asDF), 3)
+})

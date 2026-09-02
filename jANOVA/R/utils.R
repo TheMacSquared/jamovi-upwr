@@ -641,3 +641,23 @@ artTableRm <- function(d, dep, subject, within, between = NULL, ssType = "3") {
     }
     out <- do.call(rbind, rows); rownames(out) <- NULL; out
 }
+
+# ART post-hoc for main effects (as ARTool::art.con for a single factor):
+# pairwise comparisons on the ranks aligned for that factor, via the same
+# emmeans-based engine as the parametric post-hoc.
+artMainEffectComparisons <- function(d, dep, factors, term, method, alpha,
+                                     subject = NULL, within = NULL, between = NULL, ssType = "3") {
+    ranks <- artAlignedRanks(d, dep, factors)
+    dd <- d[c(subject, factors)]; dd$.r <- ranks[[term]]
+    if (is.null(subject)) {
+        ctr <- stats::setNames(rep(list("contr.sum"), length(factors)), factors)
+        f <- stats::as.formula(paste(".r ~", paste(bt(factors), collapse = " * ")))
+        fit <- stats::lm(f, data = dd, contrasts = ctr)
+        mse <- sum(stats::residuals(fit)^2) / stats::df.residual(fit)
+    } else {
+        res <- fitRm(dd, ".r", subject, within, between, NULL, ssType)
+        fit <- res$fit
+        mse <- rmMseFor(res$an0, term)
+    }
+    compareTerm(fit, term, method, alpha, control = NULL, mse = mse)
+}

@@ -26,6 +26,12 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             }
             for (f in c(self$options$within, self$options$between))
                 self$results$contrasts$addItem(key = f)
+            for (f in c(self$options$within, self$options$between)) {
+                self$results$artMeans$addItem(key = f)
+                self$results$artPairs$addItem(key = f)
+                self$results$artMeans$get(key = f)$setTitle(paste("ART, średnie rang:", f))
+                self$results$artPairs$get(key = f)$setTitle(paste("ART, porównania parami:", f))
+            }
         },
         .run = function() {
             o <- self$options
@@ -145,6 +151,27 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                         artT$setNote("art", paste0("Aligned Rank Transform (Wobbrock i in., 2011): dla każdego efektu odpowiedź ",
                             "wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE powtórzonych pomiarów ",
                             "z właściwymi warstwami błędu; raportowany jest F tego efektu."))
+                        # post-hoc for main effects on the ranks aligned for each factor
+                        method <- o$postHoc; alpha <- o$alpha
+                        if (method != "none")
+                        for (f in c(within, between)) {
+                            mt <- self$results$artMeans$get(key = f)
+                            pt <- self$results$artPairs$get(key = f)
+                            cmp <- tryCatch(artMainEffectComparisons(d, dep, c(within, between), f, method, o$alpha, subject = subject, within = within, between = between, ssType = o$ss), error = function(e) e)
+                            if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
+                            for (i in seq_len(nrow(cmp$means))) {
+                                r <- cmp$means[i, ]
+                                mt$addRow(rowKey = r$level, values = list(level = r$level, mean = r$mean, se = r$se, letters = r$letters))
+                            }
+                            if (method == "dunnett") mt$getColumn("letters")$setTitle("vs kontrola")
+                            mt$setNote("cld", paste0("Rangi wyrównane dla efektu ", f, "; ", phMethodLabel(method), "; ",
+                                cmp$critNote %||% "", ". Poziomy z tą samą literą nie różnią się istotnie."))
+                            if (!is.null(cmp$pairs)) for (i in seq_len(nrow(cmp$pairs))) {
+                                r <- cmp$pairs[i, ]
+                                pt$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se,
+                                    df = r$df, stat = r$stat, p = r$p))
+                            }
+                        }
                     }
                 }
             }

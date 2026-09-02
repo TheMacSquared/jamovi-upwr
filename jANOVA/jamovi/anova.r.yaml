@@ -186,6 +186,78 @@ items:
           type: number
           format: zto,pvalue
 
+    - name: artMeans
+      title: ART — średnie wyrównanych rang i grupy jednorodne
+      type: Array
+      visible: (art)
+      clearWith:
+        - dep
+        - factors
+        - blocks
+        - covs
+        - alpha
+        - postHoc
+        - phMain
+        - art
+      template:
+        title: ''
+        type: Table
+        rows: 0
+        columns:
+          - name: level
+            title: Poziom
+            type: text
+          - name: mean
+            title: Średnia ranga
+            type: number
+          - name: se
+            title: SE
+            type: number
+          - name: letters
+            title: Grupa
+            type: text
+
+    - name: artPairs
+      title: ART — porównania parami
+      type: Array
+      visible: (art && showPairs)
+      clearWith:
+        - dep
+        - factors
+        - blocks
+        - covs
+        - alpha
+        - postHoc
+        - phMain
+        - art
+      template:
+        title: ''
+        type: Table
+        rows: 0
+        columns:
+          - name: g1
+            title: Poziom 1
+            type: text
+          - name: g2
+            title: Poziom 2
+            type: text
+          - name: diff
+            title: Różnica rang
+            type: number
+          - name: se
+            title: SE
+            type: number
+          - name: df
+            title: df
+            type: number
+          - name: stat
+            title: t
+            type: number
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+
     - name: means
       title: Średnie brzegowe i grupy jednorodne
       type: Array

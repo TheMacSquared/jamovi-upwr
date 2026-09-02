@@ -21,7 +21,11 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   Mooda; Friedman z W Kendalla, test Page'a, porównania Nemenyiego/Conovera;
   ART (aligned rank transform, Wobbrock i in. 2011) dla układów czynnikowych
   z interakcjami, także z powtarzanymi pomiarami — własna implementacja
-  zgodna z ARTool. Ukryte w menu także jmv::anovanp i jmv::anovarmnp.
+  zgodna z ARTool; po ART porównania parami efektów głównych na wyrównanych
+  rangach z literami (jak art.con). Panele włączają opcje warunkowo: testy
+  jednoczynnikowe i Welch tylko przy jednym czynniku, ART i interakcje przy
+  co najmniej dwóch; metody porównań w jednej sekcji. Ukryte w menu także
+  jmv::anovanp i jmv::anovarmnp.
 - jRol 0.1.0 (doświadczalnictwo rolnicze) jako nowy moduł OPCJONALNY `.jmo`:
   układ całkowicie losowy, losowanych bloków, kwadrat łaciński i split-plot
   z tabelą ANOVA o właściwych błędach, porównania wielokrotne z literami

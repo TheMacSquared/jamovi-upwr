@@ -62,18 +62,12 @@ children:
               - type: CheckBox
                 name: spherTests
               - type: Label
-                label: Nieparametryczne (1 czynnik)
+                label: Nieparametryczne
                 children:
                   - type: CheckBox
                     name: friedman
                   - type: CheckBox
                     name: page
-                  - type: ComboBox
-                    name: npPostHoc
-                    enable: (friedman)
-              - type: Label
-                label: Nieparametryczne (czynnikowe)
-                children:
                   - type: CheckBox
                     name: art
           - type: LayoutBox
@@ -106,6 +100,8 @@ children:
             children:
               - type: ComboBox
                 name: postHoc
+              - type: ComboBox
+                name: npPostHoc
               - type: TextBox
                 name: alpha
                 format: number
