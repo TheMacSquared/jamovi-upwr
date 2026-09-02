@@ -81,32 +81,32 @@ options:
       default: none
 
     - name: spherTests
-      title: Test sferyczności Mauchly'ego
+      title: Test Mauchly'ego
       type: Bool
       default: true
 
     - name: friedman
-      title: Friedmana (nieparametryczny) z W Kendalla
+      title: Friedmana (z W Kendalla)
       type: Bool
       default: false
 
     - name: page
-      title: Page'a (trend w kolejności poziomów)
+      title: Page'a (trend)
       type: Bool
       default: false
 
     - name: art
-      title: ART — ANOVA na wyrównanych rangach (nieparametryczna)
+      title: ART (wyrównane rangi)
       type: Bool
       default: false
 
     - name: npPostHoc
-      title: Porównania nieparametryczne
+      title: Porównania
       type: List
       options:
         - title: Nemenyiego
           name: nemenyi
-        - title: Conovera z poprawką Holma
+        - title: Conovera, Holm
           name: conover
       default: nemenyi
 
@@ -158,7 +158,7 @@ options:
       default: true
 
     - name: phInter
-      title: Interakcje dwuczynnikowe (komórki)
+      title: Interakcje (komórki)
       type: Bool
       default: false
 
@@ -195,7 +195,7 @@ options:
       default: none
 
     - name: desc
-      title: Statystyki opisowe w komórkach
+      title: Statystyki opisowe
       type: Bool
       default: false
 
@@ -222,12 +222,12 @@ options:
       default: false
 
     - name: homog
-      title: Jednorodność wariancji między grupami (Levene)
+      title: Jednorodność wariancji (Levene)
       type: Bool
       default: false
 
     - name: norm
-      title: Normalność reszt (Shapiro-Wilk)
+      title: Normalność reszt
       type: Bool
       default: false
 

@@ -55,7 +55,7 @@ children:
               - type: CheckBox
                 name: welch
               - type: Label
-                label: Nieparametryczne (jeden czynnik)
+                label: Nieparametryczne (1 czynnik)
                 children:
                   - type: CheckBox
                     name: kruskal
@@ -67,7 +67,7 @@ children:
                     name: npPostHoc
                     enable: (kruskal)
               - type: Label
-                label: Nieparametryczne (wiele czynników)
+                label: Nieparametryczne (czynnikowe)
                 children:
                   - type: CheckBox
                     name: art
