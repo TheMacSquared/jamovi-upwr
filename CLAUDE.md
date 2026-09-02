@@ -181,3 +181,58 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
 
 Nowe zadania dopisuj poniżej jako "### Zadanie N: ..." z plikiem docelowym
 i oczekiwanym zachowaniem.
+
+### Zadanie 8: jDosw — doświadczalnictwo rolnicze (moduł wbudowany) — ZREALIZOWANE 0.1.0
+Katalog `jDosw/` (wzór: jCI), wspólny silnik w `R/utils.R`. Menu „Doświadczalnictwo":
+układ całkowicie losowy (crd), losowanych bloków (rcbd), kwadrat łaciński (latin),
+split-plot (splitplot) — każdy z tabelą ANOVA (SS sekwencyjne, w split-plot błąd (a)
+z `blok:A` i błąd (b) resztowy), porównaniami wielokrotnymi (Tukey HSD domyślnie,
+NIR/LSD, Scheffé, Dunnett przez mvtnorm, Holm; świadomie BEZ Duncana i SNK),
+grupami jednorodnymi CLD (insert-absorb; konwencja R: „a" = najniższa średnia),
+różnicą graniczną per para (jedna NIR w nocie, gdy liczebności równe), wykresem
+średnich z literami (SE/CI/SD), interakcji, reszt, testami Levene'a/Bartletta
+i Shapiro reszt. W split-plot porównania A przy różnych B używają błędu łączonego
+z df Satterthwaite'a (klasyczne wzory). Analiza `plan`: randomizacja układu +
+mapa pola. Zależności: base R + mvtnorm + car (w modules/base/R). Zbiory w jDane
+0.5.0: oats (Yates, split-plot), pszenica_latin (syntetyczny kwadrat łaciński).
+Testy: `jDosw/tests/testthat` (silnik vs aov/TukeyHSD/multcomp + integracyjne).
+
+### Zadanie 9: Eksploracja — rozszerzenia statystyk opisowych (wariant B)
+Pliki `jmv/jamovi/descriptives.{a,u,r}.yaml`, `jmv/R/descriptives.b.R`: nowe
+checkboxy: średnia geometryczna/harmoniczna/ucięta/winsoryzowana; odchylenie
+przeciętne, MAD, odchylenie ćwiartkowe, V_Q, typowy obszar zmienności; skośność
+Pearsona i kwartylowa; sekcja „Koncentracja": Gini + krzywa Lorenza; normalność:
+Lilliefors, Anderson-Darling; wykresy: ECDF, łodyga-liście. Osobna nowa analiza
+w menu Eksploracja: „Szereg rozdzielczy" (klasy wg Sturgesa/liczby/szerokości,
+tabela liczności i częstości skumulowanych, średnia/dominanta/mediana
+interpolowane z szeregu). Nie przywracać CI dla średniej (jest w jCI).
+
+### Zadanie 10: testy nieparametryczne (wariant C — hybryda)
+Checkboxy w jmv: test znaków (ttestps, ttestones), K-S dwóch prób i test mediany
+Mooda (ttestis), Jonckheere-Terpstra i test mediany k grup (anovanp), Nemenyi,
+W Kendalla, test Page'a (anovarmnp). Testy bez naturalnego miejsca w małym
+module wbudowanym `jNiepar/` (menu „Nieparametryczne"): Q Cochrana, test serii,
+K-S/Lillieforsa jednej próby, Fligner-Killeen i Ansari-Bradley. Czyste R.
+
+### Zadanie 11: jSzereg — szeregi czasowe (moduł wbudowany)
+Nowy katalog `jSzereg/`. Menu „Szeregi czasowe": indeksy dynamiki (łańcuchowe,
+jednopodstawowe, średnie tempo), średnie ruchome, dekompozycja addytywna/
+multiplikatywna i wskaźniki sezonowości, wygładzanie wykładnicze (Holt-Winters),
+trend liniowy/wielomianowy z prognozą. Base R (`decompose`, `HoltWinters`).
+
+### Zadanie 12: jMoc — moc testu i liczebność próby (moduł wbudowany)
+Nowy katalog `jMoc/` (wzór: jpower z biblioteki jamovi, ale po polsku, jak fork
+distrACTION). Menu „Moc testu": test t (jedna/dwie/pary), proporcje, korelacja,
+ANOVA jednoczynnikowa, χ²; tryby: moc / n / wykrywalny efekt; wykresy krzywych
+mocy. Czyste R (`power.t.test` i własne) lub `pwr` bundlowany.
+
+### Zadanie 13: jML — wstęp do uczenia maszynowego (moduł wbudowany)
+Nowy katalog `jML/`. Menu „Uczenie maszynowe": bez nadzoru (k-średnich z łokciem
+i silhouette, hierarchiczne z dendrogramem, zapis klastra do zmiennej), z nadzorem
+(k-NN, drzewo decyzyjne z rysunkiem własną geometrią, naiwny Bayes, regresja
+logistyczna jako klasyfikator z ROC/AUC, bagging drzew), dydaktyka (przeuczenie
+na żywo: błąd trening vs test w funkcji złożoności; walidacja krzyżowa; kompromis
+obciążenie-wariancja). Wspólne: podział trening/test z ziarnem, macierz pomyłek,
+metryki (dokładność, precyzja, czułość, F1, kappa; RMSE, MAE, R²). Zależności:
+class, rpart, cluster, MASS, nnet (recommended, w R jamovi). Analiza klasyfikacji
+w jSpace zostaje bez zmian (kontekst kosmiczny). Biplot PCA jako opcja w jmv pca.
