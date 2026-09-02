@@ -3,6 +3,35 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.3 — 2026-09-02
+- Nowa filozofia ANOVY: moduł jANOVA 0.1.0 (wbudowany) zastępuje w menu
+  ANOVA analizy jmv (jednoczynnikowa, ANOVA, ANCOVA, powtórzonych pomiarów),
+  które klient ukrywa listą `JUPWR_HIDDEN_ANALYSES`; ich kod zostaje, więc
+  zapisane pliki nadal się otwierają, a merge upstreamu nie koliduje.
+  „ANOVA": czynniki, czynniki blokujące (addytywne), kowarianty, SS typu
+  I/II/III, Welch dla jednego czynnika, η²/η²p/ω², porównania wielokrotne
+  na średnich brzegowych (Tukey, NIR, Scheffé, Dunnett, Holm, Bonferroni)
+  z grupami jednorodnymi (litery), różnicą graniczną i d Cohena, kontrasty,
+  Levene/Bartlett/Shapiro, Q-Q, reszty do arkusza, wykresy średnich z literami
+  i interakcji. „ANOVA powtórzonych pomiarów" pracuje na danych w formacie
+  długim (afex): jednostka, czynniki wewnątrz- i międzyobiektowe, kowarianty,
+  test Mauchly'ego, poprawki GG/HF, η²G/η²p; obejmuje układy split-plot.
+- jRol 0.1.0 (doświadczalnictwo rolnicze) jako nowy moduł OPCJONALNY `.jmo`:
+  układ całkowicie losowy, losowanych bloków, kwadrat łaciński i split-plot
+  z tabelą ANOVA o właściwych błędach, porównania wielokrotne z literami
+  i NIR, wykresy średnich z literami, generator planu doświadczenia z mapą
+  pola. Budowa: macOS `72-jmo-jrol.sh`, Windows `build.ps1` krok 4g.
+- jDane 0.5.0: nowe zbiory owies Yatesa (split-plot) i syntetyczny kwadrat
+  łaciński z pszenicą; panel dokumentacji „O zbiorze" dla wszystkich 14
+  zbiorów (streszczenie, szczegóły z podpowiedzią analizy, zmienne, źródło,
+  bibliografia, pochodzenie, zmiany); krótsze opisy w bibliotece; przycisk
+  „O zbiorze" z ikoną SVG w stylu paska stanu.
+- CLAUDE.md: kolejka zadań 8–13 (Eksploracja, testy nieparametryczne,
+  jSzereg, jMoc, jML) i zadanie 14 (jANOVA).
+- Moduły: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.2, jCI 0.1.0, jperm 0.1.0,
+  jboot 0.3.0, jDane 0.5.0, jANOVA 0.1.0; opcjonalne: jRISK 0.3.2,
+  jSpace 0.2.0, jRol 0.1.0.
+
 ## 0.9.2.2 — 2026-08-31
 - jCI i jperm dostają polskie znaki w interfejsie. Oba moduły miały teksty
   zapisane bez znaków diakrytycznych („CI dla sredniej (jedna proba)",

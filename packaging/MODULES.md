@@ -61,6 +61,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.3 | 28.2 | 0.3.2 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.9.2.2 | 28.2 | 0.3.2 | ✅ 2026-08-31 | ✅ 2026-08-31 |
 | 0.9.2.1 | 28.2 | 0.3.2 | ⬜ do zbudowania | ✅ 2026-08-31 |
 | 0.9.2 | 28.2 | 0.3.2 | ✅ 2026-08-30 | ✅ 2026-08-30 |
@@ -77,6 +78,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.3 | 28.2 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.9.2.2 | 28.2 | 0.2.0 | ✅ 2026-08-31 | ✅ 2026-08-31 |
 | 0.9.2.1 | 28.2 | 0.2.0 | ⬜ do zbudowania | ✅ 2026-08-31 |
 | 0.9.2 | 28.2 | 0.2.0 | ✅ 2026-08-30 | ✅ 2026-08-30 |
@@ -90,6 +92,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.3 | 28.2 | 0.1.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.9.2.2 | 28.2 | 0.1.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 
 ## Procedura wydania jUPWR — checklist

@@ -6,7 +6,7 @@
 //   MAJOR — curriculum-defining / breaking changes
 //   MINOR — new modules or features
 //   PATCH — fixes
-export const JUPWR_VERSION = '0.9.2.2';
+export const JUPWR_VERSION = '0.9.3';
 
 // Upstream jmv analyses hidden from the ribbon menus in jUPWR. The analyses
 // still exist (files saved elsewhere open and re-run), they are only not
