@@ -1,4 +1,4 @@
-# jDosw: shared engine for classical experimental designs.
+# jRol: shared engine for classical experimental designs.
 #
 # Design of this file:
 #   fitDesign()        -> ANOVA table with the correct error strata per design

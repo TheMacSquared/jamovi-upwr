@@ -45,7 +45,7 @@ write.csv(titanic, "data/titanic.csv", row.names = FALSE, na = "")
 data("oats", package = "MASS")
 write.csv(oats, "data/oats.csv", row.names = FALSE, na = "")
 
-# Synthetic 4x4 Latin square (jDosw teaching example): winter wheat yield
+# Synthetic 4x4 Latin square (jRol teaching example): winter wheat yield
 # (t/ha) under four fertilisation treatments with a row gradient (moisture)
 # and a column gradient (slope). Seed fixed so the file is reproducible.
 set.seed(2026)

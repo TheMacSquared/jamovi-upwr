@@ -149,6 +149,8 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   schemat Bernoulliego + zbiory danych Bananpol w bibliotece) jest modułem
   OPCJONALNYM: nie preinstalowany, budowany jako .jmo (macOS: 70-jmo-jrisk.sh,
   Windows: build.ps1 krok 4e), instalowany przez Moduły → Sideload
+- jRol 0.1.0 (doświadczalnictwo rolnicze) jest modułem OPCJONALNYM jak jRISK
+  (macOS: 72-jmo-jrol.sh, Windows: build.ps1 krok 4g)
 - jSpace 0.2.0 (statystyka danych kosmicznych: orbity TLE/SGP4 przez asteRisk,
   mapy punktowe/kartogramy i statystyki regionalne przez sf, statystyki rastrów
   przez terra, klasyfikacja k-NN/drzewo; 4 zbiory danych w bibliotece) jest
@@ -182,8 +184,9 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
 Nowe zadania dopisuj poniżej jako "### Zadanie N: ..." z plikiem docelowym
 i oczekiwanym zachowaniem.
 
-### Zadanie 8: jDosw — doświadczalnictwo rolnicze (moduł wbudowany) — ZREALIZOWANE 0.1.0
-Katalog `jDosw/` (wzór: jCI), wspólny silnik w `R/utils.R`. Menu „Doświadczalnictwo":
+### Zadanie 8: jRol — doświadczalnictwo rolnicze (moduł OPCJONALNY .jmo) — ZREALIZOWANE 0.1.0
+Katalog `jRol/` (wzór: jCI; pierwotnie jDosw, przemianowany i zmieniony na opcjonalny,
+bo to moduł jednego kursu; budowa: macOS 72-jmo-jrol.sh, Windows build.ps1 krok 4g), wspólny silnik w `R/utils.R`. Menu „Doświadczalnictwo":
 układ całkowicie losowy (crd), losowanych bloków (rcbd), kwadrat łaciński (latin),
 split-plot (splitplot) — każdy z tabelą ANOVA (SS sekwencyjne, w split-plot błąd (a)
 z `blok:A` i błąd (b) resztowy), porównaniami wielokrotnymi (Tukey HSD domyślnie,
@@ -195,7 +198,7 @@ i Shapiro reszt. W split-plot porównania A przy różnych B używają błędu �
 z df Satterthwaite'a (klasyczne wzory). Analiza `plan`: randomizacja układu +
 mapa pola. Zależności: base R + mvtnorm + car (w modules/base/R). Zbiory w jDane
 0.5.0: oats (Yates, split-plot), pszenica_latin (syntetyczny kwadrat łaciński).
-Testy: `jDosw/tests/testthat` (silnik vs aov/TukeyHSD/multcomp + integracyjne).
+Testy: `jRol/tests/testthat` (silnik vs aov/TukeyHSD/multcomp + integracyjne).
 
 ### Zadanie 9: Eksploracja — rozszerzenia statystyk opisowych (wariant B)
 Pliki `jmv/jamovi/descriptives.{a,u,r}.yaml`, `jmv/R/descriptives.b.R`: nowe

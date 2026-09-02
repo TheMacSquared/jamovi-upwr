@@ -221,10 +221,6 @@ COPY $JAMOVI_ROOT/jDane/ /tmp/source/jDane
 WORKDIR /tmp/source/jDane
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
-COPY $JAMOVI_ROOT/jDosw/ /tmp/source/jDosw
-WORKDIR /tmp/source/jDosw
-RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
-
 
 
 ##### I18N #####

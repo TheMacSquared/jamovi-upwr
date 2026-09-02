@@ -1,8 +1,8 @@
-# Integration tests run after jmc has installed the compiled jDosw package.
-skip_if_not_installed("jDosw")
+# Integration tests run after jmc has installed the compiled jRol package.
+skip_if_not_installed("jRol")
 
 test_that("CRD analysis fills the ANOVA and means tables", {
-    res <- jDosw:::crd(data = PlantGrowth, dep = "weight", factorA = "group",
+    res <- jRol:::crd(data = PlantGrowth, dep = "weight", factorA = "group",
                        factorB = NULL, controlA = NULL, controlB = NULL,
                        showPairs = TRUE)
     a <- res$anova$asDF
@@ -16,7 +16,7 @@ test_that("CRD analysis fills the ANOVA and means tables", {
 test_that("split-plot analysis reports both error strata", {
     data(oats, package = "MASS")
     oats$Y <- as.numeric(oats$Y)
-    res <- jDosw:::splitplot(data = oats, dep = "Y", factorA = "V", factorB = "N",
+    res <- jRol:::splitplot(data = oats, dep = "Y", factorA = "V", factorB = "N",
                              block = "B", controlA = NULL, controlB = NULL, phAB = TRUE)
     a <- res$anova$asDF
     expect_equal(a$source[3], "Błąd (a)")
@@ -26,6 +26,6 @@ test_that("split-plot analysis reports both error strata", {
 })
 
 test_that("plan analysis produces one row per plot", {
-    res <- jDosw:::plan(design = "latin", nTreat = 3, labelsA = "x,y,z")
+    res <- jRol:::plan(design = "latin", nTreat = 3, labelsA = "x,y,z")
     expect_equal(nrow(res$plan$asDF), 9)
 })

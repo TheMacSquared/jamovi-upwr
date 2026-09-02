@@ -52,7 +52,7 @@ $ElectronVer= "43.4.1"
 $PbsUrl     = "https://github.com/astral-sh/python-build-standalone/releases/download/20250612/cpython-3.12.11+20250612-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
 $NanomsgUrl = "https://github.com/nanomsg/nanomsg/archive/refs/tags/1.2.tar.gz"
 $CranRepo   = "https://packagemanager.posit.co/cran/latest"
-$Modules    = @('jmv','plots','jperm','jCI','jboot','jdistrACTION','jDane','jDosw')   # jRISK: modul opcjonalny (.jmo, krok 4e)
+$Modules    = @('jmv','plots','jperm','jCI','jboot','jdistrACTION','jDane')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f, jRol 4g
 
 $ProgressPreference = 'SilentlyContinue'
 function Step($m){ Write-Host "`n==> $m" -ForegroundColor Cyan }
@@ -249,6 +249,18 @@ Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jSpace"), '--jmo', $JmoS,
              '--assume-app-version', $JamoviVer) "jSpace .jmo"
 if (-not (Test-Path $JmoS)) { throw "jSpace: plik .jmo nie powstal" }
 Info "jSpace .jmo OK ($JmoS)"
+
+# 4g. jRol jako modul OPCJONALNY — doswiadczalnictwo rolnicze (jeden kurs); .jmo do
+#     sideloadu, --skip-deps (mvtnorm i car sa w base\R).
+# wersja modulu: jmc czyta ja wylacznie z jamovi/0000.yaml (index.js:299-306)
+$JrolVer = ((Select-String -Path (Join-Path $RepoRoot "jRol\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
+$JmoR = "$Dist\jRol_$JrolVer-win64.jmo"
+if (Test-Path $JmoR) { Remove-Item $JmoR -Force }   # stary artefakt nie moze udawac udanego buildu
+Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jRol"), '--jmo', $JmoR,
+             '--rhome', $RHome, '--rlibs', "$BaseR;$UserLib",
+             '--assume-app-version', $JamoviVer, '--skip-deps') "jRol .jmo"
+if (-not (Test-Path $JmoR)) { throw "jRol: plik .jmo nie powstal" }
+Info "jRol .jmo OK ($JmoR)"
 
 }
 finally {

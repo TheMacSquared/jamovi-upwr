@@ -16,9 +16,9 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.1.0 |
 | `jboot/` | jboot | bootstrap | wbudowany | 0.3.0 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.5.0 |
-| `jDosw/` | jDosw | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia | wbudowany | 0.1.0 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.2.0 |
+| `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.0 |
 
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
 jeden kurs jest **opcjonalny** i trafia do studentów jako plik `.jmo` (Moduły → Sideload).
@@ -39,6 +39,8 @@ wymaga osobnego builda, na maszynie z tą platformą:
 | jRISK | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4e) | `packaging\build\dist\jRISK_<wersja>-win64.jmo` |
 | jSpace | macOS arm64 | `packaging/scripts/macos/71-jmo-jspace.sh` | `packaging/build/dist/jSpace_<wersja>-macos-arm64.jmo` |
 | jSpace | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4f) | `packaging\build\dist\jSpace_<wersja>-win64.jmo` |
+| jRol | macOS arm64 | `packaging/scripts/macos/72-jmo-jrol.sh` | `packaging/build/dist/jRol_<wersja>-macos-arm64.jmo` |
+| jRol | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4g) | `packaging\build\dist\jRol_<wersja>-win64.jmo` |
 
 Nowy moduł opcjonalny = kopia tych dwóch kroków z podmienioną nazwą + wiersz w tabeli wyżej.
 
@@ -82,6 +84,12 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 | 0.8.6 | 28.1 | 0.2.0 | ⬜ do zbudowania | ✅ 2026-08-26 |
 | 0.8.5 | 28.1 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.8.0 | 28.1 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |
+
+### jRol
+
+| jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
+|---|---|---|---|---|
+| 0.9.2.2 | 28.2 | 0.1.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 
 ## Procedura wydania jUPWR — checklist
 
