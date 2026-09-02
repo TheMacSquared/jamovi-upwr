@@ -30,13 +30,7 @@
 }
 
 .jmv-statusbar-button[data-name=datasetinfo] {
-    width: 26px;
-    padding: 0;
-}
-
-.jmv-statusbar-button[data-name=datasetinfo]::before {
-    content: '\24D8';
-    font-size: 16px;
+    background-image: url('../../assets/dataset-info.svg');
 }
 
 .jmv-statusbar-button[data-name=datasetinfo][aria-disabled] {

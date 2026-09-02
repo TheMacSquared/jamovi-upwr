@@ -14,6 +14,33 @@ datasets:
   - name: Wzrost roślin (PlantGrowth)
     path: PlantGrowth.csv
     description: "Sucha masa roślin: kontrola i 2 warunki uprawy — jednoczynnikowa ANOVA"
+    documentation:
+      summary: >-
+        Sucha masa roślin w grupie kontrolnej i dwóch warunkach uprawy —
+        najprostszy przykład jednoczynnikowej analizy wariancji.
+      details: >-
+        30 roślin przydzielono losowo po 10 do trzech grup: kontrolnej oraz dwóch
+        wariantów uprawy (trt1, trt2). Zmierzono suchą masę roślin. Zbiór ilustruje
+        porównanie trzech średnich (ANOVA, testy post-hoc, grupy jednorodne) oraz
+        założenia jednorodności wariancji i normalności reszt. Analiza:
+        Doświadczalnictwo → Układ całkowicie losowy (zależna = weight, czynnik A =
+        group) lub ANOVA → Jednoczynnikowa ANOVA.
+      variables:
+        - name: weight
+          description: Sucha masa rośliny.
+        - name: group
+          description: "Warunki uprawy: ctrl (kontrola), trt1, trt2."
+      source: Dobson (1983), przykład 2.5, za dokumentacją pakietu datasets w R.
+      references:
+        - >-
+          Dobson, A. J. (1983). An Introduction to Statistical Modelling. London:
+          Chapman and Hall.
+      provenance:
+        package: datasets
+        dataset: PlantGrowth
+        url: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/PlantGrowth.html
+      changes:
+        - Dane wyeksportowane bez zmian.
     tags:
       - rolnictwo
       - ANOVA
@@ -21,6 +48,42 @@ datasets:
   - name: Nawożenie NPK (npk)
     path: npk.csv
     description: "Plon grochu przy nawożeniu N, P, K w 6 blokach (Fisher)"
+    documentation:
+      summary: >-
+        Klasyczne doświadczenie polowe z grochem: nawożenie azotem (N), fosforem
+        (P) i potasem (K) w układzie czynnikowym 2×2×2 w sześciu blokach.
+      details: >-
+        24 poletka w 6 blokach po 4 poletka. Każdy z trzech składników nawozu
+        zastosowano albo nie (0/1), co daje 8 kombinacji; w każdym bloku wystąpiła
+        połowa kombinacji (ułamkowy układ czynnikowy z uwikłaną interakcją N×P×K).
+        Zbiór ilustruje układ losowanych bloków z kilkoma czynnikami, efekty główne
+        i interakcje oraz porównania średnich. Analiza: Doświadczalnictwo → Układ
+        losowanych bloków (zależna = yield, czynnik A = N, czynnik B = P lub K,
+        blok = block). Zmienne N, P, K trzeba ustawić jako nominalne.
+      variables:
+        - name: block
+          description: Blok (1–6).
+        - name: N
+          description: "Nawożenie azotem: 0 = brak, 1 = zastosowano."
+        - name: P
+          description: "Nawożenie fosforem: 0 = brak, 1 = zastosowano."
+        - name: K
+          description: "Nawożenie potasem: 0 = brak, 1 = zastosowano."
+        - name: yield
+          description: Plon grochu w funtach z poletka (poletka po 1/70 akra).
+      source: >-
+        Imperial College London, ćwiczenia z analizy doświadczeń; za dokumentacją
+        pakietu datasets w R.
+      references:
+        - >-
+          Venables, W. N. i Ripley, B. D. (2002). Modern Applied Statistics with S,
+          wyd. 4. New York: Springer.
+      provenance:
+        package: datasets
+        dataset: npk
+        url: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/npk.html
+      changes:
+        - Dane wyeksportowane bez zmian.
     tags:
       - rolnictwo
       - ANOVA
@@ -113,12 +176,110 @@ datasets:
   - name: Uprawy ryżu (RiceFarms)
     path: RiceFarms.csv
     description: "171 gospodarstw ryżowych (Indonezja), 6 sezonów — nakłady, plony, ceny"
+    documentation:
+      summary: >-
+        Dane panelowe 171 gospodarstw ryżowych z Jawy Zachodniej (Indonezja)
+        obserwowanych w 6 sezonach: nakłady, ceny, praca i produkcja.
+      details: >-
+        1026 obserwacji (gospodarstwo × sezon) z sześciu wsi. Zbiór ilustruje
+        regresję wielokrotną i funkcję produkcji (np. logarytm produkcji względem
+        logarytmów nasion, nawozów i pracy), porównania między regionami oraz
+        wpływ statusu własności i odmian ryżu. Analiza: Regresja → Regresja
+        liniowa; Eksploracja z podziałem według region.
+      variables:
+        - name: id
+          description: Identyfikator gospodarstwa.
+        - name: size
+          description: Powierzchnia uprawy ryżu w hektarach.
+        - name: status
+          description: "Status ziemi: owner (właściciel), share (dzierżawa za udział w plonie), mixed."
+        - name: varieties
+          description: "Odmiany ryżu: trad (tradycyjne), high (wysokoplenne), mixed."
+        - name: bimas
+          description: "Udział w programie intensyfikacji BIMAS: no, yes, mixed."
+        - name: seed
+          description: Nasiona w kg.
+        - name: urea
+          description: Mocznik w kg.
+        - name: phosphate
+          description: Nawóz fosforowy w kg.
+        - name: pesticide
+          description: Koszt pestycydów w rupiach.
+        - name: pseed
+          description: Cena nasion w rupiach za kg.
+        - name: purea
+          description: Cena mocznika w rupiach za kg.
+        - name: pphosph
+          description: Cena nawozu fosforowego w rupiach za kg.
+        - name: hiredlabor
+          description: Praca najemna w godzinach.
+        - name: famlabor
+          description: Praca rodziny w godzinach.
+        - name: totlabor
+          description: Praca ogółem w godzinach (bez zbioru).
+        - name: wage
+          description: Płaca w rupiach za godzinę.
+        - name: goutput
+          description: Produkcja brutto ryżu w kg.
+        - name: noutput
+          description: Produkcja netto ryżu w kg (po odjęciu zapłaty za zbiór).
+        - name: price
+          description: Cena ryżu w rupiach za kg.
+        - name: region
+          description: "Wieś: wargabinangun, langan, gunungwangi, malausma, sukaambit, ciwangi."
+      source: Feng i Horrace (2012), za dokumentacją pakietu plm.
+      references:
+        - >-
+          Feng, Q. i Horrace, W. C. (2012). Alternative technical efficiency
+          measures: Skew, bias and scale. Journal of Applied Econometrics, 27(2),
+          253–268.
+      provenance:
+        package: plm
+        dataset: RiceFarms
+        url: https://search.r-project.org/CRAN/refmans/plm/html/RiceFarms.html
+      changes:
+        - Dane wyeksportowane bez zmian.
     tags:
       - rolnictwo
       - regresja
   - name: Zbiór danych Andersona (Irysy)
     path: iris.csv
     description: Zbiór danych "Iris" z R
+    documentation:
+      summary: >-
+        Pomiary kielicha i płatka 150 kwiatów irysa trzech gatunków — najbardziej
+        znany zbiór danych w statystyce.
+      details: >-
+        Po 50 kwiatów z gatunków Iris setosa, versicolor i virginica; dla każdego
+        zmierzono długość i szerokość działki kielicha oraz płatka (w cm). Zbiór
+        zebrał Edgar Anderson, a Fisher użył go do wprowadzenia liniowej analizy
+        dyskryminacyjnej. Ilustruje statystyki opisowe w grupach, wykresy
+        rozrzutu, korelacje, ANOVA, PCA oraz klasyfikację i grupowanie.
+      variables:
+        - name: Sepal.Length
+          description: Długość działki kielicha w cm.
+        - name: Sepal.Width
+          description: Szerokość działki kielicha w cm.
+        - name: Petal.Length
+          description: Długość płatka w cm.
+        - name: Petal.Width
+          description: Szerokość płatka w cm.
+        - name: Species
+          description: "Gatunek: setosa, versicolor, virginica."
+      source: Anderson (1935); Fisher (1936).
+      references:
+        - >-
+          Anderson, E. (1935). The irises of the Gaspé Peninsula. Bulletin of the
+          American Iris Society, 59, 2–5.
+        - >-
+          Fisher, R. A. (1936). The use of multiple measurements in taxonomic
+          problems. Annals of Eugenics, 7, 179–188.
+      provenance:
+        package: datasets
+        dataset: iris
+        url: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/iris.html
+      changes:
+        - Kopia zbioru przykładowego z jamovi (jmv); separator średnik.
     tags:
       - przyroda
       - statystyki opisowe
@@ -127,12 +288,86 @@ datasets:
     description: >-
       Pomiary 344 pingwinów trzech gatunków ze stacji Palmer na Antarktydzie
       (palmerpenguins)
+    documentation:
+      summary: >-
+        Pomiary 344 pingwinów trzech gatunków z trzech wysp archipelagu Palmera
+        na Antarktydzie — współczesna alternatywa dla zbioru irysów.
+      details: >-
+        Dane zebrane w latach 2007–2009 przez dr Kristen Gorman w ramach programu
+        Palmer Station LTER. Dla każdego osobnika: gatunek, wyspa, wymiary dzioba,
+        długość płetwy, masa ciała i płeć. Kilka obserwacji ma braki danych, co
+        pozwala ćwiczyć ich obsługę. Zbiór ilustruje statystyki opisowe w grupach,
+        wykresy rozrzutu i pudełkowe, korelacje, regresję, ANOVA i klasyfikację.
+      variables:
+        - name: species
+          description: "Gatunek: Adelie, Chinstrap, Gentoo."
+        - name: island
+          description: "Wyspa: Biscoe, Dream, Torgersen."
+        - name: bill_length_mm
+          description: Długość dzioba w mm.
+        - name: bill_depth_mm
+          description: Wysokość dzioba w mm.
+        - name: flipper_length_mm
+          description: Długość płetwy w mm.
+        - name: body_mass_g
+          description: Masa ciała w gramach.
+        - name: sex
+          description: "Płeć: female, male (u kilku osobników brak)."
+        - name: year
+          description: Rok obserwacji (2007–2009).
+      source: Gorman, Williams i Fraser (2014); pakiet palmerpenguins.
+      references:
+        - >-
+          Gorman, K. B., Williams, T. D. i Fraser, W. R. (2014). Ecological sexual
+          dimorphism and environmental variability within a community of Antarctic
+          penguins (genus Pygoscelis). PLoS ONE, 9(3), e90081.
+        - >-
+          Horst, A. M., Hill, A. P. i Gorman, K. B. (2020). palmerpenguins: Palmer
+          Archipelago (Antarctica) penguin data. R package.
+      provenance:
+        package: palmerpenguins
+        dataset: penguins
+        url: https://allisonhorst.github.io/palmerpenguins/
+      changes:
+        - Dane wyeksportowane bez zmian; braki danych jako puste komórki.
     tags:
       - przyroda
       - statystyki opisowe
   - name: Wzrost zębów
     path: ToothGrowth.csv
     description: Niezbyt ciekawy zbiór danych do obliczania testu ANOVA
+    documentation:
+      summary: >-
+        Długość odontoblastów u świnek morskich po podaniu witaminy C w trzech
+        dawkach dwiema metodami — dwuczynnikowa ANOVA z interakcją.
+      details: >-
+        60 świnek morskich otrzymywało witaminę C w dawce 0,5, 1 lub 2 mg dziennie
+        w postaci soku pomarańczowego (OJ) albo kwasu askorbinowego (VC); po 10
+        zwierząt na kombinację. Mierzono długość komórek odpowiedzialnych za wzrost
+        zębów. Zbiór ilustruje układ czynnikowy 2×3, interakcję i porównania
+        średnich. Analiza: Doświadczalnictwo → Układ całkowicie losowy (zależna =
+        len, czynnik A = supp, czynnik B = dose; dose ustaw jako nominalna).
+      variables:
+        - name: len
+          description: Długość odontoblastów.
+        - name: supp
+          description: "Sposób podania: OJ (sok pomarańczowy), VC (kwas askorbinowy)."
+        - name: dose
+          description: Dawka witaminy C w mikrogramach dziennie (500, 1000, 2000).
+      source: Crampton (1947), za dokumentacją pakietu datasets w R.
+      references:
+        - >-
+          Crampton, E. W. (1947). The growth of the odontoblast of the incisor
+          teeth as a criterion of vitamin C intake of the guinea pig. The Journal
+          of Nutrition, 33(5), 491–504.
+      provenance:
+        package: datasets
+        dataset: ToothGrowth
+        url: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html
+      changes:
+        - >-
+          Kopia zbioru przykładowego z jamovi (jmv): dawka wyrażona w mikrogramach
+          (500/1000/2000) zamiast miligramów; separator średnik.
     tags:
       - medycyna
       - ANOVA
@@ -141,18 +376,136 @@ datasets:
     description: >-
       189 noworodków — masa urodzeniowa i czynniki ryzyka niskiej masy; regresja
       logistyczna i tabele 2×2
+    documentation:
+      summary: >-
+        Masa urodzeniowa 189 noworodków i czynniki ryzyka niskiej masy
+        urodzeniowej — klasyczny zbiór do regresji logistycznej.
+      details: >-
+        Dane zebrano w Baystate Medical Center w Springfield (Massachusetts)
+        w 1986 r. Zmienna low wskazuje masę poniżej 2,5 kg. Zbiór ilustruje
+        regresję logistyczną (ryzyko niskiej masy względem palenia, wieku, rasy,
+        nadciśnienia), tabele 2×2 z ilorazem szans oraz regresję liniową masy
+        urodzeniowej. Analiza: Regresja → Regresja logistyczna dwumianowa
+        (zależna = low) lub Częstości → Tabele niezależności.
+      variables:
+        - name: low
+          description: "Niska masa urodzeniowa (poniżej 2,5 kg): no, yes."
+        - name: age
+          description: Wiek matki w latach.
+        - name: lwt
+          description: Masa matki w funtach w ostatniej miesiączce.
+        - name: race
+          description: "Rasa matki: white, black, other."
+        - name: smoke
+          description: "Palenie w czasie ciąży: no, yes."
+        - name: ptl
+          description: Liczba wcześniejszych porodów przedwczesnych.
+        - name: ht
+          description: "Nadciśnienie w wywiadzie: no, yes."
+        - name: ui
+          description: "Drażliwość macicy: no, yes."
+        - name: ftv
+          description: Liczba wizyt lekarskich w pierwszym trymestrze.
+        - name: bwt
+          description: Masa urodzeniowa w gramach.
+      source: Hosmer i Lemeshow (1989), za dokumentacją pakietu MASS.
+      references:
+        - >-
+          Hosmer, D. W. i Lemeshow, S. (1989). Applied Logistic Regression. New
+          York: Wiley.
+      provenance:
+        package: MASS
+        dataset: birthwt
+        url: https://search.r-project.org/CRAN/refmans/MASS/html/birthwt.html
+      changes:
+        - >-
+          Kody 0/1 i 1/2/3 zamienione na etykiety (no/yes, white/black/other) tak
+          jak w dokumentacji MASS, aby jamovi rozpoznał zmienne jako nominalne.
     tags:
       - medycyna
       - regresja logistyczna
   - name: Wielka Piątka (Dolan, Oort, Stoel & Wicherts, 2009)
     path: Big5.csv
     description: Ciekawy zbiór danych do obliczania korelacji
+    documentation:
+      summary: >-
+        Wyniki 500 osób w pięciu wymiarach osobowości (Wielka Piątka) — zbiór do
+        korelacji i macierzy korelacji.
+      details: >-
+        Każda zmienna to średni wynik skali kwestionariusza NEO (od 1 do 5) dla
+        jednego z pięciu czynników osobowości. Zbiór ilustruje korelacje Pearsona
+        i Spearmana, macierz korelacji z wykresem, regresję wielokrotną oraz
+        analizę czynnikową. Analiza: Regresja → Macierz korelacji; Czynnik → PCA.
+      variables:
+        - name: Neuroticism
+          description: Neurotyczność (średnia skali, 1–5).
+        - name: Extraversion
+          description: Ekstrawersja (średnia skali, 1–5).
+        - name: Openness
+          description: Otwartość na doświadczenie (średnia skali, 1–5).
+        - name: Agreeableness
+          description: Ugodowość (średnia skali, 1–5).
+        - name: Conscientiousness
+          description: Sumienność (średnia skali, 1–5).
+      source: Dolan, Oort, Stoel i Wicherts (2009); zbiór przykładowy jamovi.
+      references:
+        - >-
+          Dolan, C. V., Oort, F. J., Stoel, R. D. i Wicherts, J. M. (2009).
+          Testing measurement invariance in the target rotated multigroup
+          exploratory factor model. Structural Equation Modeling, 16(2), 295–314.
+      provenance:
+        package: jmv
+        dataset: Big5
+        url: https://github.com/jamovi/jmv/tree/master/data
+      changes:
+        - Kopia zbioru przykładowego z jamovi (jmv); separator średnik.
     tags:
       - psychologia
       - korelacja
   - name: Błędy (Ryan, Wilde i Crist, 2013)
     path: bugs.csv
     description: Zbiór danych do obliczania testu ANOVA dla powtórzonych pomiarów
+    documentation:
+      summary: >-
+        Chęć zabicia owadów różniących się poziomem obrzydzenia i strachu —
+        dane z powtórzonymi pomiarami (układ 2×2 wewnątrzobiektowy).
+      details: >-
+        93 uczestników oceniało na skali 0–10, w jakim stopniu chcieliby zabić
+        owada pokazanego na zdjęciu. Każdy widział cztery owady stanowiące
+        kombinacje niskiego/wysokiego obrzydzenia (LD/HD) i niskiego/wysokiego
+        strachu (LF/HF). Zbiór ilustruje ANOVA dla powtórzonych pomiarów z dwoma
+        czynnikami wewnątrzobiektowymi, ewentualnie z płcią jako czynnikiem
+        międzyobiektowym. Analiza: ANOVA → ANOVA powtórzonych pomiarów.
+      variables:
+        - name: Subject
+          description: Identyfikator uczestnika.
+        - name: Gender
+          description: "Płeć: Female, Male."
+        - name: Region
+          description: Region pochodzenia uczestnika.
+        - name: Education
+          description: Poziom wykształcenia.
+        - name: LDLF
+          description: Ocena owada o niskim obrzydzeniu i niskim strachu (0–10).
+        - name: LDHF
+          description: Ocena owada o niskim obrzydzeniu i wysokim strachu (0–10).
+        - name: HDLF
+          description: Ocena owada o wysokim obrzydzeniu i niskim strachu (0–10).
+        - name: HDHF
+          description: Ocena owada o wysokim obrzydzeniu i wysokim strachu (0–10).
+      source: Ryan, Wilde i Crist (2013); zbiór przykładowy jamovi.
+      references:
+        - >-
+          Ryan, R. S., Wilde, M. i Crist, S. (2013). Compared to a small,
+          supervised lab experiment, a large, unsupervised web-based experiment on
+          a previously known effect produces a worse result. Computers in Human
+          Behavior, 29(4), 1295–1300.
+      provenance:
+        package: jmv
+        dataset: bugs
+        url: https://github.com/jamovi/jmv/tree/master/data
+      changes:
+        - Kopia zbioru przykładowego z jamovi (jmv); separator średnik.
     tags:
       - psychologia
       - ANOVA
@@ -224,6 +577,46 @@ datasets:
     description: >-
       601 respondentów ankiety Psychology Today — romanse pozamałżeńskie i cechy
       demograficzne
+    documentation:
+      summary: >-
+        Ankieta magazynu Psychology Today (1969): liczba romansów
+        pozamałżeńskich w ostatnim roku i cechy 601 respondentów.
+      details: >-
+        Dane wykorzystane przez Faira (1978) w modelu tobitowym. Zmienna affairs
+        jest zliczeniem z dużą liczbą zer, co pozwala ćwiczyć regresję
+        logistyczną (romans tak/nie), tabele niezależności oraz porównania
+        grup. Analiza: Regresja → Regresja logistyczna dwumianowa po
+        utworzeniu zmiennej obliczanej (affairs > 0).
+      variables:
+        - name: affairs
+          description: Liczba romansów pozamałżeńskich w ostatnim roku (0, 1, 2, 3, 7, 12).
+        - name: gender
+          description: "Płeć: female, male."
+        - name: age
+          description: Wiek (środek przedziału wiekowego, w latach).
+        - name: yearsmarried
+          description: Staż małżeński (środek przedziału, w latach).
+        - name: children
+          description: "Dzieci: no, yes."
+        - name: religiousness
+          description: Religijność na skali 1 (przeciw) – 5 (bardzo religijny).
+        - name: education
+          description: Wykształcenie w latach nauki (9 = szkoła podstawowa, 20 = stopień naukowy).
+        - name: occupation
+          description: Zawód wg klasyfikacji Hollingsheada (1–7, odwrócona).
+        - name: rating
+          description: Ocena małżeństwa na skali 1 (bardzo nieszczęśliwe) – 5 (bardzo szczęśliwe).
+      source: Fair (1978), za dokumentacją pakietu AER.
+      references:
+        - >-
+          Fair, R. C. (1978). A theory of extramarital affairs. Journal of
+          Political Economy, 86(1), 45–61.
+      provenance:
+        package: AER
+        dataset: Affairs
+        url: https://search.r-project.org/CRAN/refmans/AER/html/Affairs.html
+      changes:
+        - Dane wyeksportowane bez zmian.
     tags:
       - społeczne
       - regresja
@@ -232,6 +625,38 @@ datasets:
     description: >-
       1309 pasażerów Titanica — przeżycie, płeć, wiek i klasa; tabele
       wielodzielcze i regresja logistyczna
+    documentation:
+      summary: >-
+        Losy 1309 pasażerów Titanica: przeżycie, płeć, wiek i klasa — zbiór do
+        tabel wielodzielczych i regresji logistycznej.
+      details: >-
+        Dane o pasażerach (bez załogi) z Encyclopedia Titanica, w wersji z pakietu
+        carData. Wiek brakuje u części osób. Zbiór ilustruje tabele niezależności
+        (przeżycie × płeć × klasa), iloraz szans i ryzyko względne oraz regresję
+        logistyczną. Analiza: Częstości → Tabele niezależności; Regresja →
+        Regresja logistyczna dwumianowa (zależna = survived).
+      variables:
+        - name: name
+          description: Nazwisko i imię pasażera.
+        - name: survived
+          description: "Przeżycie katastrofy: no, yes."
+        - name: sex
+          description: "Płeć: female, male."
+        - name: age
+          description: Wiek w latach (u części pasażerów brak).
+        - name: passengerClass
+          description: "Klasa: 1st, 2nd, 3rd."
+      source: Encyclopedia Titanica, za dokumentacją pakietu carData.
+      references:
+        - >-
+          Fox, J. i Weisberg, S. (2019). An R Companion to Applied Regression,
+          wyd. 3. Thousand Oaks: Sage.
+      provenance:
+        package: carData
+        dataset: TitanicSurvival
+        url: https://search.r-project.org/CRAN/refmans/carData/html/TitanicSurvival.html
+      changes:
+        - Nazwiska pasażerów przeniesione z nazw wierszy do zwykłej kolumny name.
     tags:
       - społeczne
       - regresja logistyczna
