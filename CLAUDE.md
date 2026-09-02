@@ -294,3 +294,10 @@ oś różnicy po prawej zakotwiczona w średniej drugiej grupy), par i różnicy
 średniej z H₀. Usunięte świadomie: czynnik Bayesa (osobny moduł w planach),
 permutacje i bootstrap (są w jperm/jboot), test znaków, K-S. Ukryte w kliencie:
 jmv::ttestis, ttestps, ttestones.
+
+### Zadanie 16: przegląd podpisów (not) pod tabelami w jANOVA, jTestyT, jRol — DO ZROBIENIA (osobna sesja)
+Noty pod tabelami (setNote) rozrosły się: po kilka zdań o metodzie, konwencji liter,
+różnicy granicznej, poziomie CI. Przejrzeć gruntownie: każda nota ma mieć jedno
+zdanie z tym, co niezbędne do odczytania tabeli; objaśnienia metod przenieść do
+dokumentacji/handoutu. Sprawdzić też długość podtytułów wykresów (obcinane przy
+długich nazwach zmiennych/poziomów).

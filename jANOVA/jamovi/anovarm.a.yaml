@@ -59,14 +59,14 @@ options:
       default: null
 
     - name: spherCorr
-      title: Poprawka na sferyczność
+      title: Sferyczność
       type: List
       options:
-        - title: Brak
+        - title: Bez poprawki
           name: none
-        - title: Greenhouse'a-Geissera
+        - title: Greenhouse-Geisser
           name: GG
-        - title: Huynha-Feldta
+        - title: Huynh-Feldt
           name: HF
       default: none
 
@@ -101,14 +101,14 @@ options:
       default: '3'
 
     - name: alpha
-      title: Poziom istotności α
+      title: α
       type: Number
       min: 0.001
       max: 0.5
       default: 0.05
 
     - name: postHoc
-      title: Metoda porównań
+      title: Porównania
       type: List
       options:
         - title: Tukeya (HSD)
