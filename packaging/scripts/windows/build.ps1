@@ -52,7 +52,7 @@ $ElectronVer= "43.4.1"
 $PbsUrl     = "https://github.com/astral-sh/python-build-standalone/releases/download/20250612/cpython-3.12.11+20250612-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
 $NanomsgUrl = "https://github.com/nanomsg/nanomsg/archive/refs/tags/1.2.tar.gz"
 $CranRepo   = "https://packagemanager.posit.co/cran/latest"
-$Modules    = @('jmv','plots','jperm','jCI','jboot','jdistrACTION','jDane')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f, jRol 4g
+$Modules    = @('jmv','plots','jperm','jCI','jboot','jdistrACTION','jDane','jANOVA')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f, jRol 4g
 
 $ProgressPreference = 'SilentlyContinue'
 function Step($m){ Write-Host "`n==> $m" -ForegroundColor Cyan }

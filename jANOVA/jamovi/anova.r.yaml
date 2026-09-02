@@ -1,0 +1,321 @@
+---
+name: anova
+title: ANOVA
+jrs: '1.1'
+
+items:
+    - name: anova
+      title: Analiza wariancji
+      type: Table
+      rows: 0
+      clearWith: &cw
+        - dep
+        - factors
+        - blocks
+        - covs
+        - interactions
+        - ss
+      columns:
+        - name: source
+          title: Źródło zmienności
+          type: text
+        - name: ss
+          title: SS
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: ms
+          title: MS
+          type: number
+        - name: F
+          title: F
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: eta
+          title: η²
+          type: number
+          format: zto
+          visible: (eta)
+        - name: partEta
+          title: η²p
+          type: number
+          format: zto
+          visible: (partEta)
+        - name: omega
+          title: ω²
+          type: number
+          format: zto
+          visible: (omega)
+
+    - name: welch
+      title: ANOVA Welcha (bez założenia równych wariancji)
+      type: Table
+      visible: (welch)
+      rows: 1
+      clearWith: *cw
+      columns:
+        - name: F
+          title: F
+          type: number
+        - name: df1
+          title: df1
+          type: number
+        - name: df2
+          title: df2
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: means
+      title: Średnie brzegowe i grupy jednorodne
+      type: Array
+      clearWith: &cwph
+        - dep
+        - factors
+        - blocks
+        - covs
+        - interactions
+        - ss
+        - alpha
+        - postHoc
+        - phMain
+        - phInter
+      template:
+        title: ''
+        type: Table
+        rows: 0
+        columns:
+          - name: level
+            title: Poziom
+            type: text
+          - name: mean
+            title: Średnia
+            type: number
+          - name: se
+            title: SE
+            type: number
+          - name: lower
+            title: Dolna
+            type: number
+            superTitle: Przedział ufności
+          - name: upper
+            title: Górna
+            type: number
+            superTitle: Przedział ufności
+          - name: letters
+            title: Grupa
+            type: text
+
+    - name: pairs
+      title: Porównania parami
+      type: Array
+      visible: (showPairs)
+      clearWith: *cwph
+      template:
+        title: ''
+        type: Table
+        rows: 0
+        columns:
+          - name: g1
+            title: Poziom 1
+            type: text
+          - name: g2
+            title: Poziom 2
+            type: text
+          - name: diff
+            title: Różnica
+            type: number
+          - name: se
+            title: SE
+            type: number
+          - name: df
+            title: df
+            type: number
+          - name: stat
+            title: t
+            type: number
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+          - name: crit
+            title: Różnica graniczna
+            type: number
+          - name: lower
+            title: Dolna
+            type: number
+            superTitle: Przedział ufności
+          - name: upper
+            title: Górna
+            type: number
+            superTitle: Przedział ufności
+          - name: d
+            title: d Cohena
+            type: number
+            visible: (phES)
+
+    - name: contrasts
+      title: Kontrasty
+      type: Array
+      visible: (contrastType:deviation || contrastType:simple || contrastType:simpleLast || contrastType:difference || contrastType:helmert || contrastType:repeated || contrastType:polynomial)
+      clearWith:
+        - dep
+        - factors
+        - blocks
+        - covs
+        - interactions
+        - ss
+        - contrastType
+      template:
+        title: ''
+        type: Table
+        rows: 0
+        columns:
+          - name: contrast
+            title: Kontrast
+            type: text
+          - name: estimate
+            title: Oszacowanie
+            type: number
+          - name: se
+            title: SE
+            type: number
+          - name: df
+            title: df
+            type: number
+          - name: t
+            title: t
+            type: number
+          - name: p
+            title: p
+            type: number
+            format: zto,pvalue
+
+    - name: desc
+      title: Statystyki opisowe
+      type: Table
+      visible: (desc)
+      rows: 0
+      clearWith:
+        - dep
+        - factors
+      columns:
+        - name: level
+          title: Komórka
+          type: text
+        - name: n
+          title: n
+          type: integer
+        - name: mean
+          title: Średnia
+          type: number
+        - name: sd
+          title: SD
+          type: number
+        - name: median
+          title: Mediana
+          type: number
+
+    - name: homog
+      title: Jednorodność wariancji
+      type: Table
+      visible: (homog)
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: test
+          title: Test
+          type: text
+        - name: stat
+          title: Statystyka
+          type: number
+        - name: df1
+          title: df1
+          type: integer
+        - name: df2
+          title: df2
+          type: integer
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: norm
+      title: Normalność reszt (Shapiro-Wilk)
+      type: Table
+      visible: (norm)
+      rows: 1
+      clearWith: *cw
+      columns:
+        - name: w
+          title: W
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: plotMeans
+      title: Wykresy średnich
+      type: Array
+      visible: (plotMeans)
+      clearWith:
+        - dep
+        - factors
+        - blocks
+        - covs
+        - interactions
+        - ss
+        - alpha
+        - postHoc
+        - phMain
+        - phInter
+        - errorBars
+      template:
+        title: ''
+        type: Image
+        width: 500
+        height: 380
+        renderFun: .meansPlot
+
+    - name: plotInteraction
+      title: Wykres interakcji
+      type: Image
+      visible: (plotInteraction)
+      width: 500
+      height: 380
+      renderFun: .interactionPlot
+      clearWith: *cw
+
+    - name: qq
+      title: Wykres Q-Q reszt
+      type: Image
+      visible: (qq)
+      width: 400
+      height: 350
+      renderFun: .qqPlot
+      clearWith: *cw
+
+    - name: residPlot
+      title: Reszty
+      type: Image
+      visible: (residPlot)
+      width: 450
+      height: 350
+      renderFun: .residPlot
+      clearWith: *cw
+
+    - name: residsOV
+      title: Reszty
+      type: Output
+      varTitle: Reszty ANOVA
+      varDescription: Reszty z modelu ANOVA
+      measureType: continuous
+      clearWith: *cw
+...

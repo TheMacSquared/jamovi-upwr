@@ -2,6 +2,7 @@
 'use strict';
 
 import RibbonMenu from './ribbonmenu';
+import { JUPWR_HIDDEN_ANALYSES } from '../../common/jupwr';
 import RibbonTab, { RibbonItem } from './ribbontab';
 import Placeholder from './placeholder';
 import interactionManager from '../../common/interactionmanager';
@@ -118,6 +119,8 @@ export class AnalyseTab extends RibbonTab {
             let isNew = module.new;
             for (let analysis of module.analyses) {
                 if (analysis.category !== undefined && analysis.category !== 'analyses')
+                    continue;
+                if (JUPWR_HIDDEN_ANALYSES.has(`${analysis.ns}::${analysis.name}`))
                     continue;
 
                 let groupName = analysis.menuGroup;

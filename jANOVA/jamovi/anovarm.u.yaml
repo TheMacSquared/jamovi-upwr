@@ -1,0 +1,162 @@
+title: ANOVA powtórzonych pomiarów
+name: anovarm
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Zmienna zależna
+        children:
+          - type: VariablesListBox
+            name: dep
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Jednostka (osoba, poletko)
+        children:
+          - type: VariablesListBox
+            name: subject
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Czynniki wewnątrzobiektowe (powtarzane)
+        children:
+          - type: VariablesListBox
+            name: within
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Czynniki międzyobiektowe
+        children:
+          - type: VariablesListBox
+            name: between
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Kowarianty
+        children:
+          - type: VariablesListBox
+            name: covs
+            isTarget: true
+  - type: CollapseBox
+    label: Model i test
+    collapsed: false
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: ComboBox
+                name: ss
+              - type: ComboBox
+                name: spherCorr
+              - type: CheckBox
+                name: spherTests
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Wielkość efektu
+                children:
+                  - type: CheckBox
+                    name: ges
+                  - type: CheckBox
+                    name: pes
+  - type: CollapseBox
+    label: Porównania wielokrotne
+    collapsed: false
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: ComboBox
+                name: postHoc
+              - type: TextBox
+                name: alpha
+                format: number
+              - type: ComboBox
+                name: contrastType
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Porównuj
+                children:
+                  - type: CheckBox
+                    name: phWithin
+                  - type: CheckBox
+                    name: phBetween
+                  - type: CheckBox
+                    name: phInter
+              - type: CheckBox
+                name: showPairs
+              - type: CheckBox
+                name: phES
+                enable: (showPairs)
+  - type: CollapseBox
+    label: Średnie i wykresy
+    collapsed: false
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: CheckBox
+                name: plotMeans
+              - type: ComboBox
+                name: errorBars
+                enable: (plotMeans)
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: CheckBox
+                name: plotInteraction
+              - type: CheckBox
+                name: desc
+  - type: CollapseBox
+    label: Założenia
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        children:
+          - type: CheckBox
+            name: homog
+          - type: CheckBox
+            name: norm
+          - type: CheckBox
+            name: qq

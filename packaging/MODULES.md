@@ -16,6 +16,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.1.0 |
 | `jboot/` | jboot | bootstrap | wbudowany | 0.3.0 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.5.0 |
+| `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery/NIR; zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.1.0 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.2.0 |
 | `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.0 |

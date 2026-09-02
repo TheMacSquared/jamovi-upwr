@@ -1,0 +1,26 @@
+Package: jANOVA
+Type: Package
+Title: ANOVA jUPWR dla jamovi
+Version: 0.1.0
+# UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
+# przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
+Author: jUPWR Team
+Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+Description: Analiza wariancji w jednym miejscu: jedno- i wieloczynnikowa ANOVA
+    z blokami i kowariantami (typ I/II/III SS, Welch, wielkości efektu, kontrasty),
+    ANOVA powtórzonych pomiarów na danych w formacie długim (afex; sferyczność,
+    poprawki GG/HF), porównania wielokrotne z grupami jednorodnymi i NIR,
+    wykresy średnich z literami. Zastępuje w menu jUPWR analizy ANOVA z jmv.
+License: GPL (>= 2)
+Encoding: UTF-8
+Imports:
+    jmvcore (>= 2.4.2),
+    R6,
+    ggplot2,
+    emmeans,
+    afex,
+    car,
+    mvtnorm
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

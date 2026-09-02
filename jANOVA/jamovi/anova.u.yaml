@@ -1,0 +1,172 @@
+title: ANOVA
+name: anova
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Zmienna zależna
+        children:
+          - type: VariablesListBox
+            name: dep
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Czynniki
+        children:
+          - type: VariablesListBox
+            name: factors
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Czynniki blokujące (addytywne)
+        children:
+          - type: VariablesListBox
+            name: blocks
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Kowarianty
+        children:
+          - type: VariablesListBox
+            name: covs
+            isTarget: true
+  - type: CollapseBox
+    label: Model i test
+    collapsed: false
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: ComboBox
+                name: ss
+              - type: CheckBox
+                name: interactions
+              - type: CheckBox
+                name: welch
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Wielkość efektu
+                children:
+                  - type: CheckBox
+                    name: eta
+                  - type: CheckBox
+                    name: partEta
+                  - type: CheckBox
+                    name: omega
+  - type: CollapseBox
+    label: Porównania wielokrotne
+    collapsed: false
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: ComboBox
+                name: postHoc
+              - type: TextBox
+                name: alpha
+                format: number
+              - type: ComboBox
+                name: contrastType
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Porównuj
+                children:
+                  - type: CheckBox
+                    name: phMain
+                  - type: CheckBox
+                    name: phInter
+              - type: CheckBox
+                name: showPairs
+              - type: CheckBox
+                name: phES
+                enable: (showPairs)
+  - type: CollapseBox
+    label: Średnie i wykresy
+    collapsed: false
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: CheckBox
+                name: plotMeans
+              - type: ComboBox
+                name: errorBars
+                enable: (plotMeans)
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: CheckBox
+                name: plotInteraction
+              - type: CheckBox
+                name: desc
+  - type: CollapseBox
+    label: Założenia
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: CheckBox
+                name: homog
+              - type: CheckBox
+                name: norm
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: CheckBox
+                name: qq
+              - type: CheckBox
+                name: residPlot
+              - type: Output
+                name: residsOV

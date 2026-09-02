@@ -1,0 +1,30 @@
+---
+title: ANOVA jUPWR
+name: jANOVA
+version: 0.1.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: >
+  Analiza wariancji w jednym miejscu: ANOVA z blokami i kowariantami, ANOVA
+  powtórzonych pomiarów w formacie długim, porównania wielokrotne z literami.
+analyses:
+  - title: ANOVA
+    name: anova
+    ns: jANOVA
+    menuGroup: ANOVA
+    menuTitle: ANOVA
+    menuSubtitle: jedno- i wieloczynnikowa, bloki, kowarianty
+    category: analyses
+  - title: ANOVA powtórzonych pomiarów
+    name: anovarm
+    ns: jANOVA
+    menuGroup: ANOVA
+    menuTitle: ANOVA powtórzonych pomiarów
+    menuSubtitle: format długi, sferyczność, split-plot
+    category: analyses
+usesNative: true
+minApp: 1.0.8
+
+...

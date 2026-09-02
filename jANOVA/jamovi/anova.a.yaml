@@ -1,0 +1,207 @@
+---
+name: anova
+title: ANOVA
+menuGroup: ANOVA
+menuTitle: ANOVA
+menuSubtitle: jedno- i wieloczynnikowa, bloki, kowarianty
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: dep
+      title: Zmienna zależna
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: factors
+      title: Czynniki
+      type: Variables
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default: null
+
+    - name: blocks
+      title: Czynniki blokujące (addytywne)
+      type: Variables
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default: null
+
+    - name: covs
+      title: Kowarianty
+      type: Variables
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default: null
+
+    - name: interactions
+      title: Interakcje między czynnikami
+      type: Bool
+      default: true
+
+    - name: ss
+      title: Sumy kwadratów
+      type: List
+      options:
+        - title: Typ III
+          name: '3'
+        - title: Typ II
+          name: '2'
+        - title: Typ I (sekwencyjne)
+          name: '1'
+      default: '3'
+
+    - name: welch
+      title: Test Welcha (nierówne wariancje)
+      type: Bool
+      default: false
+
+    - name: eta
+      title: η²
+      type: Bool
+      default: false
+
+    - name: partEta
+      title: η² cząstkowe
+      type: Bool
+      default: false
+
+    - name: omega
+      title: ω²
+      type: Bool
+      default: false
+
+    - name: alpha
+      title: Poziom istotności α
+      type: Number
+      min: 0.001
+      max: 0.5
+      default: 0.05
+
+    - name: postHoc
+      title: Test porównań wielokrotnych
+      type: List
+      options:
+        - title: Tukeya (HSD)
+          name: tukey
+        - title: NIR (LSD Fishera)
+          name: lsd
+        - title: Scheffégo
+          name: scheffe
+        - title: Dunnetta (vs pierwszy poziom)
+          name: dunnett
+        - title: t z poprawką Holma
+          name: holm
+        - title: t z poprawką Bonferroniego
+          name: bonf
+        - title: Brak (tylko średnie)
+          name: none
+      default: tukey
+
+    - name: phMain
+      title: Efekty główne
+      type: Bool
+      default: true
+
+    - name: phInter
+      title: Interakcje dwuczynnikowe (komórki)
+      type: Bool
+      default: false
+
+    - name: showPairs
+      title: Tabela porównań parami
+      type: Bool
+      default: false
+
+    - name: phES
+      title: d Cohena w tabeli par
+      type: Bool
+      default: false
+
+    - name: contrastType
+      title: Kontrasty
+      type: List
+      options:
+        - title: Brak
+          name: none
+        - title: Odchylenia (vs średnia ogólna)
+          name: deviation
+        - title: Proste (vs pierwszy)
+          name: simple
+        - title: Proste (vs ostatni)
+          name: simpleLast
+        - title: Różnicowe (vs wcześniejsze)
+          name: difference
+        - title: Helmerta (vs późniejsze)
+          name: helmert
+        - title: Powtarzane (sąsiednie)
+          name: repeated
+        - title: Wielomianowe
+          name: polynomial
+      default: none
+
+    - name: desc
+      title: Statystyki opisowe w komórkach
+      type: Bool
+      default: false
+
+    - name: plotMeans
+      title: Wykres średnich z literami
+      type: Bool
+      default: true
+
+    - name: errorBars
+      title: Słupki błędów
+      type: List
+      options:
+        - title: Błąd standardowy (SE)
+          name: se
+        - title: Przedział ufności
+          name: ci
+        - title: Brak
+          name: none
+      default: se
+
+    - name: plotInteraction
+      title: Wykres interakcji
+      type: Bool
+      default: false
+
+    - name: homog
+      title: Jednorodność wariancji (Levene, Bartlett)
+      type: Bool
+      default: false
+
+    - name: norm
+      title: Normalność reszt (Shapiro-Wilk)
+      type: Bool
+      default: false
+
+    - name: qq
+      title: Wykres Q-Q reszt
+      type: Bool
+      default: false
+
+    - name: residPlot
+      title: Reszty vs wartości dopasowane
+      type: Bool
+      default: false
+
+    - name: residsOV
+      title: Reszty do arkusza
+      type: Output
+...

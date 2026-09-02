@@ -1,0 +1,213 @@
+---
+name: anovarm
+title: ANOVA powtórzonych pomiarów
+menuGroup: ANOVA
+menuTitle: ANOVA powtórzonych pomiarów
+menuSubtitle: format długi, sferyczność, split-plot
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: dep
+      title: Zmienna zależna
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: subject
+      title: Jednostka (osoba, poletko)
+      type: Variable
+      suggested:
+        - id
+        - nominal
+      permitted:
+        - factor
+        - id
+
+    - name: within
+      title: Czynniki wewnątrzobiektowe (powtarzane)
+      type: Variables
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default: null
+
+    - name: between
+      title: Czynniki międzyobiektowe
+      type: Variables
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default: null
+
+    - name: covs
+      title: Kowarianty
+      type: Variables
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default: null
+
+    - name: ss
+      title: Sumy kwadratów
+      type: List
+      options:
+        - title: Typ III
+          name: '3'
+        - title: Typ II
+          name: '2'
+      default: '3'
+
+    - name: spherCorr
+      title: Poprawka na sferyczność
+      type: List
+      options:
+        - title: Brak
+          name: none
+        - title: Greenhouse'a-Geissera
+          name: GG
+        - title: Huynha-Feldta
+          name: HF
+      default: none
+
+    - name: spherTests
+      title: Test sferyczności Mauchly'ego
+      type: Bool
+      default: true
+
+    - name: ges
+      title: η² uogólnione
+      type: Bool
+      default: false
+
+    - name: pes
+      title: η² cząstkowe
+      type: Bool
+      default: false
+
+    - name: alpha
+      title: Poziom istotności α
+      type: Number
+      min: 0.001
+      max: 0.5
+      default: 0.05
+
+    - name: postHoc
+      title: Test porównań wielokrotnych
+      type: List
+      options:
+        - title: Tukeya (HSD)
+          name: tukey
+        - title: NIR (LSD Fishera)
+          name: lsd
+        - title: Scheffégo
+          name: scheffe
+        - title: Dunnetta (vs pierwszy poziom)
+          name: dunnett
+        - title: t z poprawką Holma
+          name: holm
+        - title: t z poprawką Bonferroniego
+          name: bonf
+        - title: Brak (tylko średnie)
+          name: none
+      default: tukey
+
+    - name: phWithin
+      title: Czynniki wewnątrzobiektowe
+      type: Bool
+      default: true
+
+    - name: phBetween
+      title: Czynniki międzyobiektowe
+      type: Bool
+      default: true
+
+    - name: phInter
+      title: Interakcje dwuczynnikowe (komórki)
+      type: Bool
+      default: false
+
+    - name: showPairs
+      title: Tabela porównań parami
+      type: Bool
+      default: false
+
+    - name: phES
+      title: d Cohena w tabeli par
+      type: Bool
+      default: false
+
+    - name: contrastType
+      title: Kontrasty
+      type: List
+      options:
+        - title: Brak
+          name: none
+        - title: Odchylenia (vs średnia ogólna)
+          name: deviation
+        - title: Proste (vs pierwszy)
+          name: simple
+        - title: Proste (vs ostatni)
+          name: simpleLast
+        - title: Różnicowe (vs wcześniejsze)
+          name: difference
+        - title: Helmerta (vs późniejsze)
+          name: helmert
+        - title: Powtarzane (sąsiednie)
+          name: repeated
+        - title: Wielomianowe
+          name: polynomial
+      default: none
+
+    - name: desc
+      title: Statystyki opisowe w komórkach
+      type: Bool
+      default: false
+
+    - name: plotMeans
+      title: Wykres średnich z literami
+      type: Bool
+      default: true
+
+    - name: errorBars
+      title: Słupki błędów
+      type: List
+      options:
+        - title: Błąd standardowy (SE)
+          name: se
+        - title: Przedział ufności
+          name: ci
+        - title: Brak
+          name: none
+      default: se
+
+    - name: plotInteraction
+      title: Wykres interakcji
+      type: Bool
+      default: false
+
+    - name: homog
+      title: Jednorodność wariancji między grupami (Levene)
+      type: Bool
+      default: false
+
+    - name: norm
+      title: Normalność reszt (Shapiro-Wilk)
+      type: Bool
+      default: false
+
+    - name: qq
+      title: Wykres Q-Q reszt
+      type: Bool
+      default: false
+...
