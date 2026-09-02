@@ -54,6 +54,23 @@ children:
                 name: interactions
               - type: CheckBox
                 name: welch
+              - type: Label
+                label: Nieparametryczne (jeden czynnik)
+                children:
+                  - type: CheckBox
+                    name: kruskal
+                  - type: CheckBox
+                    name: jonckheere
+                  - type: CheckBox
+                    name: medianTest
+                  - type: ComboBox
+                    name: npPostHoc
+                    enable: (kruskal)
+              - type: Label
+                label: Nieparametryczne (wiele czynników)
+                children:
+                  - type: CheckBox
+                    name: art
           - type: LayoutBox
             cell:
               column: 1

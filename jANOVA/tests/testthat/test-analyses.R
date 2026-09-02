@@ -30,3 +30,27 @@ test_that("repeated-measures analysis on long data", {
     expect_equal(nrow(res$spher$asDF), 2)
     expect_equal(res$means$get(key = "N")$asDF$level, levels(oats$N))
 })
+
+test_that("nonparametric switches in the ANOVA analysis", {
+    res <- jANOVA:::anova(data = PlantGrowth, dep = "weight", factors = "group",
+                          kruskal = TRUE, jonckheere = TRUE, medianTest = TRUE, showPairs = TRUE)
+    np <- res$npTests$asDF
+    expect_equal(nrow(np), 3)
+    expect_equal(np$p[1], kruskal.test(weight ~ group, PlantGrowth)$p.value)
+    expect_equal(nrow(res$npMeans$asDF), 3)
+    expect_equal(nrow(res$npPairs$asDF), 3)
+    tg <- ToothGrowth; tg$dose <- factor(tg$dose)
+    art <- jANOVA:::anova(data = tg, dep = "len", factors = c("supp", "dose"), art = TRUE)$art$asDF
+    expect_equal(art$source, c("supp", "dose", "supp × dose"))
+})
+
+test_that("Friedman and ART in the repeated-measures analysis", {
+    set.seed(3)
+    d <- data.frame(id = factor(rep(1:12, 3)), czas = factor(rep(c("t1", "t2", "t3"), each = 12)))
+    d$y <- 10 + as.integer(d$czas) + rnorm(36)
+    res <- jANOVA:::anovarm(data = d, dep = "y", subject = "id", within = "czas",
+                            friedman = TRUE, page = TRUE, art = TRUE)
+    expect_equal(nrow(res$npTests$asDF), 2)
+    expect_equal(res$npMeans$asDF$level, c("t1", "t2", "t3"))
+    expect_equal(res$art$asDF$source, "czas")
+})

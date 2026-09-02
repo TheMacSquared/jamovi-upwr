@@ -212,11 +212,15 @@ w menu Eksploracja: „Szereg rozdzielczy" (klasy wg Sturgesa/liczby/szerokości
 tabela liczności i częstości skumulowanych, średnia/dominanta/mediana
 interpolowane z szeregu). Nie przywracać CI dla średniej (jest w jCI).
 
-### Zadanie 10: testy nieparametryczne (wariant C — hybryda)
-Checkboxy w jmv: test znaków (ttestps, ttestones), K-S dwóch prób i test mediany
-Mooda (ttestis), Jonckheere-Terpstra i test mediany k grup (anovanp), Nemenyi,
-W Kendalla, test Page'a (anovarmnp). Testy bez naturalnego miejsca w małym
-module wbudowanym `jNiepar/` (menu „Nieparametryczne"): Q Cochrana, test serii,
+### Zadanie 10: testy nieparametryczne (wariant C — hybryda) — CZĘŚĆ ANOVA ZREALIZOWANA w jANOVA
+Część ANOVA (Kruskal-Wallis z ε² i Dunnem, Jonckheere-Terpstra, test mediany
+Mooda, Friedman z W Kendalla, Nemenyi/Conover, test Page'a oraz ART — aligned
+rank transform dla układów czynnikowych, własna implementacja zwalidowana
+z ARTool) jest w jANOVA jako przełączniki w panelach „ANOVA" i „ANOVA
+powtórzonych pomiarów"; jmv::anovanp i jmv::anovarmnp ukryte w kliencie.
+Pozostaje: checkboxy w jmv: test znaków (ttestps, ttestones), K-S dwóch prób
+i test mediany Mooda (ttestis); testy bez naturalnego miejsca w małym module
+wbudowanym `jNiepar/` (menu „Nieparametryczne"): Q Cochrana, test serii,
 K-S/Lillieforsa jednej próby, Fligner-Killeen i Ansari-Bradley. Czyste R.
 
 ### Zadanie 11: jSzereg — szeregi czasowe (moduł wbudowany)
@@ -253,8 +257,13 @@ Q-Q, reszty do arkusza) i `anovarm` (format DŁUGI: zależna, jednostka, czynnik
 wewnątrz- i międzyobiektowe, kowarianty; afex::aov_ez z include_aov; Mauchly,
 poprawki GG/HF; emmeans model="univariate", poziomy wewnątrzobiektowe mapowane
 z make.names). Silnik wspólny w `R/utils.R` (wywodzi się z jRol).
+Nieparametryczne jako przełączniki: w „ANOVA" (jeden czynnik) Kruskal-Wallis
+z ε² i Dunnem (litery), Jonckheere-Terpstra, test mediany; w RM (jeden czynnik
+wewnątrz) Friedman z W Kendalla, Page, Nemenyi/Conover; ART (Wobbrock 2011)
+w obu — wyrównanie przez inkluzję-ekskluzję średnich komórkowych, rangi,
+ANOVA typu III (lm) lub afex na rangach; zgodne z ARTool (walidacja w testach).
 PUŁAPKA: wrapper analizy `anova()` zasłania `stats::anova` — w kodzie modułu
 zawsze `stats::anova(...)`. Ukrywanie analiz jmv: `JUPWR_HIDDEN_ANALYSES`
 w `client/common/jupwr.ts` (jmv::anovaonew, anova, ancova, anovarm) filtrowane
-w `client/main/ribbon/analysetab.ts`; kod jmv nietknięty, stare pliki .omv
-otwierają się. MANCOVA i testy nieparametryczne jmv pozostają widoczne.
+w `client/main/ribbon/analysetab.ts` (także jmv::anovanp, anovarmnp); kod jmv
+nietknięty, stare pliki .omv otwierają się. MANCOVA jmv pozostaje widoczna.

@@ -93,6 +93,62 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 }
             }
 
+            # nonparametric (one within factor, nothing else)
+            oneWithin <- length(within) == 1 && length(between) == 0 && length(covs) == 0
+            if (isTRUE(o$friedman) || isTRUE(o$page)) {
+                npt <- self$results$npTests
+                if (!oneWithin) {
+                    npt$setNote("na", "Testy Friedmana i Page'a są dostępne tylko dla jednego czynnika wewnątrzobiektowego bez czynników międzyobiektowych i kowariant.")
+                } else {
+                    m <- rmMatrix(d, dep, subject, within)
+                    addNp <- function(key, r) if (!is.null(r))
+                        npt$addRow(rowKey = key, values = list(test = r$test, stat = r$stat, df = r$df,
+                            z = r$z %||% NA, p = r$p, es = r$es))
+                    if (isTRUE(o$friedman)) addNp("fr", friedmanTable(m))
+                    if (isTRUE(o$page)) {
+                        pg <- pageTable(m)
+                        if (is.null(pg)) npt$setNote("pg", "Test Page'a wymaga co najmniej 3 poziomów.")
+                        else addNp("pg", pg)
+                    }
+                    npt$setNote("es", "W Kendalla = χ²/(n(k − 1)). Trend Page'a: kierunek wg kolejności poziomów (z > 0 = rosnący), p dwustronne.")
+                    if (isTRUE(o$friedman)) {
+                        fp <- friedmanPairs(m, method = o$npPostHoc, adjust = "holm", alpha = o$alpha)
+                        nm <- self$results$npMeans
+                        for (i in seq_len(nrow(fp$levels))) {
+                            r <- fp$levels[i, ]
+                            nm$addRow(rowKey = r$level, values = list(level = r$level, n = r$n, median = r$median,
+                                meanRank = r$meanRank, letters = r$letters))
+                        }
+                        nm$setNote("np", sprintf("Test %s; poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią rangą (rangi w obrębie jednostki).",
+                            if (o$npPostHoc == "nemenyi") "Nemenyiego" else "Conovera z poprawką Holma"))
+                        np <- self$results$npPairs
+                        for (i in seq_len(nrow(fp$pairs))) {
+                            r <- fp$pairs[i, ]
+                            np$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se, stat = r$stat, p = r$p))
+                        }
+                        np$getColumn("stat")$setTitle(if (o$npPostHoc == "nemenyi") "q" else "t")
+                    }
+                }
+            }
+            if (isTRUE(o$art)) {
+                artT <- self$results$art
+                if (length(covs) > 0) {
+                    artT$setNote("na", "ART wymaga modelu z samymi czynnikami (bez kowariant).")
+                } else {
+                    at2 <- tryCatch(artTableRm(d, dep, subject, within, between, o$ss), error = function(e) e)
+                    if (inherits(at2, "error")) artT$setNote("err", conditionMessage(at2))
+                    else {
+                        for (i in seq_len(nrow(at2))) {
+                            r <- at2[i, ]
+                            artT$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
+                        }
+                        artT$setNote("art", paste0("Aligned Rank Transform (Wobbrock i in., 2011): dla każdego efektu odpowiedź ",
+                            "wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE powtórzonych pomiarów ",
+                            "z właściwymi warstwami błędu; raportowany jest F tego efektu."))
+                    }
+                }
+            }
+
             keys <- private$.termKeys()
             method <- o$postHoc; alpha <- o$alpha
             for (k in names(keys)) {

@@ -16,6 +16,12 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   i interakcji. „ANOVA powtórzonych pomiarów" pracuje na danych w formacie
   długim (afex): jednostka, czynniki wewnątrz- i międzyobiektowe, kowarianty,
   test Mauchly'ego, poprawki GG/HF, η²G/η²p; obejmuje układy split-plot.
+  Testy nieparametryczne jako przełączniki w tych samych panelach: Kruskal-
+  Wallis z ε² i porównaniami Dunna (litery), Jonckheere-Terpstra, test mediany
+  Mooda; Friedman z W Kendalla, test Page'a, porównania Nemenyiego/Conovera;
+  ART (aligned rank transform, Wobbrock i in. 2011) dla układów czynnikowych
+  z interakcjami, także z powtarzanymi pomiarami — własna implementacja
+  zgodna z ARTool. Ukryte w menu także jmv::anovanp i jmv::anovarmnp.
 - jRol 0.1.0 (doświadczalnictwo rolnicze) jako nowy moduł OPCJONALNY `.jmo`:
   układ całkowicie losowy, losowanych bloków, kwadrat łaciński i split-plot
   z tabelą ANOVA o właściwych błędach, porównania wielokrotne z literami

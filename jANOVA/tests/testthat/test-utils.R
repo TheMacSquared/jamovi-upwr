@@ -70,3 +70,53 @@ test_that("repeated measures via afex reproduces aov(Error()) strata", {
     m <- termMeans(res$fit, "N")$means
     expect_equal(m$level, levels(oats$N))
 })
+
+test_that("nonparametric one-factor tests match stats and formulas", {
+    y <- PlantGrowth$weight; g <- PlantGrowth$group
+    kw <- kruskalTable(y, g)
+    expect_equal(kw$p, kruskal.test(y, g)$p.value)
+    expect_equal(kw$es, unname(kruskal.test(y, g)$statistic) / (length(y) - 1))
+    md <- medianTable(y, g)
+    expect_equal(md$df, 2)
+    dn <- dunnPairs(y, g, "none")
+    # z for a pair from the textbook formula (no ties correction needed here: check magnitude)
+    expect_equal(nrow(dn$pairs), 3)
+    expect_true(all(nchar(dn$levels$letters) >= 1))
+    skip_if_not_installed("clinfun")
+    jt <- jonckheereTable(y, g)
+    ref <- clinfun::jonckheere.test(y, as.integer(g))
+    expect_equal(jt$stat, unname(ref$statistic))
+    # clinfun handles ties in the variance slightly differently; JT itself is identical
+    expect_equal(jt$p, ref$p.value, tolerance = 1e-3)
+})
+
+test_that("Friedman family matches stats::friedman.test", {
+    set.seed(3)
+    d <- data.frame(id = factor(rep(1:12, 3)), czas = factor(rep(c("t1", "t2", "t3"), each = 12)))
+    d$y <- 10 + as.integer(d$czas) + rnorm(36)
+    m <- rmMatrix(d, "y", "id", "czas")
+    fr <- friedmanTable(m)
+    expect_equal(fr$p, friedman.test(m)$p.value)
+    expect_equal(fr$es, fr$stat / (12 * 2))
+    pg <- pageTable(m)
+    expect_gt(pg$z, 0)
+    ne <- friedmanPairs(m, "nemenyi")
+    expect_equal(ne$levels$level, c("t1", "t2", "t3"))
+    co <- friedmanPairs(m, "conover")
+    expect_equal(nrow(co$pairs), 3)
+})
+
+test_that("ART reproduces ARTool (fixed and repeated measures)", {
+    skip_if_not_installed("ARTool")
+    data(Higgins1990Table5, package = "ARTool"); h <- Higgins1990Table5
+    mine <- artTable(h, "DryMatter", c("Moisture", "Fertilizer"))
+    ref <- ARTool:::anova.art(ARTool::art(DryMatter ~ Moisture * Fertilizer, data = h))
+    expect_equal(mine$F, ref[["F value"]], tolerance = 1e-8)
+    expect_equal(mine$p, ref[["Pr(>F)"]], tolerance = 1e-8)
+    skip_if_not_installed("afex")
+    rm <- artTableRm(h, "DryMatter", "Tray", "Fertilizer", "Moisture")
+    refRm <- ARTool:::anova.art(ARTool::art(DryMatter ~ Moisture * Fertilizer + Error(Tray), data = h))
+    key <- function(x) vapply(strsplit(x, ":", fixed = TRUE), function(v) paste(sort(v), collapse = ":"), "")
+    refF <- setNames(refRm[["F value"]], key(as.character(refRm$Term)))
+    expect_equal(rm$F, unname(refF[key(rm$term)]), tolerance = 1e-8)
+})

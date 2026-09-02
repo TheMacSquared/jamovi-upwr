@@ -61,6 +61,21 @@ children:
                 name: spherCorr
               - type: CheckBox
                 name: spherTests
+              - type: Label
+                label: Nieparametryczne (jeden czynnik wewnątrzobiektowy)
+                children:
+                  - type: CheckBox
+                    name: friedman
+                  - type: CheckBox
+                    name: page
+                  - type: ComboBox
+                    name: npPostHoc
+                    enable: (friedman)
+              - type: Label
+                label: Nieparametryczne (wiele czynników)
+                children:
+                  - type: CheckBox
+                    name: art
           - type: LayoutBox
             cell:
               column: 1

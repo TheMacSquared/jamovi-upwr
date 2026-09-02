@@ -72,6 +72,120 @@ items:
           type: number
           format: zto,pvalue
 
+    - name: npTests
+      title: Testy nieparametryczne
+      type: Table
+      visible: (kruskal || jonckheere || medianTest)
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: test
+          title: Test
+          type: text
+        - name: stat
+          title: Statystyka
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: z
+          title: z
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: es
+          title: ε²
+          type: number
+          format: zto
+
+    - name: npMeans
+      title: Mediany, średnie rang i grupy jednorodne (Dunn)
+      type: Table
+      visible: (kruskal)
+      rows: 0
+      clearWith:
+        - dep
+        - factors
+        - blocks
+        - covs
+        - alpha
+        - npPostHoc
+      columns:
+        - name: level
+          title: Poziom
+          type: text
+        - name: n
+          title: n
+          type: integer
+        - name: median
+          title: Mediana
+          type: number
+        - name: meanRank
+          title: Średnia ranga
+          type: number
+        - name: letters
+          title: Grupa
+          type: text
+
+    - name: npPairs
+      title: Porównania parami (Dunn)
+      type: Table
+      visible: (kruskal && showPairs)
+      rows: 0
+      clearWith:
+        - dep
+        - factors
+        - blocks
+        - covs
+        - alpha
+        - npPostHoc
+      columns:
+        - name: g1
+          title: Poziom 1
+          type: text
+        - name: g2
+          title: Poziom 2
+          type: text
+        - name: diff
+          title: Różnica średnich rang
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: stat
+          title: z
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: art
+      title: ART — ANOVA na wyrównanych rangach
+      type: Table
+      visible: (art)
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: source
+          title: Efekt
+          type: text
+        - name: F
+          title: F
+          type: number
+        - name: df1
+          title: df
+          type: number
+        - name: df2
+          title: df błędu
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
     - name: means
       title: Średnie brzegowe i grupy jednorodne
       type: Array

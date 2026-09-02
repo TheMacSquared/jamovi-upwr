@@ -81,6 +81,65 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 }
             }
 
+            # nonparametric (one factor, no blocks/covariates)
+            oneFactor <- length(factors) == 1 && length(blocks) == 0 && length(covs) == 0
+            if (isTRUE(opts$kruskal) || isTRUE(opts$jonckheere) || isTRUE(opts$medianTest)) {
+                npt <- self$results$npTests
+                if (!oneFactor) {
+                    npt$setNote("na", "Testy nieparametryczne są dostępne tylko dla jednego czynnika bez bloków i kowariant.")
+                } else {
+                    y <- d[[dep]]; g <- d[[factors]]
+                    addNp <- function(key, r) if (!is.null(r))
+                        npt$addRow(rowKey = key, values = list(test = r$test, stat = r$stat, df = r$df,
+                            z = r$z %||% NA, p = r$p, es = r$es))
+                    if (isTRUE(opts$kruskal)) addNp("kw", kruskalTable(y, g))
+                    if (isTRUE(opts$jonckheere)) {
+                        jt <- jonckheereTable(y, g)
+                        if (is.null(jt)) npt$setNote("jt", "Test Jonckheere'a-Terpstry wymaga co najmniej 3 poziomów.")
+                        else addNp("jt", jt)
+                    }
+                    if (isTRUE(opts$medianTest)) addNp("md", medianTable(y, g))
+                    npt$setNote("es", paste0("ε² = H/(n − 1). Trend Jonckheere'a: kierunek wg kolejności poziomów ",
+                        "czynnika (z > 0 = rosnący), p dwustronne."))
+                    if (isTRUE(opts$kruskal)) {
+                        dn <- dunnPairs(y, g, adjust = opts$npPostHoc, alpha = opts$alpha)
+                        nm <- self$results$npMeans
+                        for (i in seq_len(nrow(dn$levels))) {
+                            r <- dn$levels[i, ]
+                            nm$addRow(rowKey = r$level, values = list(level = r$level, n = r$n, median = r$median,
+                                meanRank = r$meanRank, letters = r$letters))
+                        }
+                        nm$setNote("dunn", sprintf(paste0("Test Dunna (%s); poziomy z tą samą literą nie różnią się ",
+                            "istotnie; litera a = grupa z najniższą średnią rangą."),
+                            switch(opts$npPostHoc, holm = "poprawka Holma", bonferroni = "poprawka Bonferroniego", none = "bez poprawki")))
+                        np <- self$results$npPairs
+                        for (i in seq_len(nrow(dn$pairs))) {
+                            r <- dn$pairs[i, ]
+                            np$addRow(rowKey = i, values = list(g1 = r$g1, g2 = r$g2, diff = r$diff, se = r$se,
+                                stat = r$stat, p = r$p))
+                        }
+                    }
+                }
+            }
+            if (isTRUE(opts$art)) {
+                artT <- self$results$art
+                if (length(covs) > 0 || length(blocks) > 0) {
+                    artT$setNote("na", "ART wymaga modelu z samymi czynnikami (bez bloków i kowariant).")
+                } else {
+                    at2 <- tryCatch(artTable(d, dep, factors), error = function(e) e)
+                    if (inherits(at2, "error")) artT$setNote("err", conditionMessage(at2))
+                    else {
+                        for (i in seq_len(nrow(at2))) {
+                            r <- at2[i, ]
+                            artT$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
+                        }
+                        artT$setNote("art", paste0("Aligned Rank Transform (Wobbrock i in., 2011): dla każdego efektu odpowiedź ",
+                            "wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE typu III; ",
+                            "raportowany jest F tego efektu. Pełny model czynnikowy z interakcjami."))
+                    }
+                }
+            }
+
             # comparisons
             keys <- private$.termKeys()
             method <- opts$postHoc; alpha <- opts$alpha

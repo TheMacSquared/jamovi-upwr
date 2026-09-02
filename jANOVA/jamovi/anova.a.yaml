@@ -70,6 +70,38 @@ options:
       type: Bool
       default: false
 
+    - name: kruskal
+      title: Kruskala-Wallisa (nieparametryczny)
+      type: Bool
+      default: false
+
+    - name: jonckheere
+      title: Jonckheere'a-Terpstry (trend w kolejności poziomów)
+      type: Bool
+      default: false
+
+    - name: medianTest
+      title: Test mediany (Mooda)
+      type: Bool
+      default: false
+
+    - name: art
+      title: ART — ANOVA na wyrównanych rangach (czynnikowa nieparametryczna)
+      type: Bool
+      default: false
+
+    - name: npPostHoc
+      title: Porównania nieparametryczne (Dunn)
+      type: List
+      options:
+        - title: Dunna z poprawką Holma
+          name: holm
+        - title: Dunna z poprawką Bonferroniego
+          name: bonferroni
+        - title: Dunna bez poprawki
+          name: none
+      default: holm
+
     - name: eta
       title: η²
       type: Bool

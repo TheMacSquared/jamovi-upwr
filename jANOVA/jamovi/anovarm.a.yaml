@@ -85,6 +85,31 @@ options:
       type: Bool
       default: true
 
+    - name: friedman
+      title: Friedmana (nieparametryczny) z W Kendalla
+      type: Bool
+      default: false
+
+    - name: page
+      title: Page'a (trend w kolejności poziomów)
+      type: Bool
+      default: false
+
+    - name: art
+      title: ART — ANOVA na wyrównanych rangach (nieparametryczna)
+      type: Bool
+      default: false
+
+    - name: npPostHoc
+      title: Porównania nieparametryczne
+      type: List
+      options:
+        - title: Nemenyiego
+          name: nemenyi
+        - title: Conovera z poprawką Holma
+          name: conover
+      default: nemenyi
+
     - name: ges
       title: η² uogólnione
       type: Bool

@@ -450,3 +450,194 @@ subjectMeans <- function(d, dep, subject, between) {
     f <- stats::as.formula(paste(bt(dep), "~", paste(bt(c(subject, between)), collapse = " + ")))
     stats::aggregate(f, data = d, FUN = mean)
 }
+
+# ---------------------------------------------------------------------------
+# Nonparametric: one factor (Kruskal-Wallis family)
+# ---------------------------------------------------------------------------
+
+tiesCorrectionSum <- function(y) {
+    t <- table(y); sum(t^3 - t)
+}
+
+kruskalTable <- function(y, g) {
+    k <- stats::kruskal.test(y, g)
+    n <- length(y)
+    list(test = "Kruskala-Wallisa", stat = unname(k$statistic), df = unname(k$parameter),
+        p = k$p.value, es = unname(k$statistic) / (n - 1))   # ε² = H / (n − 1)
+}
+
+# Jonckheere-Terpstra: trend across levels in factor order; normal approximation
+# with the tie-corrected variance (Hollander & Wolfe).
+jonckheereTable <- function(y, g) {
+    g <- droplevels(factor(g)); levs <- levels(g); k <- length(levs)
+    if (k < 3) return(NULL)
+    ys <- split(y, g); ns <- lengths(ys); N <- sum(ns)
+    JT <- 0
+    for (i in 1:(k - 1)) for (j in (i + 1):k) {
+        a <- ys[[i]]; b <- ys[[j]]
+        JT <- JT + sum(outer(a, b, "<")) + 0.5 * sum(outer(a, b, "=="))
+    }
+    tj <- as.numeric(table(y))
+    mu <- (N^2 - sum(ns^2)) / 4
+    v <- (N * (N - 1) * (2 * N + 5) - sum(ns * (ns - 1) * (2 * ns + 5)) - sum(tj * (tj - 1) * (2 * tj + 5))) / 72 +
+        sum(ns * (ns - 1) * (ns - 2)) * sum(tj * (tj - 1) * (tj - 2)) / (36 * N * (N - 1) * (N - 2)) +
+        sum(ns * (ns - 1)) * sum(tj * (tj - 1)) / (8 * N * (N - 1))
+    z <- (JT - mu) / sqrt(v)
+    list(test = "Jonckheere'a-Terpstry (trend)", stat = JT, z = z, df = NA,
+        p = 2 * stats::pnorm(-abs(z)), es = NA)
+}
+
+# Mood's median test: chi-square on counts above the grand median
+medianTable <- function(y, g) {
+    med <- stats::median(y)
+    tab <- table(factor(y > med, levels = c(FALSE, TRUE)), g)
+    ct <- suppressWarnings(stats::chisq.test(tab, correct = FALSE))
+    list(test = "mediany (Mooda)", stat = unname(ct$statistic), df = unname(ct$parameter),
+        p = ct$p.value, es = NA, median = med)
+}
+
+# Dunn's pairwise z tests on mean ranks (tie-corrected), p adjusted by `adjust`
+dunnPairs <- function(y, g, adjust = "holm", alpha = 0.05) {
+    g <- droplevels(factor(g)); levs <- levels(g); k <- length(levs)
+    r <- rank(y); N <- length(y)
+    Rm <- tapply(r, g, mean); ns <- as.numeric(table(g)); names(ns) <- levs
+    Tc <- tiesCorrectionSum(y)
+    pairs <- t(utils::combn(levs, 2))
+    out <- data.frame(g1 = pairs[, 1], g2 = pairs[, 2], stringsAsFactors = FALSE)
+    out$diff <- Rm[out$g1] - Rm[out$g2]
+    out$se <- sqrt((N * (N + 1) / 12 - Tc / (12 * (N - 1))) * (1 / ns[out$g1] + 1 / ns[out$g2]))
+    out$stat <- out$diff / out$se
+    out$p <- stats::p.adjust(2 * stats::pnorm(-abs(out$stat)), method = adjust)
+    out$sig <- out$p < alpha
+    rownames(out) <- NULL
+    levelsTab <- data.frame(level = levs, n = ns, median = as.numeric(tapply(y, g, stats::median)),
+        meanRank = as.numeric(Rm), stringsAsFactors = FALSE)
+    ord <- levs[order(Rm)]
+    levelsTab$letters <- unname(cldLetters(ord, out)[levs])
+    list(levels = levelsTab, pairs = out)
+}
+
+# ---------------------------------------------------------------------------
+# Nonparametric: one within factor (Friedman family)
+# ---------------------------------------------------------------------------
+
+# wide matrix subjects × levels (mean over duplicates)
+rmMatrix <- function(d, dep, subject, within) {
+    m <- tapply(d[[dep]], list(d[[subject]], d[[within]]), mean)
+    m[stats::complete.cases(m), , drop = FALSE]
+}
+
+friedmanTable <- function(m) {
+    f <- stats::friedman.test(m)
+    n <- nrow(m); k <- ncol(m)
+    list(test = "Friedmana", stat = unname(f$statistic), df = unname(f$parameter),
+        p = f$p.value, es = unname(f$statistic) / (n * (k - 1)))   # W Kendalla
+}
+
+# Page's L for a monotone trend in level order (normal approximation)
+pageTable <- function(m) {
+    n <- nrow(m); k <- ncol(m)
+    if (k < 3) return(NULL)
+    R <- t(apply(m, 1, rank))
+    L <- sum(seq_len(k) * colSums(R))
+    mu <- n * k * (k + 1)^2 / 4
+    v <- n * k^2 * (k + 1) * (k^2 - 1) / 144
+    z <- (L - mu) / sqrt(v)
+    list(test = "Page'a (trend)", stat = L, z = z, df = NA, p = 2 * stats::pnorm(-abs(z)), es = NA)
+}
+
+# Pairwise after Friedman: Nemenyi (studentized range, no adjustment needed)
+# or Conover (t on rank sums, p adjusted by `adjust`)
+friedmanPairs <- function(m, method = "nemenyi", adjust = "holm", alpha = 0.05) {
+    n <- nrow(m); k <- ncol(m); levs <- colnames(m)
+    R <- t(apply(m, 1, rank))
+    Rsum <- colSums(R); Rmean <- Rsum / n
+    pairs <- t(utils::combn(levs, 2))
+    out <- data.frame(g1 = pairs[, 1], g2 = pairs[, 2], stringsAsFactors = FALSE)
+    out$diff <- Rmean[out$g1] - Rmean[out$g2]
+    if (method == "nemenyi") {
+        out$se <- sqrt(k * (k + 1) / (6 * n))
+        out$stat <- out$diff / out$se
+        out$p <- stats::ptukey(abs(out$stat) * sqrt(2), k, Inf, lower.tail = FALSE)
+    } else {
+        A1 <- sum(R^2); B1 <- sum(Rsum^2) / n
+        dfC <- (n - 1) * (k - 1)
+        seSum <- sqrt(2 * (A1 - B1) / dfC)     # for rank-sum differences
+        out$se <- seSum / n
+        out$stat <- (Rsum[out$g1] - Rsum[out$g2]) / seSum
+        out$p <- stats::p.adjust(2 * stats::pt(-abs(out$stat), dfC), method = adjust)
+    }
+    out$sig <- out$p < alpha
+    rownames(out) <- NULL
+    levelsTab <- data.frame(level = levs, n = n, median = apply(m, 2, stats::median),
+        meanRank = as.numeric(Rmean), stringsAsFactors = FALSE)
+    ord <- levs[order(Rmean)]
+    levelsTab$letters <- unname(cldLetters(ord, out)[levs])
+    list(levels = levelsTab, pairs = out)
+}
+
+# ---------------------------------------------------------------------------
+# ART: aligned rank transform (Wobbrock et al. 2011), full factorial
+# ---------------------------------------------------------------------------
+
+# Returns data.frame of aligned ranks, one column per term (names "A", "A:B", ...)
+artAlignedRanks <- function(d, dep, factors) {
+    y <- d[[dep]]
+    k <- length(factors)
+    termSets <- unlist(lapply(seq_len(k), function(o) utils::combn(factors, o, simplify = FALSE)), recursive = FALSE)
+    cellMean <- function(vars) {
+        if (length(vars) == 0) return(rep(mean(y), length(y)))
+        stats::ave(y, d[vars], FUN = mean)
+    }
+    full <- cellMean(factors)
+    resid <- y - full
+    out <- list()
+    for (ts in termSets) {
+        # inclusion–exclusion over the sub-terms of ts (grand mean included)
+        est <- 0
+        for (o in 0:length(ts)) {
+            subs <- if (o == 0) list(character(0)) else utils::combn(ts, o, simplify = FALSE)
+            sgn <- if ((length(ts) - o) %% 2 == 0) 1 else -1
+            for (sb in subs) est <- est + sgn * cellMean(sb)
+        }
+        aligned <- resid + est
+        out[[paste(ts, collapse = ":")]] <- rank(round(aligned, 12))
+    }
+    as.data.frame(out, check.names = FALSE, optional = TRUE)
+}
+
+# Fixed-effects ART table: one full-factorial lm per term, type III F of that term
+artTable <- function(d, dep, factors) {
+    ranks <- artAlignedRanks(d, dep, factors)
+    ctr <- stats::setNames(rep(list("contr.sum"), length(factors)), factors)
+    rows <- list()
+    for (term in names(ranks)) {
+        dd <- d[factors]; dd$.r <- ranks[[term]]
+        f <- stats::as.formula(paste(".r ~", paste(bt(factors), collapse = " * ")))
+        fit <- stats::lm(f, data = dd, contrasts = ctr)
+        an <- car::Anova(fit, type = 3)
+        key <- rownames(an)[vapply(rownames(an), function(r)
+            setequal(strsplit(r, ":", fixed = TRUE)[[1]], strsplit(term, ":", fixed = TRUE)[[1]]), TRUE)][1]
+        rows[[term]] <- data.frame(term = term, source = termLabel(term), F = an[key, "F value"],
+            df1 = an[key, "Df"], df2 = an["Residuals", "Df"], p = an[key, "Pr(>F)"], stringsAsFactors = FALSE)
+    }
+    out <- do.call(rbind, rows); rownames(out) <- NULL; out
+}
+
+# Repeated-measures ART: aligned ranks per term, then afex on each with the
+# proper error strata; report the term's own F
+artTableRm <- function(d, dep, subject, within, between = NULL, ssType = "3") {
+    factors <- c(within, between)
+    ranks <- artAlignedRanks(d, dep, factors)
+    rows <- list()
+    for (term in names(ranks)) {
+        dd <- d[c(subject, factors)]; dd$.r <- ranks[[term]]
+        res <- fitRm(dd, ".r", subject, within, between, NULL, ssType)
+        an <- res$an0
+        key <- rownames(an)[vapply(rownames(an), function(r)
+            setequal(strsplit(r, ":", fixed = TRUE)[[1]], strsplit(term, ":", fixed = TRUE)[[1]]), TRUE)][1]
+        rows[[term]] <- data.frame(term = term, source = termLabel(term), F = an[key, "F"],
+            df1 = an[key, "num Df"], df2 = an[key, "den Df"], p = an[key, "Pr(>F)"], stringsAsFactors = FALSE)
+    }
+    out <- do.call(rbind, rows); rownames(out) <- NULL; out
+}

@@ -11,11 +11,15 @@ export const JUPWR_VERSION = '0.9.3';
 // Upstream jmv analyses hidden from the ribbon menus in jUPWR. The analyses
 // still exist (files saved elsewhere open and re-run), they are only not
 // offered from the menu because a jUPWR module replaces them:
-//   jANOVA (ANOVA, ANOVA powtórzonych pomiarów) replaces the jmv ANOVA family.
+//   jANOVA (ANOVA, ANOVA powtórzonych pomiarów) replaces the jmv ANOVA family,
+//   including the non-parametric one-way (Kruskal-Wallis) and repeated-measures
+//   (Friedman) analyses, which jANOVA offers as switches in the same panels.
 // Key: `${ns}::${name}`.
 export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
     'jmv::anovaonew',
     'jmv::anova',
     'jmv::ancova',
     'jmv::anovarm',
+    'jmv::anovanp',
+    'jmv::anovarmnp',
 ]);
