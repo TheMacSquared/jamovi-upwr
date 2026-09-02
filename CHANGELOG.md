@@ -3,8 +3,8 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
-## 0.9.3 — 2026-09-02
-- Nowa filozofia ANOVY: moduł jANOVA 0.2.0 (wbudowany) zastępuje w menu
+## 0.9.4 — 2026-09-02
+- Nowa filozofia ANOVY: moduł jANOVA 0.3.0 (wbudowany) zastępuje w menu
   ANOVA analizy jmv (jednoczynnikowa, ANOVA, ANCOVA, powtórzonych pomiarów),
   które klient ukrywa listą `JUPWR_HIDDEN_ANALYSES`; ich kod zostaje, więc
   zapisane pliki nadal się otwierają, a merge upstreamu nie koliduje.
@@ -27,8 +27,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   i Nemenyim w powtórzonych pomiarach. Przełącznik Welcha daje test Welcha
   przy jednym czynniku i test Welcha-Jamesa (Johansen) przy kilku, zgodny
   z welchADF. Ukryte w menu także Kruskal-Wallis i Friedman z jmv; MANCOVA
-  z jmv zostaje widoczna, bo jANOVA jej nie obsługuje.
-- Nowy moduł jTestyT 0.1.0 (wbudowany) zastępuje w menu testy t z jmv (ukryte
+  z jmv zostaje widoczna na końcu menu (mechanizm `JUPWR_MENU_LAST`
+  w kliencie), bo jANOVA jej nie obsługuje.
+- Nowy moduł jTestyT 0.2.0 (wbudowany) zastępuje w menu testy t z jmv (ukryte
   w kliencie): jedna próba, dwie grupy, próby sparowane z płaskim panelem jak
   w jmv — każdy test to osobny checkbox (t Studenta, t Welcha, Mann-Whitney /
   Wilcoxon), więc odznaczenie Studenta usuwa jego wiersz z tabeli;
@@ -52,7 +53,7 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - CLAUDE.md: kolejka zadań 8–13 (Eksploracja, testy nieparametryczne,
   jSzereg, jMoc, jML) i zadanie 14 (jANOVA).
 - Moduły: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.2, jCI 0.1.0, jperm 0.1.0,
-  jboot 0.3.0, jDane 0.5.0, jANOVA 0.2.0, jTestyT 0.1.0; opcjonalne: jRISK 0.3.2,
+  jboot 0.3.0, jDane 0.5.0, jANOVA 0.3.0, jTestyT 0.2.0; opcjonalne: jRISK 0.3.2,
   jSpace 0.2.0, jRol 0.1.0.
 
 ## 0.9.2.2 — 2026-08-31

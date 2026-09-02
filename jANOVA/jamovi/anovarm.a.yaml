@@ -3,6 +3,7 @@ name: anovarm
 title: ANOVA powtórzonych pomiarów
 menuGroup: ANOVA
 menuTitle: ANOVA powtórzonych pomiarów
+menuSubtitle: format długi, sferyczność
 version: '1.0.0'
 jas: '1.2'
 

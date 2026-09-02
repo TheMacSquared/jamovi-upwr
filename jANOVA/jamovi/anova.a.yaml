@@ -3,6 +3,7 @@ name: anova
 title: ANOVA
 menuGroup: ANOVA
 menuTitle: ANOVA
+menuSubtitle: jedno- i wieloczynnikowa, bloki, kowarianty
 version: '1.0.0'
 jas: '1.2'
 

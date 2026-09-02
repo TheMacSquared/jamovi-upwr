@@ -2,7 +2,7 @@
 'use strict';
 
 import RibbonMenu from './ribbonmenu';
-import { JUPWR_HIDDEN_ANALYSES } from '../../common/jupwr';
+import { JUPWR_HIDDEN_ANALYSES, JUPWR_MENU_LAST } from '../../common/jupwr';
 import RibbonTab, { RibbonItem } from './ribbontab';
 import Placeholder from './placeholder';
 import interactionManager from '../../common/interactionmanager';
@@ -148,6 +148,19 @@ export class AnalyseTab extends RibbonTab {
                 submenu.items.push(item);
                 menu[subgroup] = submenu;
                 menus[groupName] = menu;
+            }
+        }
+
+        // jUPWR: push selected upstream analyses to the end of their submenu
+        for (let groupName in menus) {
+            let menu = menus[groupName];
+            for (let key in menu) {
+                let submenu = menu[key];
+                if (submenu === null || typeof submenu !== 'object' || !Array.isArray(submenu.items))
+                    continue;
+                let last = submenu.items.filter(item => JUPWR_MENU_LAST.has(`${item.ns}::${item.name}`));
+                if (last.length > 0)
+                    submenu.items = submenu.items.filter(item => !last.includes(item)).concat(last);
             }
         }
 
