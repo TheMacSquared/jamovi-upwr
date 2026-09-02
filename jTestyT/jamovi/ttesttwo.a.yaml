@@ -87,11 +87,6 @@ options:
       type: Bool
       default: false
 
-    - name: bf
-      title: Czynnik Bayesa
-      type: Bool
-      default: false
-
     - name: norm
       title: Normalność (Shapiro-Wilk)
       type: Bool

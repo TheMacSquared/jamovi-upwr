@@ -57,7 +57,7 @@ items:
     - name: extra
       title: Dodatkowe testy i przedziały
       type: Table
-      visible: (perm || boot || bf || signTest)
+      visible: (perm || boot || signTest)
       rows: 0
       clearWith: *cw
       columns:

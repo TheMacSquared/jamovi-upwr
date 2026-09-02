@@ -71,17 +71,6 @@ bootOne <- function(x, B = 2000, level = 0.95, seed = 1) {
         note = sprintf("%d prób bootstrapowych", B))
 }
 
-bayesOne <- function(x, mu = 0, paired = FALSE, y = NULL) {
-    if (!requireNamespace("BayesFactor", quietly = TRUE)) return(NULL)
-    res <- tryCatch({
-        bf <- if (paired) BayesFactor::ttestBF(x = x, y = y, paired = TRUE) else BayesFactor::ttestBF(x = x, mu = mu)
-        BayesFactor::extractBF(bf)
-    }, error = function(e) NULL)
-    if (is.null(res)) return(NULL)
-    list(test = "czynnik Bayesa BF₁₀", stat = res$bf[1], p = NA, lower = NA, upper = NA,
-        note = sprintf("błąd ±%.2f%%; prior Cauchy'ego r = 0,707", 100 * res$error[1]))
-}
-
 # ---------------------------------------------------------------------------
 # Two independent groups
 # ---------------------------------------------------------------------------
@@ -132,15 +121,6 @@ bootTwo <- function(y, g, B = 2000, level = 0.95, seed = 1) {
     q <- stats::quantile(sims, c((1 - level) / 2, 1 - (1 - level) / 2), names = FALSE)
     list(test = "bootstrap (percentylowy CI różnicy)", stat = mean(x1) - mean(x2), p = NA, lower = q[1], upper = q[2],
         note = sprintf("%d prób bootstrapowych w każdej grupie", B))
-}
-
-bayesTwo <- function(y, g) {
-    if (!requireNamespace("BayesFactor", quietly = TRUE)) return(NULL)
-    lv <- levels(g)
-    res <- tryCatch(BayesFactor::extractBF(BayesFactor::ttestBF(x = y[g == lv[1]], y = y[g == lv[2]])), error = function(e) NULL)
-    if (is.null(res)) return(NULL)
-    list(test = "czynnik Bayesa BF₁₀", stat = res$bf[1], p = NA, lower = NA, upper = NA,
-        note = sprintf("błąd ±%.2f%%; prior Cauchy'ego r = 0,707", 100 * res$error[1]))
 }
 
 leveneTwo <- function(y, g) {

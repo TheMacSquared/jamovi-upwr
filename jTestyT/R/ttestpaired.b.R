@@ -31,7 +31,6 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                 if (isTRUE(o$signTest)) addExtraRow(ex, paste(k, "s"), k, signTest(dif, 0, o$hypothesis))
                 if (isTRUE(o$perm)) addExtraRow(ex, paste(k, "p"), k, permOne(dif, 0, o$hypothesis))
                 if (isTRUE(o$boot)) { bb <- bootOne(dif, level = level); bb$test <- "bootstrap (percentylowy CI średniej różnicy)"; addExtraRow(ex, paste(k, "b"), k, bb) }
-                if (isTRUE(o$bf)) addExtraRow(ex, paste(k, "bf"), k, bayesOne(a, paired = TRUE, y = b))
                 if (isTRUE(o$desc)) {
                     self$results$desc$addRow(rowKey = paste(k, 1), values = c(list(var = k, group = p$i1), descRow(a)))
                     self$results$desc$addRow(rowKey = paste(k, 2), values = c(list(var = k, group = p$i2), descRow(b)))

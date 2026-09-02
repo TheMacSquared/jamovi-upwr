@@ -36,11 +36,17 @@ children:
         stretchFactor: 1
         children:
           - type: Label
-            label: Test
+            label: Testy
             children:
-
+              - type: CheckBox
+                name: signTest
               - type: CheckBox
                 name: nonpar
+              - type: CheckBox
+                name: perm
+          - type: Label
+            label: Hipoteza
+            children:
               - type: ComboBox
                 name: hypothesis
       - type: LayoutBox
@@ -50,38 +56,7 @@ children:
         stretchFactor: 1
         children:
           - type: Label
-            label: Wykres
-            children:
-              - type: CheckBox
-                name: plot
-
-  - type: CollapseBox
-    label: Założenia
-    collapsed: true
-    stretchFactor: 1
-    children:
-      - type: LayoutBox
-        margin: large
-        children:
-          - type: CheckBox
-            name: norm
-          - type: CheckBox
-            name: qq
-
-  - type: CollapseBox
-    label: Zaawansowane
-    collapsed: true
-    stretchFactor: 1
-    children:
-      - type: LayoutBox
-        margin: large
-        stretchFactor: 1
-        children:
-          - type: LayoutBox
-            cell:
-              column: 0
-              row: 0
-            stretchFactor: 1
+            label: Dodatkowe statystyki
             children:
               - type: TextBox
                 name: ciWidth
@@ -89,17 +64,27 @@ children:
                 suffix: '%'
               - type: CheckBox
                 name: desc
-          - type: LayoutBox
-            cell:
-              column: 1
-              row: 0
-            stretchFactor: 1
-            children:
-              - type: CheckBox
-                name: perm
               - type: CheckBox
                 name: boot
+
+          - type: Label
+            label: Wykres
+            children:
               - type: CheckBox
-                name: bf
+                name: plot
+
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Sprawdzenie założeń
+        children:
+          - type: LayoutBox
+            style: inline
+            children:
               - type: CheckBox
-                name: signTest
+                name: norm
+              - type: CheckBox
+                name: qq
+

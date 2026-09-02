@@ -10,7 +10,7 @@ Description: Testy t (jedna próba, dwie grupy, próby sparowane) z panelem pod
     dydaktyczną prostotę: Welch i testy rangowe jako przełączniki, różnica
     z przedziałem ufności i d Cohena z przedziałem, wykres estymacyjny
     Gardnera-Altmana, wykres linii par; w sekcji zaawansowanej test
-    permutacyjny, przedział bootstrapowy, czynnik Bayesa, test znaków, K-S.
+    permutacyjny, przedział bootstrapowy, test znaków, K-S.
     Zastępuje w menu jUPWR testy t z jmv.
 License: GPL (>= 2)
 Encoding: UTF-8
@@ -20,6 +20,5 @@ Imports:
     ggplot2,
     car
 Suggests:
-    BayesFactor,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

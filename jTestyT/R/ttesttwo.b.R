@@ -27,7 +27,6 @@ ttesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 if (isTRUE(o$ks)) addExtraRow(ex, paste(v, "ks"), v, ksTwo(y, g))
                 if (isTRUE(o$perm)) addExtraRow(ex, paste(v, "p"), v, permTwo(y, g, o$hypothesis))
                 if (isTRUE(o$boot)) addExtraRow(ex, paste(v, "b"), v, bootTwo(y, g, level = level))
-                if (isTRUE(o$bf)) addExtraRow(ex, paste(v, "bf"), v, bayesTwo(y, g))
                 x1 <- y[g == lv[1]]; x2 <- y[g == lv[2]]
                 if (isTRUE(o$desc)) for (l in lv)
                     self$results$desc$addRow(rowKey = paste(v, l), values = c(list(var = v, group = l), descRow(y[g == l])))

@@ -23,7 +23,6 @@ ttestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 if (isTRUE(o$perm)) addExtraRow(ex, paste(v, "p"), v, permOne(x, mu, o$hypothesis))
                 if (isTRUE(o$boot)) { b <- bootOne(x, level = level); b$stat <- b$stat - mu; b$lower <- b$lower - mu; b$upper <- b$upper - mu
                     b$test <- "bootstrap (percentylowy CI średniej − wartość testowa)"; addExtraRow(ex, paste(v, "b"), v, b) }
-                if (isTRUE(o$bf)) addExtraRow(ex, paste(v, "bf"), v, bayesOne(x, mu))
                 if (isTRUE(o$desc)) self$results$desc$addRow(rowKey = v, values = c(list(var = v, group = ""), descRow(x)))
                 if (isTRUE(o$norm)) self$results$norm$addRow(rowKey = v, values = c(list(var = v, group = ""), shapiroRow(x)))
                 m <- stats::t.test(x, conf.level = level)
