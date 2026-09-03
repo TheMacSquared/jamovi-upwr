@@ -1,0 +1,23 @@
+Package: jCzest
+Type: Package
+Title: Analizy częstości jUPWR dla jamovi
+Version: 0.1.0
+# UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
+# przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
+Author: jUPWR Team
+Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+Description: Analizy tabel liczności z panelem pod dydaktyczną prostotę:
+    tabela kontyngencji z testem chi-kwadrat, V Craméra i procentami widocznymi
+    od razu, automatyczną kontrolą założenia o liczebnościach oczekiwanych
+    i sugestią testu Fishera, resztami wskazującymi komórki decydujące
+    o zależności oraz wykresem słupkowym i mozaikowym.
+    Zastępuje w menu jUPWR analizy częstości z jmv.
+License: GPL (>= 2)
+Encoding: UTF-8
+Imports:
+    jmvcore (>= 2.4.2),
+    R6,
+    ggplot2
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

@@ -171,7 +171,10 @@ export class AnalyseTab extends RibbonTab {
             'T-Tests': 40,
             'ANOVA': 50,
             'Regression': 60,
-            'Frequencies': 70,
+            'Częstości': 70,
+            // jmv::Frequencies zostaje widoczne obok, dopóki jCzest nie osiągnie
+            // parytetu (brak warstw, `zgodnosc` i `zalezne`) — patrz CLAUDE.md, zadanie 17
+            'Frequencies': 71,
             'Factor': 80,
             'Testy permutacyjne': 90,
             'Bootstrap': 100

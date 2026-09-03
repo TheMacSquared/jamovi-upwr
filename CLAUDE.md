@@ -305,3 +305,62 @@ różnicy granicznej, poziomie CI. Przejrzeć gruntownie: każda nota ma mieć j
 zdanie z tym, co niezbędne do odczytania tabeli; objaśnienia metod przenieść do
 dokumentacji/handoutu. Sprawdzić też długość podtytułów wykresów (obcinane przy
 długich nazwach zmiennych/poziomów).
+
+### Zadanie 17: jCzest — częstości jUPWR zamiast analiz częstości jmv (wzór jANOVA)
+Katalog `jCzest/` (wbudowany, menuGroup „Częstości"). Diagnoza kategorii jmv
+(2026-09-03): problem odwrotny niż w ANOVIE — panel nie jest przeładowany, tylko
+PUSTY. `contTables` ma 40 opcji, wszystkie w zwiniętych sekcjach; po wrzuceniu
+zmiennych widać samą tabelę liczności i χ². Domyślnie wyłączone jest wszystko,
+czego trzeba do interpretacji: procenty wierszami, liczebności oczekiwane,
+V Craméra. Sprawdzone w kodzie: jedyny `Notice` w `jmv/R/conttables.b.R:38`
+dotyczy ważenia danych — **nie ma żadnej kontroli założenia E ≥ 5**; tabela `nom`
+ma dla V Craméra wyłącznie kolumnę `Value` (bez CI); tabela `chiSq` nie ma
+kolumny z wielkością efektu.
+
+Trzy analizy zamiast pięciu:
+- `tabela` (← `contTables`) — RDZEŃ: wiersze, kolumny, liczności, χ²,
+  **V Craméra domyślnie ON**, procenty jako radio (brak/wierszami/kolumnami),
+  α, wykres (słupkowy/mozaikowy). „Założenia": liczebności oczekiwane
+  + **automatyczne ostrzeżenie, gdy E < 5 w > 20 % komórek, z sugestią Fishera**.
+  „Zaawansowane": iloraz wiarygodności, poprawka ciągłości, z dla różnicy
+  proporcji, miary 2×2 (OR, RR, różnica proporcji + CI, `compare`, `hypothesis`),
+  miary porządkowe (gamma, tau-b, Mantel-Haenszel), reszty standaryzowane
+  („które komórki decydują"), warstwy.
+- `zgodnosc` (← `propTestN` + `propTest2` SCALONE) — jeden panel, metoda dobierana
+  automatycznie jak przełącznik `nonpar` w jANOVIE: 2 kategorie → test dwumianowy,
+  N kategorii → χ² zgodności. Dziś to dwie pozycje w menu, a dla studenta jedno
+  pytanie.
+- `zalezne` (← `contTablesPaired` + Q COCHRANA) — McNemar dla 2 pomiarów,
+  Q Cochrana dla k pomiarów. Daje Q Cochrana naturalny dom (zadanie 10 wymienia
+  go jako test „bez naturalnego miejsca", planowany do `jNiepar` — stamtąd usunąć).
+
+Usunięte świadomie: `contCoef` (zdominowany przez V Craméra, zależy od wymiaru
+tabeli), `logOdds` (szczegół techniczny, OR wystarczy), `resU` (reszty surowe,
+nieporównywalne między komórkami), `resA`/`hlresA` (reszty dewiancji z Poisson GLM),
+oraz w `propTest2` czynnik Bayesa z priorami i wykresami posterior (`bf`, `priorA`,
+`priorB`, `ciBayes`, `ciBayesWidth`, `postPlots` — 6 z 13 opcji; ta sama decyzja
+co w jTestyT: Bayes to osobny moduł w planach).
+
+Do dodania (nie ma tego w jmv):
+1. ostrzeżenie o E < 5 z sugestią Fishera — najważniejsze, dziś wybór testu
+   jest niewspierany,
+2. porównania wielokrotne dla tabel r×c (które pary kategorii się różnią,
+   poprawka Holma) — dziś tylko reszty, które trzeba umieć czytać,
+3. V Craméra z przedziałem ufności (bootstrap),
+4. test trendu Cochrana-Armitage'a dla uporządkowanych kategorii
+   (Mantel-Haenszel to nie to samo),
+5. w Cohena jako wielkość efektu testu zgodności,
+6. wykres mozaikowy wprost w analizie (dziś tylko w zakładce Wykresy jako
+   `scatr::mosaic`, więc nie łączy się z tabelą).
+
+`logLinear` ZOSTAJE jako jmv, widoczne — jedyne narzędzie do tabel 3+-wymiarowych,
+poziomem poza kursem podstawowym; casus MANCOVY (nie zastępujemy, ewentualnie
+`JUPWR_MENU_LAST`). CI dla pojedynczej proporcji świadomie NIE dublujemy — jest
+w jCI (`ciproportion`).
+
+Kolejność prac: `tabela` najpierw (≈80 % użycia kategorii; ostrzeżenie o E < 5
+daje najwięcej wartości przy najmniejszym nakładzie), potem `zgodnosc`, `zalezne`.
+Ukrywanie jmv w `JUPWR_HIDDEN_ANALYSES`: `jmv::contTables`, `jmv::contTablesPaired`,
+`jmv::propTest2`, `jmv::propTestN` (UWAGA: klucze to `ns::name` z pola `name:`
+w .a.yaml jmv, czyli camelCase). Grupa „Częstości" w `groupOrder`
+(`client/main/ribbon/analysetab.ts`) w miejscu dzisiejszego `Frequencies: 70`.

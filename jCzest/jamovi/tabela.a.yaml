@@ -1,0 +1,168 @@
+---
+name: tabela
+title: Tabela kontyngencji
+menuGroup: Częstości
+menuTitle: Tabela kontyngencji
+menuSubtitle: dwie zmienne jakościowe
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    # --- rdzeń ---
+    - name: rows
+      title: Wiersze
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: cols
+      title: Kolumny
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: counts
+      title: Liczności (opcjonalnie)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default:
+
+    - name: chiSq
+      title: χ² niezależności
+      type: Bool
+      default: true
+
+    - name: effSize
+      title: Wielkość efektu (V Craméra)
+      type: Bool
+      default: true
+
+    - name: pc
+      title: Procenty
+      type: List
+      options:
+        - title: Brak
+          name: none
+        - title: Wierszami
+          name: row
+        - title: Kolumnami
+          name: col
+        - title: Od ogółu
+          name: total
+      default: row
+
+    - name: alpha
+      title: α
+      type: Number
+      min: 0.0001
+      max: 0.5
+      default: 0.05
+
+    - name: plot
+      title: Wykres
+      type: List
+      options:
+        - title: Brak
+          name: none
+        - title: Słupkowy
+          name: bar
+        - title: Mozaikowy
+          name: mosaic
+      default: none
+
+    # --- założenia ---
+    - name: exp
+      title: Liczebności oczekiwane
+      type: Bool
+      default: false
+
+    - name: fisher
+      title: Dokładny test Fishera
+      type: Bool
+      default: false
+
+    # --- zaawansowane ---
+    - name: chiSqCorr
+      title: Poprawka ciągłości (2×2)
+      type: Bool
+      default: false
+
+    - name: likeRat
+      title: Iloraz wiarygodności (G²)
+      type: Bool
+      default: false
+
+    - name: effSizeCI
+      title: Przedział ufności dla V (bootstrap)
+      type: Bool
+      default: false
+
+    - name: resid
+      title: Reszty standaryzowane
+      type: Bool
+      default: false
+
+    - name: pairwise
+      title: Porównania par wierszy (Holm)
+      type: Bool
+      default: false
+
+    - name: trend
+      title: Test trendu (Cochran-Armitage)
+      type: Bool
+      default: false
+
+    - name: odds
+      title: Iloraz szans (OR)
+      type: Bool
+      default: false
+
+    - name: relRisk
+      title: Ryzyko względne (RR)
+      type: Bool
+      default: false
+
+    - name: diffProp
+      title: Różnica proporcji
+      type: Bool
+      default: false
+
+    - name: compare
+      title: Porównuj
+      type: List
+      options:
+        - title: Wiersze
+          name: rows
+        - title: Kolumny
+          name: cols
+      default: rows
+
+    - name: ciWidth
+      title: Poziom ufności
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+
+    - name: gamma
+      title: Gamma Goodmana-Kruskala
+      type: Bool
+      default: false
+
+    - name: taub
+      title: Tau-b Kendalla
+      type: Bool
+      default: false
+...

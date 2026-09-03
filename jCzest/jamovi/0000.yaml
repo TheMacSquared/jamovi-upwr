@@ -1,0 +1,23 @@
+---
+title: Częstości jUPWR
+name: jCzest
+version: 0.1.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: >
+  Analizy tabel liczności z prostym panelem: test χ², V Craméra i procenty
+  widoczne od razu, automatyczna kontrola liczebności oczekiwanych.
+analyses:
+  - title: Tabela kontyngencji
+    name: tabela
+    ns: jCzest
+    menuGroup: Częstości
+    menuTitle: Tabela kontyngencji
+    menuSubtitle: dwie zmienne jakościowe
+    category: analyses
+usesNative: true
+minApp: 1.0.8
+
+...

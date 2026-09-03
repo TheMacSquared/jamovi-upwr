@@ -1,0 +1,188 @@
+---
+name: tabela
+title: Tabela kontyngencji
+jrs: '1.1'
+
+items:
+    - name: freqs
+      title: Tabela kontyngencji
+      type: Table
+      rows: 0
+      clearWith: &cw
+        - rows
+        - cols
+        - counts
+        - pc
+        - exp
+      columns: []
+
+    - name: tests
+      title: Testy niezależności
+      type: Table
+      rows: 0
+      clearWith: &cwt
+        - rows
+        - cols
+        - counts
+        - chiSq
+        - chiSqCorr
+        - likeRat
+        - fisher
+      columns:
+        - name: test
+          title: ''
+          type: text
+        - name: stat
+          title: Wartość
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: effsize
+      title: Wielkość efektu
+      type: Table
+      rows: 0
+      visible: (effSize)
+      clearWith:
+        - rows
+        - cols
+        - counts
+        - effSizeCI
+        - ciWidth
+      columns:
+        - name: measure
+          title: ''
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+        - name: lower
+          title: Dolna
+          type: number
+          visible: (effSizeCI)
+        - name: upper
+          title: Górna
+          type: number
+          visible: (effSizeCI)
+        - name: interp
+          title: Interpretacja
+          type: text
+
+    - name: measures
+      title: Miary dla tabeli 2×2
+      type: Table
+      rows: 0
+      visible: (odds || relRisk || diffProp)
+      clearWith:
+        - rows
+        - cols
+        - counts
+        - compare
+        - ciWidth
+      columns:
+        - name: measure
+          title: ''
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+        - name: lower
+          title: Dolna
+          type: number
+        - name: upper
+          title: Górna
+          type: number
+
+    - name: ordinal
+      title: Miary dla zmiennych porządkowych
+      type: Table
+      rows: 0
+      visible: (gamma || taub)
+      clearWith:
+        - rows
+        - cols
+        - counts
+      columns:
+        - name: measure
+          title: ''
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+
+    - name: trend
+      title: Test trendu (Cochran-Armitage)
+      type: Table
+      rows: 0
+      visible: (trend)
+      clearWith:
+        - rows
+        - cols
+        - counts
+      columns:
+        - name: z
+          title: z
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: resid
+      title: Reszty standaryzowane
+      type: Table
+      rows: 0
+      visible: (resid)
+      clearWith:
+        - rows
+        - cols
+        - counts
+        - alpha
+      columns: []
+
+    - name: pairwise
+      title: Porównania par wierszy
+      type: Table
+      rows: 0
+      visible: (pairwise)
+      clearWith:
+        - rows
+        - cols
+        - counts
+      columns:
+        - name: g1
+          title: ''
+          type: text
+        - name: g2
+          title: ''
+          type: text
+        - name: stat
+          title: χ²
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: p
+          title: p Holm
+          type: number
+          format: zto,pvalue
+
+    - name: plot
+      title: Wykres
+      type: Image
+      width: 500
+      height: 400
+      renderFun: .plot
+      visible: (plot:bar || plot:mosaic)
+      clearWith:
+        - rows
+        - cols
+        - counts
+        - plot
+        - pc
+...

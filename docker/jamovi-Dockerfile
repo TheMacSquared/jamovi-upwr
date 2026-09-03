@@ -229,6 +229,10 @@ COPY $JAMOVI_ROOT/jTestyT/ /tmp/source/jTestyT
 WORKDIR /tmp/source/jTestyT
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
+COPY $JAMOVI_ROOT/jCzest/ /tmp/source/jCzest
+WORKDIR /tmp/source/jCzest
+RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
+
 
 
 ##### I18N #####
