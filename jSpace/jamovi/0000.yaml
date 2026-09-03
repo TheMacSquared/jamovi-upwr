@@ -1,7 +1,7 @@
 ---
 title: Statystyka danych kosmicznych
 name: jSpace
-version: 0.2.1
+version: 0.2.2
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -53,9 +53,57 @@ datasets:
     description: "562 satelity z 11 konstelacji: inklinacja, ekscentrycznosc, wysokosc, okres — ANOVA"
     documentation:
       summary: >-
-        Aktywne satelity z 11 konstelacji (GPS, Galileo, Starlink, GEO...): inklinacja,
-        ekscentrycznosc, wysokosc i okres orbity. Zrodlo: CelesTrak (dane USSPACECOM),
-        snapshot 2026-08-26.
+        Aktywne satelity z 11 konstelacji (GPS, Galileo, Starlink, GEO...) z
+        parametrami orbit wyliczonymi z elementow TLE — porownanie grup satelitow
+        i rozkladow parametrow orbitalnych.
+      details: >-
+        562 satelity z 12 grup CelesTrak (stacje kosmiczne, GPS, GLONASS, Galileo,
+        BeiDou, Iridium NEXT, Starlink, OneWeb, meteorologiczne, naukowe,
+        komunikacyjne GEO), snapshot z 2026-08-26. Z drugiej linii TLE odczytano
+        inklinacje, ekscentrycznosc i liczbe obiegow na dobe; wysokosc obliczono
+        z trzeciego prawa Keplera (polos wielka minus sredni promien Ziemi 6371 km),
+        okres jako 1440/obiegi. Typ orbity: LEO ponizej 2000 km, MEO do 34 000 km,
+        GEO powyzej. Satelity obecne w kilku grupach zostawiono raz. Zbior ilustruje
+        porownanie grup (ANOVA, Kruskal-Wallis), rozklady i zaleznosc
+        wysokosc-okres. Analiza: Kosmos → Porownanie grup satelitow (zmienna =
+        wysokosc_km lub inklinacja, grupujaca = konstelacja lub typ_orbity).
+      variables:
+        - name: nazwa
+          description: Nazwa satelity wg CelesTrak.
+        - name: norad
+          description: Numer katalogowy NORAD.
+        - name: konstelacja
+          description: "Konstelacja / grupa: GPS, GLONASS, Galileo, BeiDou, Iridium NEXT, Starlink, OneWeb, Meteorologiczne, Naukowe, Komunikacyjne GEO, Stacje kosmiczne."
+        - name: inklinacja
+          description: Nachylenie plaszczyzny orbity do rownika (stopnie).
+        - name: ekscentrycznosc
+          description: Mimosrod orbity (0 = kolowa).
+        - name: obiegi_na_dobe
+          description: Ruch sredni — liczba obiegow Ziemi na dobe.
+        - name: wysokosc_km
+          description: Srednia wysokosc orbity nad srednim promieniem Ziemi (km), z trzeciego prawa Keplera.
+        - name: okres_min
+          description: Okres obiegu (minuty) = 1440 / obiegi_na_dobe.
+        - name: typ_orbity
+          description: "Klasa orbity wg wysokosci: LEO (< 2000 km), MEO, GEO (> 34 000 km)."
+      source: >-
+        CelesTrak (https://celestrak.org), elementy TLE generowane przez USSPACECOM,
+        snapshot 2026-08-26; przetworzone skryptem data-raw/satelity.R.
+      references:
+        - >-
+          Kelso, T. S. CelesTrak: Current GP Element Sets. https://celestrak.org/NORAD/elements/
+        - >-
+          Vallado, D. A. (2013). Fundamentals of Astrodynamics and Applications (4th ed.).
+          Microcosm Press.
+      provenance:
+        package: CelesTrak
+        dataset: GP element sets (TLE), snapshot 2026-08-26
+        url: https://celestrak.org/NORAD/elements/
+      changes:
+        - >-
+          Z TLE zachowano tylko inklinacje, ekscentrycznosc i ruch sredni; wysokosc,
+          okres i typ orbity to wielkosci pochodne wyliczone w jUPWR.
+        - Nazwy konstelacji po polsku; duplikaty (satelita w kilku grupach) usuniete.
     tags:
       - kosmos
       - orbity
@@ -65,9 +113,46 @@ datasets:
     description: "Stacje naziemne w miastach Europy: wspolrzedne i pomiary (temperatura, AOD, NDVI)"
     documentation:
       summary: >-
-        Stacje naziemne w miastach Europy: wspolrzedne geograficzne oraz symulowane pomiary
-        srednioroczne (temperatura, AOD, NDVI) z gradientem szerokosci geograficznej.
-        Wspolrzedne: Natural Earth (domena publiczna).
+        150 stacji naziemnych w 50 miastach Europy: wspolrzedne geograficzne oraz
+        symulowane srednioroczne pomiary z gradientem szerokosci geograficznej —
+        mapy punktowe, statystyki regionalne, korelacja i regresja.
+      details: >-
+        Po 3 stacje na miasto, rozrzucone losowo do 0,25 stopnia od centrum.
+        Wspolrzedne miast to fakty publiczne (sprawdzone z Natural Earth); pomiary sa
+        SYMULOWANE (ustalone ziarno): temperatura maleje o ok. 0,6 °C na stopien
+        szerokosci, AOD ma lagodny gradient poludnie-polnoc, NDVI jest najwyzsze
+        w strefie umiarkowanej i spada na dalekim poludniu i polnocy (zaleznosc
+        nieliniowa). Zbior ilustruje mapy punktowe, agregacje po kraju, korelacje
+        i regresje na danych geograficznych. Analiza: Kosmos → Mapa punktowa
+        i statystyki regionalne (lon = lon, lat = lat, wartosc = temperatura,
+        grupa = kraj) lub Regresja → Korelacja (lat, temperatura, ndvi_sredni).
+      variables:
+        - name: stacja
+          description: Identyfikator stacji (miasto-numer).
+        - name: miasto
+          description: Miasto, przy ktorym lezy stacja (50 miast).
+        - name: kraj
+          description: Kraj (grupa do statystyk regionalnych).
+        - name: lon
+          description: Dlugosc geograficzna (stopnie, WGS84).
+        - name: lat
+          description: Szerokosc geograficzna (stopnie, WGS84).
+        - name: temperatura
+          description: Symulowana srednia roczna temperatura (°C).
+        - name: aod
+          description: Symulowana grubosc optyczna aerozolu (AOD, bezwymiarowa).
+        - name: ndvi_sredni
+          description: Symulowany sredni roczny NDVI w otoczeniu stacji.
+      source: >-
+        Dane syntetyczne jUPWR (skrypt data-raw/stacje.R, ziarno 2026); wspolrzedne
+        miast za Natural Earth (populated places, domena publiczna).
+      references:
+        - Natural Earth. Populated Places. https://www.naturalearthdata.com/
+      provenance:
+        package: jSpace
+        dataset: data-raw/stacje.R
+      changes:
+        - Zbior utworzony w jUPWR; pomiary symulowane, nie pochodza z rzeczywistych stacji.
     tags:
       - kosmos
       - dane przestrzenne
@@ -77,9 +162,48 @@ datasets:
     description: "Piksele Landsat: 4 pasma, NDVI i klasa pokrycia terenu — klasyfikacja"
     documentation:
       summary: >-
-        Probki pikseli z obrazow Landsat (UCI Statlog): 4 pasma spektralne, NDVI i klasa
-        pokrycia terenu — dane do klasyfikacji. Zrodlo: UCI ML Repository,
-        doi:10.24432/C55887, licencja CC BY 4.0.
+        1500 pikseli z obrazow Landsat MSS z wartosciami w 4 pasmach spektralnych,
+        NDVI i klasa pokrycia terenu — klasyfikacja nadzorowana (k-NN, drzewo)
+        i porownanie klas.
+      details: >-
+        Losowa podprobka (ustalone ziarno) zbioru Statlog (Landsat Satellite)
+        z repozytorium UCI: z kazdego sasiedztwa 3×3 pikseli zachowano 4 pasma
+        piksela centralnego (zielone 0,55-0,61 µm, czerwone 0,61-0,68 µm, NIR
+        0,72-0,90 µm i 0,80-1,10 µm; wartosci 0-255) oraz klase pokrycia terenu,
+        a NDVI obliczono jako (nir1 - czerwony)/(nir1 + czerwony). Szesc klas:
+        gleba czerwona, uprawa bawelny, gleba szara, gleba szara wilgotna,
+        roslinnosc na sciernisku, gleba szara bardzo wilgotna. Analiza: Kosmos →
+        Klasyfikacja pokrycia terenu (klasa = klasa, predyktory = zielony,
+        czerwony, nir1, nir2) lub ANOVA (ndvi wg klasa).
+      variables:
+        - name: zielony
+          description: Odbicie w pasmie zielonym (0-255).
+        - name: czerwony
+          description: Odbicie w pasmie czerwonym (0-255).
+        - name: nir1
+          description: Odbicie w bliskiej podczerwieni 0,72-0,90 µm (0-255).
+        - name: nir2
+          description: Odbicie w bliskiej podczerwieni 0,80-1,10 µm (0-255).
+        - name: ndvi
+          description: Znormalizowany wskaznik roslinnosci (nir1 - czerwony)/(nir1 + czerwony).
+        - name: klasa
+          description: Klasa pokrycia terenu (6 poziomow) — zmienna celu klasyfikacji.
+      source: >-
+        Srinivasan, A. (1993). Statlog (Landsat Satellite). UCI Machine Learning
+        Repository; licencja CC BY 4.0.
+      references:
+        - >-
+          Srinivasan, A. (1993). Statlog (Landsat Satellite) [Dataset]. UCI Machine
+          Learning Repository. https://doi.org/10.24432/C55887
+      provenance:
+        package: UCI Machine Learning Repository
+        dataset: Statlog (Landsat Satellite)
+        url: https://archive.ics.uci.edu/dataset/146/statlog+landsat+satellite
+      changes:
+        - >-
+          Z 36 atrybutow zachowano 4 pasma piksela centralnego; dodano NDVI; klasy
+          przetlumaczono na polski; losowa podprobka 1500 z 4435 wierszy zbioru
+          treningowego.
     tags:
       - kosmos
       - uczenie maszynowe
@@ -89,8 +213,31 @@ datasets:
     description: "Symulowany raster NDVI (siatka 200x200) jako tabela x, y, ndvi"
     documentation:
       summary: >-
-        Symulowany raster wskaznika NDVI okolic Wroclawia (siatka 200x200, widoczne centrum
-        miasta i rzeka) zapisany jako tabela x, y, ndvi — raster w postaci tabelarycznej.
+        Symulowany raster wskaznika NDVI okolic Wroclawia (200×200 komorek) zapisany
+        jako tabela wspolrzednych i wartosci — statystyki rastra, histogram
+        i mapa wartosci.
+      details: >-
+        40 000 komorek siatki regularnej w ukladzie WGS84 (16,85-17,25° E,
+        50,98-51,24° N). Pole wygenerowano celowo syntetycznie (ustalone ziarno):
+        gladkie tlo roslinne, spadek NDVI w centrum miasta i pas rzeki o NDVI
+        bliskim zera, tak by struktura przestrzenna przypominala rzeczywistosc,
+        a modul dal sie odtworzyc bez pobierania danych Sentinel-2. Ten sam raster
+        jest dolaczony jako GeoTIFF (inst/extdata/ndvi_wroclaw.tif). Analiza:
+        Kosmos → Statystyki rastra (x = x, y = y, wartosc = ndvi) lub Eksploracja →
+        Statystyki opisowe (ndvi).
+      variables:
+        - name: x
+          description: Dlugosc geograficzna srodka komorki (stopnie).
+        - name: y
+          description: Szerokosc geograficzna srodka komorki (stopnie).
+        - name: ndvi
+          description: Symulowany NDVI komorki (od -0,1 do 0,95).
+      source: Dane syntetyczne jUPWR (skrypt data-raw/ndvi.R, ziarno 2026, pakiet terra).
+      provenance:
+        package: jSpace
+        dataset: data-raw/ndvi.R
+      changes:
+        - Zbior utworzony w jUPWR; wartosci nie pochodza z rzeczywistych obrazow satelitarnych.
     tags:
       - kosmos
       - dane przestrzenne

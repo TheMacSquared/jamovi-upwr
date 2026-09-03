@@ -18,8 +18,8 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.5.0 |
 | `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery/NIR; zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.3.0 |
 | `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem, d Cohena z CI, wykresem estymacyjnym; zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.2.0 |
-| `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
-| `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.2.1 |
+| `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.3 |
+| `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.2.2 |
 | `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.0 |
 
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
@@ -62,6 +62,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.4 | 28.2 | 0.3.3 | ✅ 2026-09-03 | ⬜ do zbudowania |
 | 0.9.4 | 28.2 | 0.3.2 | ✅ 2026-09-03 | ✅ 2026-09-03 |
 | 0.9.2.2 | 28.2 | 0.3.2 | ✅ 2026-08-31 | ✅ 2026-08-31 |
 | 0.9.2.1 | 28.2 | 0.3.2 | ⬜ do zbudowania | ✅ 2026-08-31 |
@@ -79,7 +80,8 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 0.9.4 | 28.2 | 0.2.1 | ✅ 2026-09-03 | ⬜ do zbudowania |
+| 0.9.4 | 28.2 | 0.2.2 | ✅ 2026-09-03 | ⬜ do zbudowania |
+| 0.9.4 | 28.2 | 0.2.1 | ✅ 2026-09-03 (zastąpiony przez 0.2.2) | ⬜ |
 | 0.9.4 | 28.2 | 0.2.0 | ✅ 2026-09-03 (wadliwy na macOS — nie ładuje sf/asteRisk) | ✅ 2026-09-03 |
 | 0.9.2.2 | 28.2 | 0.2.0 | ✅ 2026-08-31 | ✅ 2026-08-31 |
 | 0.9.2.1 | 28.2 | 0.2.0 | ⬜ do zbudowania | ✅ 2026-08-31 |

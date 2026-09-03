@@ -52,9 +52,12 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   „O zbiorze" z ikoną SVG w stylu paska stanu.
 - CLAUDE.md: kolejka zadań 8–13 (Eksploracja, testy nieparametryczne,
   jSzereg, jMoc, jML) i zadanie 14 (jANOVA).
-- jSpace 0.2.1: krótkie jednowierszowe opisy zbiorów w Bibliotece (długie
-  nachodziły na sąsiednie pozycje), szczegóły przeniesione do `documentation`
-  jak w jDane. Plik `.jmo` dla macOS ładuje się teraz w silniku: binaria CRAN
+- Dokumentacja zbiorów („O zbiorze", jak w jDane) dla modułów opcjonalnych:
+  jSpace 0.2.2 (4 zbiory: streszczenie, szczegóły z podpowiedzią analizy,
+  zmienne, źródło, bibliografia, pochodzenie, zmiany) i jRISK 0.3.3 (3 zbiory
+  Bananpol; do tego tagi i krótkie jednowierszowe opisy w Bibliotece).
+- jSpace: krótkie jednowierszowe opisy zbiorów w Bibliotece (długie
+  nachodziły na sąsiednie pozycje). Plik `.jmo` dla macOS ładuje się teraz w silniku: binaria CRAN
   asteRisk i classInt (a przez niego sf) odwoływały się do libR/libgfortran
   przez `@executable_path/../Frameworks/R.framework/...` i do libtbb przez
   LC_RPATH systemowego R — wrapper `R` maskował to zmienną
@@ -64,8 +67,8 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - Build macOS: 20-modules.sh nie usuwa już z payloadu jANOVA i jTestyT
   (lista `EXPECTED` nie znała nowych modułów wbudowanych).
 - Moduły: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.2, jCI 0.1.0, jperm 0.1.0,
-  jboot 0.3.0, jDane 0.5.0, jANOVA 0.3.0, jTestyT 0.2.0; opcjonalne: jRISK 0.3.2,
-  jSpace 0.2.1, jRol 0.1.0.
+  jboot 0.3.0, jDane 0.5.0, jANOVA 0.3.0, jTestyT 0.2.0; opcjonalne: jRISK 0.3.3,
+  jSpace 0.2.2, jRol 0.1.0.
 
 ## 0.9.2.2 — 2026-08-31
 - jCI i jperm dostają polskie znaki w interfejsie. Oba moduły miały teksty

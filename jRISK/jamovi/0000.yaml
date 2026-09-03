@@ -1,7 +1,7 @@
 ---
 title: Ryzyko i niezawodnosc
 name: jRISK
-version: 0.3.2
+version: 0.3.3
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -48,19 +48,136 @@ analyses:
 datasets:
   - name: Bananpol — urządzenia dojrzewalni
     path: bananpol.csv
-    description: >-
-      Czasy pracy 150 urządzeń dojrzewalni (Weibull, cenzurowanie) oraz
-      kontrole, usterki i wydajność
+    description: "Czasy pracy 150 urządzeń z cenzurowaniem, kontrole, usterki, wydajność — Weibull"
+    documentation:
+      summary: >-
+        Czasy pracy do awarii 150 urządzeń dojrzewalni bananów w firmie Bananpol,
+        z cenzurowaniem prawostronnym, oraz liczby niezaliczonych kontroli, usterek
+        i wydajność — modele czasu życia i rozkłady dyskretne.
+      details: >-
+        Dane syntetyczne (ustalone ziarno). Czas pracy w miesiącach wylosowano
+        z rozkładu Weibulla (kształt 1,5, skala 24) i ucięto przy 36 miesiącach:
+        urządzenia pracujące dłużej mają awaria = 0 (obserwacja cenzurowana).
+        Liczba niezaliczonych kontroli to wynik 12 kontroli rocznie z szansą
+        niezaliczenia 0,15 (rozkład dwumianowy), usterki rocznie mają rozkład
+        Poissona (λ = 2), wydajność rozkład normalny (100, 8). Trzy sekcje i trzy
+        typy urządzeń pozwalają na porównania grup. Analiza: Ryzyko → Modele czasu
+        życia (czas = czas_pracy, status = awaria) oraz Rozkłady → dopasowanie
+        rozkładu dwumianowego i Poissona.
+      variables:
+        - name: id
+          description: Numer urządzenia.
+        - name: sekcja
+          description: "Sekcja dojrzewalni: A, B, C."
+        - name: urzadzenie
+          description: "Typ urządzenia: agregat, wentylator, nawilzacz."
+        - name: czas_pracy
+          description: Czas pracy do awarii lub do końca obserwacji (miesiące, maks. 36).
+        - name: awaria
+          description: "Status: 1 = zaobserwowano awarię, 0 = obserwacja cenzurowana (urządzenie nadal pracuje)."
+        - name: kontrole_niezaliczone
+          description: Liczba niezaliczonych kontroli spośród 12 w roku.
+        - name: usterki_rok
+          description: Liczba drobnych usterek w roku.
+        - name: wydajnosc
+          description: Wydajność jako procent wartości nominalnej.
+      source: Dane syntetyczne jUPWR (skrypt data-raw/bananpol.R, ziarno 2026).
+      provenance:
+        package: jRISK
+        dataset: data-raw/bananpol.R
+      changes:
+        - Zbiór utworzony w jUPWR na potrzeby kursu analizy ryzyka; firma Bananpol jest fikcyjna.
+    tags:
+      - ryzyko
+      - niezawodność
+      - czas życia
   - name: Bananpol — wypadki (skórki od banana)
     path: bananpol_wypadki.csv
-    description: >-
-      Poślizgnięcia 200 pracowników na skórkach od banana: miejsce pracy, buty
-      antypoślizgowe, ciężkość urazu — dane do warunkowania i tabel 2×2
+    description: "Poślizgnięcia 200 pracowników: miejsce, buty antypoślizgowe, ciężkość — tabele 2×2"
+    documentation:
+      summary: >-
+        Poślizgnięcia na skórkach od banana wśród 200 pracowników magazynu
+        Bananpol: sekcja, miejsce pracy, staż, buty antypoślizgowe, liczba skórek
+        w tygodniu, ciężkość urazu i dni zwolnienia — prawdopodobieństwo
+        warunkowe, tabele 2×2 i schemat Bernoulliego.
+      details: >-
+        Dane syntetyczne (ustalone ziarno) o celowo zbudowanej strukturze
+        zależności: liczba napotkanych skórek zależy od sekcji (Poisson; sekcja C
+        sąsiaduje ze stołówką), każda skórka to próba Bernoulliego, w której
+        szansa poślizgnięcia zależy od butów antypoślizgowych (0,04 vs 0,12)
+        i podłoża (dojrzewalnia wilgotna ×1,6, magazyn suchy ×0,7), ciężkość urazu
+        przy poślizgnięciu jest łagodniejsza w butach antypoślizgowych, a dni
+        zwolnienia rosną z ciężkością. Analiza: Ryzyko → Zdarzenia i warunkowanie
+        (zdarzenie A = poslizgniecie, B = buty_antyposlizgowe lub miejsce),
+        Ryzyko → Schemat Bernoulliego (wynik = poslizgniecie), Częstości →
+        Tabele kontyngencji.
+      variables:
+        - name: pracownik
+          description: Numer pracownika.
+        - name: sekcja
+          description: "Sekcja: A, B, C (C przy stołówce — więcej skórek)."
+        - name: miejsce
+          description: "Miejsce pracy: magazyn, dojrzewalnia, pakownia."
+        - name: staz
+          description: Staż pracy (lata).
+        - name: buty_antyposlizgowe
+          description: "Czy pracownik nosi buty antypoślizgowe: tak / nie."
+        - name: skorki_tydzien
+          description: Liczba skórek napotkanych w tygodniu.
+        - name: poslizgniecie
+          description: "Czy doszło do poślizgnięcia: tak / nie."
+        - name: ciezkosc
+          description: "Ciężkość urazu: brak, lekki, sredni, ciezki."
+        - name: dni_zwolnienia
+          description: Liczba dni zwolnienia po wypadku.
+      source: Dane syntetyczne jUPWR (skrypt data-raw/bananpol-wypadki.R, ziarno 32).
+      provenance:
+        package: jRISK
+        dataset: data-raw/bananpol-wypadki.R
+      changes:
+        - Zbiór utworzony w jUPWR; struktura zależności opisana w skrypcie generującym.
+    tags:
+      - ryzyko
+      - prawdopodobieństwo
+      - tabele kontyngencji
   - name: Bananpol — linia dojrzewania (komponenty)
     path: bananpol_system.csv
-    description: >-
-      8 komponentów linii dojrzewania z niezawodnościami i p awarii — dane do
-      niezawodności systemów (tryb danych) i drzewa błędów
+    description: "8 komponentów linii z niezawodnościami i p awarii — systemy i drzewo błędów"
+    documentation:
+      summary: >-
+        Osiem komponentów jednej linii dojrzewania Bananpol w czterech podsystemach
+        z niezawodnością misji i prawdopodobieństwem awarii — niezawodność systemów
+        szeregowo-równoległych i drzewo błędów (FTA).
+      details: >-
+        Wartości ustalone ręcznie (bez losowania). Podsystemy: chłodzenie (AGR1,
+        AGR2), wentylacja (WEN1-WEN3), nawilżanie (NAW1, NAW2) i sterowanie (STER)
+        — komponenty w podsystemie pracują równolegle (redundancja), podsystemy
+        szeregowo, a STER jest celowo pojedynczym punktem awarii. Kolumna p_awarii
+        = 1 - niezawodnosc, więc ten sam plik zasila drzewo błędów z bramkami AND
+        (w podsystemie) i OR (między podsystemami): P(zdarzenie szczytowe)
+        = 1 - R systemu. Analiza: Ryzyko → Niezawodność systemów (niezawodność =
+        niezawodnosc, etykieta = komponent, podsystem = podsystem) oraz Ryzyko →
+        Drzewo błędów (etykieta = komponent, prawdopodobieństwo = p_awarii, gałąź =
+        podsystem).
+      variables:
+        - name: komponent
+          description: Etykieta komponentu (AGR1, AGR2, WEN1-WEN3, NAW1, NAW2, STER).
+        - name: podsystem
+          description: "Podsystem: chlodzenie, wentylacja, nawilzanie, sterowanie."
+        - name: niezawodnosc
+          description: Niezawodność komponentu w czasie misji (prawdopodobieństwo poprawnej pracy).
+        - name: p_awarii
+          description: Prawdopodobieństwo awarii = 1 - niezawodnosc.
+      source: Dane syntetyczne jUPWR (skrypt data-raw/bananpol-system.R).
+      provenance:
+        package: jRISK
+        dataset: data-raw/bananpol-system.R
+      changes:
+        - Zbiór utworzony w jUPWR; struktura systemu dobrana dydaktycznie (redundancja + pojedynczy punkt awarii).
+    tags:
+      - ryzyko
+      - niezawodność
+      - drzewo błędów
 usesNative: true
 minApp: 1.0.8
 
