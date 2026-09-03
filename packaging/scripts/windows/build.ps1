@@ -199,7 +199,7 @@ $jmc = Join-Path $RepoRoot "jamovi-compiler\index.js"
 # Bajty (a nie Get-Content/Set-Content), bo skrypt bywa uruchamiany pod Windows
 # PowerShell 5.1, gdzie `-Encoding UTF8` dopisuje BOM i psuje pliki.
 $YamlBackup = @{}
-foreach ($m in ($Modules + @('jRISK','jSpace'))) {
+foreach ($m in ($Modules + @('jRISK','jSpace','jRol'))) {   # + kazdy modul opcjonalny z krokow 4e-4g
     $y = Join-Path $RepoRoot "$m\jamovi\0000.yaml"
     if (Test-Path $y) { $YamlBackup[$y] = [System.IO.File]::ReadAllBytes($y) }
 }
