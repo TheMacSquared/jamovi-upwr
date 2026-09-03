@@ -1,7 +1,7 @@
 ---
 title: Zbiory danych do zajęć (UPWr)
 name: jDane
-version: 0.5.0
+version: 0.6.0
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -63,7 +63,7 @@ datasets:
       variables:
         - name: block
           description: Blok (1–6).
-        - name: N
+        - name: "N"
           description: "Nawożenie azotem: 0 = brak, 1 = zastosowano."
         - name: P
           description: "Nawożenie fosforem: 0 = brak, 1 = zastosowano."
@@ -575,6 +575,388 @@ datasets:
     tags:
       - społeczne
       - regresja logistyczna
+  - name: Uroda wykładowcy a ocena zajęć (TeachingRatings)
+    path: TeachingRatings.csv
+    description: >-
+      463 kursy na University of Texas — ocena zajęć w ankiecie studenckiej
+      a ocena atrakcyjności wykładowcy
+    documentation:
+      summary: >-
+        Czy ładniejsi wykładowcy dostają lepsze oceny w ankietach studenckich?
+        463 kursy prowadzone przez 94 wykładowców.
+      details: >-
+        Dane z ankiet oceny zajęć na University of Texas at Austin z lat
+        2000–2002. Sześcioro studentów, którzy nie znali wykładowców, oceniło
+        ich atrakcyjność na podstawie zdjęć; zmienna beauty to uśredniona
+        i wystandaryzowana ocena (średnia 0). Zbiór ilustruje korelację, regresję
+        wielokrotną z kontrolą zmiennych zakłócających (płeć, staż, poziom
+        kursu, wielkość grupy) oraz porównania grup. Świetny punkt wyjścia do
+        rozmowy o tym, czego ankiety naprawdę mierzą. Uwaga metodyczna: jeden
+        wykładowca prowadził kilka kursów (zmienna prof), więc obserwacje nie są
+        w pełni niezależne. Analiza: Regresja → Korelacja i Regresja liniowa;
+        T-testy → Test t dla prób niezależnych (eval wg gender).
+      variables:
+        - name: minority
+          description: "Wykładowca należy do mniejszości etnicznej: no, yes."
+        - name: age
+          description: Wiek wykładowcy w latach.
+        - name: gender
+          description: "Płeć wykładowcy: male, female."
+        - name: credits
+          description: >-
+            Waga kursu: single (kurs jednopunktowy, np. zajęcia praktyczne),
+            more (kurs wielopunktowy).
+        - name: beauty
+          description: >-
+            Ocena atrakcyjności wykładowcy — średnia z 6 niezależnych sędziów,
+            wystandaryzowana (średnia 0, wartości ujemne poniżej przeciętnej).
+        - name: eval
+          description: Średnia ocena zajęć w ankiecie studenckiej (1–5).
+        - name: division
+          description: "Poziom kursu: lower (początkowe lata), upper (wyższe lata)."
+        - name: native
+          description: "Angielski jako język ojczysty wykładowcy: yes, no."
+        - name: tenure
+          description: "Stanowisko z gwarancją zatrudnienia (tenure): no, yes."
+        - name: students
+          description: Liczba studentów, którzy wypełnili ankietę.
+        - name: allstudents
+          description: Liczba studentów zapisanych na kurs.
+        - name: prof
+          description: Identyfikator wykładowcy (1–94); ten sam prowadzi kilka kursów.
+      source: Hamermesh i Parker (2005), za dokumentacją pakietu AER.
+      references:
+        - >-
+          Hamermesh, D. S. i Parker, A. M. (2005). Beauty in the classroom:
+          Instructors' pulchritude and putative pedagogical productivity.
+          Economics of Education Review, 24(4), 369–376.
+        - >-
+          Stock, J. H. i Watson, M. W. (2007). Introduction to Econometrics,
+          wyd. 2. Boston: Addison Wesley.
+      provenance:
+        package: AER
+        dataset: TeachingRatings
+        url: https://search.r-project.org/CRAN/refmans/AER/html/TeachingRatings.html
+      changes:
+        - Dane wyeksportowane bez zmian.
+    tags:
+      - społeczne
+      - regresja
+      - korelacja
+  - name: Opóźnienia autobusów
+    path: autobusy.csv
+    description: >-
+      500 kursów miejskich — opóźnienie w minutach wobec pory dnia, dnia
+      tygodnia, pogody i długości trasy (zbiór syntetyczny)
+    documentation:
+      summary: >-
+        Opóźnienia autobusów miejskich w zależności od pory dnia, dnia tygodnia,
+        pogody i długości trasy — zbiór syntetyczny przygotowany na zajęcia.
+      details: >-
+        500 wylosowanych kursów czterech linii. Opóźnienia są mocno prawoskośne
+        z dużą liczbą zer (kurs punktualny lub przed czasem), co pozwala pokazać,
+        że średnia i mediana rozjeżdżają się, a założenie normalności bywa
+        naciągane. Zbiór ilustruje dwuczynnikową ANOVA (pora dnia × pogoda),
+        porównania wielokrotne, regresję z kowariantem (długość trasy) oraz
+        testy nieparametryczne. Poziomy zmiennych porządkowych mają przedrostki
+        liczbowe (1_rano, 2_wt), żeby układały się w naturalnej kolejności.
+        Uwaga: dane są wygenerowane, nie pochodzą z pomiaru — nie należy z nich
+        wyciągać wniosków o rzeczywistej komunikacji miejskiej. Analiza: ANOVA →
+        ANOVA (zależna = opoznienie_min, czynniki = pora_dnia, pogoda).
+      variables:
+        - name: opoznienie_min
+          description: Opóźnienie kursu w minutach (0 = punktualnie lub przed czasem).
+        - name: pora_dnia
+          description: "Pora dnia: 1_rano, 2_popoludnie, 3_wieczor."
+        - name: dzien_tygodnia
+          description: "Dzień tygodnia: od 1_pon do 7_nd."
+        - name: pogoda
+          description: "Warunki pogodowe: slonecznie, deszcz, snieg."
+        - name: nr_linii
+          description: Numer linii autobusowej (144, 175, 182, 501).
+        - name: dlugosc_trasy_km
+          description: Długość trasy w kilometrach.
+      source: Zbiór syntetyczny, wygenerowany na potrzeby zajęć w jUPWR.
+      provenance:
+        package: jDane
+        dataset: autobusy
+      changes:
+        - >-
+          Ujemne zera powstałe przy zaokrąglaniu zamienione na 0; numery linii
+          zapisane jako liczby całkowite.
+    tags:
+      - społeczne
+      - ANOVA
+  - name: Fast food — wartości odżywcze
+    path: fastfood.csv
+    description: >-
+      515 pozycji z menu ośmiu sieci fast food — kalorie, tłuszcz, sód, białko
+    documentation:
+      summary: >-
+        Wartości odżywcze 515 pozycji menu ośmiu amerykańskich sieci fast food
+        — kalorie, tłuszcze, sód, węglowodany i białko.
+      details: >-
+        Dane zebrane ze stron restauracji (McDonald's, Burger King, Subway,
+        Taco Bell, Chick-fil-A, Sonic, Arby's, Dairy Queen). Rozkłady są
+        prawoskośne z wyraźnymi obserwacjami odstającymi — pojedyncze pozycje
+        pokrywają dzienne zapotrzebowanie na sód albo kalorie. Zbiór ilustruje
+        statystyki opisowe w grupach, wykresy pudełkowe i rozrzutu, ANOVA
+        (kalorie wg restauracji), korelację (tłuszcz a kalorie) oraz regresję
+        wielokrotną. Analiza: Eksploracja → Statystyki opisowe z podziałem
+        według restaurant; ANOVA → ANOVA.
+      variables:
+        - name: restaurant
+          description: Sieć restauracji.
+        - name: item
+          description: Nazwa pozycji menu.
+        - name: calories
+          description: Kalorie w porcji (kcal).
+        - name: cal_fat
+          description: Kalorie pochodzące z tłuszczu (kcal).
+        - name: total_fat
+          description: Tłuszcz ogółem w gramach.
+        - name: sat_fat
+          description: Tłuszcze nasycone w gramach.
+        - name: trans_fat
+          description: Tłuszcze trans w gramach.
+        - name: cholesterol
+          description: Cholesterol w miligramach.
+        - name: sodium
+          description: Sód w miligramach (dzienna norma to około 2300 mg).
+        - name: total_carb
+          description: Węglowodany ogółem w gramach.
+        - name: fiber
+          description: Błonnik w gramach.
+        - name: sugar
+          description: Cukry w gramach.
+        - name: protein
+          description: Białko w gramach.
+        - name: vit_a
+          description: Witamina A jako odsetek dziennego zapotrzebowania.
+        - name: vit_c
+          description: Witamina C jako odsetek dziennego zapotrzebowania.
+        - name: calcium
+          description: Wapń jako odsetek dziennego zapotrzebowania.
+        - name: salad
+          description: Czy pozycja jest sałatką (w tym zbiorze zawsze Other).
+      source: Strony internetowe sieci restauracji; pakiet openintro.
+      references:
+        - >-
+          Çetinkaya-Rundel, M. i Hardin, J. (2021). Introduction to Modern
+          Statistics. OpenIntro.
+      provenance:
+        package: openintro
+        dataset: fastfood
+        url: https://www.openintro.org/data/index.php?data=fastfood
+      changes:
+        - Dane wyeksportowane bez zmian; braki danych jako puste komórki.
+    tags:
+      - żywność
+      - statystyki opisowe
+      - ANOVA
+  - name: Filmy (IMDb)
+    path: movies.csv
+    description: >-
+      2000 filmów pełnometrażowych z lat 1970–2005 — budżet, długość, gatunek
+      i ocena widzów
+    documentation:
+      summary: >-
+        Losowa próbka 2000 filmów pełnometrażowych z serwisu IMDb: budżet,
+        czas trwania, gatunek, kategoria wiekowa i średnia ocena widzów.
+      details: >-
+        Podzbiór zbioru movies z pakietu ggplot2movies (stan bazy IMDb na
+        2005 r., pierwotnie 58 788 filmów). Zostawiono filmy od 1970 r., trwające
+        co najmniej 60 minut, z podanym budżetem i co najmniej setką głosów;
+        z tego wylosowano 2000 pozycji. Zbiór ilustruje korelację i regresję
+        (czy droższe filmy są lepiej oceniane — odpowiedź bywa zaskakująca),
+        porównania gatunków, trendy w czasie i pracę z rozkładem prawoskośnym
+        (budżet, liczba głosów — dobry moment na transformację logarytmiczną).
+        Analiza: Regresja → Regresja liniowa (rating od budget, length, year);
+        ANOVA → ANOVA (rating wg genre).
+      variables:
+        - name: title
+          description: Tytuł filmu.
+        - name: year
+          description: Rok produkcji (1970–2005).
+        - name: length
+          description: Czas trwania w minutach.
+        - name: budget
+          description: Budżet produkcji w dolarach (bez korekty o inflację).
+        - name: rating
+          description: Średnia ocena użytkowników IMDb (1–10).
+        - name: votes
+          description: Liczba oddanych głosów.
+        - name: mpaa
+          description: >-
+            Kategoria wiekowa MPAA (G, PG, PG-13, R, NC-17); u wielu filmów brak.
+        - name: genre
+          description: >-
+            Gatunek główny: Documentary, Animation, Action, Romance, Comedy,
+            Drama, Short. Other oznacza film, któremu w bazie nie przypisano
+            żadnego z tych siedmiu gatunków (np. horror czy science fiction).
+        - name: n_genres
+          description: >-
+            Liczba przypisanych gatunków spośród siedmiu (film może mieć kilka;
+            genre podaje pierwszy wg ustalonego priorytetu).
+      source: Internet Movie Database (2005), za pakietem ggplot2movies.
+      references:
+        - >-
+          Wickham, H. (2015). ggplot2movies: Movies Data. R package.
+      provenance:
+        package: ggplot2movies
+        dataset: movies
+        url: https://cran.r-project.org/package=ggplot2movies
+      changes:
+        - >-
+          Filtr (rok ≥ 1970, długość ≥ 60 min, ≥ 100 głosów, znany budżet
+          większy od zera) i losowa próbka 2000 filmów (ziarno 2026).
+        - >-
+          Siedem kolumn wskaźnikowych gatunku zastąpiono zmienną nominalną genre
+          oraz licznikiem n_genres.
+    tags:
+      - kultura
+      - regresja
+      - korelacja
+  - name: Postacie Star Wars
+    path: starwars.csv
+    description: >-
+      87 postaci z sagi Gwiezdnych wojen — wzrost, masa, gatunek i planeta
+      pochodzenia
+    documentation:
+      summary: >-
+        87 postaci z filmów Gwiezdne wojny: wzrost, masa ciała, kolor włosów
+        i skóry, gatunek i planeta pochodzenia.
+      details: >-
+        Mały, lekki zbiór o dwóch dydaktycznych zaletach. Po pierwsze, ma sporo
+        braków danych (masa, kolor włosów, rok urodzenia), więc dobrze nadaje się
+        do rozmowy o brakach. Po drugie, w regresji masy względem wzrostu jedna
+        obserwacja — Jabba the Hutt, ponad tonę przy niewielkim wzroście —
+        samodzielnie wywraca dopasowanie, co jest najkrótszym możliwym wykładem
+        o obserwacjach wpływowych. Analiza: Eksploracja → Statystyki opisowe;
+        Regresja → Regresja liniowa (mass od height) z wykresami diagnostycznymi.
+      variables:
+        - name: name
+          description: Imię postaci.
+        - name: height
+          description: Wzrost w centymetrach.
+        - name: mass
+          description: Masa ciała w kilogramach (u wielu postaci brak).
+        - name: hair_color
+          description: Kolor włosów.
+        - name: skin_color
+          description: Kolor skóry.
+        - name: eye_color
+          description: Kolor oczu.
+        - name: birth_year
+          description: Rok urodzenia w latach przed bitwą o Yavin (BBY).
+        - name: sex
+          description: "Płeć biologiczna: male, female, hermaphroditic, none."
+        - name: gender
+          description: "Rodzaj gramatyczny/rola: masculine, feminine."
+        - name: homeworld
+          description: Planeta pochodzenia.
+        - name: species
+          description: Gatunek (Human, Droid, Wookiee, Hutt i inne).
+      source: Star Wars API (swapi.dev), za pakietem dplyr.
+      provenance:
+        package: dplyr
+        dataset: starwars
+        url: https://dplyr.tidyverse.org/reference/starwars.html
+      changes:
+        - >-
+          Usunięto kolumny listowe (films, vehicles, starships), których nie da
+          się zapisać w arkuszu.
+    tags:
+      - kultura
+      - regresja
+      - statystyki opisowe
+  - name: Datasaurus — te same statystyki, inne wykresy
+    path: datasaurus.csv
+    description: >-
+      13 zbiorów po 142 punkty o niemal identycznych średnich, odchyleniach
+      i korelacji, a zupełnie różnych wykresach
+    documentation:
+      summary: >-
+        Trzynaście zbiorów danych, które mają praktycznie te same statystyki
+        opisowe i tę samą korelację, ale na wykresie rozrzutu wyglądają zupełnie
+        inaczej — jeden z nich to dinozaur.
+      details: >-
+        Zbiory wygenerowano algorytmem symulowanego wyżarzania (Matejka
+        i Fitzmaurice, 2017), tak aby średnie x i y, odchylenia standardowe
+        i współczynnik korelacji zgadzały się do dwóch miejsc po przecinku,
+        a kształt chmury punktów był z góry zadany. To najkrótszy dowód na to,
+        że dane trzeba narysować, zanim policzy się z nich cokolwiek. Sposób
+        użycia na zajęciach: policzyć statystyki opisowe i korelację z podziałem
+        według dataset (wyjdą identyczne), a potem zrobić wykres rozrzutu
+        z podziałem na te same grupy. Analiza: Eksploracja → Statystyki opisowe
+        (podział według dataset); Wykresy → Zależności → Wykres rozrzutu.
+      variables:
+        - name: dataset
+          description: >-
+            Nazwa zbioru: dino, away, bullseye, circle, dots, h_lines,
+            high_lines, slant_down, slant_up, star, v_lines, wide_lines, x_shape.
+        - name: x
+          description: Współrzędna x punktu.
+        - name: "y"
+          description: Współrzędna y punktu.
+      source: Matejka i Fitzmaurice (2017); pakiet datasauRus.
+      references:
+        - >-
+          Matejka, J. i Fitzmaurice, G. (2017). Same stats, different graphs:
+          Generating datasets with varied appearance and identical statistics
+          through simulated annealing. Proceedings of the CHI Conference on Human
+          Factors in Computing Systems, 1290–1294.
+      provenance:
+        package: datasauRus
+        dataset: datasaurus_dozen
+        url: https://cran.r-project.org/package=datasauRus
+      changes:
+        - Dane wyeksportowane bez zmian.
+    tags:
+      - dydaktyka
+      - wykresy
+      - korelacja
+  - name: Kwartet Anscombe'a
+    path: anscombe.csv
+    description: >-
+      Cztery zbiory po 11 punktów z tą samą regresją, korelacją i średnimi,
+      lecz zupełnie inną strukturą
+    documentation:
+      summary: >-
+        Cztery klasyczne zbiory Anscombe'a: identyczne średnie, wariancje,
+        korelacja i równanie regresji, a każdy opowiada inną historię.
+      details: >-
+        Anscombe (1973) skonstruował je, aby pokazać, że sama tabela współczynników
+        nie wystarcza. Zbiór 1 to zwyczajna zależność liniowa, zbiór 2 jest
+        wyraźnie krzywoliniowy, w zbiorze 3 jedna obserwacja odstająca odchyla
+        prostą, a w zbiorze 4 cała zależność opiera się na jednym punkcie
+        o skrajnym x. Dane zapisano w formacie długim: jeden wiersz to jeden
+        punkt. Sposób użycia: regresja y od x z podziałem według zbior, a potem
+        wykresy rozrzutu z linią regresji. Uzupełnienie zbioru Datasaurus.
+      variables:
+        - name: zbior
+          description: "Numer zbioru: zbior_1, zbior_2, zbior_3, zbior_4."
+        - name: x
+          description: Zmienna objaśniająca.
+        - name: "y"
+          description: Zmienna objaśniana.
+      source: Anscombe (1973), za dokumentacją pakietu datasets w R.
+      references:
+        - >-
+          Anscombe, F. J. (1973). Graphs in statistical analysis. The American
+          Statistician, 27(1), 17–21.
+      provenance:
+        package: datasets
+        dataset: anscombe
+        url: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/anscombe.html
+      changes:
+        - >-
+          Format szeroki (x1–x4, y1–y4) przekształcony w długi: kolumny zbior,
+          x, y.
+    tags:
+      - dydaktyka
+      - wykresy
+      - regresja
 usesNative: true
 minApp: 1.0.8
 
