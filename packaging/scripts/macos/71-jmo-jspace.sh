@@ -36,4 +36,5 @@ node "$JMC" --build "$REPO_ROOT/jSpace" \
     --rlibs "$BASE_R" \
     --assume-app-version "$JAMOVI_VERSION"
 [ -f "$JMO" ] || die "Plik .jmo nie powstał"
+jmo_relocate_macho "$JMO"   # CRAN-owe .so (asteRisk, classInt) -> @rpath, libtbb obok .so; patrz lib.sh
 log "OK — $JMO ($(du -h "$JMO" | cut -f1)). Instalacja w jUPWR: Moduły → Sideload."

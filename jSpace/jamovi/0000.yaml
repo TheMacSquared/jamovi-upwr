@@ -1,7 +1,7 @@
 ---
 title: Statystyka danych kosmicznych
 name: jSpace
-version: 0.2.0
+version: 0.2.1
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -50,40 +50,47 @@ analyses:
 datasets:
   - name: Satelity — konstelacje i orbity
     path: satelity.csv
-    description: >-
-      562 aktywne satelity z 11 konstelacji (GPS, Galileo, Starlink, GEO...):
-      inklinacja, ekscentrycznosc, wysokosc i okres orbity. Zrodlo: CelesTrak
-      (dane USSPACECOM), snapshot 2026-08-26
+    description: "562 satelity z 11 konstelacji: inklinacja, ekscentrycznosc, wysokosc, okres — ANOVA"
+    documentation:
+      summary: >-
+        Aktywne satelity z 11 konstelacji (GPS, Galileo, Starlink, GEO...): inklinacja,
+        ekscentrycznosc, wysokosc i okres orbity. Zrodlo: CelesTrak (dane USSPACECOM),
+        snapshot 2026-08-26.
     tags:
       - kosmos
       - orbity
       - ANOVA
   - name: Stacje pomiarowe Europy
     path: stacje_pomiarowe.csv
-    description: >-
-      Stacje naziemne w miastach Europy: wspolrzedne geograficzne oraz
-      symulowane pomiary srednioroczne (temperatura, AOD, NDVI) z gradientem
-      szerokosci geograficznej. Wspolrzedne: Natural Earth (domena publiczna)
+    description: "Stacje naziemne w miastach Europy: wspolrzedne i pomiary (temperatura, AOD, NDVI)"
+    documentation:
+      summary: >-
+        Stacje naziemne w miastach Europy: wspolrzedne geograficzne oraz symulowane pomiary
+        srednioroczne (temperatura, AOD, NDVI) z gradientem szerokosci geograficznej.
+        Wspolrzedne: Natural Earth (domena publiczna).
     tags:
       - kosmos
       - dane przestrzenne
       - korelacja
   - name: Landsat — probki pikseli
     path: landsat_probki.csv
-    description: >-
-      Probki pikseli z obrazow Landsat (UCI Statlog): 4 pasma spektralne, NDVI i
-      klasa pokrycia terenu — dane do klasyfikacji. Zrodlo: UCI ML Repository,
-      doi:10.24432/C55887, licencja CC BY 4.0
+    description: "Piksele Landsat: 4 pasma, NDVI i klasa pokrycia terenu — klasyfikacja"
+    documentation:
+      summary: >-
+        Probki pikseli z obrazow Landsat (UCI Statlog): 4 pasma spektralne, NDVI i klasa
+        pokrycia terenu — dane do klasyfikacji. Zrodlo: UCI ML Repository,
+        doi:10.24432/C55887, licencja CC BY 4.0.
     tags:
       - kosmos
       - uczenie maszynowe
       - klasyfikacja
   - name: NDVI — okolice Wroclawia (tabela)
     path: ndvi_tabela.csv
-    description: >-
-      Symulowany raster wskaznika NDVI okolic Wroclawia (siatka 200x200,
-      widoczne centrum miasta i rzeka) jako tabela x, y, ndvi — raster w postaci
-      tabelarycznej
+    description: "Symulowany raster NDVI (siatka 200x200) jako tabela x, y, ndvi"
+    documentation:
+      summary: >-
+        Symulowany raster wskaznika NDVI okolic Wroclawia (siatka 200x200, widoczne centrum
+        miasta i rzeka) zapisany jako tabela x, y, ndvi — raster w postaci tabelarycznej.
     tags:
       - kosmos
       - dane przestrzenne

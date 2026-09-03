@@ -65,7 +65,7 @@ done
 
 # stage/ jest przyrostowy — usuń moduły, których już nie preinstalujemy (np. jRISK),
 # inaczej stare katalogi przeciekają do .app (50-assemble-app.sh kopiuje cały payload).
-EXPECTED=(base jmv scatr jperm jCI jboot distrACTION jDane)
+EXPECTED=(base jmv scatr jperm jCI jboot distrACTION jDane jANOVA jTestyT)
 for d in "$PAYLOAD/modules"/*/; do
     d="${d%/}"; name="$(basename "$d")"
     case " ${EXPECTED[*]} " in *" $name "*) ;; *) log "usuwam nieaktualny moduł z payloadu: $name"; rm -rf "$d";; esac

@@ -82,3 +82,52 @@ src_guard() {
     trap src_restore EXIT
     trap 'src_restore; exit 130' INT TERM
 }
+
+# --- relokacja bibliotek Mach-O wewnątrz .jmo -------------------------------
+# Binaria CRAN pakietów R zależnych (bundlowanych przez jmc bez --skip-deps)
+# odwołują się do libR/libgfortran/libquadmath przez
+# `@executable_path/../Frameworks/R.framework/...` albo `/Library/Frameworks/...`,
+# a asteRisk dodatkowo do libtbb z RcppParallel przez LC_RPATH w systemowym R.
+# Wrapper `R` maskuje to przez DYLD_FALLBACK_LIBRARY_PATH=R_HOME/lib, ale silnik
+# jamovi-engine ładuje libR bez wrappera i wtedy dyld nie znajduje tych ścieżek
+# („unable to load shared object ... Frameworks ..."). Odpowiednik 55-relocate.sh
+# dla modułu sideloadowanego: każde takie odwołanie przepisujemy na @rpath/<nazwa>
+# (silnik i R/bin/exec/R mają LC_RPATH -> Resources/jamovi/libs, gdzie leżą
+# libR, libgfortran, libquadmath), a libtbb kopiujemy obok .so z @loader_path.
+jmo_relocate_macho() {
+    local jmo="$1" tmp so dep leaf src rp n=0
+    tmp="$(mktemp -d "${TMPDIR:-/tmp}/jupwr-jmo.XXXXXX")"
+    ( cd "$tmp" && unzip -q "$jmo" )
+    while IFS= read -r so; do
+        file -b "$so" 2>/dev/null | grep -q 'Mach-O' || continue
+        chmod u+w "$so"
+        while IFS= read -r dep; do
+            [ -n "$dep" ] || continue
+            leaf="${dep##*/}"
+            case "$dep" in
+                @executable_path/../Frameworks/R.framework/*|/Library/Frameworks/R.framework/*)
+                    install_name_tool -change "$dep" "@rpath/$leaf" "$so"; n=$((n+1)) ;;
+                @rpath/libtbb*.dylib)
+                    src="$(Rscript -e 'cat(system.file("lib", package="RcppParallel"))')/$leaf"
+                    [ -f "$src" ] || die "jmo_relocate_macho: brak $src (RcppParallel w systemowym R)"
+                    if [ ! -f "$(dirname "$so")/$leaf" ]; then
+                        cp -L "$src" "$(dirname "$so")/$leaf"; chmod u+w "$(dirname "$so")/$leaf"
+                        install_name_tool -id "@rpath/$leaf" "$(dirname "$so")/$leaf"
+                        codesign -f -s - "$(dirname "$so")/$leaf" 2>/dev/null
+                    fi
+                    otool -l "$so" | awk '/cmd LC_RPATH/{f=1} f&&/path /{print $2;f=0}' | grep -Fxq '@loader_path' \
+                        || install_name_tool -add_rpath '@loader_path' "$so"
+                    n=$((n+1)) ;;
+            esac
+        done < <(otool -L "$so" 2>/dev/null | tail -n +2 | awk '{print $1}')
+        # LC_RPATH do systemowego R nie istnieje u studenta — usuwamy
+        while IFS= read -r rp; do
+            install_name_tool -delete_rpath "$rp" "$so"
+        done < <(otool -l "$so" | awk '/cmd LC_RPATH/{f=1} f&&/path /{print $2;f=0}' | grep -E '^/Library/Frameworks/')
+        codesign -f -s - "$so" 2>/dev/null
+    done < <(find "$tmp" -type f \( -name '*.so' -o -name '*.dylib' \))
+    rm -f "$jmo"
+    ( cd "$tmp" && zip -q -r -X "$jmo" . )
+    rm -rf "$tmp"
+    log "relokacja Mach-O w $(basename "$jmo"): przepisano odwołań: $n"
+}
