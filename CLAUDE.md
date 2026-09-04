@@ -567,3 +567,18 @@ bo lokalnie brak afex.
 Etykiet opcji z `.a.yaml` nie da się odczytać w R (kompilator wycina `title`),
 więc nazwy metod trzeba pisać w `.b.R`. Kolejne moduły po akceptacji pilotażu:
 jTestyT, jANOVA, jRol, jCI.
+
+### Zadanie 20: bibliografia — cytowania pakietów R używanych przez analizy (PO 1.0.0)
+Dziś bibliografia ma trzy stałe pozycje (jUPWR, jamovi, R — `client/main/
+references.ts`). Dodać cytowania pakietów, na których faktycznie opierają się
+analizy jUPWR: mechanizm upstreamu to `refs:` przy elemencie wyniku w `.r.yaml`
+wskazujące klucz z `jamovi/00refs.yaml` modułu (wzór: `jmv/jamovi/00refs.yaml`
+i `refs: car` w `jmv/jamovi/ttestis.r.yaml`); jmvcore rozwija klucze przy
+serializacji (`analysis.R`), klient numeruje i deduplikuje. Kandydaci: car
+(Levene, Durbin-Watson, Anova II — jTestyT, jANOVA, jRegr), emmeans i afex
+(jANOVA), mvtnorm (jRol, Dunnett), boot (jCI), ggplot2 (wykresy wszędzie),
+nortest jako źródło przybliżeń p (jEksplor, bez zależności), ARTool/Wobbrock
+2011 i Johansen 1980 jako literatura metod (jANOVA), Newcombe 1998 i
+Bonett-Wright 2000 (jCI). Cytować tylko wtedy, gdy dana tabela/wykres
+naprawdę z pakietu korzysta (refs na elemencie, nie na całej analizie).
+
