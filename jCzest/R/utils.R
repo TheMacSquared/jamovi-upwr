@@ -348,15 +348,28 @@ pairwiseMcnemar <- function(mat, names_ = NULL, method = "holm") {
     res <- lapply(seq_len(ncol(cmb)), function(i) {
         a <- mat[, cmb[1, i]]; b <- mat[, cmb[2, i]]
         n01 <- sum(a == 0 & b == 1); n10 <- sum(a == 1 & b == 0)
-        if (n01 + n10 == 0) return(list(stat = NA_real_, p = NA_real_, disc = 0))
+        if (n01 + n10 == 0)
+            return(list(stat = NA_real_, p = NA_real_, disc = 0,
+                        or = NA_real_, lower = NA_real_, upper = NA_real_))
         st <- (n01 - n10)^2 / (n01 + n10)
-        list(stat = st, p = stats::pchisq(st, 1, lower.tail = FALSE), disc = n01 + n10)
+        # OR par niezgodnych dla tej pary — ta sama miara co przy dwoch pomiarach,
+        # dzieki czemu wielkosc efektu jest dostepna takze przy k >= 3
+        z <- stats::qnorm(0.975)
+        or <- if (n01 > 0 && n10 > 0) n10 / n01 else NA_real_
+        se <- if (is.finite(or)) sqrt(1 / n01 + 1 / n10) else NA_real_
+        list(stat = st, p = stats::pchisq(st, 1, lower.tail = FALSE), disc = n01 + n10,
+             or = or,
+             lower = if (is.finite(or)) exp(log(or) - z * se) else NA_real_,
+             upper = if (is.finite(or)) exp(log(or) + z * se) else NA_real_)
     })
     data.frame(
         g1 = names_[cmb[1, ]], g2 = names_[cmb[2, ]],
         stat = vapply(res, function(r) r$stat, numeric(1)),
         disc = vapply(res, function(r) r$disc, numeric(1)),
         p = stats::p.adjust(vapply(res, function(r) r$p, numeric(1)), method = method),
+        or = vapply(res, function(r) r$or, numeric(1)),
+        lower = vapply(res, function(r) r$lower, numeric(1)),
+        upper = vapply(res, function(r) r$upper, numeric(1)),
         stringsAsFactors = FALSE
     )
 }

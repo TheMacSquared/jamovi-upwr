@@ -82,6 +82,37 @@ test_that("Q dla dwoch pomiarow pokrywa sie z McNemarem (kontrola spojnosci)", {
     expect_equal(mc, cochranQ(m)$stat)
 })
 
+test_that("wykres udzialow dziala dla obu metod", {
+    r3 <- jCzest:::zalezne(data = trzy, vars = c("p1", "p2", "p3"), plot = TRUE)
+    st <- r3$plot$state
+    expect_false(is.null(st))
+    expect_equal(st$vars, c("p1", "p2", "p3"))
+    expect_equal(length(st$prop), 3)
+    expect_true(all(st$prop >= 0 & st$prop <= 1))
+    expect_equal(st$level, levels(trzy$p1)[1])   # pierwszy poziom alfabetycznie
+
+    r2 <- jCzest:::zalezne(data = pary, vars = c("przed", "po"), counts = "n", plot = TRUE)
+    expect_false(is.null(r2$plot$state))
+    expect_equal(length(r2$plot$state$prop), 2)
+
+    # bez opcji stan nie jest ustawiany
+    expect_null(jCzest:::zalezne(data = trzy, vars = c("p1", "p2"))$plot$state)
+})
+
+test_that("wielkosc efektu przy k >= 3 jest podawana parami, nie pusta tabela", {
+    res <- jCzest:::zalezne(data = trzy, vars = c("p1", "p2", "p3"), posthoc = TRUE)
+    ph <- res$posthoc$asDF
+    expect_true("or" %in% names(ph))
+    expect_equal(nrow(ph), 3)
+    # OR jest skonczony tam, gdzie sa pary niezgodne w obie strony
+    expect_true(any(is.finite(ph$or)))
+    expect_true(all(ph$lower[is.finite(ph$or)] < ph$or[is.finite(ph$or)]))
+
+    # bez post-hoc: ma byc wskazowka, gdzie szukac wielkosci efektu
+    bez <- jCzest:::zalezne(data = trzy, vars = c("p1", "p2", "p3"))
+    expect_true(grepl("parami", txt(bez)))
+})
+
 test_that("przypadki brzegowe nie wywalaja analizy", {
     # pomiary identyczne — Q/McNemar nieokreslone, ma byc komunikat, nie blad
     ident <- data.frame(a = factor(c("tak", "nie", "tak")), b = factor(c("tak", "nie", "tak")))

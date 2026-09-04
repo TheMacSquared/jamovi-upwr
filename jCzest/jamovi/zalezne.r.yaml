@@ -69,6 +69,15 @@ items:
           title: Górna
           type: number
 
+    - name: plot
+      title: Udziały w kolejnych pomiarach
+      type: Image
+      width: 500
+      height: 380
+      renderFun: .plot
+      visible: (plot)
+      clearWith: *cw
+
     - name: pairs
       title: Tabela par
       type: Table
@@ -100,4 +109,15 @@ items:
           title: p Holm
           type: number
           format: zto,pvalue
+        - name: or
+          title: OR
+          type: number
+        - name: lower
+          title: Dolna
+          type: number
+          superTitle: Przedział ufności
+        - name: upper
+          title: Górna
+          type: number
+          superTitle: Przedział ufności
 ...

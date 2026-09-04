@@ -34,6 +34,8 @@ children:
             name: effSize
           - type: CheckBox
             name: props
+          - type: CheckBox
+            name: plot
 
   # --- zaawansowane ---
   - type: CollapseBox

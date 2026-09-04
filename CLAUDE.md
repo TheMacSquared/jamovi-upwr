@@ -364,3 +364,40 @@ Ukrywanie jmv w `JUPWR_HIDDEN_ANALYSES`: `jmv::contTables`, `jmv::contTablesPair
 `jmv::propTest2`, `jmv::propTestN` (UWAGA: klucze to `ns::name` z pola `name:`
 w .a.yaml jmv, czyli camelCase). Grupa „Częstości" w `groupOrder`
 (`client/main/ribbon/analysetab.ts`) w miejscu dzisiejszego `Frequencies: 70`.
+
+### Zadanie 18: wykresy — tryb „szeroki" (kilka zmiennych) w scatr
+Diagnoza (2026-09-04): z 26 wykresów w `plots/` tylko trzy przyjmują kilka zmiennych
+naraz (`parcoord`, `radar`, `corrgram` — pole `vars`); reszta wymaga jednej zmiennej
+plus grupującej, czyli formatu DŁUGIEGO. Danych z powtórzonymi pomiarami w formacie
+SZEROKIM (kolumny `przed`, `po`, `po_pol_roku` — jak w zbiorze jDane `szkolenie`)
+nie da się więc niczym narysować. `mode` (ModeSelector) mają dziś tylko `jmvbar`
+(Kategorialne/Ciągła/Liczebności) i `jmvline` (Punkty indywidualne/Zagregowane),
+ale żaden tryb nie dotyczy formatu danych.
+
+Mechanizm do powielenia: opcja `mode` typu List w `.a.yaml` + `type: ModeSelector`
+z `Content` na tryb w `.u.yaml` (wzór: `plots/jamovi/jmvbar.u.yaml`).
+
+Priorytet 1 (tam, gdzie brak najbardziej boli):
+- `jmvbar` — tryb „Kilka zmiennych": każda kolumna to jeden pomiar, słupki
+  liczności albo udziału wybranej kategorii,
+- `jmvbox`, `violin`, `raincloud` — rozkłady kilku pomiarów obok siebie
+  (przed-po na zmiennych ciągłych),
+- `jmvline` — pomiary na osi X, profil średnich.
+
+Priorytet 2: `stripmean`, `ridge`, `dens` — te same argumenty, rzadsze użycie.
+
+PUŁAPKA: dla zmiennych BINARNYCH tryb szeroki wymaga dodatkowego pytania, która
+kategoria jest „zdarzeniem" (inaczej wykres nie wie, czy rysować udział „tak", czy
+„nie"). Dla zmiennych ciągłych problem nie występuje. Ten sam problem dotyczy
+wykresu w jCzest `zalezne` — rysuje udział PIERWSZEJ kategorii alfabetycznie,
+co przy „tak/nie" daje „nie"; oś jest jawnie opisana, ale historia czyta się
+odwrotnie. Rozważyć wspólne rozwiązanie (wybór poziomu) dla obu miejsc.
+
+Bez sensu: `scat`, `hexbin`, `bubble`, `heatmap` (z natury x–y), `mosaic`,
+`stackbar`, `waffle`, `treemap`, `pareto`, `wordcloud` (liczności kategorii),
+`qq` (z definicji jedna zmienna). Już działają w wide i warto to tylko
+udokumentować: `parcoord` (najlepszy wykres przed-po: każda linia to jednostka),
+`radar`, `corrgram`.
+
+UWAGA: `plots/` to submoduł (fork scatr) — zmiany idą osobnym commitem w submodule
+i bumpem wskaźnika w superprojekcie.

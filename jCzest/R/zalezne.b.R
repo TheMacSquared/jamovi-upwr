@@ -70,7 +70,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 t$setNote("z", "Brak par niezgodnych — pomiary są identyczne, więc testu nie da się policzyć.")
             } else {
                 t$addRow(rowKey = "mc", values = list(test = lab, stat = m$stat, df = m$df, p = m$p))
-                t$setNote("disc", sprintf("Test opiera się na %d parach niezgodnych (%d i %d).",
+                t$setNote("disc", sprintf("Pary niezgodne: %d (%d i %d).",
                                           m$discordant, m$b, m$c))
             }
 
@@ -87,7 +87,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 self$results$insert(1, jmvcore::Notice$new(
                     self$options, name = ".assumption", type = jmvcore::NoticeType$WARNING,
                     content = sprintf(paste(
-                        "Par niezgodnych jest tylko %d (zwyczajowo wymaga się co najmniej 25),",
+                        "Pary niezgodne: %d (zwyczajowo wymaga się co najmniej 25),",
                         "więc przybliżenie χ² jest zawodne. Użyj dokładnego testu dwumianowego."),
                         a$discordant)))
 
@@ -123,27 +123,42 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             } else {
                 t$addRow(rowKey = "q", values = list(test = "Q Cochrana", stat = q$stat,
                                                      df = q$df, p = q$p))
-                t$setNote("n", sprintf("N = %d jednostek, %d pomiarów.", q$n, length(vars)))
+                t$setNote("n", sprintf("N = %d, k = %d.", q$n, length(vars)))
             }
 
             lv1 <- levels(factor(self$data[[vars[1]]]))[1]
             private$.fillMarg(stats::setNames(q$props * q$n, vars), q$n, lv1)
 
-            if (isTRUE(o$effSize))
-                self$results$effsize$setNote("na", paste(
-                    "OR par niezgodnych jest określony tylko dla dwóch pomiarów;",
-                    "przy większej liczbie pomiarów porównuj pary w sekcji post-hoc."))
+            # OR par niezgodnych jest miara dla PARY pomiarow, wiec przy k >= 3
+            # nie ma jednej wartosci — zamiast zostawiac pusta tabele, chowamy ja
+            # i podajemy OR osobno dla kazdej pary w post-hoc
+            self$results$effsize$setVisible(FALSE)
 
             if (isTRUE(o$posthoc)) {
                 pw <- pairwiseMcnemar(m, vars)
                 ph <- self$results$posthoc
-                if (!is.null(pw)) for (i in seq_len(nrow(pw)))
-                    ph$addRow(rowKey = i, values = list(g1 = pw$g1[i], g2 = pw$g2[i],
-                                                        disc = pw$disc[i], stat = pw$stat[i], p = pw$p[i]))
+                if (!is.null(pw)) {
+                    for (i in seq_len(nrow(pw)))
+                        ph$addRow(rowKey = i, values = list(
+                            g1 = pw$g1[i], g2 = pw$g2[i], disc = pw$disc[i],
+                            stat = pw$stat[i], p = pw$p[i],
+                            or = pw$or[i], lower = pw$lower[i], upper = pw$upper[i]))
+                    ph$setNote("or", paste(
+                        "OR par niezgodnych dla każdej pary pomiarów (95% CI);",
+                        "1 oznacza brak zmiany między pomiarami."))
+                }
+            } else if (isTRUE(o$effSize)) {
+                self$results$tests$setNote("es", paste(
+                    "Wielkość efektu dla trzech i więcej pomiarów jest określona parami —",
+                    "włącz „Porównania par pomiarów” w sekcji Zaawansowane."))
             }
         },
 
         .fillMarg = function(counts, n, level = NULL) {
+            if (isTRUE(self$options$plot) && n > 0)
+                self$results$plot$setState(list(
+                    vars = names(counts), prop = as.numeric(counts) / n,
+                    n = n, level = level))
             if (!isTRUE(self$options$props)) return()
             t <- self$results$marg
             for (i in seq_along(counts))
@@ -155,6 +170,29 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             t$setNote("lv", if (is.null(level))
                 "Udział pierwszej kategorii (alfabetycznie) w każdym pomiarze."
                 else sprintf("Udział kategorii „%s” (pierwszej alfabetycznie) w każdym pomiarze.", level))
+        },
+
+        .plot = function(image, ...) {
+            st <- image$state
+            if (is.null(st)) return(FALSE)
+            df <- data.frame(pomiar = factor(st$vars, levels = st$vars),
+                             udzial = st$prop, stringsAsFactors = FALSE)
+            lab <- if (is.null(st$level)) "Udział" else sprintf("Udział kategorii „%s”", st$level)
+            p <- ggplot2::ggplot(df, ggplot2::aes(x = pomiar, y = udzial, group = 1)) +
+                ggplot2::geom_col(width = 0.6, fill = "grey60") +
+                # linia laczy slupki, bo to TE SAME jednostki mierzone kilka razy —
+                # bez niej wykres wyglada jak porownanie niezaleznych grup
+                ggplot2::geom_line(colour = "grey25", linewidth = 0.7) +
+                ggplot2::geom_point(size = 2.6, colour = "grey25") +
+                ggplot2::geom_text(ggplot2::aes(label = sprintf("%.0f%%", 100 * udzial)),
+                                   vjust = -1.1, size = 3.6) +
+                ggplot2::scale_y_continuous(labels = function(x) paste0(100 * x, "%"),
+                                            limits = c(0, min(1, max(df$udzial) * 1.25 + 0.05))) +
+                ggplot2::labs(x = NULL, y = lab,
+                              caption = sprintf("N = %d", st$n)) +
+                ggplot2::theme_minimal()
+            print(p)
+            TRUE
         },
 
         .fillPairs = function(tab) {

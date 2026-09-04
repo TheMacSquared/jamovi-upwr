@@ -40,6 +40,11 @@ options:
       type: Bool
       default: true
 
+    - name: plot
+      title: Wykres udziałów
+      type: Bool
+      default: false
+
     # --- zaawansowane ---
     - name: exact
       title: Dokładny test (dwumianowy na parach)
