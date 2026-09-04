@@ -52,6 +52,8 @@ nadany tego samego dnia nie trafił do dystrybucji — jego zmiany są poniżej.
 - jDane 0.7.1: usunięto trzy zbiory dydaktyczne o statystykach niezwiązanych
   z programem zajęć (postacie Star Wars, Datasaurus, kwartet Anscombe'a);
   opisy zbiorów wskazują nowe pozycje menu (jEksplor, jRegr, Testy t).
+- Bibliografia: jUPWR jest cytowany jako pierwsza pozycja (przed jamovi i R),
+  z numerem wersji braną z `JUPWR_VERSION`.
 - Zgodność wstecz: pliki .omv z analizami jboot oraz z jperm/jCI/jTestyT
   sprzed tych wersji nie otwierają tych analiz (zmienione opcje).
 

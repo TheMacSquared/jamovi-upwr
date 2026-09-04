@@ -3,6 +3,7 @@
 
 import interactionManager, { type FocusLoop } from '../common/interactionmanager';
 import Analyses from './analyses';
+import { JUPWR_VERSION } from '../common/jupwr';
 
 interface IReferenceDetails {
     addresses: {
@@ -31,6 +32,17 @@ export interface IReference {
     year2?: string;
     extra?: string;
 }
+
+// jUPWR itself is always cited (first), before jamovi and R.
+export const jupwr = {
+    name: 'jUPWR',
+    type: 'software',
+    authors: { complete: 'Karczewski, M.' },
+    year: 2026,
+    title: 'jUPWR: dystrybucja jamovi do dydaktyki statystyki',
+    publisher: `(Wersja ${ JUPWR_VERSION }) [Oprogramowanie]. Uniwersytet Przyrodniczy we Wrocławiu. Pobrano z https://github.com/TheMacSquared/jamovi-upwr`,
+    url: 'https://github.com/TheMacSquared/jamovi-upwr',
+};
 
 export const jmv = {
     name: 'jamovi',
@@ -105,7 +117,7 @@ export class References extends HTMLElement {
 
     getAllNumbers() {
         if ( ! this._numbers) {
-            let numbers = { jmv: { }, R: { } };
+            let numbers = { jupwr: { }, jmv: { }, R: { } };
             for (let module of this._modules)
                 numbers[module] = { };
             for (let i = 0; i < this._refs.length; i++) {
@@ -195,6 +207,7 @@ export class References extends HTMLElement {
         let refs = [ ];
         let modules = new Set<string>();
 
+        refs.push(this.resolve('jupwr', jupwr));
         refs.push(this.resolve('jmv', jmv));
         refs.push(this.resolve('R', R));
 
