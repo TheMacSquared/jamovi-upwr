@@ -1,0 +1,22 @@
+Package: jRegr
+Type: Package
+Title: Korelacja i regresja jUPWR dla jamovi
+Version: 0.1.0
+# UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
+# przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
+Author: jUPWR Team
+Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+Description: Korelacja (para zmiennych albo macierz), regresja liniowa
+    prosta i wieloraka oraz regresja logistyczna dwumianowa z panelem pod
+    dydaktyczna prostote (rdzen widoczny od razu, reszta w Zaawansowane
+    i Zalozenia). Zastepuje w menu Regresja analizy jmv kursu podstawowego.
+License: GPL (>= 2)
+Encoding: UTF-8
+Imports:
+    jmvcore (>= 2.4.2),
+    R6,
+    car,
+    ggplot2
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

@@ -1,0 +1,36 @@
+---
+title: Regresja jUPWR
+name: jRegr
+version: 0.1.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: |
+  Korelacja, regresja liniowa i logistyczna z prostym panelem.
+analyses:
+  - title: Korelacja
+    name: korelacja
+    ns: jRegr
+    menuGroup: Regression
+    menuTitle: Korelacja
+    menuSubtitle: para zmiennych albo macierz
+    category: analyses
+  - title: Regresja liniowa
+    name: liniowa
+    ns: jRegr
+    menuGroup: Regression
+    menuTitle: Regresja liniowa
+    menuSubtitle: prosta i wieloraka
+    category: analyses
+  - title: Regresja logistyczna
+    name: logistyczna
+    ns: jRegr
+    menuGroup: Regression
+    menuTitle: Regresja logistyczna
+    menuSubtitle: zmienna zależna dwupoziomowa
+    category: analyses
+usesNative: true
+minApp: 1.0.8
+
+...

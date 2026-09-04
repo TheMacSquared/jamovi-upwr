@@ -1,0 +1,83 @@
+---
+name: korelacja
+title: Korelacja
+jrs: '1.1'
+
+items:
+    - name: pair
+      title: Korelacja
+      type: Table
+      rows: 1
+      clearWith: &cw
+        - vars
+        - method
+        - hypothesis
+        - ci
+        - ciWidth
+      columns:
+        - name: var1
+          title: ''
+          type: text
+        - name: var2
+          title: ''
+          type: text
+        - name: n
+          title: N
+          type: integer
+        - name: r
+          title: r
+          type: number
+        - name: lower
+          title: Dolna
+          type: number
+          superTitle: Przedział ufności
+          visible: (ci)
+        - name: upper
+          title: Górna
+          type: number
+          superTitle: Przedział ufności
+          visible: (ci)
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: matrix
+      title: Macierz korelacji
+      type: Table
+      rows: 0
+      clearWith:
+        - vars
+        - method
+        - hypothesis
+        - showN
+        - flag
+      columns: []
+
+    - name: plot
+      title: Wykres rozrzutu
+      type: Image
+      visible: (plot)
+      width: 500
+      height: 400
+      renderFun: .pairPlot
+      clearWith:
+        - vars
+        - method
+
+    - name: plotMatrix
+      title: Macierz rozrzutów
+      type: Image
+      visible: (plot)
+      width: 640
+      height: 520
+      renderFun: .matrixPlot
+      clearWith:
+        - vars
+        - method
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
+...

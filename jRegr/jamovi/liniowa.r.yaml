@@ -1,0 +1,229 @@
+---
+name: liniowa
+title: Regresja liniowa
+jrs: '1.1'
+
+items:
+    - name: fit
+      title: Dopasowanie modelu
+      type: Table
+      rows: 1
+      clearWith: &cw
+        - dep
+        - covs
+        - factors
+        - refLevels
+        - ciWidth
+      columns:
+        - name: r
+          title: R
+          type: number
+        - name: r2
+          title: R²
+          type: number
+        - name: r2adj
+          title: R² skoryg.
+          type: number
+        - name: F
+          title: F
+          type: number
+        - name: df1
+          title: df1
+          type: integer
+        - name: df2
+          title: df2
+          type: integer
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: rmse
+          title: RMSE
+          type: number
+        - name: aic
+          title: AIC
+          type: number
+          visible: (ic)
+        - name: bic
+          title: BIC
+          type: number
+          visible: (ic)
+
+    - name: coef
+      title: Współczynniki
+      type: Table
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: term
+          title: ''
+          type: text
+        - name: b
+          title: b
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: t
+          title: t
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: lower
+          title: Dolna
+          type: number
+          superTitle: Przedział ufności
+        - name: upper
+          title: Górna
+          type: number
+          superTitle: Przedział ufności
+        - name: beta
+          title: β
+          type: number
+          visible: (stdEst)
+
+    - name: anova
+      title: ANOVA modelu (typ II)
+      type: Table
+      rows: 0
+      visible: (anova)
+      clearWith: *cw
+      columns:
+        - name: term
+          title: ''
+          type: text
+        - name: ss
+          title: SS
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: ms
+          title: MS
+          type: number
+        - name: F
+          title: F
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: norm
+      title: Normalność reszt (Shapiro-Wilk)
+      type: Table
+      rows: 1
+      visible: (norm)
+      clearWith: *cw
+      columns:
+        - name: w
+          title: W
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: durbin
+      title: Autokorelacja reszt (Durbin-Watson)
+      type: Table
+      rows: 1
+      visible: (durbin)
+      clearWith: *cw
+      columns:
+        - name: r
+          title: Autokorelacja
+          type: number
+        - name: dw
+          title: DW
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: vif
+      title: Współliniowość
+      type: Table
+      rows: 0
+      visible: (vif)
+      clearWith: *cw
+      columns:
+        - name: term
+          title: ''
+          type: text
+        - name: vif
+          title: VIF
+          type: number
+        - name: tol
+          title: Tolerancja
+          type: number
+
+    - name: cooks
+      title: Odległość Cooka
+      type: Table
+      rows: 1
+      visible: (cooks)
+      clearWith: *cw
+      columns:
+        - name: mean
+          title: Średnia
+          type: number
+        - name: max
+          title: Maksimum
+          type: number
+        - name: thr
+          title: Próg 4/n
+          type: number
+        - name: nHigh
+          title: Powyżej progu
+          type: integer
+
+    - name: plot
+      title: Rozrzut z prostą regresji
+      type: Image
+      visible: (plot)
+      width: 520
+      height: 400
+      renderFun: .plot
+      clearWith: *cw
+
+    - name: resPlot
+      title: Reszty vs dopasowane
+      type: Image
+      visible: (resPlot)
+      width: 520
+      height: 380
+      renderFun: .resPlot
+      clearWith: *cw
+
+    - name: qq
+      title: Q-Q reszt
+      type: Image
+      visible: (qq)
+      width: 420
+      height: 380
+      renderFun: .qqPlot
+      clearWith: *cw
+
+    - name: predictOV
+      title: Wartości przewidywane
+      type: Output
+      varTitle: Przewidywane
+      varDescription: Wartości przewidywane z regresji liniowej
+      clearWith: *cw
+
+    - name: residsOV
+      title: Reszty
+      type: Output
+      varTitle: Reszty
+      varDescription: Reszty z regresji liniowej
+      clearWith: *cw
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
+...

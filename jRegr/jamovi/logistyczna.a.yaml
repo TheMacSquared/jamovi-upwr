@@ -1,0 +1,114 @@
+---
+name: logistyczna
+title: Regresja logistyczna
+menuGroup: Regression
+menuTitle: Regresja logistyczna
+menuSubtitle: zmienna zależna dwupoziomowa
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: dep
+      title: Zmienna zależna (2 poziomy)
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: event
+      title: Kategoria „zdarzenie”
+      type: Level
+      variable: (dep)
+
+    - name: covs
+      title: Predyktory ilościowe
+      type: Variables
+      suggested:
+        - continuous
+        - ordinal
+      permitted:
+        - numeric
+      default: null
+
+    - name: factors
+      title: Predyktory jakościowe
+      type: Variables
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default: null
+
+    - name: refLevels
+      title: Poziomy odniesienia
+      type: Array
+      items: (factors)
+      default: null
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: ref
+                type: Level
+                variable: (var)
+
+    - name: ciWidth
+      title: Poziom ufności
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+
+    - name: plot
+      title: Krzywa logistyczna (jeden predyktor)
+      type: Bool
+      default: true
+
+    # --- zaawansowane ---
+    - name: cutoff
+      title: Próg klasyfikacji
+      type: Number
+      min: 0.01
+      max: 0.99
+      default: 0.5
+
+    - name: roc
+      title: Krzywa ROC
+      type: Bool
+      default: false
+
+    - name: ic
+      title: AIC i BIC
+      type: Bool
+      default: false
+
+    - name: predictOV
+      title: Prawdopodobieństwa do arkusza
+      type: Output
+
+    # --- założenia ---
+    - name: vif
+      title: Współliniowość (VIF)
+      type: Bool
+      default: false
+
+    - name: cooks
+      title: Odległość Cooka
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
+...

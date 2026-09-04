@@ -1,0 +1,81 @@
+---
+name: korelacja
+title: Korelacja
+menuGroup: Regression
+menuTitle: Korelacja
+menuSubtitle: para zmiennych albo macierz
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: vars
+      title: Zmienne
+      type: Variables
+      suggested:
+        - continuous
+        - ordinal
+      permitted:
+        - numeric
+
+    - name: method
+      title: Współczynnik
+      type: List
+      options:
+        - title: r Pearsona
+          name: pearson
+        - title: ρ Spearmana
+          name: spearman
+        - title: τ-b Kendalla
+          name: kendall
+      default: pearson
+
+    - name: plot
+      title: Wykres rozrzutu
+      type: Bool
+      default: true
+
+    # --- zaawansowane ---
+    - name: hypothesis
+      title: Hipoteza alternatywna
+      type: List
+      options:
+        - title: Korelacja ≠ 0 (dwustronna)
+          name: corr
+        - title: Korelacja > 0
+          name: pos
+        - title: Korelacja < 0
+          name: neg
+      default: corr
+
+    - name: ci
+      title: Przedział ufności
+      type: Bool
+      default: false
+
+    - name: ciWidth
+      title: Poziom ufności
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+
+    - name: showN
+      title: N w macierzy
+      type: Bool
+      default: false
+
+    - name: flag
+      title: Oznacz istotne gwiazdkami
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
+...

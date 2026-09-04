@@ -1,0 +1,205 @@
+---
+name: logistyczna
+title: Regresja logistyczna
+jrs: '1.1'
+
+items:
+    - name: fit
+      title: Dopasowanie modelu
+      type: Table
+      rows: 1
+      clearWith: &cw
+        - dep
+        - event
+        - covs
+        - factors
+        - refLevels
+        - ciWidth
+      columns:
+        - name: dev
+          title: Dewiancja
+          type: number
+        - name: chi
+          title: χ²
+          type: number
+          superTitle: Test modelu (LR)
+        - name: df
+          title: df
+          type: integer
+          superTitle: Test modelu (LR)
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+          superTitle: Test modelu (LR)
+        - name: mcf
+          title: R² McFaddena
+          type: number
+        - name: nag
+          title: R² Nagelkerkego
+          type: number
+        - name: aic
+          title: AIC
+          type: number
+          visible: (ic)
+        - name: bic
+          title: BIC
+          type: number
+          visible: (ic)
+
+    - name: coef
+      title: Współczynniki
+      type: Table
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: term
+          title: ''
+          type: text
+        - name: b
+          title: b
+          type: number
+        - name: se
+          title: SE
+          type: number
+        - name: z
+          title: z
+          type: number
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+        - name: or
+          title: OR
+          type: number
+        - name: orLower
+          title: Dolna
+          type: number
+          superTitle: Przedział ufności OR
+        - name: orUpper
+          title: Górna
+          type: number
+          superTitle: Przedział ufności OR
+
+    - name: classTable
+      title: Tabela klasyfikacji
+      type: Table
+      rows: 0
+      clearWith:
+        - dep
+        - event
+        - covs
+        - factors
+        - refLevels
+        - cutoff
+      columns:
+        - name: obs
+          title: Obserwowane
+          type: text
+        - name: pred0
+          title: ''
+          type: integer
+          superTitle: Przewidywane
+        - name: pred1
+          title: ''
+          type: integer
+          superTitle: Przewidywane
+        - name: pct
+          title: '% poprawnych'
+          type: number
+
+    - name: classStats
+      title: Jakość klasyfikacji
+      type: Table
+      rows: 1
+      clearWith:
+        - dep
+        - event
+        - covs
+        - factors
+        - refLevels
+        - cutoff
+      columns:
+        - name: cutoff
+          title: Próg
+          type: number
+        - name: acc
+          title: Trafność
+          type: number
+        - name: sens
+          title: Czułość
+          type: number
+        - name: spec
+          title: Swoistość
+          type: number
+        - name: auc
+          title: AUC
+          type: number
+
+    - name: vif
+      title: Współliniowość
+      type: Table
+      rows: 0
+      visible: (vif)
+      clearWith: *cw
+      columns:
+        - name: term
+          title: ''
+          type: text
+        - name: vif
+          title: VIF
+          type: number
+        - name: tol
+          title: Tolerancja
+          type: number
+
+    - name: cooks
+      title: Odległość Cooka
+      type: Table
+      rows: 1
+      visible: (cooks)
+      clearWith: *cw
+      columns:
+        - name: mean
+          title: Średnia
+          type: number
+        - name: max
+          title: Maksimum
+          type: number
+        - name: thr
+          title: Próg 4/n
+          type: number
+        - name: nHigh
+          title: Powyżej progu
+          type: integer
+
+    - name: plot
+      title: Krzywa logistyczna
+      type: Image
+      visible: (plot)
+      width: 520
+      height: 400
+      renderFun: .plot
+      clearWith: *cw
+
+    - name: roc
+      title: Krzywa ROC
+      type: Image
+      visible: (roc)
+      width: 440
+      height: 440
+      renderFun: .rocPlot
+      clearWith: *cw
+
+    - name: predictOV
+      title: Prawdopodobieństwa
+      type: Output
+      varTitle: P(zdarzenie)
+      varDescription: Prawdopodobieństwa zdarzenia z regresji logistycznej
+      clearWith: *cw
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
+...

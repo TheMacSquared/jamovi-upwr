@@ -1,0 +1,94 @@
+title: Korelacja
+name: korelacja
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Zmienne (2 = para, więcej = macierz)
+        children:
+          - type: VariablesListBox
+            name: vars
+            isTarget: true
+
+  # --- rdzeń ---
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Współczynnik
+            children:
+              - type: ComboBox
+                name: method
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wykres
+            children:
+              - type: CheckBox
+                name: plot
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
+
+  # --- zaawansowane ---
+  - type: CollapseBox
+    label: Zaawansowane
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Hipoteza
+                children:
+                  - type: ComboBox
+                    name: hypothesis
+              - type: Label
+                label: Przedział ufności
+                children:
+                  - type: CheckBox
+                    name: ci
+                  - type: TextBox
+                    name: ciWidth
+                    suffix: '%'
+                    format: number
+                    enable: (ci)
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Macierz
+                children:
+                  - type: CheckBox
+                    name: showN
+                  - type: CheckBox
+                    name: flag

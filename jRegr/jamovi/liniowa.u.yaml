@@ -1,0 +1,171 @@
+title: Regresja liniowa
+name: liniowa
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Zmienna zależna
+        children:
+          - type: VariablesListBox
+            name: dep
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Predyktory ilościowe
+        children:
+          - type: VariablesListBox
+            name: covs
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Predyktory jakościowe
+        children:
+          - type: VariablesListBox
+            name: factors
+            isTarget: true
+
+  # --- rdzeń ---
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+          - type: Label
+            label: Poziomy odniesienia predyktorów jakościowych
+            children:
+              - type: ListBox
+                name: refLevels
+                showColumnHeaders: true
+                fullRowSelect: true
+                stretchFactor: 1
+                height: small
+                columns:
+                  - name: var
+                    label: Zmienna
+                    selectable: false
+                    stretchFactor: 1
+                    maxWidth: 300
+                    template:
+                      type: VariableLabel
+                  - name: ref
+                    label: Poziom odniesienia
+                    selectable: false
+                    stretchFactor: 0.6
+                    template:
+                      type: LevelSelector
+                      label: ''
+
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Przedział ufności
+            children:
+              - type: TextBox
+                name: ciWidth
+                suffix: '%'
+                format: number
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wykres
+            children:
+              - type: CheckBox
+                name: plot
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
+
+  - type: CollapseBox
+    label: Założenia
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Reszty
+                children:
+                  - type: CheckBox
+                    name: norm
+                  - type: CheckBox
+                    name: qq
+                  - type: CheckBox
+                    name: resPlot
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Predyktory i obserwacje
+                children:
+                  - type: CheckBox
+                    name: durbin
+                  - type: CheckBox
+                    name: vif
+                  - type: CheckBox
+                    name: cooks
+
+  - type: CollapseBox
+    label: Zaawansowane
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Model
+                children:
+                  - type: CheckBox
+                    name: stdEst
+                  - type: CheckBox
+                    name: anova
+                  - type: CheckBox
+                    name: ic
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Zapis do arkusza
+                children:
+                  - type: Output
+                    name: predictOV
+                  - type: Output
+                    name: residsOV

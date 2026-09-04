@@ -259,7 +259,35 @@ Kolejność prac:
    ukryte w kliencie (kod jmv nietknięty). ETAP 3 ZAMKNIĘTY.
 4. Regresja: moduł `jRegr` tylko z korelacją, regresją liniową (prostą
    i wieloraką) i logistyczną dwumianową; wielomianowa i porządkowa
-   zostają jmv (widoczne, później — po 1.0.0).
+   zostają jmv (widoczne, później — po 1.0.0). Decyzje 2026-09-04:
+   ukryć jmv::linReg całkowicie (bez bloków, średnich brzegowych, wag,
+   interakcji), jmv::simpleCorr i jmv::corrMatrix też; jmv::corrPart,
+   logRegMulti, logRegOrd widoczne na końcu menu (JUPWR_MENU_LAST).
+   Predyktory jakościowe z WYBOREM poziomu odniesienia (deklaratywnie jak
+   `refLevels` w jmv linReg: Array items (factors) + ListBox z
+   LevelSelector). Korelacja: przy DOKŁADNIE 2 zmiennych tabela jednego
+   wiersza (r, CI, p, N) i rozrzut, przy >2 macierz — bez macierzy 2×2
+   z polami redundantnymi. Kolejność: korelacja → liniowa → logistyczna.
+   STAN: jRegr 0.1.0 ZROBIONE — `korelacja` (para: jeden wiersz z CI
+   i rozrzut; ≥3: dolny trójkąt macierzy jako komórki tekstowe r/p/N
+   z gwiazdkami, macierz rozrzutów jako panele par), `liniowa` (lm; R²,
+   R² skoryg., F, RMSE; b, SE, t, p, CI; β; ANOVA typu II przez car;
+   AIC/BIC; Shapiro reszt, Q-Q, reszty vs dopasowane, Durbin-Watson
+   z p przez car (ziarno 1), VIF liczony ręcznie na kolumnach macierzy
+   modelu, Cook; rozrzut z prostą tylko przy jednym predyktorze
+   ilościowym; zapis przewidywanych i reszt), `logistyczna` (glm logit;
+   wybór kategorii „zdarzenie" opcją Level, domyślnie DRUGI poziom;
+   dewiancja, test LR, R² McFaddena i Nagelkerkego; b, SE, z, p, OR z CI;
+   tabela klasyfikacji i trafność/czułość/swoistość/AUC przy progu;
+   ROC w czystym R; krzywa logistyczna przy jednym predyktorze; VIF,
+   Cook; zapis prawdopodobieństw). Poziomy odniesienia: opcja Array
+   `refLevels` z `items: (factors)` + ListBox z LevelSelector, JS
+   `jamovi/js/<analiza>.js` ustawia `variable` selektora (wzór jmv).
+   Ukryte: jmv::simpleCorr, corrMatrix, linReg, logRegBin; na końcu menu:
+   corrPart, logRegMulti, logRegOrd. ETAP 4 ZAMKNIĘTY — mapa drogowa
+   1.0.0 w części „moduły" wykonana; do wydania 1.0.0 zostaje bump wersji
+   jUPWR, CHANGELOG, MODULES.md, .jmo modułów opcjonalnych i buildy
+   natywne.
 Poza zakresem 1.0.0: opisy metod dla wykresów scatr (świadomie nie),
 regresja wielomianowa/porządkowa, jRol oraz moduły opcjonalne (jRISK,
 jSpace) — te dostają opisy później, w miarę potrzeby.

@@ -40,6 +40,12 @@ export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
     // analysis added to jmv earlier (menuGroup 'Exploration').
     'jmv::descriptives',
     'jmv::qualitative',
+    // jRegr replaces the basic-course regression analyses (menuGroup
+    // 'Regression'); partial, multinomial and ordinal stay visible at the end.
+    'jmv::simpleCorr',
+    'jmv::corrMatrix',
+    'jmv::linReg',
+    'jmv::logRegBin',
 ]);
 
 // Upstream analyses kept in the menu but listed after the jUPWR ones in the
@@ -47,4 +53,7 @@ export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
 export const JUPWR_MENU_LAST: ReadonlySet<string> = new Set([
     'jmv::mancova',
     'jmv::logLinear',
+    'jmv::corrPart',
+    'jmv::logRegMulti',
+    'jmv::logRegOrd',
 ]);

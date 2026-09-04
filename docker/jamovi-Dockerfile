@@ -233,6 +233,10 @@ COPY $JAMOVI_ROOT/jEksplor/ /tmp/source/jEksplor
 WORKDIR /tmp/source/jEksplor
 RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
 
+COPY $JAMOVI_ROOT/jRegr/ /tmp/source/jRegr
+WORKDIR /tmp/source/jRegr
+RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R --patch-version --skip-deps
+
 
 
 ##### I18N #####

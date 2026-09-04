@@ -17,6 +17,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.7.0 |
 | `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.2.0 |
 | `jEksplor/` | jEksplor | eksploracja jUPWR: zmienne ilościowe (rdzeń N/braki/średnia/mediana/kwartyle/SD/min/max/V, miary pozycyjne, Gini i Lorenz, Lilliefors i Anderson-Darling), zmienne jakościowe (tabele liczności, także w grupach), szereg rozdzielczy; zastępuje w menu Eksploracja jmv::descriptives i jmv::qualitative (ukryte w kliencie) | wbudowany | 0.1.0 |
+| `jRegr/` | jRegr | regresja jUPWR: korelacja (para = jeden wiersz, więcej = macierz), regresja liniowa, logistyczna dwumianowa; zastępuje w menu Regresja jmv::simpleCorr, corrMatrix, linReg, logRegBin (ukryte w kliencie) | wbudowany | 0.1.0 |
 | `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery/NIR; zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.4.0 |
 | `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem, d Cohena z CI, wykresem estymacyjnym; zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.3.0 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.3 |

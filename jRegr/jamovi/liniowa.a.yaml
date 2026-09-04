@@ -1,0 +1,130 @@
+---
+name: liniowa
+title: Regresja liniowa
+menuGroup: Regression
+menuTitle: Regresja liniowa
+menuSubtitle: prosta i wieloraka
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: dep
+      title: Zmienna zależna
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: covs
+      title: Predyktory ilościowe
+      type: Variables
+      suggested:
+        - continuous
+        - ordinal
+      permitted:
+        - numeric
+      default: null
+
+    - name: factors
+      title: Predyktory jakościowe
+      type: Variables
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default: null
+
+    - name: refLevels
+      title: Poziomy odniesienia
+      type: Array
+      items: (factors)
+      default: null
+      template:
+          type: Group
+          elements:
+              - name: var
+                type: Variable
+                content: $key
+              - name: ref
+                type: Level
+                variable: (var)
+
+    - name: ciWidth
+      title: Poziom ufności
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+
+    - name: plot
+      title: Wykres rozrzutu z prostą (jeden predyktor)
+      type: Bool
+      default: true
+
+    # --- zaawansowane ---
+    - name: stdEst
+      title: Współczynniki standaryzowane β
+      type: Bool
+      default: false
+
+    - name: anova
+      title: Tabela ANOVA modelu
+      type: Bool
+      default: false
+
+    - name: ic
+      title: AIC i BIC
+      type: Bool
+      default: false
+
+    - name: predictOV
+      title: Wartości przewidywane do arkusza
+      type: Output
+
+    - name: residsOV
+      title: Reszty do arkusza
+      type: Output
+
+    # --- założenia ---
+    - name: norm
+      title: Normalność reszt (Shapiro-Wilk)
+      type: Bool
+      default: false
+
+    - name: qq
+      title: Wykres Q-Q reszt
+      type: Bool
+      default: false
+
+    - name: resPlot
+      title: Reszty vs dopasowane
+      type: Bool
+      default: false
+
+    - name: durbin
+      title: Autokorelacja (Durbin-Watson)
+      type: Bool
+      default: false
+
+    - name: vif
+      title: Współliniowość (VIF)
+      type: Bool
+      default: false
+
+    - name: cooks
+      title: Odległość Cooka
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
+...
