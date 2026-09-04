@@ -27,6 +27,20 @@ items:
           title: p
           type: number
           format: zto,pvalue
+        - name: or
+          title: OR
+          type: number
+          visible: (effSize)
+        - name: lower
+          title: Dolna
+          type: number
+          visible: (effSize)
+          superTitle: Przedział ufności
+        - name: upper
+          title: Górna
+          type: number
+          visible: (effSize)
+          superTitle: Przedział ufności
 
     - name: marg
       title: Udziały w pomiarach
@@ -45,29 +59,6 @@ items:
           title: Udział
           type: number
           format: pc
-
-    - name: effsize
-      title: Wielkość efektu
-      type: Table
-      rows: 0
-      visible: (effSize)
-      clearWith:
-        - vars
-        - counts
-        - ciWidth
-      columns:
-        - name: measure
-          title: ''
-          type: text
-        - name: value
-          title: Wartość
-          type: number
-        - name: lower
-          title: Dolna
-          type: number
-        - name: upper
-          title: Górna
-          type: number
 
     - name: plot
       title: Udziały w kolejnych pomiarach

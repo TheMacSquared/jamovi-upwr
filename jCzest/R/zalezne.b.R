@@ -66,12 +66,21 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
 
             m <- mcnemar(tab, correct = isTRUE(o$corr))
             lab <- if (isTRUE(o$corr)) "McNemar (z poprawką ciągłości)" else "McNemar"
+            # OR par niezgodnych to miara dla TEJ SAMEJ pary pomiarow co test,
+            # wiec idzie w wiersz testu — nie do osobnej tabeli z jednym wierszem
+            or <- if (isTRUE(o$effSize)) mcnemarOR(tab, level = o$ciWidth / 100)
+                  else list(est = NULL, lower = NULL, upper = NULL)
             if (is.na(m$stat)) {
                 t$setNote("z", "Brak par niezgodnych — pomiary są identyczne, więc testu nie da się policzyć.")
             } else {
-                t$addRow(rowKey = "mc", values = list(test = lab, stat = m$stat, df = m$df, p = m$p))
+                t$addRow(rowKey = "mc", values = list(test = lab, stat = m$stat, df = m$df, p = m$p,
+                                                      or = or$est, lower = or$lower, upper = or$upper))
                 t$setNote("disc", sprintf("Pary niezgodne: %d (%d i %d).",
                                           m$discordant, m$b, m$c))
+                if (isTRUE(o$effSize))
+                    t$setNote("or", sprintf(
+                        "OR: iloraz liczby par „%s → %s” do par „%s → %s”; 1 oznacza brak zmiany.",
+                        rownames(tab)[1], rownames(tab)[2], rownames(tab)[2], rownames(tab)[1]))
             }
 
             if (isTRUE(o$exact)) {
@@ -90,16 +99,6 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                         "Pary niezgodne: %d (zwyczajowo wymaga się co najmniej 25),",
                         "więc przybliżenie χ² jest zawodne. Użyj dokładnego testu dwumianowego."),
                         a$discordant)))
-
-            if (isTRUE(o$effSize)) {
-                or <- mcnemarOR(tab, level = o$ciWidth / 100)
-                e <- self$results$effsize
-                e$addRow(rowKey = "or", values = list(measure = "OR par niezgodnych",
-                                                      value = or$est, lower = or$lower, upper = or$upper))
-                e$setNote("or", sprintf(
-                    "Iloraz liczby par „%s → %s” do par „%s → %s”; 1 oznacza brak zmiany.",
-                    rownames(tab)[1], rownames(tab)[2], rownames(tab)[2], rownames(tab)[1]))
-            }
         },
 
         # --- trzy i więcej pomiarów: Q Cochrana ---
@@ -129,10 +128,10 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             lv1 <- levels(factor(self$data[[vars[1]]]))[1]
             private$.fillMarg(stats::setNames(q$props * q$n, vars), q$n, lv1)
 
-            # OR par niezgodnych jest miara dla PARY pomiarow, wiec przy k >= 3
-            # nie ma jednej wartosci — zamiast zostawiac pusta tabele, chowamy ja
-            # i podajemy OR osobno dla kazdej pary w post-hoc
-            self$results$effsize$setVisible(FALSE)
+            # OR jest miara dla PARY pomiarow, wiec przy k >= 3 nie ma jednej
+            # wartosci — chowamy kolumny w tabeli testow i podajemy OR osobno
+            # dla kazdej pary w post-hoc
+            for (col in c("or", "lower", "upper")) t$getColumn(col)$setVisible(FALSE)
 
             if (isTRUE(o$posthoc)) {
                 pw <- pairwiseMcnemar(m, vars)

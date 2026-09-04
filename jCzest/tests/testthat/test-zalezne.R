@@ -31,13 +31,20 @@ test_that("dwa pomiary: McNemar zgodny z mcnemar.test", {
                  unname(mcnemar.test(as.table(tab), correct = TRUE)$statistic))
 })
 
-test_that("OR par niezgodnych z przedzialem", {
+test_that("OR przy dwoch pomiarach jest w GLOWNEJ tabeli, nie w osobnej", {
     res <- jCzest:::zalezne(data = pary, vars = c("przed", "po"), counts = "n")
-    e <- res$effsize$asDF
-    expect_equal(nrow(e), 1)
-    expect_true(is.finite(e$value[1]))
-    expect_lt(e$lower[1], e$value[1])
-    expect_gt(e$upper[1], e$value[1])
+    t <- res$tests$asDF
+    expect_true(all(c("or", "lower", "upper") %in% names(t)))
+    expect_true(is.finite(t$or[1]))
+    expect_lt(t$lower[1], t$or[1])
+    expect_gt(t$upper[1], t$or[1])
+    # OR = b/c, czyli pary "nie -> tak" do par "tak -> nie" (10 / 25), zgodnie
+    # z nota pod tabela; odwrotna kolejnosc dalaby 2.5
+    expect_equal(t$or[1], 10 / 25)
+
+    # wylaczona wielkosc efektu: komorka pozostaje pusta (nie liczba)
+    bez <- jCzest:::zalezne(data = pary, vars = c("przed", "po"), counts = "n", effSize = FALSE)
+    expect_false(isTRUE(is.finite(bez$tests$asDF$or[1])))
 })
 
 test_that("dokladny test dwumianowy na parach niezgodnych", {
