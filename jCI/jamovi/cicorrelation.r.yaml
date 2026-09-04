@@ -1,6 +1,6 @@
 ---
 name: cicorrelation
-title: CI dla korelacji
+title: Przedział ufności dla korelacji
 jrs: '1.1'
 
 items:
@@ -8,43 +8,56 @@ items:
       title: Przedział ufności dla korelacji
       type: Table
       rows: 1
-      clearWith:
+      clearWith: &cw
         - var1
         - var2
         - method
         - ciWidth
+        - ciMethod
+        - nBoot
+        - seed
       columns:
         - name: var1
           title: Zmienna 1
           type: text
-
         - name: var2
           title: Zmienna 2
           type: text
-
+        - name: n
+          title: n
+          type: integer
         - name: estimate
           title: r
           type: number
-
         - name: lower
-          title: Dolna granica
+          title: Dolna
           type: number
-
+          superTitle: Przedział ufności
         - name: upper
-          title: Górna granica
+          title: Górna
           type: number
+          superTitle: Przedział ufności
 
     - name: plot
       title: ''
       type: Image
-      visible: (showPlot)
-      width: 450
-      height: 350
+      visible: (plot)
+      width: 520
+      height: 400
       renderFun: .ciPlot
-      clearWith:
-        - var1
-        - var2
-        - method
-        - ciWidth
+      clearWith: *cw
 
+    - name: bootPlot
+      title: Rozkład bootstrapowy
+      type: Image
+      visible: (bootPlot && (ciMethod:perc || ciMethod:bca))
+      width: 480
+      height: 340
+      renderFun: .bootPlot
+      clearWith: *cw
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
 ...

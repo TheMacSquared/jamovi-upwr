@@ -1,5 +1,5 @@
-title: Przedział ufności dla średniej różnic
-name: cipairedmeans
+title: Przedział ufności dla współczynników regresji
+name: ciregression
 jus: '3.0'
 stage: 0
 compilerMode: tame
@@ -9,17 +9,17 @@ children:
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Pomiar 1
+        label: Zmienna zależna (Y)
         children:
           - type: VariablesListBox
-            name: var1
+            name: dep
             isTarget: true
             maxItemCount: 1
       - type: TargetLayoutBox
-        label: Pomiar 2
+        label: Predyktor (X)
         children:
           - type: VariablesListBox
-            name: var2
+            name: pred
             isTarget: true
             maxItemCount: 1
 

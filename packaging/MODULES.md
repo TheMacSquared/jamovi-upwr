@@ -12,9 +12,8 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.4 |
 | `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 26 wykresów) | wbudowany | 2.9.0 |
 | `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.3.2 |
-| `jCI/` | jCI | przedziały ufności | wbudowany | 0.1.0 |
+| `jCI/` | jCI | przedziały ufności: klasyczne i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.2.0 |
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.0 |
-| `jboot/` | jboot | bootstrap | wbudowany | 0.3.0 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.7.0 |
 | `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.2.0 |
 | `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery/NIR; zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.4.0 |

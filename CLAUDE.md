@@ -145,7 +145,7 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
 - descriptives: boxMean, współczynnik zmienności V (%); facetowanie histogramów
   zapewnia wbudowany mechanizm „Podziel według" upstreamu (osobna opcja
   histFacet okazała się zbędna); CI dla średniej usunięte (przeniesione do jCI)
-- moduły preinstalowane: jmv, plots (scatr), jperm, jCI, jboot,
+- moduły preinstalowane: jmv, plots (scatr), jperm, jCI (od 0.2.0 z bootstrapem, dawny jboot wchłonięty),
   jdistrACTION 1.3.x (11 rozkładów, w tym gamma, Weibulla i ujemny dwumianowy
   z wyborem konwencji zmiennej losowej); jRISK (ryzyko i niezawodność:
   modele czasu życia z cenzorowaniem, systemy, FTA, zdarzenia/warunkowanie,
@@ -212,12 +212,26 @@ Kolejność prac:
      Fishera dla Pearsona (i wstęga OLS na wykresie), wykres różnicy
      proporcji bez przedziału, „Newcombe" z podwójnym z; „Error bar plot"
      po angielsku; brak menuSubtitle.
-   - jboot: wariant „11 → 6 analiz" (miara centralna z listą stat,
-     porównanie grup, pary, proporcje, korelacja, regresja + „Jak działa
-     bootstrap" ze zbieżnością w środku; bez showClassical i metody basic),
-     z propozycją SCALENIA z jCI (bootstrap jako metoda przedziału
-     w każdej analizie jCI + regresja + podgrupa Dydaktyka) — czeka na
-     decyzję użytkownika.
+   - jCI 0.2.0 ZROBIONE = jCI + jboot SCALONE (decyzja 2026-09-04): jboot
+     usunięty z drzewa i skryptów builda (Dockerfile, build.ps1,
+     20-modules.sh, MODULES.md, groupOrder klienta). W każdej analizie jCI
+     lista „Metoda przedziału": klasyczna (t / Welch / Wilson /
+     Clopper-Pearson / Wald / Newcombe / Fisher z / t dla lm) albo
+     bootstrap percentylowy / BCa (pakiet boot; „Zaawansowane": B, ziarno,
+     histogram replikacji). Nowe analizy: `ciregression` (wyraz wolny
+     i nachylenie, pasmo klasyczne z predict() albo bootstrapowe)
+     i `cibootstrap` „Jak działa bootstrap" (podgrupa Dydaktyka, próby krok
+     po kroku + zbieżność). Średnia jednej próby ma listę miary
+     (średnia/mediana/ucięta; mediana i ucięta wymuszają bootstrap
+     percentylowy z notą). Naprawione: CI Spearmana (Bonett-Wright),
+     Newcombe bez podwójnego z (zwalidowany z Newcombe 1998), wykres
+     różnicy proporcji rysuje przedział (Gardner-Altman na skali udziału).
+     Silnik: `jCI/R/utils.R` (`bootCI` — jedno losowanie daje wszystkie
+     statystyki, np. oba współczynniki regresji; BCa z fallbackiem do
+     percentyli, gdy boot.ci zwraca NULL). Świadomie bez: showClassical
+     (testy są w jTestyT), metody „basic", CI per poziom w proporcji
+     (jCzest zgodność). Stare .omv z jboot i jCI 0.1.0 nie otwierają tych
+     analiz.
 3. Eksploracja: moduł jUPWR (roboczo `jEksplor`) zamiast rozszerzania jmv
    descriptives z zadania 9 — zakres z zadania 9 przechodzi do niego;
    jmv::descriptives ukryte.
@@ -341,7 +355,7 @@ testowa + lista), „Dodatkowe statystyki" (poziom ufności, opisowe), „Wykres
 z CI (niecentralny t, `dInterval`). Wykresy: grup i różnicy (Gardner-Altman,
 oś różnicy po prawej zakotwiczona w średniej drugiej grupy), par i różnicy,
 średniej z H₀. Usunięte świadomie: czynnik Bayesa (osobny moduł w planach),
-permutacje i bootstrap (są w jperm/jboot), test znaków, K-S. Ukryte w kliencie:
+permutacje i bootstrap (są w jperm/jCI), test znaków, K-S. Ukryte w kliencie:
 jmv::ttestis, ttestps, ttestones.
 
 ### Zadanie 16: przegląd podpisów (not) pod tabelami w jANOVA, jTestyT, jRol — DO ZROBIENIA (osobna sesja)

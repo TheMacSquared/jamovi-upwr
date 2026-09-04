@@ -1,52 +1,71 @@
 ---
 name: cionemean
-title: CI dla średniej (jedna próba)
+title: Przedział ufności dla średniej
 jrs: '1.1'
 
 items:
     - name: table
       title: Przedział ufności dla średniej
       type: Table
-      rows: -1
-      clearWith:
+      rows: 0
+      clearWith: &cw
         - dep
-        - ciWidth
         - group
+        - stat
+        - trimProp
+        - ciWidth
+        - ciMethod
+        - nBoot
+        - seed
       columns:
         - name: var
-          title: Zmienna
+          title: ''
           type: text
-
+          combineBelow: true
         - name: grp
           title: Grupa
           type: text
-
+        - name: n
+          title: n
+          type: integer
         - name: estimate
           title: Średnia
           type: number
-
         - name: se
           title: SE
           type: number
-
         - name: lower
-          title: Dolna granica
+          title: Dolna
           type: number
-
+          superTitle: Przedział ufności
         - name: upper
-          title: Górna granica
+          title: Górna
           type: number
+          superTitle: Przedział ufności
 
     - name: plot
       title: ''
       type: Image
-      visible: (showPlot)
-      width: 600
-      height: 450
+      visible: (plot)
+      width: 520
+      height: 400
       renderFun: .ciPlot
-      clearWith:
-        - dep
-        - ciWidth
-        - group
+      clearWith: *cw
 
+    - name: bootPlots
+      title: Rozkład bootstrapowy
+      type: Array
+      visible: (bootPlot && (ciMethod:perc || ciMethod:bca))
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 480
+        height: 340
+        renderFun: .bootPlot
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
 ...

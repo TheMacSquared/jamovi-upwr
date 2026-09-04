@@ -3,112 +3,76 @@ cionemeanClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
     "cionemeanClass",
     inherit = cionemeanBase,
     private = list(
+        .statFun = function() {
+            o <- self$options
+            switch(o$stat, median = stats::median, trimmed = function(v) mean(v, trim = o$trimProp), mean)
+        },
+        .statLabel = function() {
+            o <- self$options
+            switch(o$stat, median = "Mediana", trimmed = sprintf("Średnia ucięta (%g%%)", 100 * o$trimProp), "Średnia")
+        },
         .run = function() {
-            if (is.null(self$options$dep))
-                return()
+            o <- self$options
+            if (!optNonEmpty(o$dep)) return()
+            level <- o$ciWidth / 100
+            t <- self$results$table
+            statLab <- private$.statLabel(); fun <- private$.statFun()
+            t$getColumn("estimate")$setTitle(statLab)
+            # median / trimmed mean have no t interval: bootstrap percentile is forced
+            method <- o$ciMethod
+            forced <- o$stat != "mean" && !isBoot(method)
+            if (forced) method <- "perc"
 
-            dep <- self$options$dep
-            groupVar <- self$options$group
-            ciWidth <- self$options$ciWidth / 100
+            x <- jmvcore::toNumeric(self$data[[o$dep]])
+            grouped <- optNonEmpty(o$group)
+            g <- if (grouped) factor(self$data[[o$group]]) else factor(rep(o$dep, length(x)))
+            ok <- !is.na(x) & !is.na(g); x <- x[ok]; g <- droplevels(g[ok])
+            if (length(x) == 0) { t$setNote("err", "Brak obserwacji."); return() }
 
-            x <- jmvcore::toNumeric(self$data[[dep]])
+            m <- jmvcore::metodyNew()
+            m$add("Dane", "Zmienna „%s”%s; %s = %s; braki pominięte.", o$dep,
+                  if (grouped) sprintf(", osobno w grupach zmiennej „%s” (%s)", o$group, jmvcore::metodyCyt(levels(g))) else "",
+                  if (grouped) "N w grupach" else "N", if (grouped) paste(table(g), collapse = ", ") else length(x))
+            m$add("Dane", "Estymowana miara: %s%s.", tolower(statLab),
+                  if (o$stat == "trimmed") sprintf(" — średnia po odrzuceniu %g%% obserwacji z każdego końca", 100 * o$trimProp) else "")
+            metodyPrzedzial(m, o, method, "Przedział t-Studenta: średnia ± t(df = n − 1) · SD/√n",
+                            "losowanie n obserwacji ze zwracaniem, osobno w każdej grupie",
+                            if (forced) "Dla mediany i średniej uciętej przedział klasyczny nie istnieje — użyto bootstrapu percentylowego." else NULL)
+            m$addIf(o$plot, "Wykres", "Punkty = obserwacje, romb = %s, wąsy = przedział ufności.", tolower(statLab))
+            m$addIf(o$bootPlot && isBoot(method), "Wykres", "Histogram replikacji bootstrapowych z estymatą i granicami przedziału.")
+            m$render(self$results$metody)
 
-            # If grouping variable is provided
-            if (!is.null(groupVar) && groupVar != "") {
-                grp <- as.factor(self$data[[groupVar]])
-
-                # Remove NA values
-                validIdx <- !is.na(x) & !is.na(grp)
-                x <- x[validIdx]
-                grp <- grp[validIdx]
-
-                groups <- levels(grp)
-                rowNo <- 1
-
-                plotData <- list(
-                    label = dep,
-                    groups = list(),
-                    ciWidth = self$options$ciWidth
-                )
-
-                for (g in groups) {
-                    xg <- x[grp == g]
-                    n <- length(xg)
-
-                    if (n < 2) {
-                        self$results$table$addRow(rowKey = g, values = list(
-                            var = dep, grp = g, estimate = NA, se = NA,
-                            lower = NA, upper = NA
-                        ))
-                        self$results$table$setNote("warn",
-                            paste("Grupa", g, "ma < 2 obserwacji"))
-                        rowNo <- rowNo + 1
-                        next
-                    }
-
-                    est <- mean(xg)
-                    se <- sd(xg) / sqrt(n)
-                    tCrit <- qt(1 - (1 - ciWidth) / 2, df = n - 1)
-                    lower <- est - tCrit * se
-                    upper <- est + tCrit * se
-
-                    self$results$table$addRow(rowKey = g, values = list(
-                        var = dep, grp = g, estimate = est, se = se,
-                        lower = lower, upper = upper
-                    ))
-
-                    plotData$groups[[g]] <- list(
-                        x = xg, estimate = est, lower = lower, upper = upper, n = n
-                    )
-                    rowNo <- rowNo + 1
-                }
-
-                self$results$table$setNote("ci",
-                    paste0(self$options$ciWidth, "% CI (t-Studenta)"))
-                self$results$plot$setState(plotData)
-
-            } else {
-                # No grouping - original single group behavior
-                x <- x[!is.na(x)]
-                n <- length(x)
-
+            plotData <- list(label = o$dep, groups = list(), ciWidth = o$ciWidth, statLabel = statLab)
+            fallback <- FALSE
+            for (lv in levels(g)) {
+                xg <- x[g == lv]; n <- length(xg); key <- if (grouped) lv else o$dep
                 if (n < 2) {
-                    self$results$table$setNote("err", "Za mało obserwacji.")
-                    return()
+                    t$addRow(rowKey = key, values = list(var = o$dep, grp = if (grouped) lv else "", n = n))
+                    t$setNote(paste0("n", key), sprintf("%s: za mało obserwacji (n < 2).", key)); next
                 }
-
-                est <- mean(x)
-                se <- sd(x) / sqrt(n)
-                tCrit <- qt(1 - (1 - ciWidth) / 2, df = n - 1)
-                lower <- est - tCrit * se
-                upper <- est + tCrit * se
-
-                self$results$table$addRow(rowKey = dep, values = list(
-                    var = dep, grp = "", estimate = est, se = se,
-                    lower = lower, upper = upper
-                ))
-                self$results$table$setNote("ci",
-                    paste0(self$options$ciWidth, "% CI (t-Studenta, df=", n - 1, ")"))
-
-                self$results$plot$setState(list(
-                    label = dep, x = x,
-                    estimate = est, lower = lower, upper = upper,
-                    ciWidth = self$options$ciWidth,
-                    groups = NULL
-                ))
+                if (isBoot(method)) {
+                    r <- bootCI(xg, function(d, i) fun(d[i]), o$nBoot, o$seed, method, level)
+                    fallback <- fallback || r$fallback
+                    if (isTRUE(o$bootPlot)) {
+                        self$results$bootPlots$addItem(key = key)
+                        img <- self$results$bootPlots$get(key = key); img$setTitle(key)
+                        img$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = statLab))
+                    }
+                } else r <- ciMeanT(xg, level)
+                t$addRow(rowKey = key, values = list(var = o$dep, grp = if (grouped) lv else "", n = n,
+                    estimate = r$est, se = r$se, lower = r$lower, upper = r$upper))
+                plotData$groups[[key]] <- list(x = xg, estimate = r$est, lower = r$lower, upper = r$upper)
             }
+            ciNote(t, o, method, "t-Studenta", fallback)
+            if (length(plotData$groups)) self$results$plot$setState(plotData)
         },
         .ciPlot = function(image, ggtheme, theme, ...) {
-            if (is.null(image$state))
-                return(FALSE)
-            s <- image$state
-
-            # If grouped data
-            if (!is.null(s$groups) && length(s$groups) > 0) {
-                buildGroupedMeanCIPlot(s$label, s$groups, s$ciWidth, ggtheme, theme)
-            } else {
-                buildMeanCIPlot(s$label, s$x, s$estimate, s$lower, s$upper, s$ciWidth, ggtheme, theme)
-            }
+            s <- image$state; if (is.null(s)) return(FALSE)
+            buildGroupedMeanCIPlot(s$label, s$groups, s$ciWidth, s$statLabel, ggtheme, theme)
+        },
+        .bootPlot = function(image, ggtheme, theme, ...) {
+            s <- image$state; if (is.null(s)) return(FALSE)
+            buildBootHist(s$reps, s$est, s$lower, s$upper, s$xlab, ggtheme, theme)
         }
     )
 )

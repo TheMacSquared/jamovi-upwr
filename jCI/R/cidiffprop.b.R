@@ -4,115 +4,55 @@ cidiffpropClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
     inherit = cidiffpropBase,
     private = list(
         .run = function() {
-            if (is.null(self$options$dep) || is.null(self$options$group))
-                return()
+            o <- self$options
+            if (!optNonEmpty(o$dep) || !optNonEmpty(o$group)) return()
+            level <- o$ciWidth / 100; t <- self$results$table; method <- o$ciMethod
+            column <- self$data[[o$dep]]
+            lv <- pickLevel(column, o$level); if (is.null(lv)) return()
+            outcome <- as.character(column); g <- factor(self$data[[o$group]])
+            ok <- !is.na(outcome) & !is.na(g); outcome <- outcome[ok]; g <- droplevels(g[ok])
+            sel <- pickTwoLevels(t, levels(g), o$groupLevel1, o$groupLevel2); if (is.null(sel)) return()
+            keep <- g %in% sel; outcome <- outcome[keep]; g <- factor(g[keep], levels = sel)
+            succ <- as.integer(outcome == lv)
+            n1 <- sum(g == sel[1]); n2 <- sum(g == sel[2]); x1 <- sum(succ[g == sel[1]]); x2 <- sum(succ[g == sel[2]])
+            if (n1 < 1 || n2 < 1) { t$setNote("err", "Każda grupa musi mieć co najmniej 1 obserwację."); return() }
+            p1 <- x1 / n1; p2 <- x2 / n2
 
-            dep <- self$options$dep
-            groupVar <- self$options$group
-            level <- self$options$level
-            method <- self$options$method
-            ciWidth <- self$options$ciWidth / 100
+            m <- jmvcore::metodyNew()
+            m$add("Dane", "Zmienna „%s”, „sukces” = kategoria „%s”%s; grupy „%s” (n = %d) i „%s” (n = %d) ze zmiennej „%s”; różnica = udział w „%s” − udział w „%s”; braki pominięte.",
+                  o$dep, lv, if (!optNonEmpty(o$level)) " (pierwszy poziom — wybierz inny w panelu)" else "",
+                  sel[1], n1, sel[2], n2, o$group, sel[1], sel[2])
+            metodyPrzedzial(m, o, method, switch(method,
+                newcombe = "Przedział Newcombe’a (hybrydowy score, metoda 10): granice z przedziałów Wilsona obu grup",
+                wald = "Przedział Walda: różnica ± z · √(p̂₁(1 − p̂₁)/n₁ + p̂₂(1 − p̂₂)/n₂) — zawodny przy małych n", ""),
+                "losowanie ze zwracaniem osobno w każdej grupie (bootstrap warstwowy), statystyka = różnica udziałów")
+            m$addIf(o$plot, "Wykres", "Udziały w grupach z przedziałami Wilsona i różnica z przedziałem na osi po prawej (p.p. = punkty procentowe), zakotwiczonej w udziale „%s”.", sel[2])
+            m$addIf(o$bootPlot && isBoot(method), "Wykres", "Histogram replikacji bootstrapowych różnicy udziałów.")
+            m$render(self$results$metody)
 
-            # Auto-pick first level if user hasn't selected one
-            if (is.null(level) || length(level) == 0 || nchar(as.character(level)) == 0) {
-                column <- self$data[[dep]]
-                if (is.factor(column))
-                    level <- levels(column)[1]
-                else
-                    level <- as.character(sort(unique(column[!is.na(column)]))[1])
-                if (is.null(level) || is.na(level))
-                    return()
-            }
-            level <- as.character(level)
-
-            outcome <- as.character(self$data[[dep]])
-            group <- factor(self$data[[groupVar]])
-
-            complete <- !is.na(outcome) & !is.na(group)
-            outcome <- outcome[complete]
-            group <- droplevels(group[complete])
-            allLevs <- levels(group)
-
-            # Level selection for groups (same logic as citwomeans)
-            gLev1 <- self$options$groupLevel1
-            gLev2 <- self$options$groupLevel2
-
-            haveG1 <- !is.null(gLev1) && length(gLev1) > 0 &&
-                nchar(as.character(gLev1)) > 0
-            haveG2 <- !is.null(gLev2) && length(gLev2) > 0 &&
-                nchar(as.character(gLev2)) > 0
-
-            if (haveG1 && haveG2) {
-                lev1 <- as.character(gLev1)
-                lev2 <- as.character(gLev2)
-                if (lev1 == lev2) {
-                    self$results$table$setNote("err",
-                        "Grupa 1 i Grupa 2 muszą być różne.")
-                    return()
-                }
-                if (!(lev1 %in% allLevs) || !(lev2 %in% allLevs)) {
-                    self$results$table$setNote("err",
-                        "Wybrane grupy nie istnieją w zmiennej.")
-                    return()
-                }
-            } else if (length(allLevs) == 2) {
-                lev1 <- allLevs[1]
-                lev2 <- allLevs[2]
-            } else if (length(allLevs) < 2) {
-                self$results$table$setNote("err",
-                    "Zmienna grupująca musi mieć co najmniej 2 poziomy.")
-                return()
-            } else {
-                lev1 <- allLevs[1]
-                lev2 <- allLevs[2]
-                self$results$table$setNote("info",
-                    paste0("Więcej niż 2 grupy. Użyto pierwszych dwóch: ",
-                        lev1, " vs ", lev2, ". Wybierz ręcznie w opcjach."))
-            }
-
-            x1 <- sum(outcome[group == lev1] == level)
-            n1 <- sum(group == lev1)
-            x2 <- sum(outcome[group == lev2] == level)
-            n2 <- sum(group == lev2)
-
-            if (n1 < 1 || n2 < 1) {
-                self$results$table$setNote("err",
-                    "Każda grupa musi mieć co najmniej 1 obserwację.")
-                return()
-            }
-
-            p1 <- x1 / n1
-            p2 <- x2 / n2
-            est <- p1 - p2
-
-            ci <- ciDiffProportion(x1, n1, x2, n2, ciWidth, method)
-
-            self$results$table$setRow(rowNo = 1, values = list(
-                var = dep, group1 = lev1, group2 = lev2,
-                p1 = p1, p2 = p2, estimate = est,
-                lower = ci$lower, upper = ci$upper
-            ))
-
-            methodLabel <- switch(method,
-                wald = "Wald",
-                newcombe = "Newcombe")
-            self$results$table$setNote("ci",
-                paste0(self$options$ciWidth, "% CI (metoda: ", methodLabel, ")"))
-
-            self$results$plot$setState(list(
-                group1 = lev1,
-                group2 = lev2,
-                p1 = p1, p2 = p2, n1 = n1, n2 = n2,
-                estimate = est, lower = ci$lower, upper = ci$upper,
-                ciWidth = self$options$ciWidth
-            ))
+            fallback <- FALSE
+            if (isBoot(method)) {
+                d <- data.frame(s = succ, g = g)
+                r <- bootCI(d, function(dd, i) { z <- dd[i, ]; mean(z$s[z$g == sel[1]]) - mean(z$s[z$g == sel[2]]) },
+                            o$nBoot, o$seed, method, level, strata = g)
+                fallback <- r$fallback
+                self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = "Różnica udziałów"))
+                clab <- NULL
+            } else { r <- ciDiffProportion(x1, n1, x2, n2, level, method); clab <- switch(method, newcombe = "Newcombe’a", wald = "Walda") }
+            t$setRow(rowNo = 1, values = list(var = o$dep, group1 = sel[1], group2 = sel[2], p1 = p1, p2 = p2,
+                estimate = p1 - p2, lower = r$lower, upper = r$upper))
+            ciNote(t, o, method, clab, fallback)
+            self$results$plot$setState(list(group1 = sel[1], group2 = sel[2], p1 = p1, p2 = p2,
+                ci1 = ciProportion(x1, n1, level, "wilson"), ci2 = ciProportion(x2, n2, level, "wilson"),
+                estimate = p1 - p2, lower = r$lower, upper = r$upper, ciWidth = o$ciWidth, level = lv))
         },
         .ciPlot = function(image, ggtheme, theme, ...) {
-            if (is.null(image$state))
-                return(FALSE)
-            s <- image$state
-            buildDiffPropPlot(s$group1, s$group2, s$p1, s$p2, s$n1, s$n2,
-                s$estimate, s$lower, s$upper, s$ciWidth, ggtheme, theme)
+            s <- image$state; if (is.null(s)) return(FALSE)
+            buildDiffPropPlot(s$group1, s$group2, s$p1, s$p2, s$ci1, s$ci2, s$estimate, s$lower, s$upper, s$ciWidth, s$level, ggtheme, theme)
+        },
+        .bootPlot = function(image, ggtheme, theme, ...) {
+            s <- image$state; if (is.null(s)) return(FALSE)
+            buildBootHist(s$reps, s$est, s$lower, s$upper, s$xlab, ggtheme, theme)
         }
     )
 )

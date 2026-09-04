@@ -4,112 +4,48 @@ citwomeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
     inherit = citwomeansBase,
     private = list(
         .run = function() {
-            if (is.null(self$options$dep) || is.null(self$options$group))
-                return()
+            o <- self$options
+            if (!optNonEmpty(o$dep) || !optNonEmpty(o$group)) return()
+            level <- o$ciWidth / 100; t <- self$results$table; method <- o$ciMethod
+            x <- jmvcore::toNumeric(self$data[[o$dep]]); g <- factor(self$data[[o$group]])
+            ok <- !is.na(x) & !is.na(g); x <- x[ok]; g <- droplevels(g[ok])
+            sel <- pickTwoLevels(t, levels(g), o$level1, o$level2)
+            if (is.null(sel)) return()
+            keep <- g %in% sel; x <- x[keep]; g <- factor(g[keep], levels = sel)
+            x1 <- x[g == sel[1]]; x2 <- x[g == sel[2]]
+            if (length(x1) < 2 || length(x2) < 2) { t$setNote("err", "Każda grupa musi mieć co najmniej 2 obserwacje."); return() }
 
-            dep <- self$options$dep
-            groupVar <- self$options$group
-            ciWidth <- self$options$ciWidth / 100
+            m <- jmvcore::metodyNew()
+            m$add("Dane", "Zmienna „%s”; grupy „%s” (n = %d) i „%s” (n = %d) ze zmiennej „%s”; różnica = „%s” − „%s”; braki pominięte.",
+                  o$dep, sel[1], length(x1), sel[2], length(x2), o$group, sel[1], sel[2])
+            metodyPrzedzial(m, o, method, "Przedział Welcha: różnica ± t(df Welcha-Satterthwaite’a) · √(s₁²/n₁ + s₂²/n₂), bez założenia równych wariancji",
+                            "losowanie ze zwracaniem osobno w każdej grupie (bootstrap warstwowy), statystyka = różnica średnich")
+            m$addIf(o$plot, "Wykres", "Estymacyjny (Gardner-Altman): punkty = obserwacje, romby = średnie grup, różnica z przedziałem na osi po prawej, zakotwiczonej w średniej „%s”.", sel[2])
+            m$addIf(o$bootPlot && isBoot(method), "Wykres", "Histogram replikacji bootstrapowych różnicy z estymatą i granicami przedziału.")
+            m$render(self$results$metody)
 
-            x <- jmvcore::toNumeric(self$data[[dep]])
-            group <- factor(self$data[[groupVar]])
-
-            complete <- !is.na(x) & !is.na(group)
-            x <- x[complete]
-            group <- droplevels(group[complete])
-            allLevs <- levels(group)
-
-            # Level selection logic:
-            # - If user selected level1 and level2, use them
-            # - Otherwise, if exactly 2 levels, use them automatically
-            # - Otherwise, fall back to first 2 levels
-            level1 <- self$options$level1
-            level2 <- self$options$level2
-
-            haveL1 <- !is.null(level1) && length(level1) > 0 &&
-                nchar(as.character(level1)) > 0
-            haveL2 <- !is.null(level2) && length(level2) > 0 &&
-                nchar(as.character(level2)) > 0
-
-            if (haveL1 && haveL2) {
-                lev1 <- as.character(level1)
-                lev2 <- as.character(level2)
-                if (lev1 == lev2) {
-                    self$results$table$setNote("err",
-                        "Grupa 1 i Grupa 2 muszą być różne.")
-                    return()
-                }
-                if (!(lev1 %in% allLevs) || !(lev2 %in% allLevs)) {
-                    self$results$table$setNote("err",
-                        "Wybrane grupy nie istnieją w zmiennej.")
-                    return()
-                }
-            } else if (length(allLevs) == 2) {
-                lev1 <- allLevs[1]
-                lev2 <- allLevs[2]
-            } else if (length(allLevs) < 2) {
-                self$results$table$setNote("err",
-                    "Zmienna grupująca musi mieć co najmniej 2 poziomy.")
-                return()
-            } else {
-                lev1 <- allLevs[1]
-                lev2 <- allLevs[2]
-                self$results$table$setNote("info",
-                    paste0("Więcej niż 2 grupy w zmiennej. Użyto pierwszych dwóch: ",
-                        lev1, " vs ", lev2, ". Wybierz ręcznie w opcjach."))
-            }
-
-            # Filter to just the two selected levels
-            keep <- group %in% c(lev1, lev2)
-            x <- x[keep]
-            group <- droplevels(group[keep])
-
-            x1 <- x[group == lev1]
-            x2 <- x[group == lev2]
-            n1 <- length(x1)
-            n2 <- length(x2)
-
-            if (n1 < 2 || n2 < 2) {
-                self$results$table$setNote("err",
-                    "Każda grupa musi mieć co najmniej 2 obserwacje.")
-                return()
-            }
-
-            est <- mean(x1) - mean(x2)
-            var1 <- var(x1)
-            var2 <- var(x2)
-            se <- sqrt(var1 / n1 + var2 / n2)
-
-            # Welch-Satterthwaite degrees of freedom
-            df <- (var1 / n1 + var2 / n2)^2 /
-                ((var1 / n1)^2 / (n1 - 1) + (var2 / n2)^2 / (n2 - 1))
-
-            tCrit <- qt(1 - (1 - ciWidth) / 2, df = df)
-            lower <- est - tCrit * se
-            upper <- est + tCrit * se
-
-            self$results$table$setRow(rowNo = 1, values = list(
-                var = dep, group1 = lev1, group2 = lev2,
-                estimate = est, se = se, lower = lower, upper = upper
-            ))
-            self$results$table$setNote("ci",
-                paste0(self$options$ciWidth, "% CI (Welch, df=",
-                    formatC(df, format = "f", digits = 1), ")"))
-
-            self$results$plot$setState(list(
-                x1 = x1, x2 = x2,
-                group1 = lev1,
-                group2 = lev2,
-                estimate = est, lower = lower, upper = upper,
-                ciWidth = self$options$ciWidth
-            ))
+            fallback <- FALSE
+            if (isBoot(method)) {
+                d <- data.frame(x = x, g = g)
+                r <- bootCI(d, function(dd, i) { s <- dd[i, ]; mean(s$x[s$g == sel[1]]) - mean(s$x[s$g == sel[2]]) },
+                            o$nBoot, o$seed, method, level, strata = g)
+                fallback <- r$fallback
+                self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = "Różnica średnich"))
+                clab <- NULL
+            } else { r <- ciTwoMeansWelch(x1, x2, level); clab <- sprintf("Welcha, df = %.1f", r$df) }
+            t$setRow(rowNo = 1, values = list(var = o$dep, group1 = sel[1], group2 = sel[2],
+                estimate = r$est, se = r$se, lower = r$lower, upper = r$upper))
+            ciNote(t, o, method, clab, fallback)
+            self$results$plot$setState(list(x1 = x1, x2 = x2, group1 = sel[1], group2 = sel[2], ylab = o$dep,
+                estimate = r$est, lower = r$lower, upper = r$upper, ciWidth = o$ciWidth))
         },
         .ciPlot = function(image, ggtheme, theme, ...) {
-            if (is.null(image$state))
-                return(FALSE)
-            s <- image$state
-            buildTwoMeansCIPlot(s$x1, s$x2, s$group1, s$group2,
-                s$estimate, s$lower, s$upper, s$ciWidth, ggtheme, theme)
+            s <- image$state; if (is.null(s)) return(FALSE)
+            buildTwoMeansCIPlot(s$x1, s$x2, s$group1, s$group2, s$estimate, s$lower, s$upper, s$ciWidth, s$ylab, ggtheme, theme)
+        },
+        .bootPlot = function(image, ggtheme, theme, ...) {
+            s <- image$state; if (is.null(s)) return(FALSE)
+            buildBootHist(s$reps, s$est, s$lower, s$upper, s$xlab, ggtheme, theme)
         }
     )
 )

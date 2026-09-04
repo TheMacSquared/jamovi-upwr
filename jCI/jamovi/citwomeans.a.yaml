@@ -1,19 +1,19 @@
 ---
 name: citwomeans
-title: CI dla różnicy średnich (dwie próby)
+title: Przedział ufności dla różnicy średnich
 menuGroup: Przedziały ufności
-menuTitle: "Różnica średnich (dwie próby)"
-version: '1.0.0'
+menuSubgroup: Średnie
+menuTitle: Różnica średnich
+menuSubtitle: dwie grupy niezależne
+version: '2.0.0'
 jas: '1.2'
-
-completeWhenFilled: true
 
 options:
     - name: data
       type: Data
 
     - name: dep
-      title: Zmienna zależna
+      title: Zmienna
       type: Variable
       suggested:
         - continuous
@@ -46,8 +46,46 @@ options:
       max: 99.9
       default: 95
 
-    - name: showPlot
+    - name: ciMethod
+      title: Metoda przedziału
+      type: List
+      options:
+        - title: Welcha (t, nierówne wariancje)
+          name: welch
+        - title: Bootstrap percentylowy
+          name: perc
+        - title: Bootstrap BCa
+          name: bca
+      default: welch
+
+    - name: plot
       title: Wykres
       type: Bool
       default: true
+
+    # --- zaawansowane: bootstrap ---
+    - name: nBoot
+      title: Liczba losowań B
+      type: Integer
+      default: 1000
+      min: 100
+      max: 100000
+
+    - name: seed
+      title: Ziarno generatora (0 = bez ustawiania)
+      type: Integer
+      default: 0
+      min: 0
+
+    - name: bootPlot
+      title: Histogram rozkładu bootstrapowego
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
 ...

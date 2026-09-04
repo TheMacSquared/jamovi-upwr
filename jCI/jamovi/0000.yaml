@@ -1,58 +1,81 @@
 ---
 title: Przedziały ufności
 name: jCI
-version: 0.1.0
+version: 0.2.0
 jms: '1.0'
 authors:
   - jUPWR Team
 maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 description: >
-  Przedziały ufności dla średnich, proporcji i korelacji.
+  Przedziały ufności dla średnich, proporcji, korelacji i regresji — klasyczne i
+  bootstrapowe (percentylowe, BCa) w jednym panelu, plus „Jak działa bootstrap”
+  krok po kroku.
 analyses:
-  - title: CI dla średniej (jedna próba)
+  - title: Przedział ufności dla średniej
     name: cionemean
     ns: jCI
     menuGroup: Przedziały ufności
-    menuTitle: Średnia (jedna próba)
     menuSubgroup: Średnie
+    menuTitle: Średnia
+    menuSubtitle: jedna próba, także osobno w grupach
     category: analyses
-  - title: CI dla różnicy średnich (dwie próby)
+  - title: Przedział ufności dla różnicy średnich
     name: citwomeans
     ns: jCI
     menuGroup: Przedziały ufności
-    menuTitle: Różnica średnich (dwie próby)
     menuSubgroup: Średnie
+    menuTitle: Różnica średnich
+    menuSubtitle: dwie grupy niezależne
     category: analyses
-  - title: CI dla średnich (próby sparowane)
+  - title: Przedział ufności dla średniej różnic
     name: cipairedmeans
     ns: jCI
     menuGroup: Przedziały ufności
-    menuTitle: Średnie (próby sparowane)
     menuSubgroup: Średnie
+    menuTitle: Średnia różnic
+    menuSubtitle: dwa pomiary tej samej jednostki
     category: analyses
-  - title: CI dla proporcji
+  - title: Przedział ufności dla proporcji
     name: ciproportion
     ns: jCI
     menuGroup: Przedziały ufności
-    menuTitle: Proporcja
     menuSubgroup: Proporcje
+    menuTitle: Proporcja
+    menuSubtitle: udział jednej kategorii
     category: analyses
-  - title: CI dla różnicy proporcji
+  - title: Przedział ufności dla różnicy proporcji
     name: cidiffprop
     ns: jCI
     menuGroup: Przedziały ufności
-    menuTitle: Różnica proporcji
     menuSubgroup: Proporcje
+    menuTitle: Różnica proporcji
+    menuSubtitle: dwie grupy niezależne
     category: analyses
-  - title: CI dla korelacji
+  - title: Przedział ufności dla korelacji
     name: cicorrelation
     ns: jCI
     menuGroup: Przedziały ufności
-    menuTitle: Korelacja
     menuSubgroup: Korelacja i regresja
+    menuTitle: Korelacja
+    menuSubtitle: Pearsona lub Spearmana
+    category: analyses
+  - title: Przedział ufności dla współczynników regresji
+    name: ciregression
+    ns: jCI
+    menuGroup: Przedziały ufności
+    menuSubgroup: Korelacja i regresja
+    menuTitle: Regresja liniowa
+    menuSubtitle: wyraz wolny i nachylenie
+    category: analyses
+  - title: Jak działa bootstrap
+    name: cibootstrap
+    ns: jCI
+    menuGroup: Przedziały ufności
+    menuSubgroup: Dydaktyka
+    menuTitle: Jak działa bootstrap
+    menuSubtitle: próby krok po kroku, zbieżność
     category: analyses
 usesNative: true
 minApp: 1.0.8
-index: 11
 
 ...

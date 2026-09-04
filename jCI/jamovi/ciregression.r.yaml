@@ -1,41 +1,29 @@
 ---
-name: cidiffprop
-title: Przedział ufności dla różnicy proporcji
+name: ciregression
+title: Przedział ufności dla współczynników regresji
 jrs: '1.1'
 
 items:
     - name: table
-      title: Przedział ufności dla różnicy proporcji
+      title: Współczynniki regresji
       type: Table
-      rows: 1
+      rows: 0
       clearWith: &cw
         - dep
-        - group
-        - level
-        - groupLevel1
-        - groupLevel2
+        - pred
         - ciWidth
         - ciMethod
         - nBoot
         - seed
       columns:
-        - name: var
+        - name: term
           title: ''
           type: text
-        - name: group1
-          title: Grupa 1
-          type: text
-        - name: group2
-          title: Grupa 2
-          type: text
-        - name: p1
-          title: p̂₁
-          type: number
-        - name: p2
-          title: p̂₂
-          type: number
         - name: estimate
-          title: Różnica
+          title: Współczynnik
+          type: number
+        - name: se
+          title: SE
           type: number
         - name: lower
           title: Dolna
@@ -50,7 +38,7 @@ items:
       title: ''
       type: Image
       visible: (plot)
-      width: 520
+      width: 540
       height: 400
       renderFun: .ciPlot
       clearWith: *cw

@@ -1,0 +1,54 @@
+---
+name: cibootstrap
+title: Jak działa bootstrap
+menuGroup: Przedziały ufności
+menuSubgroup: Dydaktyka
+menuTitle: Jak działa bootstrap
+menuSubtitle: próby krok po kroku, zbieżność
+version: '2.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: dep
+      title: Zmienna
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: nBoot
+      title: Liczba prób (do pokazania)
+      type: Integer
+      default: 10
+      min: 1
+      max: 50
+
+    - name: ciWidth
+      title: Poziom ufności
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+
+    - name: seed
+      title: Ziarno generatora
+      type: Integer
+      default: 42
+      min: 1
+
+    - name: showConvergence
+      title: "Zbieżność: wpływ liczby losowań B"
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
+...

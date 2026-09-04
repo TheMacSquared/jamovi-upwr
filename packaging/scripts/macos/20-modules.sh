@@ -48,7 +48,7 @@ log "Instalacja zależności ridge/hexbin/GGally (ggridges, hexbin, GGally) do $
 
 # Moduły w kolejności jak w docker/jamovi-Dockerfile.
 # R znajduje zależności w $R_HOME_SYS/library (systemowy R), jmvcore w base/R.
-MODULES=(jmv plots jperm jCI jboot jdistrACTION jDane jANOVA jTestyT jCzest)   # opcjonalne (.jmo): jRISK 70-, jSpace 71-, jRol 72-jmo-*.sh
+MODULES=(jmv plots jperm jCI jdistrACTION jDane jANOVA jTestyT jCzest)   # opcjonalne (.jmo): jRISK 70-, jSpace 71-, jRol 72-jmo-*.sh
 src_guard "${MODULES[@]}"   # jmc nadpisuje pliki źródłowe — trap przywraca je po pętli
 for m in "${MODULES[@]}"; do
     [ -d "$REPO_ROOT/$m" ] || { log "pomijam $m (brak katalogu)"; continue; }
@@ -65,7 +65,7 @@ done
 
 # stage/ jest przyrostowy — usuń moduły, których już nie preinstalujemy (np. jRISK),
 # inaczej stare katalogi przeciekają do .app (50-assemble-app.sh kopiuje cały payload).
-EXPECTED=(base jmv scatr jperm jCI jboot distrACTION jDane jANOVA jTestyT jCzest)
+EXPECTED=(base jmv scatr jperm jCI distrACTION jDane jANOVA jTestyT jCzest)
 for d in "$PAYLOAD/modules"/*/; do
     d="${d%/}"; name="$(basename "$d")"
     case " ${EXPECTED[*]} " in *" $name "*) ;; *) log "usuwam nieaktualny moduł z payloadu: $name"; rm -rf "$d";; esac

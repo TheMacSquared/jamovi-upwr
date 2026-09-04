@@ -1,18 +1,21 @@
 Package: jCI
 Type: Package
 Title: Przedzialy ufnosci dla jamovi
-Version: 0.1.0
+Version: 0.2.0
 # UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
 # przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
 Author: jUPWR Team
 Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
-Description: Przedzialy ufnosci dla srednich, proporcji i korelacji.
-    Modul dydaktyczny laczacy wszystkie metody CI w jednym miejscu.
+Description: Przedzialy ufnosci dla srednich, proporcji, korelacji i regresji:
+    klasyczne (t, Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) oraz
+    bootstrapowe (percentylowy, BCa) w jednym panelu; analiza dydaktyczna
+    "Jak dziala bootstrap". Wchlania dawny modul jboot.
 License: GPL (>= 2)
 Encoding: UTF-8
 Imports:
     jmvcore (>= 2.4.2),
     R6,
+    boot,
     ggplot2
 Suggests:
     testthat (>= 3.0.0)

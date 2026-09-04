@@ -1,10 +1,10 @@
 ---
-name: cidiffprop
-title: Przedział ufności dla różnicy proporcji
+name: ciregression
+title: Przedział ufności dla współczynników regresji
 menuGroup: Przedziały ufności
-menuSubgroup: Proporcje
-menuTitle: Różnica proporcji
-menuSubtitle: dwie grupy niezależne
+menuSubgroup: Korelacja i regresja
+menuTitle: Regresja liniowa
+menuSubtitle: wyraz wolny i nachylenie
 version: '2.0.0'
 jas: '1.2'
 
@@ -13,37 +13,20 @@ options:
       type: Data
 
     - name: dep
-      title: Zmienna
+      title: Zmienna zależna (Y)
       type: Variable
       suggested:
-        - nominal
-        - ordinal
+        - continuous
       permitted:
-        - factor
+        - numeric
 
-    - name: group
-      title: Zmienna grupująca
+    - name: pred
+      title: Predyktor (X)
       type: Variable
       suggested:
-        - nominal
-        - ordinal
+        - continuous
       permitted:
-        - factor
-
-    - name: level
-      title: Kategoria „sukces”
-      type: Level
-      variable: (dep)
-
-    - name: groupLevel1
-      title: Grupa 1
-      type: Level
-      variable: (group)
-
-    - name: groupLevel2
-      title: Grupa 2
-      type: Level
-      variable: (group)
+        - numeric
 
     - name: ciWidth
       title: Poziom ufności
@@ -56,15 +39,13 @@ options:
       title: Metoda przedziału
       type: List
       options:
-        - title: Newcombe’a (score)
-          name: newcombe
-        - title: Walda
-          name: wald
+        - title: t-Studenta (lm)
+          name: t
         - title: Bootstrap percentylowy
           name: perc
         - title: Bootstrap BCa
           name: bca
-      default: newcombe
+      default: t
 
     - name: plot
       title: Wykres

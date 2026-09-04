@@ -24,7 +24,7 @@ Instrukcja budowania `jUPWR.app` (i `.dmg`) na macOS arm64. Komendy zebrane w sk
 cd packaging/scripts/macos
 ./00-prereqs.sh        # Homebrew: boost, nanomsg, protobuf, python@3.12, create-dmg
 ./10-client.sh         # vite build -> stage/jamovi/client
-./20-modules.sh        # jmvcore + jmc install (jmv, scatr, jperm, jCI, jboot, distrACTION)
+./20-modules.sh        # jmvcore + jmc install (jmv, scatr, jperm, jCI, distrACTION)
 ./25-i18n.sh           # kompilacja tłumaczeń
 ./40-engine.sh         # kompilacja jamovi-engine (C++)
 ./30-server.sh         # venv 3.12 + requirements + jamovi.core/server/readstat
@@ -80,7 +80,7 @@ i `vite build --outDir stage/jamovi/client`. Wynik ~5.6 MB, zawiera `index.html`
 
 `--skip-deps` zakłada, że zależności (ggplot2, car, multcomp, emmeans, vcd…) są w bibliotece
 systemowego R — tak jak w Dockerze pochodzą z obrazu `jamovi-deps`. Moduł `plots` (submoduł
-jmvplots) instaluje się pod nazwą **`scatr`**. Zainstalowane: `jmv, scatr, jperm, jCI, jboot,
+jmvplots) instaluje się pod nazwą **`scatr`**. Zainstalowane: `jmv, scatr, jperm, jCI,
 distrACTION` + `base` (jmvcore). jRISK nie jest preinstalowany — `70-jmo-jrisk.sh` buduje
 osobny plik `jRISK_<wersja>-macos-arm64.jmo` w `dist/` (instalacja: Moduły → Sideload).
 

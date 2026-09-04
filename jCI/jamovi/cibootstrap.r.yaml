@@ -1,0 +1,101 @@
+---
+name: cibootstrap
+title: Jak działa bootstrap
+jrs: '1.1'
+
+items:
+    - name: origTable
+      title: Dane — podsumowanie
+      type: Table
+      rows: 0
+      clearWith:
+        - dep
+      columns:
+        - name: stat
+          title: ''
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+
+    - name: samplesTable
+      title: Próby bootstrapowe
+      type: Table
+      rows: 0
+      clearWith: &cw
+        - dep
+        - nBoot
+        - seed
+        - ciWidth
+      columns:
+        - name: sample
+          title: Nr próby
+          type: integer
+        - name: indices
+          title: Wylosowane indeksy
+          type: text
+        - name: values
+          title: Wylosowane wartości
+          type: text
+        - name: mean
+          title: Średnia
+          type: number
+
+    - name: summaryTable
+      title: Podsumowanie bootstrapu
+      type: Table
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: stat
+          title: ''
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+
+    - name: convTable
+      title: Wpływ liczby losowań B na przedział
+      type: Table
+      rows: 0
+      visible: (showConvergence)
+      clearWith:
+        - dep
+        - seed
+        - ciWidth
+      columns:
+        - name: b
+          title: B
+          type: integer
+        - name: seBoot
+          title: SE bootstrapowy
+          type: number
+        - name: lower
+          title: Dolna
+          type: number
+          superTitle: Przedział ufności
+        - name: upper
+          title: Górna
+          type: number
+          superTitle: Przedział ufności
+        - name: width
+          title: Szerokość
+          type: number
+
+    - name: convPlot
+      title: Zbieżność przedziału
+      type: Image
+      visible: (showConvergence)
+      width: 520
+      height: 380
+      renderFun: .convPlot
+      clearWith:
+        - dep
+        - seed
+        - ciWidth
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
+...

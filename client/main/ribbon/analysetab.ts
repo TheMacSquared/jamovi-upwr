@@ -176,8 +176,7 @@ export class AnalyseTab extends RibbonTab {
             // jedno menu, jedna ikona, bez drugiej pozycji o tej samej nazwie
             'Frequencies': 70,
             'Factor': 80,
-            'Testy permutacyjne': 90,
-            'Bootstrap': 100
+            'Testy permutacyjne': 90
         };
 
         let groupNames = Object.keys(menus);

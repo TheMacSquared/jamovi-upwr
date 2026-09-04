@@ -1,12 +1,12 @@
 ---
 name: cicorrelation
-title: CI dla korelacji
+title: Przedział ufności dla korelacji
 menuGroup: Przedziały ufności
-menuTitle: "Korelacja"
-version: '1.0.0'
+menuSubgroup: Korelacja i regresja
+menuTitle: Korelacja
+menuSubtitle: Pearsona lub Spearmana
+version: '2.0.0'
 jas: '1.2'
-
-completeWhenFilled: true
 
 options:
     - name: data
@@ -28,16 +28,6 @@ options:
       permitted:
         - numeric
 
-    - name: method
-      title: Metoda
-      type: List
-      options:
-        - name: pearson
-          title: Pearson
-        - name: spearman
-          title: Spearman
-      default: pearson
-
     - name: ciWidth
       title: Poziom ufności
       type: Number
@@ -45,8 +35,56 @@ options:
       max: 99.9
       default: 95
 
-    - name: showPlot
+    - name: method
+      title: Współczynnik
+      type: List
+      options:
+        - title: r Pearsona
+          name: pearson
+        - title: ρ Spearmana
+          name: spearman
+      default: pearson
+
+    - name: ciMethod
+      title: Metoda przedziału
+      type: List
+      options:
+        - title: Transformacja Fishera z
+          name: fisher
+        - title: Bootstrap percentylowy
+          name: perc
+        - title: Bootstrap BCa
+          name: bca
+      default: fisher
+
+    - name: plot
       title: Wykres
       type: Bool
       default: true
+
+    # --- zaawansowane: bootstrap ---
+    - name: nBoot
+      title: Liczba losowań B
+      type: Integer
+      default: 1000
+      min: 100
+      max: 100000
+
+    - name: seed
+      title: Ziarno generatora (0 = bez ustawiania)
+      type: Integer
+      default: 0
+      min: 0
+
+    - name: bootPlot
+      title: Histogram rozkładu bootstrapowego
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
 ...

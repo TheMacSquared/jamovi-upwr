@@ -1,14 +1,10 @@
-title: CI dla korelacji
+title: Przedział ufności dla korelacji
 name: cicorrelation
 jus: '3.0'
 stage: 0
 compilerMode: tame
 children:
   - type: VariableSupplier
-    suggested:
-      - continuous
-    permitted:
-      - numeric
     persistentItems: false
     stretchFactor: 1
     children:
@@ -26,6 +22,8 @@ children:
             name: var2
             isTarget: true
             maxItemCount: 1
+
+  # --- rdzeń ---
   - type: LayoutBox
     margin: large
     stretchFactor: 1
@@ -37,16 +35,19 @@ children:
         stretchFactor: 1
         children:
           - type: Label
-            label: Opcje
+            label: Współczynnik
             children:
               - type: ComboBox
                 name: method
-                label: Metoda
+          - type: Label
+            label: Przedział ufności
+            children:
               - type: TextBox
                 name: ciWidth
-                label: Poziom ufności
                 suffix: '%'
                 format: number
+              - type: ComboBox
+                name: ciMethod
       - type: LayoutBox
         cell:
           column: 1
@@ -54,8 +55,34 @@ children:
         stretchFactor: 1
         children:
           - type: Label
-            label: Wykresy
+            label: Wykres
             children:
               - type: CheckBox
-                name: showPlot
-                label: Error bar plot
+                name: plot
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
+
+  # --- zaawansowane: parametry bootstrapu (działają tylko przy metodzie bootstrap) ---
+  - type: CollapseBox
+    label: Zaawansowane
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Bootstrap
+            children:
+              - type: TextBox
+                name: nBoot
+                format: number
+              - type: TextBox
+                name: seed
+                format: number
+              - type: CheckBox
+                name: bootPlot

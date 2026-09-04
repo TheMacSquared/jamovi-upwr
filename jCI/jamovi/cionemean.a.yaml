@@ -1,12 +1,12 @@
 ---
 name: cionemean
-title: CI dla średniej (jedna próba)
+title: Przedział ufności dla średniej
 menuGroup: Przedziały ufności
-menuTitle: "Średnia (jedna próba)"
-version: '1.0.0'
+menuSubgroup: Średnie
+menuTitle: Średnia
+menuSubtitle: jedna próba, także osobno w grupach
+version: '2.0.0'
 jas: '1.2'
-
-completeWhenFilled: true
 
 options:
     - name: data
@@ -20,15 +20,8 @@ options:
       permitted:
         - numeric
 
-    - name: ciWidth
-      title: Poziom ufności
-      type: Number
-      min: 50
-      max: 99.9
-      default: 95
-
     - name: group
-      title: Zmienna grupująca
+      title: Grupy (opcjonalnie)
       type: Variable
       suggested:
         - nominal
@@ -36,8 +29,72 @@ options:
       permitted:
         - factor
 
-    - name: showPlot
+    - name: ciWidth
+      title: Poziom ufności
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+
+    - name: ciMethod
+      title: Metoda przedziału
+      type: List
+      options:
+        - title: t-Studenta
+          name: t
+        - title: Bootstrap percentylowy
+          name: perc
+        - title: Bootstrap BCa
+          name: bca
+      default: t
+
+    - name: stat
+      title: Miara
+      type: List
+      options:
+        - title: Średnia
+          name: mean
+        - title: Mediana
+          name: median
+        - title: Średnia ucięta
+          name: trimmed
+      default: mean
+
+    - name: plot
       title: Wykres
       type: Bool
       default: true
+
+    # --- zaawansowane: bootstrap ---
+    - name: nBoot
+      title: Liczba losowań B
+      type: Integer
+      default: 1000
+      min: 100
+      max: 100000
+
+    - name: seed
+      title: Ziarno generatora (0 = bez ustawiania)
+      type: Integer
+      default: 0
+      min: 0
+
+    - name: bootPlot
+      title: Histogram rozkładu bootstrapowego
+      type: Bool
+      default: false
+
+    - name: trimProp
+      title: Proporcja ucięcia (średnia ucięta)
+      type: Number
+      min: 0
+      max: 0.49
+      default: 0.1
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
 ...
