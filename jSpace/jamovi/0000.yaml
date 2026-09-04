@@ -1,7 +1,7 @@
 ---
 title: Statystyka danych kosmicznych
 name: jSpace
-version: 0.2.2
+version: 0.3.0
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -53,9 +53,8 @@ datasets:
     description: "562 satelity z 11 konstelacji: inklinacja, ekscentrycznosc, wysokosc, okres — ANOVA"
     documentation:
       summary: >-
-        Aktywne satelity z 11 konstelacji (GPS, Galileo, Starlink, GEO...) z
-        parametrami orbit wyliczonymi z elementow TLE — porownanie grup satelitow
-        i rozkladow parametrow orbitalnych.
+        562 aktywne satelity z 11 konstelacji, z parametrami orbit wyliczonymi z
+        elementow TLE — porownanie grup i rozkladow.
       details: >-
         562 satelity z 12 grup CelesTrak (stacje kosmiczne, GPS, GLONASS, Galileo,
         BeiDou, Iridium NEXT, Starlink, OneWeb, meteorologiczne, naukowe,
@@ -113,9 +112,8 @@ datasets:
     description: "Stacje naziemne w miastach Europy: wspolrzedne i pomiary (temperatura, AOD, NDVI)"
     documentation:
       summary: >-
-        150 stacji naziemnych w 50 miastach Europy: wspolrzedne geograficzne oraz
-        symulowane srednioroczne pomiary z gradientem szerokosci geograficznej —
-        mapy punktowe, statystyki regionalne, korelacja i regresja.
+        150 stacji naziemnych w 50 miastach Europy: wspolrzedne i srednioroczne pomiary
+        — mapy punktowe i statystyki regionalne.
       details: >-
         Po 3 stacje na miasto, rozrzucone losowo do 0,25 stopnia od centrum.
         Wspolrzedne miast to fakty publiczne (sprawdzone z Natural Earth); pomiary sa
@@ -162,9 +160,8 @@ datasets:
     description: "Piksele Landsat: 4 pasma, NDVI i klasa pokrycia terenu — klasyfikacja"
     documentation:
       summary: >-
-        1500 pikseli z obrazow Landsat MSS z wartosciami w 4 pasmach spektralnych,
-        NDVI i klasa pokrycia terenu — klasyfikacja nadzorowana (k-NN, drzewo)
-        i porownanie klas.
+        1500 pikseli Landsat MSS: 4 pasma spektralne, NDVI i klasa pokrycia terenu —
+        klasyfikacja nadzorowana (k-NN, drzewo).
       details: >-
         Losowa podprobka (ustalone ziarno) zbioru Statlog (Landsat Satellite)
         z repozytorium UCI: z kazdego sasiedztwa 3×3 pikseli zachowano 4 pasma
@@ -213,9 +210,8 @@ datasets:
     description: "Symulowany raster NDVI (siatka 200x200) jako tabela x, y, ndvi"
     documentation:
       summary: >-
-        Symulowany raster wskaznika NDVI okolic Wroclawia (200×200 komorek) zapisany
-        jako tabela wspolrzednych i wartosci — statystyki rastra, histogram
-        i mapa wartosci.
+        Symulowany raster NDVI okolic Wroclawia (200x200) jako tabela wspolrzednych i
+        wartosci — statystyki rastra i mapa.
       details: >-
         40 000 komorek siatki regularnej w ukladzie WGS84 (16,85-17,25° E,
         50,98-51,24° N). Pole wygenerowano celowo syntetycznie (ustalone ziarno):

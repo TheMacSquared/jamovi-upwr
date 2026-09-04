@@ -6,7 +6,7 @@
 //   MAJOR — curriculum-defining / breaking changes
 //   MINOR — new modules or features
 //   PATCH — fixes
-export const JUPWR_VERSION = '0.9.5.5';
+export const JUPWR_VERSION = '0.9.5.6';
 
 // Upstream jmv analyses hidden from the ribbon menus in jUPWR. The analyses
 // still exist (files saved elsewhere open and re-run), they are only not
@@ -27,8 +27,11 @@ export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
     'jmv::ttestIS',
     'jmv::ttestPS',
     'jmv::ttestOneS',
-    // jCzest replaces the jmv frequency analyses; jmv::logLinear stays visible
-    // as the only tool for 3+ dimensional tables (the MANCOVA case).
+    // jCzest replaces the jmv frequency analyses. jCzest uses menuGroup
+    // 'Frequencies' (like jANOVA uses 'ANOVA'), so its analyses join the
+    // existing menu instead of creating a second one with a translated name.
+    // jmv::logLinear stays visible there as the only tool for 3+ dimensional
+    // tables (the MANCOVA case) and is pushed to the end by JUPWR_MENU_LAST.
     'jmv::contTables',
     'jmv::contTablesPaired',
     'jmv::propTest2',
@@ -39,4 +42,5 @@ export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
 // same submenu (the ribbon builds menus in module order, jmv first).
 export const JUPWR_MENU_LAST: ReadonlySet<string> = new Set([
     'jmv::mancova',
+    'jmv::logLinear',
 ]);

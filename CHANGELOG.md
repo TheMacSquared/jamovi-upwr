@@ -3,6 +3,14 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.5.6 — 2026-09-04
+- Analizy jCzest trafiają do istniejącego menu „Częstości" zamiast tworzyć drugie
+  o tej samej nazwie. Moduł używa teraz `menuGroup: Frequencies` — tak jak jANOVA
+  używa `ANOVA`, a jTestyT `T-Tests` — więc dzieli menu i ikonę z `logLinear`,
+  który jest w nim wyświetlany na końcu.
+- jSpace 0.3.0: skrócone opisy zbiorów w Bibliotece (ze 161–206 do 114–120 znaków,
+  czyli tyle co w jDane) — długie streszczenia rozlewały się na karcie zbioru.
+
 ## 0.9.5.5 — 2026-09-04
 - Analizy częstości z jmv są ukryte w menu — zastępuje je jCzest. Ukryte:
   `contTables`, `contTablesPaired`, `propTest2`, `propTestN`; ich kod zostaje

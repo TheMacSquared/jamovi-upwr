@@ -171,10 +171,10 @@ export class AnalyseTab extends RibbonTab {
             'T-Tests': 40,
             'ANOVA': 50,
             'Regression': 60,
-            'Częstości': 70,
-            // jmv::Frequencies zostaje widoczne obok, dopóki jCzest nie osiągnie
-            // parytetu (brak warstw, `zgodnosc` i `zalezne`) — patrz CLAUDE.md, zadanie 17
-            'Frequencies': 71,
+            // jCzest uzywa menuGroup 'Frequencies' (jak jANOVA uzywa 'ANOVA'),
+            // wiec jego analizy trafiaja do TEJ SAMEJ grupy co jmv::logLinear —
+            // jedno menu, jedna ikona, bez drugiej pozycji o tej samej nazwie
+            'Frequencies': 70,
             'Factor': 80,
             'Testy permutacyjne': 90,
             'Bootstrap': 100

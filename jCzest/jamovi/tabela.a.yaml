@@ -1,7 +1,7 @@
 ---
 name: tabela
 title: Tabela kontyngencji
-menuGroup: Częstości
+menuGroup: Frequencies
 menuTitle: Tabela kontyngencji
 menuSubtitle: dwie zmienne jakościowe
 version: '1.0.0'

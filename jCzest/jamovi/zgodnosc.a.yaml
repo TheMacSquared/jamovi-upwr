@@ -1,7 +1,7 @@
 ---
 name: zgodnosc
 title: Test zgodności
-menuGroup: Częstości
+menuGroup: Frequencies
 menuTitle: Jedna zmienna
 menuSubtitle: zgodność z oczekiwanymi proporcjami
 version: '1.0.0'

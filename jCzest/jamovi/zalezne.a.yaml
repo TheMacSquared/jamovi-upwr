@@ -1,7 +1,7 @@
 ---
 name: zalezne
 title: Próby zależne
-menuGroup: Częstości
+menuGroup: Frequencies
 menuTitle: Próby zależne
 menuSubtitle: te same jednostki, powtórzone pomiary
 version: '1.0.0'
