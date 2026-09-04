@@ -12,8 +12,8 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (isTRUE(private$.pairsBuilt) || length(lv) == 0) return(invisible(FALSE))
             t <- self$results$pairs
             t$addColumn(name = "row", title = "", type = "text")
-            for (l in lv) t$addColumn(name = paste0("c_", l), title = l, type = "number")
-            t$addColumn(name = "total", title = "Ogółem", type = "integer")
+            for (l in lv) t$addColumn(name = paste0("c_", l), title = l, type = "text")
+            t$addColumn(name = "total", title = "Ogółem", type = "text")
             private$.pairsBuilt <- TRUE
             invisible(TRUE)
         },
@@ -203,23 +203,23 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             lv <- colnames(tab)
             n <- sum(tab)
 
+            # liczba bez zbednych zer; caloscia steruje .b.R, bo kolumny sa tekstowe
+            num <- function(x) if (abs(x - round(x)) < 1e-9) format(round(x)) else sprintf("%.1f", x)
+            # brzeg = liczność z udziałem w nawiasie, zeby rozklady obu pomiarow
+            # byly widoczne wprost w tabeli, a nie w nocie
+            marg <- function(x) sprintf("%s (%.1f%%)", num(x), 100 * x / n)
+
             for (i in seq_len(nrow(tab))) {
-                vals <- list(row = rownames(tab)[i], total = sum(tab[i, ]))
-                for (j in seq_along(lv)) vals[[paste0("c_", lv[j])]] <- tab[i, j]
+                vals <- list(row = rownames(tab)[i], total = marg(sum(tab[i, ])))
+                for (j in seq_along(lv)) vals[[paste0("c_", lv[j])]] <- num(tab[i, j])
                 t$addRow(rowKey = rownames(tab)[i], values = vals)
             }
-            vals <- list(row = "Ogółem", total = n)
-            for (j in seq_along(lv)) vals[[paste0("c_", lv[j])]] <- sum(tab[, j])
+            vals <- list(row = "Ogółem", total = num(n))
+            for (j in seq_along(lv)) vals[[paste0("c_", lv[j])]] <- marg(sum(tab[, j]))
             t$addRow(rowKey = ".total", values = vals)
 
-            # udzialy brzegowe w nocie, a nie w osobnym wierszu/kolumnie: procenty
-            # w kolumnach liczności wymuszaja format dziesietny na calej kolumnie
-            t$setNote("p", sprintf(paste0(
-                "Wiersze — %s, kolumny — %s; przekątna to pary zgodne. ",
-                "Brzegi to rozkłady pomiarów: %s %.1f%%, %s %.1f%% dla kategorii „%s”."),
-                vars[1], vars[2],
-                vars[1], 100 * sum(tab[1, ]) / n,
-                vars[2], 100 * sum(tab[, 1]) / n, lv[1]))
+            t$setNote("p", sprintf("Wiersze — %s, kolumny — %s; przekątna to pary zgodne.",
+                                   vars[1], vars[2]))
         }
     )
 )
