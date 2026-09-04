@@ -1,6 +1,6 @@
 test_that("permutation p-values use the plus-one correction", {
     dist <- c(-3, -1, 0, 1, 2, 4)
-    expect_equal(permPValue(2, dist, "twoSided"), (3 + 1) / (6 + 1))
+    expect_equal(permPValue(2, dist, "different"), (3 + 1) / (6 + 1))
     expect_equal(permPValue(2, dist, "greater"), (2 + 1) / (6 + 1))
     expect_equal(permPValue(-1, dist, "less"), (2 + 1) / (6 + 1))
     expect_gt(permPValue(100, dist, "greater"), 0)

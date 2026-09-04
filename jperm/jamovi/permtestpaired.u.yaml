@@ -1,31 +1,32 @@
-title: Test permutacyjny - próby sparowane
+title: Test permutacyjny dla prób sparowanych
 name: permtestpaired
 jus: '3.0'
 stage: 0
 compilerMode: tame
 children:
   - type: VariableSupplier
-    suggested:
-      - continuous
-    permitted:
-      - numeric
     persistentItems: false
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Pomiar 1
+        label: Pary zmiennych
         children:
           - type: VariablesListBox
-            name: var1
+            name: pairs
             isTarget: true
-            maxItemCount: 1
-      - type: TargetLayoutBox
-        label: Pomiar 2
-        children:
-          - type: VariablesListBox
-            name: var2
-            isTarget: true
-            maxItemCount: 1
+            fullRowSelect: true
+            itemDropBehaviour: overwrite
+            columns:
+              - name: i1
+                stretchFactor: 1
+                template:
+                  type: VariableLabel
+              - name: i2
+                stretchFactor: 1
+                template:
+                  type: VariableLabel
+
+  # --- rdzeń: nazwy sekcji jak w jTestyT ---
   - type: LayoutBox
     margin: large
     stretchFactor: 1
@@ -39,32 +40,8 @@ children:
           - type: Label
             label: Hipoteza
             children:
-              - type: RadioButton
-                name: hypothesis_twoSided
-                optionName: hypothesis
-                optionPart: twoSided
-              - type: RadioButton
-                name: hypothesis_greater
-                optionName: hypothesis
-                optionPart: greater
-              - type: RadioButton
-                name: hypothesis_less
-                optionName: hypothesis
-                optionPart: less
-          - type: Label
-            label: Opcje permutacji
-            children:
-              - type: TextBox
-                name: nPerm
-                label: Liczba permutacji
-                format: number
-              - type: TextBox
-                name: seed
-                label: Ziarno generatora (0 = losowe)
-                format: number
-              - type: CheckBox
-                name: exact
-                label: Test dokładny (wszystkie permutacje)
+              - type: ComboBox
+                name: hypothesis
       - type: LayoutBox
         cell:
           column: 1
@@ -72,8 +49,34 @@ children:
         stretchFactor: 1
         children:
           - type: Label
-            label: Wykresy
+            label: Wykres
             children:
               - type: CheckBox
-                name: showPlot
-                label: Rozkład permutacyjny
+                name: plot
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
+
+  # --- zaawansowane: parametry losowania ---
+  - type: CollapseBox
+    label: Zaawansowane
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Permutacje
+            children:
+              - type: TextBox
+                name: nPerm
+                format: number
+              - type: TextBox
+                name: seed
+                format: number
+              - type: CheckBox
+                name: exact

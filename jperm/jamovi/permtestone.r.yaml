@@ -1,51 +1,49 @@
 ---
 name: permtestone
-title: Test permutacyjny - jedna próba
+title: Test permutacyjny dla jednej próby
 jrs: '1.1'
 
 items:
     - name: table
-      title: Test permutacyjny - jedna próba
+      title: Test permutacyjny dla jednej próby
       type: Table
-      rows: 1
-      clearWith:
-        - dep
-        - mu
+      rows: 0
+      clearWith: &cw
+        - vars
+        - testValue
+        - hypothesis
         - nPerm
         - seed
-        - hypothesis
         - exact
       columns:
         - name: var
-          title: Zmienna
+          title: ''
           type: text
-
         - name: stat
-          title: Statystyka obserwowana
+          title: Średnia − wartość testowa
           type: number
-
         - name: p
           title: p
           type: number
           format: zto,pvalue
-
         - name: nPerm
-          title: Liczba permutacji
+          title: Liczba układów
           type: integer
 
-    - name: plot
+    - name: plots
       title: Rozkład permutacyjny
-      type: Image
-      visible: (showPlot)
-      width: 550
-      height: 400
-      renderFun: .permPlot
-      clearWith:
-        - dep
-        - mu
-        - nPerm
-        - seed
-        - hypothesis
-        - exact
+      type: Array
+      visible: (plot)
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 520
+        height: 380
+        renderFun: .permPlot
 
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
 ...

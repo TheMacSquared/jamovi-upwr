@@ -6,13 +6,13 @@
 #'
 #' @param observed numeric, observed test statistic
 #' @param permDist numeric vector, permutation distribution
-#' @param hypothesis character, one of "twoSided", "greater", "less"
+#' @param hypothesis character, one of "different", "greater", "less"
 #' @return numeric p-value
 permPValue <- function(observed, permDist, hypothesis) {
     B <- length(permDist)
 
     count <- switch(hypothesis,
-        twoSided = sum(abs(permDist) >= abs(observed)),
+        different = sum(abs(permDist) >= abs(observed)),
         greater  = sum(permDist >= observed),
         less     = sum(permDist <= observed)
     )
@@ -115,7 +115,7 @@ permDistPaired <- function(d, nPerm, seed, exact) {
 #'
 #' @param permDist numeric vector of permutation distribution
 #' @param observed numeric, observed test statistic
-#' @param hypothesis character, one of "twoSided", "greater", "less"
+#' @param hypothesis character, one of "different", "greater", "less"
 #' @param ggtheme ggplot2 theme object from jamovi
 #' @param theme list with jamovi theme colors
 #' @return ggplot object
@@ -124,7 +124,7 @@ buildPermPlot <- function(permDist, observed, hypothesis, ggtheme, theme) {
 
     # Determine rejection region for shading
     df$reject <- switch(hypothesis,
-        twoSided = abs(df$stat) >= abs(observed),
+        different = abs(df$stat) >= abs(observed),
         greater  = df$stat >= observed,
         less     = df$stat <= observed
     )
@@ -157,4 +157,38 @@ buildPermPlot <- function(permDist, observed, hypothesis, ggtheme, theme) {
         ggtheme
 
     return(p)
+}
+
+# ---------------------------------------------------------------------------
+# Shared helpers for the three analyses (jUPWR panel/description conventions)
+# ---------------------------------------------------------------------------
+
+optNonEmpty <- function(x) !is.null(x) && length(x) > 0 && nchar(as.character(x)[1]) > 0
+
+altLabel <- function(hypothesis, what = "różnica") switch(hypothesis,
+    greater = paste(what, "> 0"), less = paste(what, "< 0"), paste(what, "≠ 0"))
+
+# One-sentence note under the table: which exactness applied for this row key
+exactNote <- function(table, key, permDist, exact) {
+    if (isTRUE(attr(permDist, "exact")))
+        table$setNote(paste0("ex", key), sprintf("%s: test dokładny (wszystkie układy).", key))
+    else if (isTRUE(exact))
+        table$setNote(paste0("ex", key), sprintf("%s: za dużo układów na test dokładny — użyto Monte Carlo.", key))
+}
+
+# kind: "one" | "two" | "paired"; limit: description of the exact-enumeration threshold
+metodyPerm <- function(m, o, kind, diffLab) {
+    m$add("Testy", "%s; statystyka testowa = %s; H₁: %s.", diffLab,
+          switch(kind, one = "średnia − wartość testowa", two = "różnica średnich grup", paired = "średnia różnic"),
+          altLabel(o$hypothesis, if (kind == "one") "średnia − wartość testowa" else "różnica"))
+    m$add("Testy", "Rozkład przy H₀ przez %s; p = (liczba układów ze statystyką co najmniej tak skrajną jak obserwowana + 1) / (liczba układów + 1)%s.",
+          if (kind == "two") "losowe przetasowanie etykiet grup" else "losową zmianę znaków odchyleń (sign-flip)",
+          if (o$hypothesis == "different") ", dwustronnie po wartości bezwzględnej" else "")
+    if (isTRUE(o$exact))
+        m$add("Testy", "Test dokładny: wyliczenie wszystkich układów, gdy jest ich najwyżej %s; w przeciwnym razie Monte Carlo jak niżej.",
+              if (kind == "two") "100 000 (liczba podziałów na grupy)" else "2²⁰ (n ≤ 20 obserwacji)")
+    m$add("Testy", "Monte Carlo: B = %s losowych układów%s.", format(o$nPerm, big.mark = " "),
+          if (o$seed > 0) sprintf(", ziarno generatora %d (wynik powtarzalny)", o$seed) else ", bez ustawionego ziarna (wynik zmienia się między uruchomieniami)")
+    m$addIf(o$plot, "Wykres", "Histogram rozkładu permutacyjnego statystyki; linia przerywana = wartość obserwowana, słupki zaznaczone = układy co najmniej tak skrajne (obszar liczony do p).")
+    invisible(m)
 }

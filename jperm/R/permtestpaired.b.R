@@ -3,82 +3,45 @@ permtestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cl
     "permtestpairedClass",
     inherit = permtestpairedBase,
     private = list(
-        .run = function() {
-            if (is.null(self$options$var1) || is.null(self$options$var2))
-                return()
-
-            var1Name <- self$options$var1
-            var2Name <- self$options$var2
-            nPerm <- self$options$nPerm
-            seed <- self$options$seed
-            hypothesis <- self$options$hypothesis
-            exact <- self$options$exact
-
-            x1 <- jmvcore::toNumeric(self$data[[var1Name]])
-            x2 <- jmvcore::toNumeric(self$data[[var2Name]])
-
-            # Remove NAs pairwise
-            complete <- !is.na(x1) & !is.na(x2)
-            x1 <- x1[complete]
-            x2 <- x2[complete]
-
-            if (length(x1) < 2) {
-                self$results$table$setNote(
-                    "err",
-                    "Za mało kompletnych par do przeprowadzenia testu."
-                )
-                return()
-            }
-
-            d <- x1 - x2
-            observed <- mean(d)
-
-            permDist <- permDistPaired(d, nPerm, seed, exact)
-            pValue <- permPValue(observed, permDist, hypothesis)
-
-            table <- self$results$table
-            table$setRow(rowNo = 1, values = list(
-                var1 = var1Name,
-                var2 = var2Name,
-                stat = observed,
-                p = pValue,
-                nPerm = length(permDist)
-            ))
-
-            hypNote <- switch(hypothesis,
-                twoSided = paste0("H\u2090: \u03BC\u2081 \u2260 \u03BC\u2082"),
-                greater  = paste0("H\u2090: \u03BC\u2081 > \u03BC\u2082"),
-                less     = paste0("H\u2090: \u03BC\u2081 < \u03BC\u2082")
-            )
-            table$setNote("hyp", hypNote)
-
-            if (isTRUE(attr(permDist, "exact")))
-                table$setNote("exact", "Test dokładny (wszystkie permutacje)")
-            else if (exact)
-                table$setNote("exact", paste0(
-                    "Test dokładny niedostępny dla tej liczby par; ",
-                    "użyto przybliżenia Monte Carlo."
-                ))
-
-            self$results$plot$setState(list(
-                permDist = permDist,
-                observed = observed,
-                hypothesis = hypothesis
-            ))
+        .pairKeys = function() {
+            keys <- character(0)
+            for (p in self$options$pairs) if (!is.null(p$i1) && !is.null(p$i2)) keys <- c(keys, paste(p$i1, "−", p$i2))
+            keys
         },
-        .permPlot = function(image, ggtheme, theme, ...) {
-            if (is.null(image$state))
-                return(FALSE)
+        .init = function() {
+            for (k in private$.pairKeys()) {
+                self$results$plots$addItem(key = k); self$results$plots$get(key = k)$setTitle(k)
+            }
+        },
+        .run = function() {
+            o <- self$options
+            pairs <- Filter(function(p) !is.null(p$i1) && !is.null(p$i2), o$pairs)
+            if (length(pairs) == 0) return()
+            tt <- self$results$table
+            m <- jmvcore::metodyNew()
+            m$add("Dane", "Pary: %s; różnica = pierwsza − druga zmienna; tylko pary bez braków.",
+                  paste(vapply(pairs, function(p) sprintf("„%s” − „%s”", jmvcore::htmlEscape(p$i1), jmvcore::htmlEscape(p$i2)), ""), collapse = ", "))
+            metodyPerm(m, o, "paired", "Różnica = pierwsza − druga zmienna")
+            m$render(self$results$metody)
+            for (p in pairs) {
+                k <- paste(p$i1, "−", p$i2)
+                a <- jmvcore::toNumeric(self$data[[p$i1]]); b <- jmvcore::toNumeric(self$data[[p$i2]])
+                ok <- !is.na(a) & !is.na(b); dif <- a[ok] - b[ok]
+                if (length(dif) < 2) { tt$setNote(paste0("n", k), sprintf("%s: za mało par.", k)); next }
+                observed <- mean(dif)
+                permDist <- permDistPaired(dif, o$nPerm, o$seed, o$exact)
+                tt$addRow(rowKey = k, values = list(var = k, stat = observed,
+                    p = permPValue(observed, permDist, o$hypothesis), nPerm = length(permDist)))
+                exactNote(tt, k, permDist, o$exact)
+                self$results$plots$get(key = k)$setState(list(permDist = permDist, observed = observed, hypothesis = o$hypothesis))
+            }
+            tt$setNote("h", "Różnica = pierwsza − druga zmienna.")
+        },
 
-            state <- image$state
-            p <- buildPermPlot(
-                state$permDist,
-                state$observed,
-                state$hypothesis,
-                ggtheme,
-                theme
-            )
-            return(p)
+        .permPlot = function(image, ggtheme, theme, ...) {
+            if (is.null(image$state)) return(FALSE)
+            s <- image$state
+            buildPermPlot(s$permDist, s$observed, s$hypothesis, ggtheme, theme)
         }
     )
 )

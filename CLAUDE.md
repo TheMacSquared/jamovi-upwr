@@ -199,6 +199,25 @@ Kolejność prac:
    z zadaniem 16: przycinanie not to ta sama robota).
 2. jCI, jboot, jperm (własne moduły, starsze): najpierw przegląd panelu
    wg obecnego schematu „krytyczne → opcjonalne → do usunięcia", potem opisy.
+   Decyzje z przeglądu (2026-09-04):
+   - jperm 0.2.0 ZROBIONE: konwencje jTestyT (`vars`/`pairs`/`group`,
+     `hypothesis` different/greater/less jako ComboBox, `testValue`, `plot`),
+     wiele zmiennych naraz, rdzeń = Hipoteza/Wykres/Opis metod, Zaawansowane =
+     liczba permutacji, ziarno, test dokładny; opis metod; podpisy w menu.
+     Permutacje zostają osobnym menu (dydaktycznie oddzielone od klasycznych).
+   - jCI ZOSTAJE osobnym modułem i ma nieść ciężar przedziałów ufności
+     (dydaktycznie CI przed testami): rozbudować CI w jCI, a w testach
+     (jTestyT) CI tylko w prostej postaci albo wcale — podział obowiązków
+     jako osobne zadanie. Błędy do naprawy w jCI: CI Spearmana wzorem
+     Fishera dla Pearsona (i wstęga OLS na wykresie), wykres różnicy
+     proporcji bez przedziału, „Newcombe" z podwójnym z; „Error bar plot"
+     po angielsku; brak menuSubtitle.
+   - jboot: wariant „11 → 6 analiz" (miara centralna z listą stat,
+     porównanie grup, pary, proporcje, korelacja, regresja + „Jak działa
+     bootstrap" ze zbieżnością w środku; bez showClassical i metody basic),
+     z propozycją SCALENIA z jCI (bootstrap jako metoda przedziału
+     w każdej analizie jCI + regresja + podgrupa Dydaktyka) — czeka na
+     decyzję użytkownika.
 3. Eksploracja: moduł jUPWR (roboczo `jEksplor`) zamiast rozszerzania jmv
    descriptives z zadania 9 — zakres z zadania 9 przechodzi do niego;
    jmv::descriptives ukryte.

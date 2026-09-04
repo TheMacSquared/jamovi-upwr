@@ -1,80 +1,63 @@
 ---
 name: permtestpaired
-title: Test permutacyjny - próby sparowane
+title: Test permutacyjny dla prób sparowanych
 menuGroup: Testy permutacyjne
-menuTitle: "Próby sparowane"
-version: '1.0.0'
+menuTitle: Próby sparowane
+menuSubtitle: dwa pomiary tej samej jednostki
+version: '2.0.0'
 jas: '1.2'
-
-completeWhenFilled: true
 
 options:
     - name: data
       type: Data
-      description:
-          R: dane w postaci ramki danych
 
-    - name: var1
-      title: Pomiar 1
-      type: Variable
+    - name: pairs
+      title: Pary zmiennych
+      type: Pairs
       suggested:
         - continuous
       permitted:
         - numeric
-      description:
-          R: pierwsza zmienna (pomiar 1)
-
-    - name: var2
-      title: Pomiar 2
-      type: Variable
-      suggested:
-        - continuous
-      permitted:
-        - numeric
-      description:
-          R: druga zmienna (pomiar 2)
 
     - name: hypothesis
       title: Hipoteza alternatywna
       type: List
       options:
-        - name: twoSided
-          title: "Pomiar 1 ≠ Pomiar 2"
-        - name: greater
-          title: "Pomiar 1 > Pomiar 2"
-        - name: less
-          title: "Pomiar 1 < Pomiar 2"
-      default: twoSided
-      description:
-          R: "'twoSided' (domyślnie), 'greater' lub 'less'"
+        - title: Dwustronna (≠)
+          name: different
+        - title: Większa (>)
+          name: greater
+        - title: Mniejsza (<)
+          name: less
+      default: different
 
+    - name: plot
+      title: Wykres rozkładu permutacyjnego
+      type: Bool
+      default: true
+
+    # --- zaawansowane ---
     - name: nPerm
-      title: Liczba permutacji
+      title: Liczba permutacji (Monte Carlo)
       type: Integer
       default: 10000
       min: 100
       max: 100000
-      description:
-          R: liczba losowych permutacji
 
     - name: seed
-      title: Ziarno generatora
+      title: Ziarno generatora (0 = bez ustawiania)
       type: Integer
       default: 0
-      description:
-          R: ziarno generatora liczb losowych; 0 = brak ustawiania ziarna
+      min: 0
 
     - name: exact
-      title: Test dokładny
+      title: Test dokładny (wszystkie układy, gdy wykonalny)
       type: Bool
       default: false
-      description:
-          R: TRUE - wylicz wszystkie permutacje
 
-    - name: showPlot
-      title: Wykres rozkładu permutacyjnego
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
       type: Bool
-      default: true
-      description:
-          R: TRUE - pokaż histogram rozkładu permutacyjnego
+      default: false
 ...
