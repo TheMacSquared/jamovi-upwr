@@ -52,3 +52,23 @@ test_that("percentile list parsing", {
     expect_equal(parsePercentiles("25, 50; 75"), c(25, 50, 75))
     expect_equal(parsePercentiles("0,10,100,abc,10"), 10)
 })
+
+test_that("szereg: class construction and grouped statistics", {
+    set.seed(7); x <- round(rnorm(50, 100, 15))
+    br <- classBreaks(x, "sturges"); expect_equal(br$k, ceiling(log2(50) + 1)); expect_equal(br$breaks[1], min(x))
+    tab <- classTable(x, br$breaks); expect_equal(sum(tab$n), 50); expect_equal(tail(tab$cumPct, 1), 100)
+    expect_equal(tab$n, as.integer(table(cut(x, br$breaks, right = FALSE, include.lowest = TRUE))))
+    bw <- classBreaks(x, "width", h = 10, start = 60); expect_equal(bw$h, 10); expect_true(max(bw$breaks) >= max(x))
+    bc <- classBreaks(x, "count", k = 4); expect_equal(bc$k, 4)
+    g <- groupedStats(tab)
+    expect_equal(g$mean, sum(tab$mid * tab$n) / 50); expect_lt(abs(g$mean - mean(x)), br$h)
+    expect_lt(abs(g$median - median(x)), br$h)
+    expect_true(g$modalClass == which.max(tab$n))
+    # textbook example: classes 10-20,20-30,30-40 with n = 5, 12, 3 -> mode 10 + 10*7/(7+9)... in class 2
+    tb <- data.frame(lower = c(10, 20, 30), upper = c(20, 30, 40), mid = c(15, 25, 35), n = c(5, 12, 3))
+    tb$cumN <- cumsum(tb$n); tb$pct <- 100 * tb$n / 20; tb$cumPct <- 100 * tb$cumN / 20
+    gs <- groupedStats(tb)
+    expect_equal(gs$mode, 20 + 10 * (12 - 5) / ((12 - 5) + (12 - 3)))
+    expect_equal(gs$median, 20 + 10 * (10 - 5) / 12)
+    expect_null(classBreaks(x, "width", h = 0))
+})

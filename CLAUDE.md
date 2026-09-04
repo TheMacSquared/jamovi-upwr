@@ -247,8 +247,16 @@ Kolejność prac:
    (Gini, Lorenz), wykresy (histogram+gęstość, pudełkowy+skrzypce+punkty+
    średnia, ECDF); Założenia: Shapiro, Lilliefors i Anderson-Darling
    w czystym R (zwalidowane z nortest, p wg Dallala-Wilkinsona/Stephensa),
-   Q-Q. DO ZROBIENIA: `szereg` (szereg rozdzielczy) i `jakosciowe`
-   (port jmv qualitative + dominanta), potem ukryć jmv::qualitative.
+   Q-Q. `szereg` ZROBIONE: klasy wg Sturgesa / liczby / szerokości
+   (lewostronnie domknięte, opcjonalny początek), tabela z środkami,
+   licznościami, częstościami i skumulowanymi, miary interpolowane
+   z szeregu (średnia, mediana, dominanta, wariancja, SD) obok wartości
+   z danych, histogram klas i ogiwa. `jakosciowe` ZROBIONE: własna
+   implementacja (nie port jmv qualitative): tabela liczności z % i
+   skumulowanymi albo tabela krzyżowa z jedną zmienną grupującą (% w
+   kolumnie/wierszu/ogółem), podsumowanie (N, braki, kategorie, dominanta
+   z udziałem), słupkowy i mozaikowy. jmv::descriptives i jmv::qualitative
+   ukryte w kliencie (kod jmv nietknięty). ETAP 3 ZAMKNIĘTY.
 4. Regresja: moduł `jRegr` tylko z korelacją, regresją liniową (prostą
    i wieloraką) i logistyczną dwumianową; wielomianowa i porządkowa
    zostają jmv (widoczne, później — po 1.0.0).

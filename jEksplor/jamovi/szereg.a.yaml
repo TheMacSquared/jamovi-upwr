@@ -1,0 +1,77 @@
+---
+name: szereg
+title: Szereg rozdzielczy
+menuGroup: Exploration
+menuTitle: Szereg rozdzielczy
+menuSubtitle: klasy, częstości skumulowane, miary z szeregu
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: var
+      title: Zmienna
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: method
+      title: Podział na klasy
+      type: List
+      options:
+        - title: Reguła Sturgesa
+          name: sturges
+        - title: Liczba klas
+          name: count
+        - title: Szerokość klasy
+          name: width
+      default: sturges
+
+    - name: nClasses
+      title: Liczba klas
+      type: Integer
+      min: 1
+      max: 50
+      default: 5
+
+    - name: width
+      title: Szerokość klasy
+      type: Number
+      default: 1
+
+    - name: startAuto
+      title: Początek pierwszej klasy = minimum
+      type: Bool
+      default: true
+
+    - name: start
+      title: Początek pierwszej klasy
+      type: Number
+      default: 0
+
+    - name: compare
+      title: Porównaj z wartościami z danych
+      type: Bool
+      default: true
+
+    - name: plot
+      title: Histogram klas
+      type: Bool
+      default: true
+
+    - name: ogive
+      title: Krzywa częstości skumulowanych
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
+...

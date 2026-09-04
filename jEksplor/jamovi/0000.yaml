@@ -17,6 +17,20 @@ analyses:
     menuTitle: Zmienne ilościowe
     menuSubtitle: statystyki opisowe, wykresy rozkładu
     category: analyses
+  - title: Zmienne jakościowe
+    name: jakosciowe
+    ns: jEksplor
+    menuGroup: Exploration
+    menuTitle: Zmienne jakościowe
+    menuSubtitle: tabele liczności, także w grupach
+    category: analyses
+  - title: Szereg rozdzielczy
+    name: szereg
+    ns: jEksplor
+    menuGroup: Exploration
+    menuTitle: Szereg rozdzielczy
+    menuSubtitle: klasy, częstości skumulowane, miary z szeregu
+    category: analyses
 usesNative: true
 minApp: 1.0.8
 

@@ -1,0 +1,77 @@
+---
+name: szereg
+title: Szereg rozdzielczy
+jrs: '1.1'
+
+items:
+    - name: classes
+      title: Szereg rozdzielczy
+      type: Table
+      rows: 0
+      clearWith: &cw
+        - var
+        - method
+        - nClasses
+        - width
+        - startAuto
+        - start
+      columns:
+        - name: klasa
+          title: Klasa
+          type: text
+        - name: mid
+          title: Środek
+          type: number
+        - name: n
+          title: Liczność
+          type: integer
+        - name: pct
+          title: '%'
+          type: number
+        - name: cumN
+          title: Liczność skumulowana
+          type: integer
+        - name: cumPct
+          title: '% skumulowany'
+          type: number
+
+    - name: stats
+      title: Miary z szeregu
+      type: Table
+      rows: 0
+      clearWith: *cw
+      columns:
+        - name: stat
+          title: ''
+          type: text
+        - name: grouped
+          title: Z szeregu
+          type: number
+        - name: exact
+          title: Z danych
+          type: number
+          visible: (compare)
+
+    - name: plot
+      title: Histogram klas
+      type: Image
+      visible: (plot)
+      width: 520
+      height: 380
+      renderFun: .histPlot
+      clearWith: *cw
+
+    - name: ogive
+      title: Częstości skumulowane
+      type: Image
+      visible: (ogive)
+      width: 520
+      height: 380
+      renderFun: .ogivePlot
+      clearWith: *cw
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
+...

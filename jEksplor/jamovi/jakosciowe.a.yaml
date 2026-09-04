@@ -1,0 +1,74 @@
+---
+name: jakosciowe
+title: Zmienne jakościowe
+menuGroup: Exploration
+menuTitle: Zmienne jakościowe
+menuSubtitle: tabele liczności, także w grupach
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: vars
+      title: Zmienne
+      type: Variables
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: splitBy
+      title: Podziel według
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default:
+
+    - name: cum
+      title: Liczności i procenty skumulowane
+      type: Bool
+      default: false
+
+    - name: summary
+      title: Podsumowanie (N, kategorie, dominanta)
+      type: Bool
+      default: true
+
+    - name: pcCol
+      title: '% w kolumnie'
+      type: Bool
+      default: true
+
+    - name: pcRow
+      title: '% w wierszu'
+      type: Bool
+      default: false
+
+    - name: pcTotal
+      title: '% ogółem'
+      type: Bool
+      default: false
+
+    - name: bar
+      title: Słupkowy
+      type: Bool
+      default: false
+
+    - name: mosaic
+      title: Mozaikowy
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
+...

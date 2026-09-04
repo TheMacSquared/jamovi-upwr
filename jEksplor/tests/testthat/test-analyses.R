@@ -46,3 +46,31 @@ test_that("advanced statistics, percentiles, cut points, extreme values, normali
     expect_true(grepl("MAD", h) && grepl("Lilliefors", h) && grepl("Percentyle P10, P90", h) && grepl("3 równoliczne", h))
     expect_lt(regexpr("<b>Statystyki</b>", h), regexpr("<b>Założenia</b>", h))
 })
+
+test_that("szereg rozdzielczy analysis", {
+    set.seed(7); s <- data.frame(w = round(rnorm(60, 50, 8)))
+    res <- jEksplor:::szereg(data = s, var = "w", metody = TRUE, ogive = TRUE)
+    t <- res$classes$asDF
+    expect_equal(nrow(t), ceiling(log2(60) + 1) + 1)
+    expect_equal(t$n[nrow(t)], 60L); expect_equal(t$klasa[nrow(t)], "Razem")
+    expect_true(grepl("^\\[", t$klasa[1]) && grepl("\\]$", t$klasa[nrow(t) - 1]))
+    st <- res$stats$asDF
+    expect_equal(st$exact[1], mean(s$w)); expect_lt(abs(st$grouped[1] - mean(s$w)), 3)
+    expect_true(grepl("Sturgesa", res$metody$content))
+    r2 <- jEksplor:::szereg(data = s, var = "w", method = "width", width = 5, startAuto = FALSE, start = 30)$classes$asDF
+    expect_equal(r2$klasa[1], "[30; 35)")
+})
+
+test_that("zmienne jakosciowe: simple and grouped tables, summary, plots", {
+    q <- data.frame(kolor = factor(c("czerwony", "zielony", "czerwony", NA, "niebieski", "czerwony")),
+                    plec = factor(c("K", "M", "K", "M", "M", "K")))
+    res <- jEksplor:::jakosciowe(data = q, vars = "kolor", splitBy = NULL, cum = TRUE, bar = TRUE, mosaic = TRUE, metody = TRUE)
+    t <- res$freqs$get(key = "kolor")$asDF
+    expect_equal(t$n, c(3L, 1L, 1L, 5L)); expect_equal(t$pct[1], 60); expect_equal(t$cumPct[2], 80)
+    sm <- res$summary$asDF
+    expect_equal(sm$n, 5L); expect_equal(sm$missing, 1L); expect_equal(sm$k, 3L); expect_equal(sm$mode, "czerwony"); expect_equal(sm$modePct, 60)
+    expect_true(grepl("Skumulowane", res$metody$content))
+    g <- jEksplor:::jakosciowe(data = q, vars = "kolor", splitBy = "plec", pcRow = TRUE, pcTotal = TRUE)$freqs$get(key = "kolor")$asDF
+    expect_equal(g$n_1, c(3L, 0L, 0L, 3L)); expect_equal(g$n_2, c(0L, 1L, 1L, 2L)); expect_equal(g$n_tot[4], 5L)
+    expect_equal(g$pcCol_1[1], 100); expect_equal(g$pcRow_1[1], 100); expect_equal(g$pcTotal_2[2], 20)
+})

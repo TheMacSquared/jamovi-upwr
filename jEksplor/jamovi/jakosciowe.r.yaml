@@ -1,0 +1,80 @@
+---
+name: jakosciowe
+title: Zmienne jakościowe
+jrs: '1.1'
+
+items:
+    - name: summary
+      title: Podsumowanie
+      type: Table
+      rows: 0
+      visible: (summary)
+      clearWith:
+        - vars
+        - splitBy
+      columns:
+        - name: var
+          title: ''
+          type: text
+        - name: n
+          title: N
+          type: integer
+        - name: missing
+          title: Braki
+          type: integer
+        - name: k
+          title: Kategorie
+          type: integer
+        - name: mode
+          title: Dominanta
+          type: text
+        - name: modePct
+          title: Udział dominanty (%)
+          type: number
+
+    - name: freqs
+      title: Tabele liczności
+      type: Array
+      clearWith: &cw
+        - vars
+        - splitBy
+      template:
+        title: ''
+        type: Table
+        rows: 0
+        clearWith:
+          - cum
+          - pcCol
+          - pcRow
+          - pcTotal
+        columns: []
+
+    - name: bars
+      title: Wykresy słupkowe
+      type: Array
+      visible: (bar)
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 520
+        height: 400
+        renderFun: .barPlot
+
+    - name: mosaics
+      title: Wykresy mozaikowe
+      type: Array
+      visible: (mosaic)
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 520
+        height: 420
+        renderFun: .mosaicPlot
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
+...

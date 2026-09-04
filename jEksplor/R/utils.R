@@ -181,3 +181,108 @@ lorenzPlot <- function(d, label, ggtheme, theme) {
         ggplot2::labs(x = "Skumulowany udział jednostek", y = sprintf("Skumulowany udział sumy „%s”", label),
                       subtitle = "Przekątna = równy rozkład; im dalej krzywa, tym większa koncentracja") + ggtheme
 }
+
+# ---------------------------------------------------------------------------
+# Szereg rozdzielczy (grouped frequency distribution)
+# ---------------------------------------------------------------------------
+
+#' Class boundaries: left-closed intervals [a, b), the last one closed [a, b].
+#' method: "sturges" (k = ceiling(log2 n + 1)), "count" (k given), "width" (h given)
+classBreaks <- function(x, method = "sturges", k = 5, h = 1, start = NULL) {
+    n <- length(x); lo <- if (is.null(start)) min(x) else start; hi <- max(x)
+    if (method == "width") {
+        if (!is.finite(h) || h <= 0) return(NULL)
+        k <- max(1, ceiling((hi - lo) / h)); if (lo + k * h <= hi) k <- k + 1
+    } else {
+        if (method == "sturges") k <- ceiling(log2(n) + 1)
+        k <- max(1, as.integer(k))
+        h <- if (hi > lo) (hi - lo) / k else 1
+    }
+    list(breaks = lo + h * (0:k), h = h, k = k)
+}
+
+#' Frequency table for the classes: counts, shares, cumulative, midpoints
+classTable <- function(x, breaks) {
+    k <- length(breaks) - 1
+    idx <- findInterval(x, breaks, rightmost.closed = TRUE)
+    idx[idx < 1] <- NA; idx[idx > k] <- NA
+    n <- tabulate(idx[!is.na(idx)], nbins = k)
+    data.frame(lower = breaks[-(k + 1)], upper = breaks[-1], mid = (breaks[-(k + 1)] + breaks[-1]) / 2,
+               n = n, pct = 100 * n / sum(n), cumN = cumsum(n), cumPct = 100 * cumsum(n) / sum(n))
+}
+
+#' Mean, variance, SD, mode and median interpolated from the grouped table
+groupedStats <- function(tab) {
+    N <- sum(tab$n); h <- tab$upper - tab$lower
+    m <- sum(tab$mid * tab$n) / N
+    v <- if (N > 1) sum((tab$mid - m)^2 * tab$n) / (N - 1) else NA_real_
+    i <- which.max(tab$n)
+    nPrev <- if (i > 1) tab$n[i - 1] else 0; nNext <- if (i < nrow(tab)) tab$n[i + 1] else 0
+    den <- (tab$n[i] - nPrev) + (tab$n[i] - nNext)
+    mode <- if (den > 0) tab$lower[i] + h[i] * (tab$n[i] - nPrev) / den else NA_real_
+    j <- which(tab$cumN >= N / 2)[1]; cumPrev <- if (j > 1) tab$cumN[j - 1] else 0
+    med <- tab$lower[j] + h[j] * (N / 2 - cumPrev) / tab$n[j]
+    list(mean = m, var = v, sd = sqrt(v), mode = mode, median = med, modalClass = i, medianClass = j)
+}
+
+fmtClass <- function(lower, upper, last = FALSE) sprintf("[%s; %s%s", format(signif(lower, 6)), format(signif(upper, 6)), if (last) "]" else ")")
+
+classHistPlot <- function(tab, label, ggtheme, theme) {
+    ggplot2::ggplot(tab) +
+        ggplot2::geom_rect(ggplot2::aes(xmin = lower, xmax = upper, ymin = 0, ymax = n), fill = theme$fill[2], colour = theme$color[1]) +
+        ggplot2::scale_x_continuous(breaks = c(tab$lower, tab$upper[nrow(tab)]), labels = function(v) format(signif(v, 4))) +
+        ggplot2::labs(x = label, y = "Liczność") + ggtheme
+}
+
+ogivePlot <- function(tab, label, ggtheme, theme) {
+    d <- data.frame(x = c(tab$lower[1], tab$upper), cum = c(0, tab$cumPct))
+    ggplot2::ggplot(d, ggplot2::aes(x = x, y = cum)) +
+        ggplot2::geom_line(colour = accent(theme), linewidth = 1) + ggplot2::geom_point(colour = accent(theme), size = 2.5) +
+        ggplot2::geom_hline(yintercept = 50, linetype = "dashed", colour = "grey50") +
+        ggplot2::scale_y_continuous(labels = function(v) paste0(v, "%"), limits = c(0, 100)) +
+        ggplot2::scale_x_continuous(breaks = d$x, labels = function(v) format(signif(v, 4))) +
+        ggplot2::labs(x = label, y = "Częstość skumulowana", subtitle = "Linia przerywana: 50% — odczyt mediany") + ggtheme
+}
+
+# ---------------------------------------------------------------------------
+# Zmienne jakościowe (qualitative variables)
+# ---------------------------------------------------------------------------
+
+barPlotQual <- function(d, var, groupVar, ggtheme, theme) {
+    if (is.null(groupVar)) {
+        cnt <- as.data.frame(table(d$x)); names(cnt) <- c("level", "n")
+        p <- ggplot2::ggplot(cnt, ggplot2::aes(x = level, y = n)) +
+            ggplot2::geom_col(fill = theme$fill[2], colour = theme$color[1], width = 0.7)
+    } else {
+        cnt <- as.data.frame(table(d$x, d$g)); names(cnt) <- c("level", "group", "n")
+        p <- ggplot2::ggplot(cnt, ggplot2::aes(x = level, y = n, fill = group)) +
+            ggplot2::geom_col(colour = theme$color[1], position = ggplot2::position_dodge(width = 0.8), width = 0.7) +
+            ggplot2::labs(fill = groupVar)
+    }
+    p <- p + ggplot2::labs(x = var, y = "Liczność") + ggplot2::scale_x_discrete(labels = jmvcore::wrapLabels) + ggtheme +
+        ggplot2::theme(legend.position = "bottom")
+    if (nlevels(d$x) > 3 || max(nchar(levels(d$x))) > 12) p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 15, hjust = 1))
+    p
+}
+
+# width of each column ~ share of the level, vertical split ~ conditional distribution of the group
+mosaicPlotQual <- function(d, var, groupVar, ggtheme, theme) {
+    tab <- if (is.null(groupVar)) table(d$x) else table(d$x, d$g)
+    if (is.null(groupVar)) tab <- as.table(matrix(tab, ncol = 1, dimnames = list(names(tab), var)))
+    tot <- rowSums(tab); keep <- tot > 0; tab <- tab[keep, , drop = FALSE]; tot <- tot[keep]
+    xr <- cumsum(c(0, tot / sum(tot)))
+    rects <- do.call(rbind, lapply(seq_len(nrow(tab)), function(i) {
+        yr <- cumsum(c(0, tab[i, ] / tot[i]))
+        data.frame(xmin = xr[i], xmax = xr[i + 1], ymin = yr[-length(yr)], ymax = yr[-1],
+                   level = rownames(tab)[i], fill = colnames(tab), stringsAsFactors = FALSE)
+    }))
+    mid <- (xr[-length(xr)] + xr[-1]) / 2
+    p <- ggplot2::ggplot(rects) +
+        ggplot2::geom_rect(ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill), colour = "white", linewidth = 0.6) +
+        ggplot2::scale_x_continuous(breaks = mid, labels = jmvcore::wrapLabels(rownames(tab)), expand = c(0, 0)) +
+        ggplot2::scale_y_continuous(labels = function(v) paste0(round(100 * v), "%"), expand = c(0, 0)) +
+        ggplot2::labs(x = var, y = if (is.null(groupVar)) "Udział" else sprintf("Udział „%s” w kategorii", groupVar), fill = groupVar) +
+        ggtheme + ggplot2::theme(legend.position = "bottom")
+    if (is.null(groupVar)) p <- p + ggplot2::guides(fill = "none")
+    p
+}

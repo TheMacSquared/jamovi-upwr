@@ -1,0 +1,71 @@
+title: Zmienne jakościowe
+name: jakosciowe
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Zmienne
+        children:
+          - type: VariablesListBox
+            name: vars
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Podziel według
+        children:
+          - type: VariablesListBox
+            name: splitBy
+            isTarget: true
+            maxItemCount: 1
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Tabela
+            children:
+              - type: CheckBox
+                name: summary
+              - type: CheckBox
+                name: cum
+                enable: (!splitBy)
+          - type: Label
+            label: Procenty (przy podziale)
+            children:
+              - type: CheckBox
+                name: pcCol
+                enable: (splitBy)
+              - type: CheckBox
+                name: pcRow
+                enable: (splitBy)
+              - type: CheckBox
+                name: pcTotal
+                enable: (splitBy)
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wykres
+            children:
+              - type: CheckBox
+                name: bar
+              - type: CheckBox
+                name: mosaic
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
