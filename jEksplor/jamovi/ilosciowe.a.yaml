@@ -1,0 +1,298 @@
+---
+name: ilosciowe
+title: Zmienne ilościowe
+menuGroup: Exploration
+menuTitle: Zmienne ilościowe
+menuSubtitle: statystyki opisowe, wykresy rozkładu
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    - name: vars
+      title: Zmienne
+      type: Variables
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+
+    - name: splitBy
+      title: Podziel według
+      type: Variables
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default: null
+
+    - name: layout
+      title: Układ tabeli
+      type: List
+      options:
+        - title: Zmienne w wierszach
+          name: rows
+        - title: Zmienne w kolumnach
+          name: columns
+      default: rows
+
+    # --- rdzeń: statystyki ---
+    - name: n
+      title: N
+      type: Bool
+      default: true
+
+    - name: missing
+      title: Braki
+      type: Bool
+      default: true
+
+    - name: mean
+      title: Średnia
+      type: Bool
+      default: true
+
+    - name: median
+      title: Mediana
+      type: Bool
+      default: true
+
+    - name: quart
+      title: Kwartyle (Q1, Q3)
+      type: Bool
+      default: true
+
+    - name: sd
+      title: Odchylenie standardowe
+      type: Bool
+      default: true
+
+    - name: min
+      title: Minimum
+      type: Bool
+      default: true
+
+    - name: max
+      title: Maksimum
+      type: Bool
+      default: true
+
+    - name: v
+      title: Współczynnik zmienności V (%)
+      type: Bool
+      default: true
+
+    # --- rdzeń: wykresy ---
+    - name: hist
+      title: Histogram
+      type: Bool
+      default: false
+
+    - name: box
+      title: Pudełkowy
+      type: Bool
+      default: false
+
+    - name: boxMean
+      title: Zaznacz średnią
+      type: Bool
+      default: true
+
+    # --- zaawansowane: położenie ---
+    - name: mode
+      title: Dominanta
+      type: Bool
+      default: false
+
+    - name: sum
+      title: Suma
+      type: Bool
+      default: false
+
+    - name: gmean
+      title: Średnia geometryczna
+      type: Bool
+      default: false
+
+    - name: hmean
+      title: Średnia harmoniczna
+      type: Bool
+      default: false
+
+    - name: tmean
+      title: Średnia ucięta
+      type: Bool
+      default: false
+
+    - name: wmean
+      title: Średnia winsoryzowana
+      type: Bool
+      default: false
+
+    - name: trimProp
+      title: Proporcja ucięcia
+      type: Number
+      min: 0
+      max: 0.49
+      default: 0.1
+
+    # --- zaawansowane: rozproszenie ---
+    - name: variance
+      title: Wariancja
+      type: Bool
+      default: false
+
+    - name: range
+      title: Rozstęp
+      type: Bool
+      default: false
+
+    - name: iqr
+      title: Rozstęp ćwiartkowy (IQR)
+      type: Bool
+      default: false
+
+    - name: meanDev
+      title: Odchylenie przeciętne
+      type: Bool
+      default: false
+
+    - name: mad
+      title: Odchylenie medianowe (MAD)
+      type: Bool
+      default: false
+
+    - name: qdev
+      title: Odchylenie ćwiartkowe
+      type: Bool
+      default: false
+
+    - name: vq
+      title: Współczynnik zmienności pozycyjny V_Q (%)
+      type: Bool
+      default: false
+
+    - name: typical
+      title: Typowy obszar zmienności (x̄ ± s)
+      type: Bool
+      default: false
+
+    # --- zaawansowane: kształt ---
+    - name: skew
+      title: Skośność
+      type: Bool
+      default: false
+
+    - name: kurt
+      title: Kurtoza
+      type: Bool
+      default: false
+
+    - name: skewPearson
+      title: Skośność Pearsona
+      type: Bool
+      default: false
+
+    - name: skewQuart
+      title: Skośność kwartylowa
+      type: Bool
+      default: false
+
+    # --- zaawansowane: kwantyle i wartości skrajne ---
+    - name: pc
+      title: Percentyle
+      type: Bool
+      default: false
+
+    - name: pcValues
+      title: Percentyle (lista)
+      type: String
+      default: "25,50,75"
+
+    - name: pcEqGr
+      title: Punkty podziału na równe grupy
+      type: Bool
+      default: false
+
+    - name: pcNEqGr
+      title: Liczba grup
+      type: Integer
+      min: 2
+      max: 10
+      default: 4
+
+    - name: extreme
+      title: Wartości skrajne
+      type: Bool
+      default: false
+
+    - name: extremeN
+      title: Liczba wartości skrajnych
+      type: Integer
+      min: 1
+      max: 20
+      default: 5
+
+    # --- zaawansowane: koncentracja ---
+    - name: gini
+      title: Współczynnik Giniego
+      type: Bool
+      default: false
+
+    - name: lorenz
+      title: Krzywa Lorenza
+      type: Bool
+      default: false
+
+    # --- zaawansowane: wykresy dodatkowe ---
+    - name: dens
+      title: Gęstość na histogramie
+      type: Bool
+      default: false
+
+    - name: violin
+      title: Skrzypce na pudełkowym
+      type: Bool
+      default: false
+
+    - name: dot
+      title: Punkty na pudełkowym
+      type: Bool
+      default: false
+
+    - name: ecdf
+      title: Dystrybuanta empiryczna (ECDF)
+      type: Bool
+      default: false
+
+    # --- założenia ---
+    - name: sw
+      title: Shapiro-Wilk
+      type: Bool
+      default: false
+
+    - name: lillie
+      title: Lilliefors (K-S)
+      type: Bool
+      default: false
+
+    - name: ad
+      title: Anderson-Darling
+      type: Bool
+      default: false
+
+    - name: qq
+      title: Wykres Q-Q
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
+
+...

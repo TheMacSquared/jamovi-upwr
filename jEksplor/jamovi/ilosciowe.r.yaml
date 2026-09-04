@@ -1,0 +1,214 @@
+---
+name: ilosciowe
+title: Zmienne ilościowe
+jrs: '1.1'
+
+items:
+    - name: desc
+      title: Statystyki opisowe
+      type: Table
+      rows: 0
+      clearWith: &cw
+        - vars
+        - splitBy
+        - layout
+        - n
+        - missing
+        - mean
+        - median
+        - quart
+        - sd
+        - min
+        - max
+        - v
+        - mode
+        - sum
+        - gmean
+        - hmean
+        - tmean
+        - wmean
+        - trimProp
+        - variance
+        - range
+        - iqr
+        - meanDev
+        - mad
+        - qdev
+        - vq
+        - typical
+        - skew
+        - kurt
+        - skewPearson
+        - skewQuart
+        - pc
+        - pcValues
+        - pcEqGr
+        - pcNEqGr
+      columns: []
+
+    - name: extreme
+      title: Wartości skrajne
+      type: Array
+      visible: (extreme)
+      clearWith:
+        - vars
+        - extremeN
+      template:
+        title: ''
+        type: Table
+        rows: 0
+        columns:
+          - name: type
+            title: ''
+            type: text
+            combineBelow: true
+          - name: place
+            title: ''
+            type: integer
+          - name: row
+            title: Wiersz
+            type: integer
+          - name: value
+            title: Wartość
+            type: number
+
+    - name: norm
+      title: Normalność
+      type: Table
+      rows: 0
+      visible: (sw || lillie || ad)
+      clearWith:
+        - vars
+        - splitBy
+      columns:
+        - name: var
+          title: ''
+          type: text
+          combineBelow: true
+        - name: group
+          title: Grupa
+          type: text
+          visible: (splitBy)
+        - name: w
+          title: W
+          type: number
+          superTitle: Shapiro-Wilk
+          visible: (sw)
+        - name: pw
+          title: p
+          type: number
+          format: zto,pvalue
+          superTitle: Shapiro-Wilk
+          visible: (sw)
+        - name: d
+          title: D
+          type: number
+          superTitle: Lilliefors
+          visible: (lillie)
+        - name: pd
+          title: p
+          type: number
+          format: zto,pvalue
+          superTitle: Lilliefors
+          visible: (lillie)
+        - name: a
+          title: A²
+          type: number
+          superTitle: Anderson-Darling
+          visible: (ad)
+        - name: pa
+          title: p
+          type: number
+          format: zto,pvalue
+          superTitle: Anderson-Darling
+          visible: (ad)
+
+    - name: conc
+      title: Koncentracja
+      type: Table
+      rows: 0
+      visible: (gini)
+      clearWith:
+        - vars
+        - splitBy
+      columns:
+        - name: var
+          title: ''
+          type: text
+          combineBelow: true
+        - name: group
+          title: Grupa
+          type: text
+          visible: (splitBy)
+        - name: n
+          title: N
+          type: integer
+        - name: gini
+          title: Gini
+          type: number
+
+    - name: hist
+      title: Histogramy
+      type: Array
+      visible: (hist)
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 520
+        height: 380
+        renderFun: .histPlot
+
+    - name: box
+      title: Wykresy pudełkowe
+      type: Array
+      visible: (box)
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 520
+        height: 380
+        renderFun: .boxPlot
+
+    - name: qq
+      title: Wykresy Q-Q
+      type: Array
+      visible: (qq)
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 420
+        height: 380
+        renderFun: .qqPlot
+
+    - name: ecdf
+      title: Dystrybuanty empiryczne
+      type: Array
+      visible: (ecdf)
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 520
+        height: 380
+        renderFun: .ecdfPlot
+
+    - name: lorenz
+      title: Krzywe Lorenza
+      type: Array
+      visible: (lorenz)
+      clearWith: *cw
+      template:
+        title: ''
+        type: Image
+        width: 420
+        height: 420
+        renderFun: .lorenzPlot
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
+...

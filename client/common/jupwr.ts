@@ -36,6 +36,8 @@ export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
     'jmv::contTablesPaired',
     'jmv::propTest2',
     'jmv::propTestN',
+    // jEksplor replaces the jmv descriptives (menuGroup 'Exploration').
+    'jmv::descriptives',
 ]);
 
 // Upstream analyses kept in the menu but listed after the jUPWR ones in the

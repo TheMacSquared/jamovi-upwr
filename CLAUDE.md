@@ -232,9 +232,23 @@ Kolejność prac:
      (testy są w jTestyT), metody „basic", CI per poziom w proporcji
      (jCzest zgodność). Stare .omv z jboot i jCI 0.1.0 nie otwierają tych
      analiz.
-3. Eksploracja: moduł jUPWR (roboczo `jEksplor`) zamiast rozszerzania jmv
-   descriptives z zadania 9 — zakres z zadania 9 przechodzi do niego;
-   jmv::descriptives ukryte.
+3. Eksploracja: moduł `jEksplor` zamiast rozszerzania jmv descriptives
+   z zadania 9 — zakres z zadania 9 przechodzi do niego; jmv::descriptives
+   ukryte. STAN: `ilosciowe` ZROBIONE (0.1.0; decyzje 2026-09-04: kwartyle
+   w rdzeniu, „Podziel według" jak w jmv — wiele zmiennych, kombinacje
+   poziomów; łodyga-liście pominięte; bez CI średniej i bez wag). Rdzeń:
+   N, braki, średnia, mediana, Q1/Q3, SD, min, max, V; układ tabeli
+   wiersze/kolumny (kolumny budowane w .init z opcji, `clearWith` na
+   wszystkich statystykach); Zaawansowane: położenie (dominanta, suma,
+   geometryczna, harmoniczna, ucięta, winsoryzowana), rozproszenie
+   (wariancja, rozstęp, IQR, odch. przeciętne, MAD bez stałej, ćwiartkowe,
+   V_Q, typowy obszar), kształt (G1/G2 z SE jak SPSS/jmv, Pearsona,
+   kwartylowa), kwantyle i punkty podziału, wartości skrajne, koncentracja
+   (Gini, Lorenz), wykresy (histogram+gęstość, pudełkowy+skrzypce+punkty+
+   średnia, ECDF); Założenia: Shapiro, Lilliefors i Anderson-Darling
+   w czystym R (zwalidowane z nortest, p wg Dallala-Wilkinsona/Stephensa),
+   Q-Q. DO ZROBIENIA: `szereg` (szereg rozdzielczy) i `jakosciowe`
+   (port jmv qualitative + dominanta), potem ukryć jmv::qualitative.
 4. Regresja: moduł `jRegr` tylko z korelacją, regresją liniową (prostą
    i wieloraką) i logistyczną dwumianową; wielomianowa i porządkowa
    zostają jmv (widoczne, później — po 1.0.0).

@@ -1,0 +1,215 @@
+title: Zmienne ilościowe
+name: ilosciowe
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Zmienne
+        children:
+          - type: VariablesListBox
+            name: vars
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Podziel według
+        children:
+          - type: VariablesListBox
+            name: splitBy
+            isTarget: true
+            height: small
+
+  # --- rdzeń: to, co student ma widzieć od razu (decyzja 2026-09-04:
+  # kwartyle w rdzeniu, bo są ważniejsze niż min/max) ---
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Statystyki
+            children:
+              - type: CheckBox
+                name: n
+              - type: CheckBox
+                name: missing
+              - type: CheckBox
+                name: mean
+              - type: CheckBox
+                name: median
+              - type: CheckBox
+                name: quart
+              - type: CheckBox
+                name: sd
+              - type: CheckBox
+                name: min
+              - type: CheckBox
+                name: max
+              - type: CheckBox
+                name: v
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wykres
+            children:
+              - type: CheckBox
+                name: hist
+              - type: CheckBox
+                name: box
+              - type: CheckBox
+                name: boxMean
+          - type: Label
+            label: Układ tabeli
+            children:
+              - type: ComboBox
+                name: layout
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
+
+  - type: CollapseBox
+    label: Założenia
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Normalność
+            children:
+              - type: CheckBox
+                name: sw
+              - type: CheckBox
+                name: lillie
+              - type: CheckBox
+                name: ad
+              - type: CheckBox
+                name: qq
+
+  - type: CollapseBox
+    label: Zaawansowane
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Położenie
+                children:
+                  - type: CheckBox
+                    name: mode
+                  - type: CheckBox
+                    name: sum
+                  - type: CheckBox
+                    name: gmean
+                  - type: CheckBox
+                    name: hmean
+                  - type: CheckBox
+                    name: tmean
+                  - type: CheckBox
+                    name: wmean
+                  - type: TextBox
+                    name: trimProp
+                    format: number
+              - type: Label
+                label: Rozproszenie
+                children:
+                  - type: CheckBox
+                    name: variance
+                  - type: CheckBox
+                    name: range
+                  - type: CheckBox
+                    name: iqr
+                  - type: CheckBox
+                    name: meanDev
+                  - type: CheckBox
+                    name: mad
+                  - type: CheckBox
+                    name: qdev
+                  - type: CheckBox
+                    name: vq
+                  - type: CheckBox
+                    name: typical
+              - type: Label
+                label: Kształt
+                children:
+                  - type: CheckBox
+                    name: skew
+                  - type: CheckBox
+                    name: kurt
+                  - type: CheckBox
+                    name: skewPearson
+                  - type: CheckBox
+                    name: skewQuart
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Kwantyle
+                children:
+                  - type: CheckBox
+                    name: pc
+                  - type: TextBox
+                    name: pcValues
+                    format: string
+                    enable: (pc)
+                  - type: CheckBox
+                    name: pcEqGr
+                  - type: TextBox
+                    name: pcNEqGr
+                    format: number
+                    enable: (pcEqGr)
+              - type: Label
+                label: Wartości skrajne
+                children:
+                  - type: CheckBox
+                    name: extreme
+                  - type: TextBox
+                    name: extremeN
+                    format: number
+                    enable: (extreme)
+              - type: Label
+                label: Koncentracja
+                children:
+                  - type: CheckBox
+                    name: gini
+                  - type: CheckBox
+                    name: lorenz
+              - type: Label
+                label: Wykresy dodatkowe
+                children:
+                  - type: CheckBox
+                    name: dens
+                  - type: CheckBox
+                    name: violin
+                  - type: CheckBox
+                    name: dot
+                  - type: CheckBox
+                    name: ecdf

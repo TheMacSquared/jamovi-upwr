@@ -1,0 +1,23 @@
+---
+title: Eksploracja jUPWR
+name: jEksplor
+version: 0.1.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: >
+  Statystyki opisowe z prostym panelem: rdzeń widoczny od razu, miary pozycyjne,
+  koncentracja i normalność w sekcjach zaawansowanych.
+analyses:
+  - title: Zmienne ilościowe
+    name: ilosciowe
+    ns: jEksplor
+    menuGroup: Exploration
+    menuTitle: Zmienne ilościowe
+    menuSubtitle: statystyki opisowe, wykresy rozkładu
+    category: analyses
+usesNative: true
+minApp: 1.0.8
+
+...
