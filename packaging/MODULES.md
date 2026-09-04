@@ -15,8 +15,8 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jCI/` | jCI | przedziały ufności | wbudowany | 0.1.0 |
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.1.0 |
 | `jboot/` | jboot | bootstrap | wbudowany | 0.3.0 |
-| `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.6.0 |
-| `jCzest/` | jCzest | analizy częstości: tabela kontyngencji z kontrolą liczebności oczekiwanych | wbudowany | 0.1.0 |
+| `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.7.0 |
+| `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.1.0 |
 | `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery/NIR; zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.3.0 |
 | `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem, d Cohena z CI, wykresem estymacyjnym; zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.2.0 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.3 |
@@ -63,6 +63,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.5 | 28.2 | 0.3.3 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.9.4 | 28.2 | 0.3.3 | ✅ 2026-09-03 | ⬜ do zbudowania |
 | 0.9.4 | 28.2 | 0.3.2 | ✅ 2026-09-03 | ✅ 2026-09-03 |
 | 0.9.2.2 | 28.2 | 0.3.2 | ✅ 2026-08-31 | ✅ 2026-08-31 |
@@ -81,6 +82,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.5 | 28.2 | 0.2.2 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.9.4 | 28.2 | 0.2.2 | ✅ 2026-09-03 | ⬜ do zbudowania |
 | 0.9.4 | 28.2 | 0.2.1 | ✅ 2026-09-03 (zastąpiony przez 0.2.2) | ⬜ |
 | 0.9.4 | 28.2 | 0.2.0 | ✅ 2026-09-03 (wadliwy na macOS — nie ładuje sf/asteRisk) | ✅ 2026-09-03 |
@@ -97,6 +99,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.5 | 28.2 | 0.1.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.9.4 | 28.2 | 0.1.0 | ✅ 2026-09-03 | ✅ 2026-09-03 |
 | 0.9.2.2 | 28.2 | 0.1.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 

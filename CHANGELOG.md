@@ -3,6 +3,39 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.5 — 2026-09-03
+- Nowy moduł jCzest 0.1.0 (wbudowany, menu „Częstości"): analizy tabel liczności
+  z panelem pod dydaktyczną prostotę. Diagnoza kategorii w jmv była odwrotna niż
+  w ANOVIE — panel nie był przeładowany, tylko pusty: po wrzuceniu zmiennych
+  widać było samą tabelę i χ², a wszystko potrzebne do interpretacji (procenty,
+  liczebności oczekiwane, V Craméra) było domyślnie wyłączone.
+  „Tabela kontyngencji": χ², V Craméra i procenty wierszami widoczne od razu,
+  dokładny test Fishera obok χ², a w „Zaawansowane" iloraz wiarygodności,
+  poprawka ciągłości, miary 2×2 (OR, RR, różnica proporcji), miary porządkowe,
+  test trendu Cochrana-Armitage'a, reszty standaryzowane i porównania par
+  wierszy z korektą Holma; wykres słupkowy i mozaikowy.
+  „Jedna zmienna" scala propTestN i propTest2: 2 kategorie → dokładny test
+  dwumianowy, 3+ → χ² zgodności; własne proporcje oczekiwane wpisuje się
+  w liście z nazwami kategorii obok, z podglądem wynikowego udziału.
+  „Próby zależne": 2 pomiary → McNemar, 3+ → Q Cochrana z porównaniami par
+  (to daje Q Cochrana miejsce w dystrybucji).
+  Czego nie ma w jmv, a jest tutaj: automatyczna kontrola warunku stosowalności
+  (E ≥ 5 dla χ², liczba par niezgodnych dla McNemara) z ostrzeżeniem nad
+  wynikami i wskazaniem testu dokładnego, wielkości efektu (V Craméra z CI
+  bootstrapowym, w Cohena, OR par niezgodnych) oraz noty mówiące, który poziom
+  jest odniesieniem — poziomy są sortowane alfabetycznie, więc bez tego kierunek
+  ilorazu szans bywa odwrotny do intuicji.
+  Analizy jmv pozostają widoczne obok: jCzest nie ma jeszcze warstw,
+  Mantel-Haenszela, z dla różnicy proporcji ani kierunku hipotezy przy 2×2.
+- jDane 0.7.0: siedem „lekkich" zbiorów z 0.6.0 (anscombe, datasaurus, starwars,
+  movies, fastfood, autobusy, TeachingRatings) oraz nowy zbiór syntetyczny
+  „szkolenie" — 120 gospodarstw i trzy powtórzone pomiary binarne do testów dla
+  prób zależnych; dobrany tak, by porównania par dawały dwa wyniki istotne
+  i jeden nieistotny.
+- Moduły: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.2, jCI 0.1.0, jperm 0.1.0,
+  jboot 0.3.0, jDane 0.7.0, jANOVA 0.3.0, jTestyT 0.2.0, jCzest 0.1.0;
+  opcjonalne: jRISK 0.3.3, jSpace 0.2.2, jRol 0.1.0.
+
 ## 0.9.4 — 2026-09-02
 - Nowa filozofia ANOVY: moduł jANOVA 0.3.0 (wbudowany) zastępuje w menu
   ANOVA analizy jmv (jednoczynnikowa, ANOVA, ANCOVA, powtórzonych pomiarów),
