@@ -2,6 +2,7 @@
 name: logistyczna
 title: Regresja logistyczna
 menuGroup: Regression
+menuSubgroup: Logistic Regression
 menuTitle: Regresja logistyczna
 menuSubtitle: zmienna zależna dwupoziomowa
 version: '1.0.0'

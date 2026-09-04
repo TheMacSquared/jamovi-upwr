@@ -283,8 +283,13 @@ Kolejność prac:
    Cook; zapis prawdopodobieństw). Poziomy odniesienia: opcja Array
    `refLevels` z `items: (factors)` + ListBox z LevelSelector, JS
    `jamovi/js/<analiza>.js` ustawia `variable` selektora (wzór jmv).
-   Ukryte: jmv::simpleCorr, corrMatrix, linReg, logRegBin; na końcu menu:
-   corrPart, logRegMulti, logRegOrd. ETAP 4 ZAMKNIĘTY — mapa drogowa
+   Ukryte: jmv::simpleCorr, corrMatrix, linReg, logRegBin. Kolejność menu
+   Regresja (2026-09-04): Korelacja → Korelacja cząstkowa → Regresja liniowa,
+   belka „Regresja logistyczna" (jRegr logistyczna ma `menuSubgroup: Logistic
+   Regression` — klucz NIEtłumaczony jak w jmv, tytuł tłumaczy i18n jmv) →
+   dwupoziomowa → Porządkowa → Wielomianowa. Mechanizm: `JUPWR_MENU_ORDER`
+   w `client/common/jupwr.ts` (stabilne sortowanie w podmenu; nienotowane =
+   500, `JUPWR_MENU_LAST` = 1000). ETAP 4 ZAMKNIĘTY — mapa drogowa
    1.0.0 w części „moduły" wykonana; do wydania 1.0.0 zostaje bump wersji
    jUPWR, CHANGELOG, MODULES.md, .jmo modułów opcjonalnych i buildy
    natywne.

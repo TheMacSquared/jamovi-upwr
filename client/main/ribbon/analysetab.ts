@@ -2,7 +2,7 @@
 'use strict';
 
 import RibbonMenu from './ribbonmenu';
-import { JUPWR_HIDDEN_ANALYSES, JUPWR_MENU_LAST } from '../../common/jupwr';
+import { JUPWR_HIDDEN_ANALYSES, JUPWR_MENU_LAST, JUPWR_MENU_ORDER } from '../../common/jupwr';
 import RibbonTab, { RibbonItem } from './ribbontab';
 import Placeholder from './placeholder';
 import interactionManager from '../../common/interactionmanager';
@@ -151,16 +151,24 @@ export class AnalyseTab extends RibbonTab {
             }
         }
 
-        // jUPWR: push selected upstream analyses to the end of their submenu
+        // jUPWR: stable sort inside each submenu — explicit JUPWR_MENU_ORDER first,
+        // unlisted analyses keep module order, JUPWR_MENU_LAST go to the end
+        const menuOrder = (item: { ns: string, name: string }) => {
+            const key = `${item.ns}::${item.name}`;
+            if (JUPWR_MENU_LAST.has(key))
+                return 1000;
+            return JUPWR_MENU_ORDER.get(key) ?? 500;
+        };
         for (let groupName in menus) {
             let menu = menus[groupName];
             for (let key in menu) {
                 let submenu = menu[key];
                 if (submenu === null || typeof submenu !== 'object' || !Array.isArray(submenu.items))
                     continue;
-                let last = submenu.items.filter(item => JUPWR_MENU_LAST.has(`${item.ns}::${item.name}`));
-                if (last.length > 0)
-                    submenu.items = submenu.items.filter(item => !last.includes(item)).concat(last);
+                submenu.items = submenu.items
+                    .map((item, index) => ({ item, index }))
+                    .sort((a, b) => (menuOrder(a.item) - menuOrder(b.item)) || (a.index - b.index))
+                    .map(entry => entry.item);
             }
         }
 

@@ -53,7 +53,17 @@ export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
 export const JUPWR_MENU_LAST: ReadonlySet<string> = new Set([
     'jmv::mancova',
     'jmv::logLinear',
-    'jmv::corrPart',
-    'jmv::logRegMulti',
-    'jmv::logRegOrd',
+]);
+
+// Explicit order inside a submenu (lower first; unlisted = 500, MENU_LAST = 1000).
+// Module load order would otherwise put jmv analyses before jUPWR ones.
+export const JUPWR_MENU_ORDER: ReadonlyMap<string, number> = new Map([
+    // Regresja: korelacja → cząstkowa → liniowa, potem podgrupa logistyczna
+    ['jRegr::korelacja', 10],
+    ['jmv::corrPart', 20],
+    ['jRegr::liniowa', 30],
+    // podgrupa „Regresja logistyczna": dwupoziomowa → porządkowa → wielomianowa
+    ['jRegr::logistyczna', 10],
+    ['jmv::logRegOrd', 20],
+    ['jmv::logRegMulti', 30],
 ]);

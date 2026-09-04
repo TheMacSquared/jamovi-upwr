@@ -27,6 +27,7 @@ analyses:
     name: logistyczna
     ns: jRegr
     menuGroup: Regression
+    menuSubgroup: Logistic Regression
     menuTitle: Regresja logistyczna
     menuSubtitle: zmienna zależna dwupoziomowa
     category: analyses
