@@ -14,7 +14,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.3.2 |
 | `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.0 |
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.0 |
-| `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.7.0 |
+| `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.7.1 |
 | `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.2.0 |
 | `jEksplor/` | jEksplor | eksploracja jUPWR: zmienne ilościowe (rdzeń N/braki/średnia/mediana/kwartyle/SD/min/max/V, miary pozycyjne, Gini i Lorenz, Lilliefors i Anderson-Darling), zmienne jakościowe (tabele liczności, także w grupach), szereg rozdzielczy; zastępuje w menu Eksploracja jmv::descriptives i jmv::qualitative (ukryte w kliencie) | wbudowany | 0.1.0 |
 | `jRegr/` | jRegr | regresja jUPWR: korelacja (para = jeden wiersz, więcej = macierz), regresja liniowa, logistyczna dwumianowa; zastępuje w menu Regresja jmv::simpleCorr, corrMatrix, linReg, logRegBin (ukryte w kliencie) | wbudowany | 0.1.0 |
@@ -64,6 +64,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.5.7 | 28.2 | 0.3.3 | ⬜ do zbudowania | ✅ 2026-09-04 (z 0.9.5.6, bez zmian) |
 | 0.9.5.6 | 28.2 | 0.3.3 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5.5 | 28.2 | 0.3.3 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5 | 28.2 | 0.3.3 | ⬜ do zbudowania | ✅ 2026-09-04 |
@@ -85,6 +86,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.5.7 | 28.2 | 0.3.0 | ⬜ do zbudowania | ✅ 2026-09-04 (z 0.9.5.6, bez zmian) |
 | 0.9.5.6 | 28.2 | 0.3.0 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5.5 | 28.2 | 0.2.2 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5 | 28.2 | 0.2.2 | ⬜ do zbudowania | ✅ 2026-09-04 |
@@ -104,6 +106,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 0.9.5.7 | 28.2 | 0.1.0 | ⬜ do zbudowania | ✅ 2026-09-04 (z 0.9.5.6, bez zmian) |
 | 0.9.5.6 | 28.2 | 0.1.0 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5.5 | 28.2 | 0.1.0 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5 | 28.2 | 0.1.0 | ⬜ do zbudowania | ✅ 2026-09-04 |

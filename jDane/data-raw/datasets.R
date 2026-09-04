@@ -46,19 +46,6 @@ write.csv(titanic, "data/titanic.csv", row.names = FALSE, na = "")
 data("TeachingRatings", package = "AER")
 write.csv(TeachingRatings, "data/TeachingRatings.csv", row.names = FALSE, na = "")
 
-# postacie Star Wars; list-columns (films/vehicles/starships) sie nie
-# eksportuja do csv, wiec wypadaja
-sw <- dplyr::starwars
-sw <- sw[, !sapply(sw, is.list)]
-write.csv(sw, "data/starwars.csv", row.names = FALSE, na = "")
-
-# kwartet Anscombe'a w formacie dlugim (jeden wiersz = jeden punkt)
-ans <- do.call(rbind, lapply(1:4, function(i) data.frame(
-    zbior = paste0("zbior_", i),
-    x = anscombe[[paste0("x", i)]],
-    y = anscombe[[paste0("y", i)]])))
-write.csv(ans, "data/anscombe.csv", row.names = FALSE, na = "")
-
 # opoznienia autobusow -- zbior syntetyczny przygotowany na zajecia;
 # "-0" z zaokraglenia normalizowane do 0
 bus <- read.csv("data-raw/spoznienia_autobusy.csv", stringsAsFactors = FALSE)
@@ -69,11 +56,6 @@ write.csv(bus, "data/autobusy.csv", row.names = FALSE, na = "")
 # fastfood: wartosci odzywcze 515 pozycji menu 8 sieci (openintro)
 data("fastfood", package = "openintro")
 write.csv(as.data.frame(fastfood), "data/fastfood.csv", row.names = FALSE, na = "")
-
-# Datasaurus Dozen: 13 zbiorow o niemal identycznych statystykach
-data("datasaurus_dozen", package = "datasauRus")
-write.csv(as.data.frame(datasaurus_dozen), "data/datasaurus.csv",
-          row.names = FALSE, na = "")
 
 # filmy IMDb (stan na 2005). Pelny zbior ma 58 788 wierszy i 24 kolumny --
 # za duzo na zajecia, wiec: filmy pelnometrazowe (>= 60 min) od 1970 r.

@@ -3,6 +3,10 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.5.7 — 2026-09-04
+- jDane 0.7.1: usunięto trzy zbiory dydaktyczne o statystykach niezwiązanych
+  z programem zajęć (postacie Star Wars, Datasaurus, kwartet Anscombe'a).
+
 ## 0.9.5.6 — 2026-09-04
 - Analizy jCzest trafiają do istniejącego menu „Częstości" zamiast tworzyć drugie
   o tej samej nazwie. Moduł używa teraz `menuGroup: Frequencies` — tak jak jANOVA
