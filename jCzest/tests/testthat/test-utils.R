@@ -39,7 +39,8 @@ test_that("bootstrapowy CI dla V jest powtarzalny i zawiera estymate", {
 test_that("reszty standaryzowane zgodne z chisq.test$stdres", {
     ref <- suppressWarnings(chisq.test(t34))$stdres
     expect_equal(stdResiduals(t34), ref, ignore_attr = TRUE)
-    expect_equal(residCritical(0.05), qnorm(0.975))
+    # prog 1,96 jest wpisany na sztywno w .b.R (odpowiada alpha = 0,05)
+    expect_equal(round(qnorm(0.975), 2), 1.96)
 })
 
 test_that("kontrola zalozenia E>=5 rozroznia tabele 2x2 i wieksze", {

@@ -1,0 +1,70 @@
+---
+name: zalezne
+title: Próby zależne
+menuGroup: Częstości
+menuTitle: Próby zależne
+menuSubtitle: te same jednostki, powtórzone pomiary
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    # --- rdzeń ---
+    # 2 pomiary → McNemar, 3 i więcej → Q Cochrana (metoda dobierana sama)
+    - name: vars
+      title: Pomiary
+      type: Variables
+      suggested:
+        - nominal
+      permitted:
+        - factor
+
+    - name: counts
+      title: Liczności (opcjonalnie, 2 pomiary)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default:
+
+    - name: effSize
+      title: Wielkość efektu (OR par niezgodnych)
+      type: Bool
+      default: true
+
+    - name: props
+      title: Udziały w pomiarach
+      type: Bool
+      default: true
+
+    # --- zaawansowane ---
+    - name: exact
+      title: Dokładny test (dwumianowy na parach)
+      type: Bool
+      default: false
+
+    - name: corr
+      title: Poprawka ciągłości
+      type: Bool
+      default: false
+
+    - name: table
+      title: Tabela par
+      type: Bool
+      default: false
+
+    - name: posthoc
+      title: Porównania par pomiarów (Holm)
+      type: Bool
+      default: false
+
+    - name: ciWidth
+      title: Poziom ufności
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+...

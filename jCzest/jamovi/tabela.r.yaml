@@ -142,7 +142,6 @@ items:
         - rows
         - cols
         - counts
-        - alpha
       columns: []
 
     - name: pairwise

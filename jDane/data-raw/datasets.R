@@ -96,3 +96,27 @@ mv <- mv[, c("title", "year", "length", "budget", "rating", "votes",
 set.seed(2026)
 mv <- mv[sort(sample(nrow(mv), 2000)), ]
 write.csv(mv, "data/movies.csv", row.names = FALSE, na = "")
+
+# szkolenie -- zbior SYNTETYCZNY przygotowany na zajecia z analizy czestosci.
+# Trzy powtorzone pomiary binarne na tych samych gospodarstwach, wiec musza byc
+# skorelowane wewnatrz jednostki: losujemy je ze wspolnej sklonnosci latentnej u,
+# a nie niezaleznie. Parametry dobrane tak, zeby McNemar przed-po wyszedl istotny,
+# a po-po_pol_roku NIE -- dwa przeciwstawne wyniki w jednym zbiorze.
+# UWAGA: kolejnosc losowan ma znaczenie -- kazde rnorm/rbinom przesuwa strumien,
+# wiec pomiary losujemy PRZED zmienna `wielkosc`. Przestawienie tych linii zmienia
+# dane i psuje wlasciwosci opisane w dokumentacji zbioru.
+set.seed(2026)
+n_gosp <- 120
+u <- rnorm(n_gosp)
+tak <- function(p) ifelse(rbinom(length(p), 1, p) == 1, "tak", "nie")
+przed_v <- tak(plogis(-1.1 + 1.3 * u))
+po_v    <- tak(plogis( 1.2 + 1.3 * u))
+pol_v   <- tak(plogis( 0.5 + 1.3 * u))
+wielkosc_v <- cut(u + rnorm(n_gosp, 0, 0.8), breaks = c(-Inf, -0.5, 0.6, Inf),
+                  labels = c("male", "srednie", "duze"))
+szkolenie <- data.frame(
+    gospodarstwo = sprintf("G%03d", seq_len(n_gosp)),
+    wielkosc = wielkosc_v,
+    przed = przed_v, po = po_v, po_pol_roku = pol_v,
+    stringsAsFactors = FALSE)
+write.csv(szkolenie, "data/szkolenie.csv", row.names = FALSE, na = "")

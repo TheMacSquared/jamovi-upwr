@@ -70,6 +70,29 @@ test_that("poprawka ciaglosci i miary 2x2 sa odrzucane poza tabela 2x2", {
     expect_equal(nrow(res$measures$asDF), 0)
 })
 
+test_that("kolumny powstaja tez gdy .init dostaje ramke bez wierszy (warunek z GUI)", {
+    # W jamovi .init bywa wolane z ramka, ktora ma kolumny i zadeklarowane poziomy,
+    # ale ZERO wierszy. Wyprowadzanie poziomow z obserwowanych wartosci dawalo wtedy
+    # tabele licznosci bez kolumn — wygladala na pusta, choc testy sie liczyly.
+    pusta <- data.frame(plec = factor(character(0), levels = c("K", "M")),
+                        wybor = factor(character(0), levels = c("A", "B", "C")))
+    a <- jCzest:::tabelaClass$new(
+        options = jCzest:::tabelaOptions$new(rows = "plec", cols = "wybor"),
+        data = pusta)
+    a$init()
+    nm <- vapply(a$results$freqs$columns, function(x) x$name, character(1))
+    expect_true(all(c("c_A", "c_B", "c_C") %in% nm))
+
+    # init + run na tym samym obiekcie nie moze zdublowac kolumn
+    b <- jCzest:::tabelaClass$new(
+        options = jCzest:::tabelaOptions$new(rows = "plec", cols = "wybor"),
+        data = duze)
+    b$init(); b$run()
+    nm2 <- vapply(b$results$freqs$columns, function(x) x$name, character(1))
+    expect_false(any(duplicated(nm2)))
+    expect_gt(nrow(b$results$freqs$asDF), 0)
+})
+
 test_that("przypadki brzegowe nie wywalaja analizy", {
     jeden <- data.frame(a = factor(rep("x", 10)), b = factor(rep("p", 10)))
     expect_error(jCzest:::tabela(data = jeden, rows = "a", cols = "b"), NA)

@@ -1,0 +1,126 @@
+title: Test zgodności
+name: zgodnosc
+jus: '2.0'
+stage: 0
+compilerMode: tame
+events:
+  update: './zgodnosc.events::update'
+  remoteDataChanged: './zgodnosc.events::onRemoteDataChanged'
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Zmienna
+        children:
+          - type: VariablesListBox
+            name: var
+            isTarget: true
+            maxItemCount: 1
+            events:
+              change: './zgodnosc.events::onChange_var'
+      - type: TargetLayoutBox
+        label: Liczności (opcjonalnie)
+        children:
+          - type: VariablesListBox
+            name: counts
+            isTarget: true
+            maxItemCount: 1
+
+  # --- rdzeń ---
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Proporcje oczekiwane
+        children:
+          - type: ListBox
+            name: ratio
+            showColumnHeaders: true
+            fullRowSelect: true
+            height: large
+            stretchFactor: 1
+            events:
+              change: './zgodnosc.events::onChange_ratio'
+            columns:
+              - name: level
+                label: Kategoria
+                headerAlign: left
+                stretchFactor: 1
+                isVirtual: true
+                maxWidth: 300
+                selectable: false
+                template:
+                    type: Label
+              - name: ratio
+                label: Waga
+                maxWidth: 60
+                template:
+                    type: TextBox
+                    format: number
+              - name: proportion
+                label: Udział
+                maxWidth: 60
+                isVirtual: true
+                selectable: false
+                template:
+                    type: Label
+
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Wyniki
+        children:
+          - type: CheckBox
+            name: effSize
+          - type: CheckBox
+            name: plot
+
+  # --- zaawansowane ---
+  - type: CollapseBox
+    label: Zaawansowane
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Hipoteza (2 kategorie)
+                children:
+                  - type: ComboBox
+                    name: hypothesis
+              - type: Label
+                label: Dodatkowe testy
+                children:
+                  - type: CheckBox
+                    name: chiSqCorr
+                  - type: CheckBox
+                    name: exact
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Post-hoc
+                children:
+                  - type: CheckBox
+                    name: resid
+              - type: Label
+                label: Liczności
+                children:
+                  - type: CheckBox
+                    name: exp

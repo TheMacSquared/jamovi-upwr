@@ -1,0 +1,84 @@
+---
+name: zgodnosc
+title: Test zgodności
+menuGroup: Częstości
+menuTitle: Jedna zmienna
+menuSubtitle: zgodność z oczekiwanymi proporcjami
+version: '1.0.0'
+jas: '1.2'
+
+options:
+    - name: data
+      type: Data
+
+    # --- rdzeń ---
+    - name: var
+      title: Zmienna
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+
+    - name: counts
+      title: Liczności (opcjonalnie)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default:
+
+    - name: ratio
+      title: Proporcje oczekiwane
+      type: Array
+      template:
+          type: Number
+          min: 0
+          default: 1
+      default:
+
+    - name: effSize
+      title: Wielkość efektu (w Cohena)
+      type: Bool
+      default: true
+
+    - name: plot
+      title: Wykres obserwowane vs oczekiwane
+      type: Bool
+      default: false
+
+    # --- zaawansowane ---
+    - name: hypothesis
+      title: Hipoteza alternatywna
+      type: List
+      options:
+        - title: Dwustronna (≠)
+          name: notequal
+        - title: Większa (>)
+          name: greater
+        - title: Mniejsza (<)
+          name: less
+      default: notequal
+
+    - name: exp
+      title: Liczebności oczekiwane
+      type: Bool
+      default: false
+
+    - name: resid
+      title: Reszty standaryzowane
+      type: Bool
+      default: false
+
+    - name: chiSqCorr
+      title: Poprawka ciągłości (2 kategorie)
+      type: Bool
+      default: false
+
+    - name: exact
+      title: Dokładny test wielomianowy (małe N)
+      type: Bool
+      default: false
+...

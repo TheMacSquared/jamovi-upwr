@@ -1,0 +1,83 @@
+title: Próby zależne
+name: zalezne
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Pomiary (2 = McNemar, 3+ = Q Cochrana)
+        children:
+          - type: VariablesListBox
+            name: vars
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Liczności (opcjonalnie, 2 pomiary)
+        children:
+          - type: VariablesListBox
+            name: counts
+            isTarget: true
+            maxItemCount: 1
+
+  # --- rdzeń ---
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Wyniki
+        children:
+          - type: CheckBox
+            name: effSize
+          - type: CheckBox
+            name: props
+
+  # --- zaawansowane ---
+  - type: CollapseBox
+    label: Zaawansowane
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: LayoutBox
+        margin: large
+        stretchFactor: 1
+        children:
+          - type: LayoutBox
+            cell:
+              column: 0
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Dodatkowe testy
+                children:
+                  - type: CheckBox
+                    name: exact
+                  - type: CheckBox
+                    name: corr
+              - type: Label
+                label: Post-hoc
+                children:
+                  - type: CheckBox
+                    name: posthoc
+          - type: LayoutBox
+            cell:
+              column: 1
+              row: 0
+            stretchFactor: 1
+            children:
+              - type: Label
+                label: Liczności
+                children:
+                  - type: CheckBox
+                    name: table
+              - type: Label
+                label: Przedziały ufności
+                children:
+                  - type: TextBox
+                    name: ciWidth
+                    suffix: '%'
+                    format: number

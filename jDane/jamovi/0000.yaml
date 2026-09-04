@@ -1,7 +1,7 @@
 ---
 title: Zbiory danych do zajęć (UPWr)
 name: jDane
-version: 0.6.0
+version: 0.7.0
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -957,6 +957,44 @@ datasets:
       - dydaktyka
       - wykresy
       - regresja
+  - name: Szkolenie gospodarstw (przed-po)
+    path: szkolenie.csv
+    description: "Stosowanie praktyki przed szkoleniem, tuż po i po pół roku — McNemar i Q Cochrana"
+    documentation:
+      summary: >-
+        Trzy powtórzone pomiary binarne na tych samych 120 gospodarstwach: czy
+        stosują daną praktykę przed szkoleniem, tuż po nim i pół roku później.
+      details: >-
+        Zbiór syntetyczny przygotowany na zajęcia. Pomiary pochodzą od tych samych
+        jednostek, więc są ze sobą skorelowane — nie wolno traktować ich jak trzech
+        niezależnych prób. Zawiera dwa przeciwstawne wyniki, co pozwala pokazać
+        różnicę między efektem istotnym a nieistotnym na jednych danych: porównanie
+        przed–po wychodzi istotne (szkolenie zadziałało), a po–po pół roku nie
+        (efekt się utrzymał, spadek mieści się w wahaniach losowych). Analizy:
+        Częstości → Próby zależne (dwa pomiary = McNemar, trzy = Q Cochrana
+        z porównaniami par) oraz Częstości → Tabela kontyngencji dla zależności
+        między wielkością gospodarstwa a stosowaniem praktyki.
+      variables:
+        - name: gospodarstwo
+          description: Identyfikator gospodarstwa (jednostka obserwacji).
+        - name: wielkosc
+          description: "Wielkość gospodarstwa: male, srednie, duze."
+        - name: przed
+          description: Czy stosuje praktykę przed szkoleniem (tak/nie).
+        - name: po
+          description: Czy stosuje praktykę tuż po szkoleniu (tak/nie).
+        - name: po_pol_roku
+          description: Czy stosuje praktykę pół roku po szkoleniu (tak/nie).
+      source: >-
+        Dane syntetyczne wygenerowane na potrzeby zajęć; kod generujący
+        w jDane/data-raw/datasets.R (ziarno 2026).
+      provenance:
+        package: jDane
+        dataset: szkolenie
+    tags:
+      - dydaktyka
+      - czestosci
+      - proby-zalezne
 usesNative: true
 minApp: 1.0.8
 

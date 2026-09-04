@@ -1,0 +1,103 @@
+---
+name: zalezne
+title: Próby zależne
+jrs: '1.1'
+
+items:
+    - name: tests
+      title: Test dla prób zależnych
+      type: Table
+      rows: 0
+      clearWith: &cw
+        - vars
+        - counts
+        - corr
+        - exact
+      columns:
+        - name: test
+          title: ''
+          type: text
+        - name: stat
+          title: Wartość
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: marg
+      title: Udziały w pomiarach
+      type: Table
+      rows: 0
+      visible: (props)
+      clearWith: *cw
+      columns:
+        - name: var
+          title: Pomiar
+          type: text
+        - name: n
+          title: Liczność
+          type: number
+        - name: prop
+          title: Udział
+          type: number
+          format: pc
+
+    - name: effsize
+      title: Wielkość efektu
+      type: Table
+      rows: 0
+      visible: (effSize)
+      clearWith:
+        - vars
+        - counts
+        - ciWidth
+      columns:
+        - name: measure
+          title: ''
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+        - name: lower
+          title: Dolna
+          type: number
+        - name: upper
+          title: Górna
+          type: number
+
+    - name: pairs
+      title: Tabela par
+      type: Table
+      rows: 0
+      visible: (table)
+      clearWith: *cw
+      columns: []
+
+    - name: posthoc
+      title: Porównania par pomiarów
+      type: Table
+      rows: 0
+      visible: (posthoc)
+      clearWith: *cw
+      columns:
+        - name: g1
+          title: ''
+          type: text
+        - name: g2
+          title: ''
+          type: text
+        - name: disc
+          title: Pary niezgodne
+          type: integer
+        - name: stat
+          title: χ²
+          type: number
+        - name: p
+          title: p Holm
+          type: number
+          format: zto,pvalue
+...

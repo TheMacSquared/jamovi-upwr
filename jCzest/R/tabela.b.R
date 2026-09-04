@@ -4,13 +4,18 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
     inherit = tabelaBase,
     private = list(
 
-        # kolumny tabeli liczności i reszt zależą od poziomów zmiennej kolumnowej,
-        # więc budujemy je dopiero, gdy zmienne są wybrane
-        .init = function() {
+        # kolumny tabeli liczności i reszt zależą od poziomów zmiennej kolumnowej.
+        # UWAGA: w GUI `self$data` bywa jeszcze puste w .init (wtedy poziomów nie da
+        # się odczytać), a przy wywołaniu z R dane są od razu. Dlatego budujemy
+        # kolumny z OBU miejsc, a flaga chroni przed dodaniem ich dwa razy.
+        .colsBuilt = FALSE,
+
+        .buildColumns = function() {
+            if (isTRUE(private$.colsBuilt)) return(invisible(FALSE))
             o <- self$options
-            if (!optNonEmpty(o$rows) || !optNonEmpty(o$cols)) return()
+            if (!optNonEmpty(o$rows) || !optNonEmpty(o$cols)) return(invisible(FALSE))
             lv <- private$.colLevels()
-            if (length(lv) == 0) return()
+            if (length(lv) == 0) return(invisible(FALSE))
 
             freqs <- self$results$freqs
             freqs$addColumn(name = "row", title = "", type = "text", combineBelow = TRUE)
@@ -25,13 +30,24 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             for (l in lv)
                 res$addColumn(name = paste0("c_", l), title = l, type = "number",
                               superTitle = o$cols)
+
+            private$.colsBuilt <- TRUE
+            invisible(TRUE)
         },
+
+        .init = function() private$.buildColumns(),
 
         .colLevels = function() {
             o <- self$options
-            v <- self$data[[o$cols]]
-            if (is.null(v)) return(character(0))
-            levels(droplevels(factor(v[!is.na(v)])))
+            v <- try(self$data[[o$cols]], silent = TRUE)
+            if (inherits(v, "try-error") || is.null(v)) return(character(0))
+            # W .init jamovi podaje ramkę z kolumnami, ale BEZ wierszy — poziomy
+            # trzeba wziąć z deklaracji czynnika, nie z obserwowanych wartości,
+            # inaczej tabela liczności zostaje bez kolumn (i wygląda na pustą).
+            lv <- levels(v)
+            if (is.null(lv) || length(lv) == 0)
+                lv <- levels(droplevels(factor(v[!is.na(v)])))
+            lv
         },
 
         .table = function() {
@@ -44,6 +60,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         .run = function() {
             o <- self$options
             if (!optNonEmpty(o$rows) || !optNonEmpty(o$cols)) return()
+            private$.buildColumns()   # w GUI dane bywają dostępne dopiero tutaj
             tab <- private$.table()
             if (any(dim(tab) < 2) || sum(tab) == 0) {
                 self$results$tests$setNote("n", "Każda zmienna musi mieć co najmniej 2 poziomy z obserwacjami.")
@@ -114,7 +131,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 sprintf(paste("W tabeli 2×2 najmniejsza liczebność oczekiwana wynosi %.2f (< 5),",
                               "więc przybliżenie χ² jest zawodne.%s"),
                         a$minExpected,
-                        if (a$fisherFeasible) " Użyj dokładnego testu Fishera (sekcja „Założenia”)." else "")
+                        if (a$fisherFeasible) " Włącz dokładny test Fishera." else "")
             else
                 sprintf(paste("%d z %d komórek (%.0f%%) ma liczebność oczekiwaną < 5,",
                               "a najmniejsza wynosi %.2f — przybliżenie χ² jest zawodne.%s"),
@@ -154,10 +171,11 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 if (inherits(ft, "try-error"))
                     t$setNote("f", "Dokładny test Fishera nie policzył się dla tej tabeli (za duża).")
                 else
-                    t$addRow(rowKey = "fi", values = list(test = "Dokładny test Fishera",
-                                                         stat = NA_real_, df = NA_integer_, p = ft$p.value))
+                    t$addRow(rowKey = "fi", values = list(test = "Dokładny test Fishera", p = ft$p.value))
             }
-            t$addRow(rowKey = "n", values = list(test = "N", stat = n, df = NA_integer_, p = NA_real_))
+            # N w nocie, nie jako wiersz: liczebnosc dzielilaby kolumne ze statystykami
+            # testowymi i dziedziczyla ich format (80.00000), a nie jest testem
+            t$setNote("N", sprintf("N = %s.", format(n, big.mark = " ")))
         },
 
         .fillEffSize = function(tab) {
@@ -229,14 +247,13 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (!isTRUE(o$resid)) return()
             t <- self$results$resid
             sr <- stdResiduals(tab)
-            crit <- residCritical(o$alpha)
             lv <- colnames(tab)
             for (i in seq_len(nrow(tab))) {
                 vals <- list(row = rownames(tab)[i])
                 for (j in seq_along(lv)) vals[[paste0("c_", lv[j])]] <- sr[i, j]
                 t$addRow(rowKey = rownames(tab)[i], values = vals)
             }
-            t$setNote("c", sprintf("Komórki z |z| > %.2f (α = %s) decydują o zależności.", crit, format(o$alpha)))
+            t$setNote("c", "Komórki z |z| > 1,96 (α = 0,05) decydują o zależności.")
         },
 
         .fillPairwise = function(tab) {

@@ -1,0 +1,95 @@
+---
+name: zgodnosc
+title: Test zgodności
+jrs: '1.1'
+
+items:
+    - name: props
+      title: Rozkład zmiennej
+      type: Table
+      rows: 0
+      clearWith: &cw
+        - var
+        - counts
+        - ratio
+        - exp
+        - resid
+      columns:
+        - name: level
+          title: Kategoria
+          type: text
+        - name: obs
+          title: Liczność
+          type: number
+        - name: obsProp
+          title: Udział
+          type: number
+          format: pc
+        - name: expCount
+          title: Liczność
+          type: number
+          visible: (exp)
+          superTitle: Oczekiwane
+        - name: expProp
+          title: Udział
+          type: number
+          format: pc
+          visible: (exp)
+          superTitle: Oczekiwane
+        - name: resid
+          title: z
+          type: number
+          visible: (resid)
+
+    - name: tests
+      title: Test zgodności
+      type: Table
+      rows: 0
+      clearWith:
+        - var
+        - counts
+        - ratio
+        - hypothesis
+        - chiSqCorr
+        - exact
+      columns:
+        - name: test
+          title: ''
+          type: text
+        - name: stat
+          title: Wartość
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: p
+          title: p
+          type: number
+          format: zto,pvalue
+
+    - name: effsize
+      title: Wielkość efektu
+      type: Table
+      rows: 0
+      visible: (effSize)
+      clearWith: *cw
+      columns:
+        - name: measure
+          title: ''
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+        - name: interp
+          title: Interpretacja
+          type: text
+
+    - name: plot
+      title: Obserwowane vs oczekiwane
+      type: Image
+      width: 500
+      height: 400
+      renderFun: .plot
+      visible: (plot)
+      clearWith: *cw
+...

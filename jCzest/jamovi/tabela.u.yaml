@@ -47,13 +47,9 @@ children:
               - type: CheckBox
                 name: chiSq
               - type: CheckBox
+                name: fisher
+              - type: CheckBox
                 name: effSize
-          - type: Label
-            label: Istotność
-            children:
-              - type: TextBox
-                name: alpha
-                format: number
       - type: LayoutBox
         cell:
           column: 1
@@ -71,30 +67,10 @@ children:
               - type: ComboBox
                 name: plot
 
-  # --- założenia ---
-  - type: CollapseBox
-    label: Założenia
-    collapsed: true
-    stretchFactor: 1
-    children:
-      - type: LayoutBox
-        margin: large
-        children:
-          - type: CheckBox
-            name: exp
-          - type: CheckBox
-            name: fisher
-      - type: Label
-        label: ''
-        children:
-          - type: LayoutBox
-            margin: large
-            children:
-              - type: Label
-                label: Warunek stosowalności χ² sprawdzany jest automatycznie —
-                       ostrzeżenie pojawia się nad wynikami.
-
   # --- zaawansowane ---
+  # Warunek stosowalności χ² sprawdzany jest automatycznie (ostrzeżenie nad
+  # wynikami), więc nie ma osobnej sekcji „Założenia" — zostałaby w niej
+  # jedna kontrolka.
   - type: CollapseBox
     label: Zaawansowane
     collapsed: true
@@ -120,12 +96,17 @@ children:
                   - type: CheckBox
                     name: trend
               - type: Label
-                label: Które komórki decydują
+                label: Post-hoc
                 children:
                   - type: CheckBox
                     name: resid
                   - type: CheckBox
                     name: pairwise
+              - type: Label
+                label: Liczności
+                children:
+                  - type: CheckBox
+                    name: exp
               - type: Label
                 label: Zmienne porządkowe
                 children:

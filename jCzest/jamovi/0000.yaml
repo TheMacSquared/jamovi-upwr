@@ -17,6 +17,20 @@ analyses:
     menuTitle: Tabela kontyngencji
     menuSubtitle: dwie zmienne jakościowe
     category: analyses
+  - title: Test zgodności
+    name: zgodnosc
+    ns: jCzest
+    menuGroup: Częstości
+    menuTitle: Jedna zmienna
+    menuSubtitle: zgodność z oczekiwanymi proporcjami
+    category: analyses
+  - title: Próby zależne
+    name: zalezne
+    ns: jCzest
+    menuGroup: Częstości
+    menuTitle: Próby zależne
+    menuSubtitle: te same jednostki, powtórzone pomiary
+    category: analyses
 usesNative: true
 minApp: 1.0.8
 
