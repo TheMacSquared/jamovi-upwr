@@ -40,6 +40,11 @@ options:
       type: Bool
       default: true
 
+    - name: table
+      title: Tabela par
+      type: Bool
+      default: true
+
     - name: plot
       title: Wykres udziałów
       type: Bool
@@ -53,11 +58,6 @@ options:
 
     - name: corr
       title: Poprawka ciągłości
-      type: Bool
-      default: false
-
-    - name: table
-      title: Tabela par
       type: Bool
       default: false
 

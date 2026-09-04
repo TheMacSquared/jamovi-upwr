@@ -13,6 +13,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             t <- self$results$pairs
             t$addColumn(name = "row", title = "", type = "text")
             for (l in lv) t$addColumn(name = paste0("c_", l), title = l, type = "number")
+            t$addColumn(name = "total", title = "Ogółem", type = "integer")
             private$.pairsBuilt <- TRUE
             invisible(TRUE)
         },
@@ -61,8 +62,12 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 return()
             }
             private$.buildPairCols(rownames(tab))
-            private$.fillPairs(tab)
-            private$.fillMarg(stats::setNames(c(sum(tab[1, ]), sum(tab[, 1])), vars), sum(tab), rownames(tab)[1])
+            private$.fillPairs(tab, vars)
+            # przy DWOCH pomiarach udzialy sa juz brzegami tabeli par — osobna
+            # tabela powtarzalaby te same liczby, wiec zostaje tylko stan wykresu
+            self$results$marg$setVisible(FALSE)
+            private$.fillMarg(stats::setNames(c(sum(tab[1, ]), sum(tab[, 1])), vars),
+                              sum(tab), rownames(tab)[1])
 
             m <- mcnemar(tab, correct = isTRUE(o$corr))
             lab <- if (isTRUE(o$corr)) "McNemar (z poprawką ciągłości)" else "McNemar"
@@ -75,8 +80,6 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             } else {
                 t$addRow(rowKey = "mc", values = list(test = lab, stat = m$stat, df = m$df, p = m$p,
                                                       or = or$est, lower = or$lower, upper = or$upper))
-                t$setNote("disc", sprintf("Pary niezgodne: %d (%d i %d).",
-                                          m$discordant, m$b, m$c))
                 if (isTRUE(o$effSize))
                     t$setNote("or", sprintf(
                         "OR: iloraz liczby par „%s → %s” do par „%s → %s”; 1 oznacza brak zmiany.",
@@ -194,16 +197,29 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             TRUE
         },
 
-        .fillPairs = function(tab) {
+        .fillPairs = function(tab, vars) {
             if (!isTRUE(self$options$table)) return()
             t <- self$results$pairs
             lv <- colnames(tab)
+            n <- sum(tab)
+
             for (i in seq_len(nrow(tab))) {
-                vals <- list(row = rownames(tab)[i])
+                vals <- list(row = rownames(tab)[i], total = sum(tab[i, ]))
                 for (j in seq_along(lv)) vals[[paste0("c_", lv[j])]] <- tab[i, j]
                 t$addRow(rowKey = rownames(tab)[i], values = vals)
             }
-            t$setNote("p", "Wiersze — pomiar pierwszy, kolumny — drugi; przekątna to pary zgodne.")
+            vals <- list(row = "Ogółem", total = n)
+            for (j in seq_along(lv)) vals[[paste0("c_", lv[j])]] <- sum(tab[, j])
+            t$addRow(rowKey = ".total", values = vals)
+
+            # udzialy brzegowe w nocie, a nie w osobnym wierszu/kolumnie: procenty
+            # w kolumnach liczności wymuszaja format dziesietny na calej kolumnie
+            t$setNote("p", sprintf(paste0(
+                "Wiersze — %s, kolumny — %s; przekątna to pary zgodne. ",
+                "Brzegi to rozkłady pomiarów: %s %.1f%%, %s %.1f%% dla kategorii „%s”."),
+                vars[1], vars[2],
+                vars[1], 100 * sum(tab[1, ]) / n,
+                vars[2], 100 * sum(tab[, 1]) / n, lv[1]))
         }
     )
 )

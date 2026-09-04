@@ -31,6 +31,8 @@ children:
         label: Wyniki
         children:
           - type: CheckBox
+            name: table
+          - type: CheckBox
             name: effSize
           - type: CheckBox
             name: props
@@ -71,11 +73,6 @@ children:
               row: 0
             stretchFactor: 1
             children:
-              - type: Label
-                label: Liczności
-                children:
-                  - type: CheckBox
-                    name: table
               - type: Label
                 label: Przedziały ufności
                 children:
