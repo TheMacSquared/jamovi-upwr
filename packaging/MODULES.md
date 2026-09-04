@@ -64,7 +64,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 0.9.5.7 | 28.2 | 0.3.3 | ⬜ do zbudowania | ✅ 2026-09-04 (z 0.9.5.6, bez zmian) |
+| 1.0.0 | 28.2 | 0.3.3 | ⬜ do zbudowania | ✅ 2026-09-04 (z 0.9.5.6, bez zmian) |
 | 0.9.5.6 | 28.2 | 0.3.3 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5.5 | 28.2 | 0.3.3 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5 | 28.2 | 0.3.3 | ⬜ do zbudowania | ✅ 2026-09-04 |
@@ -86,7 +86,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 0.9.5.7 | 28.2 | 0.3.0 | ⬜ do zbudowania | ✅ 2026-09-04 (z 0.9.5.6, bez zmian) |
+| 1.0.0 | 28.2 | 0.3.0 | ⬜ do zbudowania | ✅ 2026-09-04 (z 0.9.5.6, bez zmian) |
 | 0.9.5.6 | 28.2 | 0.3.0 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5.5 | 28.2 | 0.2.2 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5 | 28.2 | 0.2.2 | ⬜ do zbudowania | ✅ 2026-09-04 |
@@ -106,7 +106,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 0.9.5.7 | 28.2 | 0.1.0 | ⬜ do zbudowania | ✅ 2026-09-04 (z 0.9.5.6, bez zmian) |
+| 1.0.0 | 28.2 | 0.1.0 | ⬜ do zbudowania | ✅ 2026-09-04 (z 0.9.5.6, bez zmian) |
 | 0.9.5.6 | 28.2 | 0.1.0 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5.5 | 28.2 | 0.1.0 | ⬜ do zbudowania | ✅ 2026-09-04 |
 | 0.9.5 | 28.2 | 0.1.0 | ⬜ do zbudowania | ✅ 2026-09-04 |

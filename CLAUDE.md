@@ -302,6 +302,10 @@ Kolejność prac:
    w różnicy średnich), `dInterval` przeniesiony z jTestyT, opcja
    `effSize` (d Cohena z przedziałem niecentralnego t) w różnicy średnich
    i parach. Stare .omv z jTestyT ≤ 0.3.0 tracą kolumny CI.
+WYDANIE 1.0.0 (2026-09-04): numer nadany zamiast 0.9.5.7 (ten sam dzień, bez
+dystrybucji natywnej); wszystkie moduły mapy drogowej gotowe; do zrobienia na
+maszynach docelowych: build Windows (build.ps1) i macOS (skrypty packaging),
+przebudowa .jmo modułów opcjonalnych oznaczonych w MODULES.md „do zbudowania".
 Poza zakresem 1.0.0: opisy metod dla wykresów scatr (świadomie nie),
 regresja wielomianowa/porządkowa, jRol oraz moduły opcjonalne (jRISK,
 jSpace) — te dostają opisy później, w miarę potrzeby.

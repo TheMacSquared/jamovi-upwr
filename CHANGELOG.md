@@ -3,7 +3,11 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
-## 0.9.5.7 — 2026-09-04
+## 1.0.0 — 2026-09-04
+Pierwsze wydanie „pełne": każde menu kursu podstawowego (Eksploracja, Przedziały
+ufności, Testy t, ANOVA, Regresja, Częstości, Testy permutacyjne) ma analizy
+jUPWR z panelem rdzeń → Zaawansowane i opisem zastosowanych metod. Numer 0.9.5.7
+nadany tego samego dnia nie trafił do dystrybucji — jego zmiany są poniżej.
 - „Opis zastosowanych metod": każda analiza jUPWR ma na końcu wyników
   opcjonalny (domyślnie wyłączony) blok z tym, co policzono, z jakimi
   parametrami i jak przedstawiono (kierunek różnicy, poziom odniesienia,
