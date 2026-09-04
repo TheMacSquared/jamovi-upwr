@@ -293,3 +293,29 @@ pickLevel <- function(column, level) {
     if (is.factor(column)) return(levels(column)[1])
     v <- sort(unique(column[!is.na(column)])); if (length(v) == 0) NULL else as.character(v[1])
 }
+
+# ---------------------------------------------------------------------------
+# Cohen's d with a noncentral-t confidence interval (moved from jTestyT,
+# roadmap 1.0.0 item 5: effect-size intervals belong to estimation)
+# ---------------------------------------------------------------------------
+
+dInterval <- function(d, n1, n2 = NULL, level = 0.95) {
+    if (is.null(n2)) { t <- d * sqrt(n1); df <- n1 - 1; scale <- 1 / sqrt(n1) }
+    else { t <- d * sqrt(n1 * n2 / (n1 + n2)); df <- n1 + n2 - 2; scale <- sqrt((n1 + n2) / (n1 * n2)) }
+    if (!is.finite(t) || df < 1) return(c(NA_real_, NA_real_))
+    a <- (1 - level) / 2
+    f <- function(nc, prob) suppressWarnings(stats::pt(t, df, ncp = nc)) - prob
+    span <- abs(t) + 10
+    lo <- tryCatch(stats::uniroot(f, c(t - span, t + span), prob = 1 - a)$root, error = function(e) NA_real_)
+    hi <- tryCatch(stats::uniroot(f, c(t - span, t + span), prob = a)$root, error = function(e) NA_real_)
+    c(lo * scale, hi * scale)
+}
+
+#' Student (pooled-variance) interval for a difference of two independent means
+ciTwoMeansStudent <- function(x1, x2, level = 0.95) {
+    n1 <- length(x1); n2 <- length(x2)
+    sp2 <- ((n1 - 1) * stats::var(x1) + (n2 - 1) * stats::var(x2)) / (n1 + n2 - 2)
+    est <- mean(x1) - mean(x2); se <- sqrt(sp2 * (1 / n1 + 1 / n2)); df <- n1 + n2 - 2
+    tc <- stats::qt(1 - (1 - level) / 2, df = df)
+    list(est = est, se = se, lower = est - tc * se, upper = est + tc * se, df = df, sp = sqrt(sp2))
+}

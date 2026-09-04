@@ -57,10 +57,6 @@ children:
           - type: Label
             label: Dodatkowe statystyki
             children:
-              - type: TextBox
-                name: ciWidth
-                format: number
-                suffix: '%'
               - type: CheckBox
                 name: desc
           - type: Label

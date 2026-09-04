@@ -15,6 +15,7 @@ items:
         - level2
         - ciWidth
         - ciMethod
+        - effSize
         - nBoot
         - seed
       columns:
@@ -41,6 +42,20 @@ items:
           title: Górna
           type: number
           superTitle: Przedział ufności
+        - name: d
+          title: d Cohena
+          type: number
+          visible: (effSize)
+        - name: dLower
+          title: Dolna
+          type: number
+          superTitle: Przedział ufności d
+          visible: (effSize)
+        - name: dUpper
+          title: Górna
+          type: number
+          superTitle: Przedział ufności d
+          visible: (effSize)
 
     - name: plot
       title: ''

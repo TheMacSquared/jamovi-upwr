@@ -12,7 +12,6 @@ items:
         - pairs
         - hypothesis
         - nonpar
-        - ciWidth
       columns:
         - name: var
           title: ''
@@ -34,25 +33,9 @@ items:
         - name: est
           title: Średnia różnica
           type: number
-        - name: lower
-          title: Dolna
-          type: number
-          superTitle: Przedział ufności
-        - name: upper
-          title: Górna
-          type: number
-          superTitle: Przedział ufności
         - name: es
           title: Wielkość efektu
           type: number
-        - name: esLower
-          title: Dolna
-          type: number
-          superTitle: CI efektu
-        - name: esUpper
-          title: Górna
-          type: number
-          superTitle: CI efektu
 
     - name: desc
       title: Statystyki opisowe
@@ -112,7 +95,6 @@ items:
       visible: (plot)
       clearWith:
         - pairs
-        - ciWidth
       template:
         title: ''
         type: Image

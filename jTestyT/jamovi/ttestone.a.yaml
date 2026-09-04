@@ -47,16 +47,9 @@ options:
       default: false
 
     - name: plot
-      title: Wykres średniej z przedziałem ufności
+      title: Wykres pudełkowy z punktami
       type: Bool
       default: true
-
-    - name: ciWidth
-      title: Poziom ufności
-      type: Number
-      min: 50
-      max: 99.9
-      default: 95
 
     - name: desc
       title: Statystyki opisowe

@@ -3,8 +3,6 @@ test_that("t tests match stats::t.test and d intervals are sane", {
     one <- oneSampleT(x, 0)
     ref <- t.test(x)
     expect_equal(one$stat, unname(ref$statistic)); expect_equal(one$p, ref$p.value)
-    expect_equal(c(one$lower, one$upper), as.numeric(ref$conf.int))
-    expect_true(one$esLower < one$es && one$es < one$esUpper)
     g <- factor(rep(c("a", "b"), each = 10)); yy <- c(x, y)
     two <- twoSampleT(yy, g, welch = TRUE)
     ref2 <- t.test(x, y)
@@ -17,9 +15,9 @@ test_that("t tests match stats::t.test and d intervals are sane", {
     expect_equal(mw$es, 1 - 2 * unname(wilcox.test(x, y, exact = FALSE)$statistic) / 100)
 })
 
-test_that("one-sided hypotheses and d intervals", {
+test_that("one-sided hypotheses; d is a point value (intervals live in jCI)", {
     x <- c(1.2, 0.8, 2.1, 1.7, 0.3, 1.1, 2.4, 0.9)
     expect_equal(oneSampleT(x, 0, "greater")$p, t.test(x, alternative = "greater")$p.value)
-    d <- dInterval(0.5, 20, 20); expect_true(d[1] < 0.5 && d[2] > 0.5)
-    d0 <- dInterval(0, 30); expect_equal(mean(d0), 0, tolerance = 1e-3)
+    expect_equal(oneSampleT(x, 1)$es, (mean(x) - 1) / sd(x))
+    expect_false(exists("dInterval", mode = "function"))
 })

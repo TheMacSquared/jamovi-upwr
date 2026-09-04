@@ -84,3 +84,18 @@ test_that("didactic bootstrap analysis lists samples and converges", {
     expect_true(grepl("ręczny", b$metody$content) && grepl("Zbieżność", b$metody$content))
     expect_false(jCI:::cibootstrap(data = d, dep = "x")$metody$visible)
 })
+
+test_that("effect size with noncentral-t interval and the Student interval (moved from jTestyT)", {
+    g <- data.frame(y = c(2, 3, 5, 7, 8, 10, 20, 21), grp = factor(c("A", "A", "A", "B", "B", "B", "C", "C")))
+    res <- jCI:::citwomeans(data = g, dep = "y", group = "grp", level1 = "A", level2 = "B", ciMethod = "student", effSize = TRUE, plot = FALSE, metody = TRUE)
+    t <- res$table$asDF; ref <- t.test(g$y[g$grp == "A"], g$y[g$grp == "B"], var.equal = TRUE)
+    expect_equal(c(t$lower, t$upper), as.numeric(ref$conf.int))
+    x1 <- g$y[g$grp == "A"]; x2 <- g$y[g$grp == "B"]; sp <- sqrt((var(x1) + var(x2)) / 2)
+    expect_equal(t$d, (mean(x1) - mean(x2)) / sp)
+    expect_true(t$dLower < t$d && t$d < t$dUpper)
+    expect_true(grepl("wspólną wariancją", res$metody$content) && grepl("niecentralnego t", res$metody$content))
+    w <- data.frame(a = c(10, 12, 9, 15, 11, 14), b = c(8, 11, 7, 12, 10, 12))
+    pr <- jCI:::cipairedmeans(data = w, var1 = "a", var2 = "b", effSize = TRUE, plot = FALSE)$table$asDF
+    dd <- w$a - w$b; expect_equal(pr$d, mean(dd) / sd(dd)); expect_true(pr$dLower < pr$d && pr$d < pr$dUpper)
+    expect_false(jCI:::cipairedmeans(data = w, var1 = "a", var2 = "b", plot = FALSE)$table$getColumn("dLower")$visible)
+})

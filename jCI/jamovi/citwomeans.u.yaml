@@ -44,6 +44,11 @@ children:
               - type: ComboBox
                 name: ciMethod
           - type: Label
+            label: Wielkość efektu
+            children:
+              - type: CheckBox
+                name: effSize
+          - type: Label
             label: Grupy (gdy więcej niż 2 poziomy)
             children:
               - type: LevelSelector

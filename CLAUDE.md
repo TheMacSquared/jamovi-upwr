@@ -288,6 +288,20 @@ Kolejność prac:
    1.0.0 w części „moduły" wykonana; do wydania 1.0.0 zostaje bump wersji
    jUPWR, CHANGELOG, MODULES.md, .jmo modułów opcjonalnych i buildy
    natywne.
+5. Podział obowiązków jCI ↔ jTestyT (decyzja 2026-09-04, wariant A —
+   ścisły): jTestyT = tylko testowanie (statystyka, df, p, różnica i d
+   Cohena jako punkty, bez przedziałów, bez opcji poziomu ufności, wykres
+   tylko pudełkowy); jCI = estymacja (przedziały klasyczne i bootstrap,
+   Gardner-Altman, d Cohena z przedziałem niecentralnego t w różnicy
+   średnich i parach, wybór Student/Welch). Opis metod jTestyT odsyła do
+   jCI. Wersje: jTestyT 0.4.0, jCI 0.3.0. ZROBIONE: w jTestyT usunięte
+   `ciWidth`, `plotType`, kolumny CI różnicy i d, `estimationPlot`
+   i `dInterval`; wykres = `boxPlotTests` (pudełka + punkty + średnia,
+   linia odniesienia dla wartości testowej / zera; w parach trzecie
+   pudełko różnic). W jCI: `ciTwoMeansStudent` (metoda `student`
+   w różnicy średnich), `dInterval` przeniesiony z jTestyT, opcja
+   `effSize` (d Cohena z przedziałem niecentralnego t) w różnicy średnich
+   i parach. Stare .omv z jTestyT ≤ 0.3.0 tracą kolumny CI.
 Poza zakresem 1.0.0: opisy metod dla wykresów scatr (świadomie nie),
 regresja wielomianowa/porządkowa, jRol oraz moduły opcjonalne (jRISK,
 jSpace) — te dostają opisy później, w miarę potrzeby.

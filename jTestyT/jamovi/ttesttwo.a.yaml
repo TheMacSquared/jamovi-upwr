@@ -56,26 +56,9 @@ options:
       default: false
 
     - name: plot
-      title: Wykres grup i różnicy
+      title: Wykres pudełkowy z punktami
       type: Bool
       default: true
-
-    - name: plotType
-      title: Rodzaj wykresu
-      type: List
-      options:
-        - title: Estymacyjny (Gardner-Altman)
-          name: est
-        - title: Pudełkowy z punktami
-          name: box
-      default: est
-
-    - name: ciWidth
-      title: Poziom ufności
-      type: Number
-      min: 50
-      max: 99.9
-      default: 95
 
     - name: desc
       title: Statystyki opisowe

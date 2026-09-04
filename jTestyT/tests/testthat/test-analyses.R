@@ -37,9 +37,9 @@ test_that("opis metod: ukryty domyslnie, po wlaczeniu opisuje testy i wykres bez
     expect_true(res$metody$visible)
     expect_true(grepl("„1” i „2”", h))
     expect_true(grepl("t Welcha", h) && grepl("Manna-Whitneya", h) && grepl("Levene", h))
-    expect_true(grepl("Gardner-Altman", h) && grepl("t Welcha\\)", h))
+    expect_true(grepl("Pudełkowy", h) && grepl("Przedziały ufności", h))
     expect_lt(regexpr("<b>Dane</b>", h), regexpr("<b>Testy</b>", h))
-    expect_lt(regexpr("<b>Założenia</b>", h), regexpr("<b>Wykres</b>", h))
+    expect_lt(regexpr("<b>Założenia</b>", h), regexpr("<b>Wykres</b>", h)); expect_false(any(c("lower", "esLower") %in% names(res$ttest$asDF)))
     expect_false(grepl(sprintf("%.3f", res$ttest$asDF$stat[1]), h))
     # nota pod tabela zostala jednozdaniowa
     expect_true(grepl("Różnica = 1 − 2\\.", paste(capture.output(print(res$ttest)), collapse = "\n")))

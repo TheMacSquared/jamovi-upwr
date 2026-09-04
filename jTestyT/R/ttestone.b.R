@@ -12,7 +12,7 @@ ttestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         .run = function() {
             o <- self$options
             if (length(o$vars) == 0) return()
-            level <- o$ciWidth / 100; mu <- o$testValue
+            mu <- o$testValue
             tt <- self$results$ttest
             m <- jmvcore::metodyNew()
             m$add("Dane", "Zmienne: %s; wartość testowa μ₀ = %g; braki pomijane osobno dla każdej zmiennej.",
@@ -23,19 +23,17 @@ ttestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             for (v in o$vars) {
                 x <- jmvcore::toNumeric(self$data[[v]]); x <- x[!is.na(x)]
                 if (length(x) < 2) { tt$setNote(paste0("n", v), sprintf("%s: za mało obserwacji.", v)); next }
-                if (isTRUE(o$student)) addTestRow(tt, paste(v, "t"), v, oneSampleT(x, mu, o$hypothesis, level))
-                if (isTRUE(o$nonpar)) addTestRow(tt, paste(v, "w"), v, wilcoxOne(x, mu, o$hypothesis, level))
+                if (isTRUE(o$student)) addTestRow(tt, paste(v, "t"), v, oneSampleT(x, mu, o$hypothesis))
+                if (isTRUE(o$nonpar)) addTestRow(tt, paste(v, "w"), v, wilcoxOne(x, mu, o$hypothesis))
                 if (isTRUE(o$desc)) self$results$desc$addRow(rowKey = v, values = c(list(var = v, group = ""), descRow(x)))
                 if (isTRUE(o$norm)) self$results$norm$addRow(rowKey = v, values = c(list(var = v, group = ""), shapiroRow(x)))
-                m <- stats::t.test(x, conf.level = level)
-                self$results$plots$get(key = v)$setState(list(kind = "one", groups = stats::setNames(list(x), v),
-                    means = stats::setNames(list(list(mean = mean(x), lower = m$conf.int[1], upper = m$conf.int[2])), v),
-                    refLine = mu, level = level, ylab = v))
+                self$results$plots$get(key = v)$setState(list(groups = stats::setNames(list(x), v), refLine = mu,
+                    refLabel = sprintf("wartość testowa %g", mu), ylab = v))
                 self$results$qq$get(key = v)$setState(list(x = x, label = v))
             }
             tt$setNote("h", sprintf("Różnica = średnia − %g.", mu))
         },
-        .plot = function(image, ggtheme, theme, ...) estimationPlot(image, ggtheme, theme),
+        .plot = function(image, ggtheme, theme, ...) boxPlotTests(image, ggtheme, theme),
         .qq = function(image, ggtheme, theme, ...) qqPlotResid(image, ggtheme, theme)
     )
 )

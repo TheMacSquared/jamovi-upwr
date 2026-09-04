@@ -43,6 +43,11 @@ children:
                 format: number
               - type: ComboBox
                 name: ciMethod
+          - type: Label
+            label: Wielkość efektu
+            children:
+              - type: CheckBox
+                name: effSize
       - type: LayoutBox
         cell:
           column: 1

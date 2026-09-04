@@ -52,6 +52,11 @@ options:
       type: Bool
       default: true
 
+    - name: effSize
+      title: d Cohena z przedziałem ufności
+      type: Bool
+      default: false
+
     # --- zaawansowane: bootstrap ---
     - name: nBoot
       title: Liczba losowań B

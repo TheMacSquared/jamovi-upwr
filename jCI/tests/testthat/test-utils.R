@@ -56,3 +56,11 @@ test_that("bootstrap wrapper: reproducible with a seed, percentile limits are qu
     r2 <- bootCI(d, function(dd, i) coef(lm(y ~ x, data = dd[i, ])), 300, 5, "perc", 0.95)
     expect_length(r2, 2); expect_equal(r2[[2]]$est, unname(coef(lm(y ~ x, d))[2]))
 })
+
+test_that("dInterval brackets d and narrows with n; Student interval equals t.test(var.equal = TRUE)", {
+    ci1 <- dInterval(0.5, 20, 20); ci2 <- dInterval(0.5, 200, 200)
+    expect_true(ci1[1] < 0.5 && 0.5 < ci1[2]); expect_lt(diff(ci2), diff(ci1))
+    set.seed(9); x1 <- rnorm(15); x2 <- rnorm(12, 1)
+    st <- ciTwoMeansStudent(x1, x2); ref <- t.test(x1, x2, var.equal = TRUE)
+    expect_equal(c(st$lower, st$upper), as.numeric(ref$conf.int)); expect_equal(st$df, 25)
+})

@@ -52,6 +52,8 @@ options:
       options:
         - title: Welcha (t, nierówne wariancje)
           name: welch
+        - title: t-Studenta (wspólna wariancja)
+          name: student
         - title: Bootstrap percentylowy
           name: perc
         - title: Bootstrap BCa
@@ -62,6 +64,11 @@ options:
       title: Wykres
       type: Bool
       default: true
+
+    - name: effSize
+      title: d Cohena z przedziałem ufności
+      type: Bool
+      default: false
 
     # --- zaawansowane: bootstrap ---
     - name: nBoot

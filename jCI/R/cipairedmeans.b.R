@@ -16,6 +16,7 @@ cipairedmeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
                   o$var1, o$var2, o$var1, o$var2, n)
             metodyPrzedzial(m, o, method, "Przedział t-Studenta dla średniej różnic: średnia ± t(df = n − 1) · SD różnic/√n",
                             "losowanie n par (różnic) ze zwracaniem, statystyka = średnia różnic")
+            m$addIf(o$effSize, "Wielkość efektu", "d Cohena = średnia różnic / SD różnic; przedział ufności %g%% z rozkładu niecentralnego t.", o$ciWidth)
             m$addIf(o$plot, "Wykres", "Punkty = różnice w parach, romb = średnia różnic z przedziałem, linia przerywana = 0 (brak zmiany).")
             m$addIf(o$bootPlot && isBoot(method), "Wykres", "Histogram replikacji bootstrapowych średniej różnic.")
             m$render(self$results$metody)
@@ -26,7 +27,9 @@ cipairedmeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
                 self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = "Średnia różnic"))
                 clab <- NULL
             } else { r <- ciMeanT(d, level); clab <- sprintf("t-Studenta, df = %d", n - 1) }
-            t$setRow(rowNo = 1, values = list(var1 = o$var1, var2 = o$var2, n = n, estimate = r$est, se = r$se, lower = r$lower, upper = r$upper))
+            dC <- mean(d) / stats::sd(d); dci <- if (isTRUE(o$effSize)) dInterval(dC, n, level = level) else c(NA_real_, NA_real_)
+            t$setRow(rowNo = 1, values = list(var1 = o$var1, var2 = o$var2, n = n, estimate = r$est, se = r$se, lower = r$lower, upper = r$upper,
+                d = dC, dLower = dci[1], dUpper = dci[2]))
             ciNote(t, o, method, clab, fallback)
             lab <- paste(o$var1, "−", o$var2)
             self$results$plot$setState(list(label = lab, groups = stats::setNames(list(list(x = d, estimate = r$est, lower = r$lower, upper = r$upper)), lab),

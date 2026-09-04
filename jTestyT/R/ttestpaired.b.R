@@ -18,7 +18,6 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             o <- self$options
             pairs <- Filter(function(p) !is.null(p$i1) && !is.null(p$i2), o$pairs)
             if (length(pairs) == 0) return()
-            level <- o$ciWidth / 100
             tt <- self$results$ttest
             m <- jmvcore::metodyNew()
             m$add("Dane", "Pary: %s; różnica = pierwsza − druga zmienna; tylko pary bez braków.",
@@ -31,25 +30,21 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                 a <- jmvcore::toNumeric(self$data[[p$i1]]); b <- jmvcore::toNumeric(self$data[[p$i2]])
                 ok <- !is.na(a) & !is.na(b); a <- a[ok]; b <- b[ok]; dif <- a - b
                 if (length(dif) < 2) { tt$setNote(paste0("n", k), sprintf("%s: za mało par.", k)); next }
-                if (isTRUE(o$student)) { r <- oneSampleT(dif, 0, o$hypothesis, level); r$test <- "t Studenta (pary)"; addTestRow(tt, paste(k, "t"), k, r) }
-                if (isTRUE(o$nonpar)) addTestRow(tt, paste(k, "w"), k, wilcoxOne(dif, 0, o$hypothesis, level))
+                if (isTRUE(o$student)) { r <- oneSampleT(dif, 0, o$hypothesis); r$test <- "t Studenta (pary)"; addTestRow(tt, paste(k, "t"), k, r) }
+                if (isTRUE(o$nonpar)) addTestRow(tt, paste(k, "w"), k, wilcoxOne(dif, 0, o$hypothesis))
                 if (isTRUE(o$desc)) {
                     self$results$desc$addRow(rowKey = paste(k, 1), values = c(list(var = k, group = p$i1), descRow(a)))
                     self$results$desc$addRow(rowKey = paste(k, 2), values = c(list(var = k, group = p$i2), descRow(b)))
                     self$results$desc$addRow(rowKey = paste(k, 3), values = c(list(var = k, group = "różnica"), descRow(dif)))
                 }
                 if (isTRUE(o$norm)) self$results$norm$addRow(rowKey = k, values = c(list(var = k, group = "różnice"), shapiroRow(dif)))
-                t1 <- stats::t.test(a, conf.level = level); t2 <- stats::t.test(b, conf.level = level); td <- stats::t.test(dif, conf.level = level)
-                self$results$plots$get(key = k)$setState(list(kind = "paired", groups = stats::setNames(list(a, b), c(p$i1, p$i2)),
-                    means = stats::setNames(list(list(mean = mean(a), lower = t1$conf.int[1], upper = t1$conf.int[2]),
-                        list(mean = mean(b), lower = t2$conf.int[1], upper = t2$conf.int[2])), c(p$i1, p$i2)),
-                    est = mean(dif), lower = td$conf.int[1], upper = td$conf.int[2], diffs = dif, level = level,
-                    ylab = "Wartość"))
+                self$results$plots$get(key = k)$setState(list(groups = stats::setNames(list(a, b, dif), c(p$i1, p$i2, "Różnica")),
+                    refLine = 0, refLabel = "0 (brak różnicy)", ylab = "Wartość"))
                 self$results$qq$get(key = k)$setState(list(x = dif, label = k))
             }
             tt$setNote("h", "Różnica = pierwsza − druga zmienna.")
         },
-        .plot = function(image, ggtheme, theme, ...) estimationPlot(image, ggtheme, theme),
+        .plot = function(image, ggtheme, theme, ...) boxPlotTests(image, ggtheme, theme),
         .qq = function(image, ggtheme, theme, ...) qqPlotResid(image, ggtheme, theme)
     )
 )

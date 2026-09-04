@@ -14,7 +14,6 @@ items:
         - hypothesis
         - welch
         - nonpar
-        - ciWidth
       columns:
         - name: var
           title: ''
@@ -36,25 +35,9 @@ items:
         - name: est
           title: Różnica średnich
           type: number
-        - name: lower
-          title: Dolna
-          type: number
-          superTitle: Przedział ufności
-        - name: upper
-          title: Górna
-          type: number
-          superTitle: Przedział ufności
         - name: es
           title: Wielkość efektu
           type: number
-        - name: esLower
-          title: Dolna
-          type: number
-          superTitle: CI efektu
-        - name: esUpper
-          title: Górna
-          type: number
-          superTitle: CI efektu
 
     - name: desc
       title: Statystyki opisowe
@@ -139,8 +122,6 @@ items:
       clearWith:
         - vars
         - group
-        - ciWidth
-        - plotType
       template:
         title: ''
         type: Image
