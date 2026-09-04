@@ -68,17 +68,40 @@ children:
                 template:
                     type: Label
 
+  # --- rdzeń: nazwy sekcji mówią, co jest w środku (wzór: tabela kontyngencji);
+  # test dobiera się sam (2 kategorie → dwumianowy, więcej → χ²), więc nie ma
+  # checkboxa testu
   - type: LayoutBox
     margin: large
     stretchFactor: 1
     children:
-      - type: Label
-        label: Wyniki
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
         children:
-          - type: CheckBox
-            name: effSize
-          - type: CheckBox
-            name: plot
+          - type: Label
+            label: Wielkość efektu
+            children:
+              - type: CheckBox
+                name: effSize
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wykres
+            children:
+              - type: CheckBox
+                name: plot
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
 
   # --- zaawansowane ---
   - type: CollapseBox

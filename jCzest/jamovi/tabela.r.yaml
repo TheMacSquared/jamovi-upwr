@@ -184,4 +184,9 @@ items:
         - counts
         - plot
         - pc
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
 ...

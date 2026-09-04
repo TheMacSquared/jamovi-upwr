@@ -92,4 +92,9 @@ items:
       renderFun: .plot
       visible: (plot)
       clearWith: *cw
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
 ...

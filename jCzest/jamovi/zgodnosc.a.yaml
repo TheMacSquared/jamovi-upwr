@@ -45,7 +45,7 @@ options:
       default: true
 
     - name: plot
-      title: Wykres obserwowane vs oczekiwane
+      title: Obserwowane i oczekiwane
       type: Bool
       default: false
 
@@ -79,6 +79,12 @@ options:
 
     - name: exact
       title: Dokładny test wielomianowy (małe N)
+      type: Bool
+      default: false
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
       type: Bool
       default: false
 ...

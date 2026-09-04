@@ -43,12 +43,31 @@ test_that("ostrzezenie o liczebnosciach oczekiwanych pojawia sie tylko gdy trzeb
 
 test_that("dane zagregowane i miary 2x2 z nota o kierunku", {
     res <- jCzest:::tabela(data = zagregowane, rows = "w", cols = "k", counts = "n",
-                           odds = TRUE, relRisk = TRUE, diffProp = TRUE)
+                           odds = TRUE, relRisk = TRUE, diffProp = TRUE, metody = TRUE)
     m <- res$measures$asDF
     expect_equal(nrow(m), 3)
     # poziomy sortowane alfabetycznie: kolumny to (nie, tak)
     expect_equal(m$value[1], (10 * 15) / (30 * 25))
-    expect_true(grepl("odwraca OR", paste(capture.output(print(res)), collapse = "\n")))
+    # kierunek OR opisuje opis metod, nie nota pod tabela
+    expect_false(grepl("odwraca OR", paste(capture.output(print(res$measures)), collapse = "\n")))
+    expect_true(grepl("odwraca OR", res$metody$content))
+    expect_true(grepl("„A” względem „B”", res$metody$content))
+})
+
+test_that("opis metod: ukryty domyslnie, widoczny po wlaczeniu, sekcje w stalej kolejnosci", {
+    res <- jCzest:::tabela(data = duze, rows = "plec", cols = "wybor")
+    expect_false(res$metody$visible)
+    res <- jCzest:::tabela(data = duze, rows = "plec", cols = "wybor", metody = TRUE,
+                           resid = TRUE, plot = "bar")
+    expect_true(res$metody$visible)
+    h <- res$metody$content
+    expect_true(grepl("Wiersze: „plec”, kolumny: „wybor”", h))
+    expect_true(grepl("Procenty liczone wierszami", h))
+    expect_true(grepl("spełniony", h))
+    expect_lt(regexpr("<b>Dane</b>", h), regexpr("<b>Testy</b>", h))
+    expect_lt(regexpr("<b>Post-hoc</b>", h), regexpr("<b>Wykres</b>", h))
+    # tresc nie zawiera wynikow liczbowych testu
+    expect_false(grepl(sprintf("%.3f", res$tests$asDF$stat[1]), h))
 })
 
 test_that("opcje zaawansowane licza sie i nie przerywaja analizy", {

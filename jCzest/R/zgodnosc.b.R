@@ -4,6 +4,9 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
     inherit = zgodnoscBase,
     private = list(
 
+        # opis zastosowanych metod (jmvcore::metodyNew, wspólny mechanizm jUPWR) — zbierany po drodze, renderowany na końcu .run
+        .metody = NULL,
+
         .counts = function() {
             o <- self$options
             x <- self$data[[o$var]]
@@ -33,13 +36,30 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 return()
             }
 
+            private$.metody <- jmvcore::metodyNew()
+            private$.describeData(obs, e)
             private$.fillProps(obs, e)
             private$.assumptionNotice(obs, e)
             private$.fillTests(obs, e)
             private$.fillEffSize(obs, e)
 
-            if (isTRUE(o$plot))
+            if (isTRUE(o$plot)) {
                 self$results$plot$setState(list(obs = obs, e = e, var = o$var))
+                private$.metody$add("Wykres", "Słupki obserwowane obok oczekiwanych dla każdej kategorii (liczności).")
+            }
+            private$.metody$render(self$results$metody)
+        },
+
+        .describeData = function(obs, e) {
+            o <- self$options
+            m <- private$.metody
+            n <- sum(obs)
+            m$add("Dane", "Zmienna „%s”, %d kategorii w kolejności poziomów; N = %s (braki pominięte).",
+                  o$var, length(obs), format(n, big.mark = " "))
+            m$addIf(optNonEmpty(o$counts), "Dane",
+                    "Dane zagregowane: liczności z kolumny „%s”.", o$counts)
+            m$add("Dane", "Proporcje oczekiwane (wagi z panelu znormalizowane do 1): %s.",
+                  paste(sprintf("„%s” %.3f", jmvcore::htmlEscape(names(obs)), e / n), collapse = ", "))
         },
 
         .fillProps = function(obs, e) {
@@ -53,13 +73,19 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     expCount = e[[i]], expProp = e[[i]] / n,
                     resid = res[[i]]))
             if (isTRUE(self$options$resid))
-                t$setNote("z", "Kategorie z |z| > 1,96 (α = 0,05) odstają od oczekiwań.")
+                private$.metody$add("Post-hoc", paste(
+                    "Skorygowane reszty standaryzowane: (O − E) / √(E (1 − p)), w przybliżeniu N(0, 1);",
+                    "|z| &gt; 1.96 (α = 0.05) wskazuje kategorie odstające od oczekiwań."))
         },
 
         # ten sam warunek co przy teście niezależności — przybliżenie χ² wymaga E >= 5
         .assumptionNotice = function(obs, e) {
             if (length(obs) == 2) return()   # dla 2 kategorii liczymy test dokładny
             a <- checkAssumptionE(e)
+            private$.metody$add("Testy", paste(
+                "Warunek stosowalności χ² sprawdzany automatycznie: wszystkie E ≥ 1",
+                "i najwyżej 20%% kategorii z E &lt; 5 (Cochran) — tu %s."),
+                if (isTRUE(a$ok)) "spełniony" else "niespełniony (ostrzeżenie nad wynikami)")
             if (isTRUE(a$ok)) return()
             msg <- sprintf(paste(
                 "%d z %d kategorii (%.0f%%) ma liczebność oczekiwaną < 5,",
@@ -76,6 +102,7 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             o <- self$options
             t <- self$results$tests
             k <- length(obs); n <- sum(obs)
+            m <- private$.metody
 
             if (k == 2) {
                 # dwie kategorie: test dwumianowy jest DOKŁADNY, więc jest domyślny
@@ -83,20 +110,27 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 b <- binomGof(obs, p0, o$hypothesis)
                 t$addRow(rowKey = "bin", values = list(
                     test = "Test dwumianowy (dokładny)", stat = obs[[1]], df = NA_integer_, p = b$p))
-                t$setNote("b", sprintf(
-                    "Liczba obserwacji w kategorii „%s” wobec oczekiwanej proporcji %.3f; N = %d.",
-                    names(obs)[1], p0, as.integer(n)))
+                # ktora kategoria jest testowana i wobec jakiego p0 — bez tego
+                # wartosc statystyki (licznosc) nie ma odniesienia
+                m$add("Testy", paste(
+                    "Dwie kategorie → dokładny test dwumianowy: statystyka = liczba obserwacji",
+                    "w kategorii „%s” (pierwszej) wobec p₀ = %.3f; hipoteza alternatywna: %s."),
+                    names(obs)[1], p0,
+                    switch(o$hypothesis, greater = "udział większy niż p₀",
+                           less = "udział mniejszy niż p₀", "udział różny od p₀ (dwustronna)"))
                 if (isTRUE(o$chiSqCorr)) {
                     ct <- suppressWarnings(stats::chisq.test(as.vector(obs), p = e / n, correct = TRUE))
                     t$addRow(rowKey = "cc", values = list(
                         test = "χ² z poprawką ciągłości", stat = unname(ct$statistic),
                         df = unname(ct$parameter), p = unname(ct$p.value)))
+                    m$add("Testy", "χ² zgodności z poprawką ciągłości Yatesa, df = 1.")
                 }
             } else {
                 r <- chiSqGof(obs, e)
                 t$addRow(rowKey = "chi", values = list(
                     test = "χ² zgodności", stat = r$stat, df = r$df, p = r$p))
                 t$setNote("N", sprintf("N = %s.", format(n, big.mark = " ")))
+                m$add("Testy", "%d kategorii → χ² zgodności Pearsona, df = k − 1 = %d.", k, r$df)
                 if (isTRUE(o$chiSqCorr))
                     t$setNote("cc", "Poprawka ciągłości dotyczy wyłącznie dwóch kategorii.")
             }
@@ -105,9 +139,14 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 me <- multinomExact(obs, e)
                 if (is.null(me))
                     t$setNote("ex", "Dokładny test wielomianowy jest wykonalny tylko dla małych N i niewielu kategorii.")
-                else
+                else {
                     t$addRow(rowKey = "mx", values = list(
                         test = "Dokładny test wielomianowy", stat = NA_real_, df = NA_integer_, p = me$p))
+                    m$add("Testy", paste(
+                        "Dokładny test wielomianowy: p = suma prawdopodobieństw wszystkich układów",
+                        "liczności nie bardziej prawdopodobnych niż obserwowany (%s układów)."),
+                        format(me$nStates, big.mark = " "))
+                }
             }
         },
 
@@ -118,7 +157,8 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             interp <- if (!is.finite(w)) "" else if (w < 0.1) "poniżej słabego"
                       else if (w < 0.3) "słaby" else if (w < 0.5) "umiarkowany" else "silny"
             t$addRow(rowKey = "w", values = list(measure = "w Cohena", value = w, interp = interp))
-            t$setNote("th", "Progi Cohena: słaby 0,10, umiarkowany 0,30, silny 0,50.")
+            private$.metody$add("Wielkość efektu",
+                "w Cohena = √(χ² / N); interpretacja wg progów Cohena: słaby 0.10, umiarkowany 0.30, silny 0.50.")
         },
 
         .plot = function(image, ...) {

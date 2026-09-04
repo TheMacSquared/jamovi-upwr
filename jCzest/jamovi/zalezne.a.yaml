@@ -46,7 +46,7 @@ options:
       default: true
 
     - name: plot
-      title: Wykres udziałów
+      title: Udziały w pomiarach (słupki)
       type: Bool
       default: false
 
@@ -72,4 +72,10 @@ options:
       min: 50
       max: 99.9
       default: 95
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
 ...

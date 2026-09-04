@@ -111,4 +111,9 @@ items:
           title: Górna
           type: number
           superTitle: Przedział ufności
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
 ...

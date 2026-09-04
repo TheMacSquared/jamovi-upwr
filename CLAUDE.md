@@ -189,6 +189,31 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
 Nowe zadania dopisuj poniżej jako "### Zadanie N: ..." z plikiem docelowym
 i oczekiwanym zachowaniem.
 
+### Mapa drogowa jUPWR 1.0.0 (decyzja 2026-09-04, wariant „kurs podstawowy")
+Definicja 1.0.0: każde menu kursu podstawowego ma analizy jUPWR (rdzeń →
+„Zaawansowane") i KAŻDA analiza jUPWR ma „Opis zastosowanych metod"
+(zadanie 19). Analizy poza kursem zostają jmv, widoczne (precedens: MANCOVA,
+logLinear), ewentualnie na końcu podmenu przez `JUPWR_MENU_LAST`.
+Kolejność prac:
+1. Opisy metod w istniejących modułach: jTestyT → jANOVA (razem
+   z zadaniem 16: przycinanie not to ta sama robota).
+2. jCI, jboot, jperm (własne moduły, starsze): najpierw przegląd panelu
+   wg obecnego schematu „krytyczne → opcjonalne → do usunięcia", potem opisy.
+3. Eksploracja: moduł jUPWR (roboczo `jEksplor`) zamiast rozszerzania jmv
+   descriptives z zadania 9 — zakres z zadania 9 przechodzi do niego;
+   jmv::descriptives ukryte.
+4. Regresja: moduł `jRegr` tylko z korelacją, regresją liniową (prostą
+   i wieloraką) i logistyczną dwumianową; wielomianowa i porządkowa
+   zostają jmv (widoczne, później — po 1.0.0).
+Poza zakresem 1.0.0: opisy metod dla wykresów scatr (świadomie nie),
+regresja wielomianowa/porządkowa, jRol oraz moduły opcjonalne (jRISK,
+jSpace) — te dostają opisy później, w miarę potrzeby.
+Otwarte: opis metod mówi „co" i „jak" (np. „poziomy w kolejności
+alfabetycznej — odwrotna kolejność odwraca OR"), ale nie „dlaczego"
+(np. dlaczego ART zamiast rang na surowych danych przy interakcjach).
+Takie objaśnienia były w rozbudowanych notach; po ich przycięciu nie mają
+miejsca w aplikacji — do rozstrzygnięcia: handout / strona pomocy / nic.
+
 ### Zadanie 8: jRol — doświadczalnictwo rolnicze (moduł OPCJONALNY .jmo) — ZREALIZOWANE 0.1.0
 Katalog `jRol/` (wzór: jCI; pierwotnie jDosw, przemianowany i zmieniony na opcjonalny,
 bo to moduł jednego kursu; budowa: macOS 72-jmo-jrol.sh, Windows build.ps1 krok 4g), wspólny silnik w `R/utils.R`. Menu „Doświadczalnictwo":
@@ -401,3 +426,28 @@ udokumentować: `parcoord` (najlepszy wykres przed-po: każda linia to jednostka
 
 UWAGA: `plots/` to submoduł (fork scatr) — zmiany idą osobnym commitem w submodule
 i bumpem wskaźnika w superprojekcie.
+
+### Zadanie 19: „Opis zastosowanych metod" — dynamiczne podsumowanie per analiza (PILOTAŻ w jCzest 0.2.0)
+Diagnoza (2026-09-04): noty pod tabelami i teksty UI w przebudowanych modułach
+(jANOVA, jTestyT, jCzest) rozrosły się. Zamiast tego: na końcu wyników KAŻDEJ
+analizy element `metody` (`type: Html`, `visible: (metody)`) z checkboxem
+`metody` („Opis zastosowanych metod", default false — w eksploracji ogląda się
+więcej analiz, niż się używa; włącza się w tych, które idą do raportu).
+Treść: CO policzono, z JAKIMI parametrami, JAK przedstawiono (kierunek OR,
+poziom „wystąpiło", mianownik procentów, orientacja tabeli, progi Cohena,
+warunek stosowalności i czy spełniony) — NIGDY wyniki liczbowe. Sekcje w stałej
+kolejności: Dane, Model, Testy, Wielkość efektu, Post-hoc, Wykres (nieznane
+przed Wykres). Noty pod tabelami zostają tylko tam, gdzie bez nich tabeli nie da
+się odczytać (błąd, brak wiersza, N); orientację tabel rozwiązywać strukturalnie
+(title/superTitle), nie notą.
+Mechanizm (decyzja 2026-09-04: w forku jmvcore, jak motywy w `themes.R`):
+`jmvcore/R/metody.R` — `jmvcore::metodyNew()` (`add(sekcja, fmt, ...)` jak
+sprintf z htmlEscape argumentów tekstowych, `addIf`, `render(element)`) i
+`jmvcore::metodyCyt()`; eksporty dopisane ręcznie do NAMESPACE (roxygen
+6.1.1 nie jest przeganiany); testy `jmvcore/tests/testthat/test-metody.R`.
+Odrzucone: globalny przełącznik w kliencie (bibliografia jamovi jest JEDNYM
+blokiem na końcu dokumentu — `client/main/references.ts`) i osobny pakiet
+w modules/base (nowy krok w trzech pipeline'ach builda dla jednego pliku).
+Etykiet opcji z `.a.yaml` nie da się odczytać w R (kompilator wycina `title`),
+więc nazwy metod trzeba pisać w `.b.R`. Kolejne moduły po akceptacji pilotażu:
+jTestyT, jANOVA, jRol, jCI.

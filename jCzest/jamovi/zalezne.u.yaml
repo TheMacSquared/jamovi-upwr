@@ -22,22 +22,46 @@ children:
             isTarget: true
             maxItemCount: 1
 
-  # --- rdzeń ---
+  # --- rdzeń: nazwy sekcji mówią, co jest w środku (wzór: tabela kontyngencji);
+  # test dobiera się sam (2 pomiary → McNemar, więcej → Q Cochrana)
   - type: LayoutBox
     margin: large
     stretchFactor: 1
     children:
-      - type: Label
-        label: Wyniki
+      - type: LayoutBox
+        cell:
+          column: 0
+          row: 0
+        stretchFactor: 1
         children:
-          - type: CheckBox
-            name: table
-          - type: CheckBox
-            name: effSize
-          - type: CheckBox
-            name: props
-          - type: CheckBox
-            name: plot
+          - type: Label
+            label: Wielkość efektu
+            children:
+              - type: CheckBox
+                name: effSize
+          - type: Label
+            label: Tabele
+            children:
+              - type: CheckBox
+                name: table
+              - type: CheckBox
+                name: props
+      - type: LayoutBox
+        cell:
+          column: 1
+          row: 0
+        stretchFactor: 1
+        children:
+          - type: Label
+            label: Wykres
+            children:
+              - type: CheckBox
+                name: plot
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
 
   # --- zaawansowane ---
   - type: CollapseBox

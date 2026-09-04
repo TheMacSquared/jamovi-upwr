@@ -9,6 +9,8 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         # się odczytać), a przy wywołaniu z R dane są od razu. Dlatego budujemy
         # kolumny z OBU miejsc, a flaga chroni przed dodaniem ich dwa razy.
         .colsBuilt = FALSE,
+        # opis zastosowanych metod (jmvcore::metodyNew, wspólny mechanizm jUPWR) — zbierany po drodze, renderowany na końcu .run
+        .metody = NULL,
 
         .buildColumns = function() {
             if (isTRUE(private$.colsBuilt)) return(invisible(FALSE))
@@ -18,7 +20,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (length(lv) == 0) return(invisible(FALSE))
 
             freqs <- self$results$freqs
-            freqs$addColumn(name = "row", title = "", type = "text", combineBelow = TRUE)
+            freqs$addColumn(name = "row", title = o$rows, type = "text", combineBelow = TRUE)
             freqs$addColumn(name = "kind", title = "", type = "text")
             for (l in lv)
                 freqs$addColumn(name = paste0("c_", l), title = l, type = "number",
@@ -26,7 +28,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             freqs$addColumn(name = "total", title = "Ogółem", type = "number")
 
             res <- self$results$resid
-            res$addColumn(name = "row", title = "", type = "text")
+            res$addColumn(name = "row", title = o$rows, type = "text")
             for (l in lv)
                 res$addColumn(name = paste0("c_", l), title = l, type = "number",
                               superTitle = o$cols)
@@ -67,6 +69,8 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 return()
             }
 
+            private$.metody <- jmvcore::metodyNew()
+            private$.describeData(tab)
             private$.fillFreqs(tab)
             private$.assumptionNotice(tab)
             private$.fillTests(tab)
@@ -80,6 +84,38 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (o$plot != "none")
                 self$results$plot$setState(list(tab = tab, kind = o$plot, pc = o$pc,
                                                 xlab = o$rows, fill = o$cols))
+            private$.describePlot()
+            private$.metody$render(self$results$metody)
+        },
+
+        # --- opis metod: dane i prezentacja (reszta dopisywana w .fill*) ---
+        .describeData = function(tab) {
+            o <- self$options
+            m <- private$.metody
+            m$add("Dane", "Wiersze: „%s”, kolumny: „%s”; tabela %d × %d (poziomy w kolejności alfabetycznej / zadeklarowanej).",
+                  o$rows, o$cols, nrow(tab), ncol(tab))
+            m$addIf(optNonEmpty(o$counts), "Dane",
+                    "Dane zagregowane: liczności z kolumny „%s”.", o$counts)
+            m$add("Dane", "N = %s; pominięto obserwacje z brakiem w którejkolwiek ze zmiennych.",
+                  format(sum(tab), big.mark = " "))
+            m$add("Dane", switch(o$pc,
+                row = "Procenty liczone wierszami (mianownik: suma wiersza).",
+                col = "Procenty liczone kolumnami (mianownik: suma kolumny).",
+                total = "Procenty od ogółu (mianownik: N).",
+                "Bez procentów — same liczności."))
+            m$addIf(o$exp, "Dane",
+                    "Liczebności oczekiwane przy niezależności: E = (suma wiersza × suma kolumny) / N.")
+        },
+
+        .describePlot = function() {
+            o <- self$options
+            if (o$plot == "bar")
+                private$.metody$add("Wykres", "Wykres słupkowy: słupki = %s, grupy = „%s”, kolor = „%s”.",
+                    switch(o$pc, row = "% wierszem", col = "% kolumną", "liczności"), o$rows, o$cols)
+            else if (o$plot == "mosaic")
+                private$.metody$add("Wykres", paste(
+                    "Wykres mozaikowy: szerokość kolumny ∝ liczność wiersza (brzeg),",
+                    "podział w pionie = rozkład warunkowy w wierszu."))
         },
 
         # --- tabela liczności: obserwowane, oczekiwane, procenty ---
@@ -126,6 +162,10 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         # --- SEDNO MODUŁU: automatyczna kontrola warunku E >= 5 ---
         .assumptionNotice = function(tab) {
             a <- checkAssumption(tab)
+            private$.metody$add("Testy", paste(
+                "Warunek stosowalności χ² sprawdzany automatycznie: dla 2×2 wszystkie E ≥ 5,",
+                "dla większych tabel wszystkie E ≥ 1 i najwyżej 20%% komórek z E &lt; 5 (Cochran) — tu %s."),
+                if (isTRUE(a$ok)) "spełniony" else "niespełniony (ostrzeżenie nad wynikami)")
             if (isTRUE(a$ok)) return()
             msg <- if (a$is2x2)
                 sprintf(paste("W tabeli 2×2 najmniejsza liczebność oczekiwana wynosi %.2f (< 5),",
@@ -148,13 +188,16 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             o <- self$options
             t <- self$results$tests
             n <- sum(tab)
+            m <- private$.metody
             if (isTRUE(o$chiSq)) {
                 r <- chiSqTest(tab, correct = FALSE)
                 t$addRow(rowKey = "chi", values = list(test = "χ²", stat = r$stat, df = r$df, p = r$p))
+                m$add("Testy", "χ² Pearsona bez poprawki ciągłości, df = (r − 1)(c − 1) = %d.", r$df)
             }
             if (isTRUE(o$chiSqCorr)) {
                 if (all(dim(tab) == c(2, 2))) {
                     r <- chiSqTest(tab, correct = TRUE)
+                    m$add("Testy", "χ² z poprawką ciągłości Yatesa (|O − E| pomniejszone o 0.5).")
                     t$addRow(rowKey = "chic", values = list(test = "χ² z poprawką ciągłości",
                                                            stat = r$stat, df = r$df, p = r$p))
                 } else {
@@ -165,13 +208,16 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 r <- likeRatTest(tab)
                 t$addRow(rowKey = "lr", values = list(test = "G² (iloraz wiarygodności)",
                                                      stat = r$stat, df = r$df, p = r$p))
+                m$add("Testy", "G² (iloraz wiarygodności) = 2 Σ O·ln(O/E), te same df co χ².")
             }
             if (isTRUE(o$fisher)) {
                 ft <- try(stats::fisher.test(tab), silent = TRUE)
                 if (inherits(ft, "try-error"))
                     t$setNote("f", "Dokładny test Fishera nie policzył się dla tej tabeli (za duża).")
-                else
+                else {
                     t$addRow(rowKey = "fi", values = list(test = "Dokładny test Fishera", p = ft$p.value))
+                    m$add("Testy", "Dokładny test Fishera (bez statystyki testowej; dla tabel &gt; 2×2 uogólnienie Freemana-Haltona).")
+                }
             }
             # N w nocie, nie jako wiersz: liczebnosc dzielilaby kolumne ze statystykami
             # testowymi i dziedziczyla ich format (80.00000), a nie jest testem
@@ -191,8 +237,13 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                       else if (v < med) "słaby" else if (v < large) "umiarkowany" else "silny"
             t$addRow(rowKey = "v", values = list(measure = "V Craméra", value = v,
                                                  lower = ci[1], upper = ci[2], interp = interp))
-            t$setNote("th", sprintf("Progi Cohena dla tej tabeli: słaby %.2f, umiarkowany %.2f, silny %.2f.",
-                                    small, med, large))
+            m <- private$.metody
+            m$add("Wielkość efektu", paste(
+                "V Craméra = √(χ² / (N · (min(r, c) − 1))); interpretacja wg progów Cohena",
+                "dla tej tabeli: słaby %.2f, umiarkowany %.2f, silny %.2f."), small, med, large)
+            m$addIf(o$effSizeCI, "Wielkość efektu", paste(
+                "Przedział ufności %g%% dla V: bootstrap percentylowy, 1000 losowań",
+                "z rozkładu wielomianowego, ziarno 1."), o$ciWidth)
         },
 
         .fillMeasures = function(tab) {
@@ -212,12 +263,16 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (isTRUE(o$diffProp)) add("dp", "Różnica proporcji", m$dp)
 
             # Kierunek miar zależy od kolejności poziomów, a ta jest alfabetyczna —
-            # bez tej noty student nie wie, czy dostał OR czy jego odwrotność.
+            # bez tego opisu student nie wie, czy dostał OR czy jego odwrotność.
             grp <- if (o$compare == "cols") colnames(tab) else rownames(tab)
             ev  <- if (o$compare == "cols") rownames(tab) else colnames(tab)
-            t$setNote("dir", sprintf(
-                "Porównanie: „%s” względem „%s”, pod względem udziału kategorii „%s”. Poziomy uporządkowane alfabetycznie — odwrotna kolejność odwraca OR i RR.",
-                grp[1], grp[2], ev[1]))
+            m <- private$.metody
+            m$add("Miary 2×2", paste(
+                "Porównanie: „%s” względem „%s” pod względem udziału kategorii „%s”;",
+                "poziomy w kolejności alfabetycznej — odwrotna kolejność odwraca OR i RR."),
+                grp[1], grp[2], ev[1])
+            m$add("Miary 2×2", "Przedziały ufności %g%% metodą Walda: na skali logarytmicznej dla OR i RR, na skali proporcji dla różnicy.",
+                  o$ciWidth)
         },
 
         .fillOrdinal = function(tab) {
@@ -227,7 +282,11 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             m <- ordinalMeasures(tab)
             if (isTRUE(o$gamma)) t$addRow(rowKey = "g", values = list(measure = "Gamma", value = m$gamma))
             if (isTRUE(o$taub))  t$addRow(rowKey = "t", values = list(measure = "Tau-b Kendalla", value = m$taub))
-            t$setNote("o", "Miary mają sens tylko dla kategorii uporządkowanych.")
+            private$.metody$add("Zmienne porządkowe", paste(
+                "%s z par zgodnych i niezgodnych; kolejność kategorii = kolejność poziomów w tabeli",
+                "— miary mają sens tylko dla kategorii uporządkowanych."),
+                paste(c(if (isTRUE(o$gamma)) "Gamma Goodmana-Kruskala", if (isTRUE(o$taub)) "tau-b Kendalla"),
+                      collapse = " i "))
         },
 
         .fillTrend = function(tab) {
@@ -239,7 +298,9 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 return()
             }
             t$addRow(rowKey = "ca", values = list(z = ca$z, p = ca$p))
-            t$setNote("s", "Kategoriom przypisano kolejne liczby naturalne jako wartości.")
+            private$.metody$add("Testy", paste(
+                "Test trendu Cochrana-Armitage’a: uporządkowanym kategoriom przypisano wartości 1…%d",
+                "w kolejności poziomów; p dwustronne."), length(ca$scores))
         },
 
         .fillResid = function(tab) {
@@ -253,7 +314,9 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 for (j in seq_along(lv)) vals[[paste0("c_", lv[j])]] <- sr[i, j]
                 t$addRow(rowKey = rownames(tab)[i], values = vals)
             }
-            t$setNote("c", "Komórki z |z| > 1,96 (α = 0,05) decydują o zależności.")
+            private$.metody$add("Post-hoc", paste(
+                "Skorygowane reszty standaryzowane (Habermana): (O − E) / √(E (1 − p<sub>w</sub>)(1 − p<sub>k</sub>)),",
+                "w przybliżeniu N(0, 1); |z| &gt; 1.96 (α = 0.05) wskazuje komórki decydujące o zależności."))
         },
 
         .fillPairwise = function(tab) {
@@ -267,6 +330,9 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             for (i in seq_len(nrow(pw)))
                 t$addRow(rowKey = i, values = list(g1 = pw$g1[i], g2 = pw$g2[i],
                                                    stat = pw$stat[i], df = pw$df[i], p = pw$p[i]))
+            private$.metody$add("Post-hoc", paste(
+                "Porównania par wierszy: dla każdej pary χ² na podtabeli 2 × %d",
+                "(%d porównań), p skorygowane metodą Holma."), ncol(tab), nrow(pw))
         },
 
         .plot = function(image, ...) {

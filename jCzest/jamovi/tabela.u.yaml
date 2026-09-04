@@ -66,6 +66,11 @@ children:
             children:
               - type: ComboBox
                 name: plot
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
 
   # --- zaawansowane ---
   # Warunek stosowalności χ² sprawdzany jest automatycznie (ostrzeżenie nad
