@@ -4,8 +4,52 @@ Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modu
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
 ## 0.9.5.7 — 2026-09-04
+- „Opis zastosowanych metod": każda analiza jUPWR ma na końcu wyników
+  opcjonalny (domyślnie wyłączony) blok z tym, co policzono, z jakimi
+  parametrami i jak przedstawiono (kierunek różnicy, poziom odniesienia,
+  mianownik procentów, metoda przedziału, schemat losowania). Bez wyników
+  liczbowych i bez dydaktyki — porządkuje raport. Mechanizm wspólny w forku
+  jmvcore (`metodyNew`). Noty pod tabelami skrócone do jednego zdania.
+- Nowy moduł jEksplor (menu Eksploracja) zamiast opisowych jmv: „Zmienne
+  ilościowe" (rdzeń: N, braki, średnia, mediana, kwartyle, SD, min, max, V;
+  zaawansowane: miary pozycyjne, skośność Pearsona i kwartylowa, percentyle,
+  wartości skrajne, Gini z krzywą Lorenza, ECDF; założenia: Shapiro-Wilk,
+  Lilliefors, Anderson-Darling, Q-Q), „Zmienne jakościowe" (tabele liczności,
+  także w grupach, z podsumowaniem) i nowy „Szereg rozdzielczy" (klasy,
+  częstości skumulowane, miary interpolowane z szeregu, ogiwa). Ukryte:
+  `jmv::descriptives`, `jmv::qualitative`.
+- Nowy moduł jRegr (menu Regresja) w zakresie kursu podstawowego: „Korelacja"
+  (para = jeden wiersz z przedziałem i rozrzutem, kilka zmiennych = macierz
+  bez pól redundantnych), „Regresja liniowa" (predyktory ilościowe
+  i jakościowe z wyborem poziomu odniesienia, dopasowanie, współczynniki
+  z przedziałami, β, ANOVA modelu, Shapiro reszt, Q-Q, reszty vs dopasowane,
+  Durbin-Watson, VIF, Cook), „Regresja logistyczna" (wybór kategorii
+  „zdarzenie", test LR, R² McFaddena i Nagelkerkego, OR z przedziałami,
+  tabela klasyfikacji, czułość, swoistość, AUC, ROC). Ukryte:
+  `jmv::simpleCorr`, `corrMatrix`, `linReg`, `logRegBin`; korelacja
+  cząstkowa oraz logistyczne wielomianowa i porządkowa na końcu menu.
+- jCI 0.3.0 wchłonął jboot (moduł jboot usunięty): w każdej analizie
+  przedziałów lista „Metoda przedziału" — klasyczna albo bootstrap
+  percentylowy / BCa (B, ziarno, histogram replikacji w Zaawansowane);
+  nowe analizy „Regresja liniowa" (przedziały współczynników z pasmem)
+  i „Jak działa bootstrap" (podgrupa Dydaktyka); średnia jednej próby także
+  dla mediany i średniej uciętej; d Cohena z przedziałem niecentralnego t
+  w różnicy średnich i parach; metoda t-Studenta obok Welcha. Naprawione:
+  przedział Spearmana (Bonett-Wright), Newcombe (bez podwójnego z), wykres
+  różnicy proporcji rysuje przedział.
+- Podział obowiązków: jTestyT 0.4.0 tylko testuje (statystyka, p, różnica
+  i d Cohena jako punkty, wykres pudełkowy); przedziały ufności i wykres
+  estymacyjny są w jCI, opis metod odsyła. jTestyT i jANOVA 0.4.0 mają opis
+  metod.
+- jperm 0.2.0: konwencje jTestyT (wiele zmiennych, ta sama lista hipotez,
+  wartość testowa), panel rdzeń/zaawansowane (liczba permutacji, ziarno,
+  test dokładny), opis metod, podpisy w menu.
+- jCzest 0.2.0: opis metod, sekcje paneli nazwane wg tabeli kontyngencji.
 - jDane 0.7.1: usunięto trzy zbiory dydaktyczne o statystykach niezwiązanych
-  z programem zajęć (postacie Star Wars, Datasaurus, kwartet Anscombe'a).
+  z programem zajęć (postacie Star Wars, Datasaurus, kwartet Anscombe'a);
+  opisy zbiorów wskazują nowe pozycje menu (jEksplor, jRegr, Testy t).
+- Zgodność wstecz: pliki .omv z analizami jboot oraz z jperm/jCI/jTestyT
+  sprzed tych wersji nie otwierają tych analiz (zmienione opcje).
 
 ## 0.9.5.6 — 2026-09-04
 - Analizy jCzest trafiają do istniejącego menu „Częstości" zamiast tworzyć drugie

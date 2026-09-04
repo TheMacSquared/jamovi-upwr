@@ -24,7 +24,7 @@ datasets:
         porównanie trzech średnich (ANOVA, testy post-hoc, grupy jednorodne) oraz
         założenia jednorodności wariancji i normalności reszt. Analiza:
         Doświadczalnictwo → Układ całkowicie losowy (zależna = weight, czynnik A =
-        group) lub ANOVA → Jednoczynnikowa ANOVA.
+        group) lub ANOVA → ANOVA (czynnik = group).
       variables:
         - name: weight
           description: Sucha masa rośliny.
@@ -100,7 +100,7 @@ datasets:
         regresję wielokrotną i funkcję produkcji (np. logarytm produkcji względem
         logarytmów nasion, nawozów i pracy), porównania między regionami oraz
         wpływ statusu własności i odmian ryżu. Analiza: Regresja → Regresja
-        liniowa; Eksploracja z podziałem według region.
+        liniowa; Eksploracja → Zmienne ilościowe z podziałem według region.
       variables:
         - name: id
           description: Identyfikator gospodarstwa.
@@ -300,8 +300,8 @@ datasets:
         w 1986 r. Zmienna low wskazuje masę poniżej 2,5 kg. Zbiór ilustruje
         regresję logistyczną (ryzyko niskiej masy względem palenia, wieku, rasy,
         nadciśnienia), tabele 2×2 z ilorazem szans oraz regresję liniową masy
-        urodzeniowej. Analiza: Regresja → Regresja logistyczna dwumianowa
-        (zależna = low) lub Częstości → Tabele niezależności.
+        urodzeniowej. Analiza: Regresja → Regresja logistyczna (zależna = low,
+        zdarzenie = 1) lub Częstości → Tabela kontyngencji.
       variables:
         - name: low
           description: "Niska masa urodzeniowa (poniżej 2,5 kg): no, yes."
@@ -350,7 +350,8 @@ datasets:
         Każda zmienna to średni wynik skali kwestionariusza NEO (od 1 do 5) dla
         jednego z pięciu czynników osobowości. Zbiór ilustruje korelacje Pearsona
         i Spearmana, macierz korelacji z wykresem, regresję wielokrotną oraz
-        analizę czynnikową. Analiza: Regresja → Macierz korelacji; Czynnik → PCA.
+        analizę czynnikową. Analiza: Regresja → Korelacja (kilka zmiennych =
+        macierz); Czynnik → PCA.
       variables:
         - name: Neuroticism
           description: Neurotyczność (średnia skali, 1–5).
@@ -500,8 +501,8 @@ datasets:
         Dane wykorzystane przez Faira (1978) w modelu tobitowym. Zmienna affairs
         jest zliczeniem z dużą liczbą zer, co pozwala ćwiczyć regresję
         logistyczną (romans tak/nie), tabele niezależności oraz porównania
-        grup. Analiza: Regresja → Regresja logistyczna dwumianowa po
-        utworzeniu zmiennej obliczanej (affairs > 0).
+        grup. Analiza: Regresja → Regresja logistyczna po utworzeniu zmiennej
+        obliczanej (affairs > 0).
       variables:
         - name: affairs
           description: Liczba romansów pozamałżeńskich w ostatnim roku (0, 1, 2, 3, 7, 12).
@@ -548,8 +549,8 @@ datasets:
         Dane o pasażerach (bez załogi) z Encyclopedia Titanica, w wersji z pakietu
         carData. Wiek brakuje u części osób. Zbiór ilustruje tabele niezależności
         (przeżycie × płeć × klasa), iloraz szans i ryzyko względne oraz regresję
-        logistyczną. Analiza: Częstości → Tabele niezależności; Regresja →
-        Regresja logistyczna dwumianowa (zależna = survived).
+        logistyczną. Analiza: Częstości → Tabela kontyngencji; Regresja →
+        Regresja logistyczna (zależna = survived).
       variables:
         - name: name
           description: Nazwisko i imię pasażera.
@@ -594,7 +595,7 @@ datasets:
         rozmowy o tym, czego ankiety naprawdę mierzą. Uwaga metodyczna: jeden
         wykładowca prowadził kilka kursów (zmienna prof), więc obserwacje nie są
         w pełni niezależne. Analiza: Regresja → Korelacja i Regresja liniowa;
-        T-testy → Test t dla prób niezależnych (eval wg gender).
+        Testy t → Dwie grupy (eval wg gender).
       variables:
         - name: minority
           description: "Wykładowca należy do mniejszości etnicznej: no, yes."
@@ -702,7 +703,7 @@ datasets:
         pokrywają dzienne zapotrzebowanie na sód albo kalorie. Zbiór ilustruje
         statystyki opisowe w grupach, wykresy pudełkowe i rozrzutu, ANOVA
         (kalorie wg restauracji), korelację (tłuszcz a kalorie) oraz regresję
-        wielokrotną. Analiza: Eksploracja → Statystyki opisowe z podziałem
+        wielokrotną. Analiza: Eksploracja → Zmienne ilościowe z podziałem
         według restaurant; ANOVA → ANOVA.
       variables:
         - name: restaurant
