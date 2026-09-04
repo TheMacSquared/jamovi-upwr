@@ -487,4 +487,9 @@ items:
       varDescription: Reszty z modelu ANOVA
       measureType: continuous
       clearWith: *cw
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
 ...

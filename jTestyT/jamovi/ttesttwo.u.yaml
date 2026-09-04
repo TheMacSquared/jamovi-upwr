@@ -69,6 +69,11 @@ children:
               - type: ComboBox
                 name: plotType
                 enable: (plot)
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
   - type: LayoutBox
     margin: large
     stretchFactor: 1

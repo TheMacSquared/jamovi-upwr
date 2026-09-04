@@ -133,4 +133,9 @@ items:
         width: 380
         height: 340
         renderFun: .qq
+
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
 ...

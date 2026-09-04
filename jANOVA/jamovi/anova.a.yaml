@@ -202,4 +202,10 @@ options:
     - name: residsOV
       title: Reszty do arkusza
       type: Output
+
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
 ...

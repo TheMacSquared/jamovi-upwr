@@ -208,11 +208,12 @@ Kolejność prac:
 Poza zakresem 1.0.0: opisy metod dla wykresów scatr (świadomie nie),
 regresja wielomianowa/porządkowa, jRol oraz moduły opcjonalne (jRISK,
 jSpace) — te dostają opisy później, w miarę potrzeby.
-Otwarte: opis metod mówi „co" i „jak" (np. „poziomy w kolejności
-alfabetycznej — odwrotna kolejność odwraca OR"), ale nie „dlaczego"
-(np. dlaczego ART zamiast rang na surowych danych przy interakcjach).
-Takie objaśnienia były w rozbudowanych notach; po ich przycięciu nie mają
-miejsca w aplikacji — do rozstrzygnięcia: handout / strona pomocy / nic.
+Zasada (decyzja 2026-09-04, „by design"): opis metod mówi „co" i „jak"
+(np. „poziomy w kolejności alfabetycznej — odwrotna kolejność odwraca OR"),
+NIGDY „dlaczego" (np. dlaczego ART zamiast rang na surowych danych). Opis
+porządkuje to, co zrobiono; nie jest materiałem dydaktycznym — wyniki mają
+nie być przeładowane treścią. Objaśnienia „dlaczego" wypadają z aplikacji
+razem z przycinaniem not (zadanie 16).
 
 ### Zadanie 8: jRol — doświadczalnictwo rolnicze (moduł OPCJONALNY .jmo) — ZREALIZOWANE 0.1.0
 Katalog `jRol/` (wzór: jCI; pierwotnie jDosw, przemianowany i zmieniony na opcjonalny,
@@ -427,7 +428,7 @@ udokumentować: `parcoord` (najlepszy wykres przed-po: każda linia to jednostka
 UWAGA: `plots/` to submoduł (fork scatr) — zmiany idą osobnym commitem w submodule
 i bumpem wskaźnika w superprojekcie.
 
-### Zadanie 19: „Opis zastosowanych metod" — dynamiczne podsumowanie per analiza (PILOTAŻ w jCzest 0.2.0)
+### Zadanie 19: „Opis zastosowanych metod" — dynamiczne podsumowanie per analiza (ZREALIZOWANE: jCzest 0.2.0, jTestyT 0.3.0, jANOVA 0.4.0)
 Diagnoza (2026-09-04): noty pod tabelami i teksty UI w przebudowanych modułach
 (jANOVA, jTestyT, jCzest) rozrosły się. Zamiast tego: na końcu wyników KAŻDEJ
 analizy element `metody` (`type: Html`, `visible: (metody)`) z checkboxem
@@ -448,6 +449,15 @@ sprintf z htmlEscape argumentów tekstowych, `addIf`, `render(element)`) i
 Odrzucone: globalny przełącznik w kliencie (bibliografia jamovi jest JEDNYM
 blokiem na końcu dokumentu — `client/main/references.ts`) i osobny pakiet
 w modules/base (nowy krok w trzech pipeline'ach builda dla jednego pliku).
+Wzorce z wdrożeń: wspólne fragmenty opisu per moduł w `R/utils.R`
+(`metodyWspolne` w jTestyT, `metodyAnovaWspolne` w jANOVA); opcje, których
+analiza nie ma, przekazywać argumentem, bo `o$brak` rzuca błąd; w .b.R
+akumulator nazywać `md`, gdy `m` jest zajęte przez macierze/średnie;
+UI: osobna sekcja „Opis metod" w rdzeniu panelu. Noty przycięte do jednego
+zdania (zadanie 16 zrobione dla jCzest, jTestyT, jANOVA; zostaje jRol).
+jANOVA testować w obrazie Dockera (`docker run --entrypoint
+/opt/R/4.6.0/bin/Rscript -v $PWD/jANOVA:/mod:ro jupwr/jupwr:<ver> …`),
+bo lokalnie brak afex.
 Etykiet opcji z `.a.yaml` nie da się odczytać w R (kompilator wycina `title`),
 więc nazwy metod trzeba pisać w `.b.R`. Kolejne moduły po akceptacji pilotażu:
 jTestyT, jANOVA, jRol, jCI.

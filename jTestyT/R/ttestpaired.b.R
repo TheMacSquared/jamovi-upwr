@@ -20,6 +20,12 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             if (length(pairs) == 0) return()
             level <- o$ciWidth / 100
             tt <- self$results$ttest
+            m <- jmvcore::metodyNew()
+            m$add("Dane", "Pary: %s; różnica = pierwsza − druga zmienna; tylko pary bez braków.",
+                  paste(vapply(pairs, function(p) sprintf("„%s” − „%s”", jmvcore::htmlEscape(p$i1), jmvcore::htmlEscape(p$i2)), ""), collapse = ", "))
+            m$addIf(o$student, "Testy", "t Studenta dla par = t jednej próby na różnicach, df = n − 1.")
+            metodyWspolne(m, o, "paired", "Różnica = pierwsza − druga zmienna")
+            m$render(self$results$metody)
             for (p in pairs) {
                 k <- paste(p$i1, "−", p$i2)
                 a <- jmvcore::toNumeric(self$data[[p$i1]]); b <- jmvcore::toNumeric(self$data[[p$i2]])
@@ -41,9 +47,7 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                     ylab = "Wartość"))
                 self$results$qq$get(key = k)$setState(list(x = dif, label = k))
             }
-            tt$setNote("h", sprintf("Różnica = pierwsza − druga zmienna; H₁: %s; przedziały ufności %g%%. d Cohena = średnia różnica / SD różnic, z przedziałem (niecentralny t)%s.",
-                altLabel(o$hypothesis), o$ciWidth,
-                if (isTRUE(o$nonpar)) "; dla Wilcoxona r rangowo-dwuseryjne i pseudomediana z CI" else ""))
+            tt$setNote("h", "Różnica = pierwsza − druga zmienna.")
         },
         .plot = function(image, ggtheme, theme, ...) estimationPlot(image, ggtheme, theme),
         .qq = function(image, ggtheme, theme, ...) qqPlotResid(image, ggtheme, theme)

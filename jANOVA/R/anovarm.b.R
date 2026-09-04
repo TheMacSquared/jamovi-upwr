@@ -40,14 +40,14 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             }
             if (method == "none") {
                 mt$getColumn("letters")$setVisible(FALSE)
-                mt$setNote("emm", sprintf("Średnie brzegowe z modelu, %g%% CI.", 100 * (1 - alpha)))
+                mt$setNote("emm", sprintf("Przedziały ufności %g%%.", 100 * (1 - alpha)))
             } else if (method == "dunnett") {
                 mt$getColumn("letters")$setTitle("vs kontrola")
-                mt$setNote("dun", paste0("Kontrola = pierwszy poziom; * różni się istotnie od kontroli; ", cmp$critNote))
+                mt$setNote("dun", "* = różni się istotnie od kontroli (pierwszy poziom).")
             } else {
-                mt$setNote("cld", paste0(if (what == "means") "Średnie brzegowe z modelu; " else "",
-                    phMethodLabel(method), "; ", cmp$critNote,
-                    ". Poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią."))
+                # konwencja liter jest potrzebna do odczytu tabeli — reszta w opisie metod
+                mt$setNote("cld", paste0("Ta sama litera = brak istotnej różnicy (a = najniższa średnia)",
+                    if (!is.null(cmp$critNote)) paste0("; ", cmp$critNote) else "", "."))
             }
             if (!is.null(cmp$pairs)) {
                 for (i in seq_len(nrow(cmp$pairs))) {
@@ -61,8 +61,8 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                         for (cn in c("crit", "lower", "upper")) pt$getColumn(cn)$setVisible(FALSE)
                         pt$setNote("holm", "p skorygowane metodą Holma.")
                     } else {
-                        pt$setNote("crit", sprintf("%s; przedział ufności = różnica ± %s (poziom %g%%).",
-                            phMethodLabel(method), phCritLabel(method), 100 * (1 - alpha)))
+                        pt$setNote("crit", sprintf("Przedział ufności %g%% = różnica ± %s.",
+                            100 * (1 - alpha), phCritLabel(method)))
                     }
                 }
             }
@@ -107,16 +107,27 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 at$setNote("err", paste("Błąd dopasowania modelu:", conditionMessage(res))); return()
             }
             method <- o$postHoc; alpha <- o$alpha
+            md <- jmvcore::metodyNew()   # `m` is reused below for matrices/means
+            md$add("Dane", "Zmienna zależna „%s” w formacie długim; jednostka „%s” (%d jednostek, %d obserwacji kompletnych); czynniki wewnątrzobiektowe: %s%s%s.",
+                  dep, subject, nlevels(d[[subject]]), nrow(d), jmvcore::metodyCyt(within),
+                  if (length(between)) paste0("; międzyobiektowe: ", jmvcore::metodyCyt(between)) else "",
+                  if (length(covs)) paste0("; kowarianty: ", jmvcore::metodyCyt(covs)) else "")
+            md$addIf(any(tab > 1), "Dane", "Powtórzone obserwacje w tej samej komórce jednostki uśredniono.")
+            md$add("Model", "ANOVA powtórzonych pomiarów (afex::aov_ez): każdy efekt testowany wobec błędu swojej warstwy; sumy kwadratów typu %s; sferyczność: %s.",
+                  switch(o$ss, '2' = "II", "III"), switch(o$spherCorr, none = "bez poprawki", GG = "stopnie swobody z poprawką Greenhouse’a-Geissera",
+                               HF = "stopnie swobody z poprawką Huynha-Feldta"))
+            es <- c(if (isTRUE(o$ges)) "η² uogólnione (Olejnik-Algina)", if (isTRUE(o$pes)) "η²p = SS efektu / (SS efektu + SS błędu warstwy)")
+            md$addIf(length(es) > 0, "Model", "Wielkości efektu: %s.", paste(es, collapse = "; "))
+            md$addIf(o$spherTests, "Założenia", "Sferyczność: test Mauchly’ego dla czynników wewnątrzobiektowych o ≥ 3 poziomach, z ε Greenhouse’a-Geissera i Huynha-Feldta.")
             tb <- rmTable(res, o$spherCorr)
             for (i in seq_len(nrow(tb))) {
                 r <- tb[i, ]
                 at$addRow(rowKey = r$term, values = list(source = r$source, ss = r$ss, df1 = r$df1,
                     df2 = r$df2, mse = r$mse, F = r$F, p = r$p, ges = r$ges, pes = r$pes))
             }
-            corrNote <- switch(o$spherCorr, none = "bez poprawki na sferyczność",
-                GG = "stopnie swobody z poprawką Greenhouse'a-Geissera",
-                HF = "stopnie swobody z poprawką Huynha-Feldta")
-            at$setNote("ss", sprintf("Sumy kwadratów typu %s; %s. Każdy efekt testowany wobec błędu swojej warstwy (MS błędu, df błędu).", o$ss, corrNote))
+            # poprawka zmienia df w tabeli, wiec zostaje jako jedno zdanie; reszta w opisie metod
+            if (o$spherCorr != "none")
+                at$setNote("ss", sprintf("Stopnie swobody z poprawką %s.", switch(o$spherCorr, GG = "Greenhouse’a-Geissera", HF = "Huynha-Feldta")))
 
             if (isTRUE(o$spherTests)) {
                 st <- self$results$spher
@@ -128,7 +139,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                         r <- sp[i, ]
                         st$addRow(rowKey = r$term, values = list(source = r$source, W = r$W, p = r$p, gg = r$gg, hf = r$hf))
                     }
-                    st$setNote("eps", "p < α oznacza naruszenie sferyczności; wtedy użyj poprawki GG (ε < 0,75) lub HF (ε ≥ 0,75).")
+                    st$setNote("eps", "p < α = naruszenie sferyczności.")
                 }
             }
 
@@ -150,7 +161,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 fr <- friedmanTable(m)
                 npt <- self$results$npTests
                 npt$addRow(rowKey = "fr", values = list(test = fr$test, stat = fr$stat, df = fr$df, p = fr$p, es = fr$es))
-                npt$setNote("es", "Test Friedmana na rangach w obrębie jednostki; W Kendalla = χ²/(n(k − 1)).")
+                md$add("Testy", "Nieparametrycznie (jeden czynnik wewnątrzobiektowy): test Friedmana na rangach w obrębie jednostki, W Kendalla = χ² / (n (k − 1)); post-hoc test Nemenyiego (α = %g) z literami grup jednorodnych.", alpha)
                 fp <- friedmanPairs(m, alpha = alpha)
                 nm <- self$results$npMeans
                 for (i in seq_len(nrow(fp$levels))) {
@@ -158,7 +169,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     nm$addRow(rowKey = r$level, values = list(level = r$level, n = r$n, median = r$median,
                         meanRank = r$meanRank, letters = r$letters))
                 }
-                nm$setNote("np", "Test Nemenyiego; poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią rangą.")
+                nm$setNote("np", "Ta sama litera = brak istotnej różnicy (a = najniższa średnia ranga).")
                 np <- self$results$npPairs
                 for (i in seq_len(nrow(fp$pairs))) {
                     r <- fp$pairs[i, ]
@@ -174,9 +185,11 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                         r <- at2[i, ]
                         artT$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
                     }
-                    artT$setNote("art", paste0("Aligned Rank Transform (Wobbrock i in., 2011): dla każdego efektu odpowiedź ",
-                        "wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE powtórzonych pomiarów ",
-                        "z właściwymi warstwami błędu; raportowany jest F tego efektu."))
+                    md$add("Testy", paste(
+                        "Nieparametrycznie (kilka czynników): Aligned Rank Transform (Wobbrock i in., 2011) — dla każdego efektu",
+                        "odpowiedź wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE powtórzonych pomiarów",
+                        "z właściwymi warstwami błędu; raportowany F tego efektu."))
+                    md$addIf(method != "none", "Testy", "Porównania efektów głównych ART na wyrównanych rangach: %s, α = %g.", phMethodLabel(method), alpha)
                     if (method != "none") for (f in c(within, between)) {
                         mt <- self$results$artMeans$get(key = f)
                         pt <- self$results$artPairs$get(key = f)
@@ -184,13 +197,15 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                             subject = subject, within = within, between = between, ssType = o$ss), error = function(e) e)
                         if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
                         private$.fillComparison(mt, pt, cmp, method, alpha, "art")
-                        mt$setNote("cld", paste0("Rangi wyrównane dla efektu ", f, "; ", phMethodLabel(method), "; ",
-                            cmp$critNote %||% "", ". Poziomy z tą samą literą nie różnią się istotnie."))
+                        mt$setNote("cld", "Ta sama litera = brak istotnej różnicy (a = najniższa średnia ranga).")
                     }
                 }
             }
 
             # --- parametric comparisons
+            metodyAnovaWspolne(md, o, c(within, between))
+            md$addIf(o$homog, "Założenia", "Jednorodność wariancji: test Levene’a (odchylenia od mediany) i test Bartletta na średnich jednostek (uśrednionych po czynnikach wewnątrzobiektowych) między grupami międzyobiektowymi.")
+            md$render(self$results$metody)
             keys <- private$.termKeys()
             for (k in names(keys)) {
                 term <- keys[[k]]
@@ -238,7 +253,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 if (length(between)) {
                     sm <- subjectMeans(d, dep, subject, between)
                     for (r in homogeneityTable(sm[[dep]], cellsFactor(sm, between))) ht$addRow(rowKey = r$test, values = r)
-                    ht$setNote("cells", "Test na średnich jednostek (uśrednionych po czynnikach wewnątrzobiektowych) między grupami czynników międzyobiektowych.")
+                    ht$setNote("cells", "Na średnich jednostek, między grupami międzyobiektowymi.")
                 } else ht$setNote("na", "Test Levene'a wymaga czynnika międzyobiektowego.")
             }
             resid <- tryCatch(as.numeric(stats::residuals(res$fit$lm)), error = function(e) NULL)

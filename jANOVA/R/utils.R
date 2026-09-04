@@ -302,6 +302,46 @@ homogeneityTable <- function(y, cells) {
 }
 
 # ---------------------------------------------------------------------------
+# Methods description shared by anova and anovarm (jmvcore::metodyNew)
+# ---------------------------------------------------------------------------
+
+# Parametric post-hoc, contrasts, descriptives, assumptions and plots are
+# configured the same way in both analyses; `factorsAll` = factors whose
+# main effects get letters, `resid` = whether residual diagnostics exist.
+metodyAnovaWspolne <- function(m, o, factorsAll, residPlot = FALSE) {
+    method <- o$postHoc; alpha <- o$alpha
+    if (method == "none") {
+        m$add("Post-hoc", "Bez porównań: tylko średnie brzegowe z modelu (emmeans) z przedziałami ufności %g%%.", 100 * (1 - alpha))
+    } else {
+        m$add("Post-hoc", paste(
+            "Porównania na średnich brzegowych z modelu (emmeans): %s, α = %g; litery grup jednorodnych",
+            "metodą insert-absorb, „a” = najniższa średnia, ta sama litera = brak istotnej różnicy%s."),
+            phMethodLabel(method), alpha,
+            if (method == "dunnett") "; kontrola = pierwszy poziom czynnika" else "")
+        if (method != "holm")
+            m$add("Post-hoc", "Różnica graniczna (%s) w tabeli średnich; przedział ufności pary = różnica ± wartość graniczna (poziom %g%%).",
+                  phCritLabel(method), 100 * (1 - alpha))
+        m$addIf(o$phInter, "Post-hoc", "Porównywane także komórki interakcji dwóch czynników.")
+        m$addIf(o$showPairs && isTRUE(o$phES), "Post-hoc", "d Cohena w tabeli par = różnica średnich / √MS błędu.")
+    }
+    if (o$contrastType != "none")
+        m$add("Post-hoc", "Kontrasty %s dla każdego czynnika (emmeans::contrast), bez korekty na liczbę porównań.",
+              switch(o$contrastType, deviation = "odchyleń od średniej ogólnej", simple = "proste vs pierwszy poziom",
+                     simpleLast = "proste vs ostatni poziom", difference = "różnicowe (vs średnia wcześniejszych)",
+                     helmert = "Helmerta (vs średnia późniejszych)", repeated = "powtarzane (sąsiednie poziomy)",
+                     polynomial = "wielomianowe (trendy)", o$contrastType))
+    m$addIf(o$desc, "Dodatkowe", "Statystyki opisowe (n, średnia, SD, mediana) dla każdej komórki czynników.")
+    m$addIf(o$norm, "Założenia", "Normalność: test Shapiro-Wilka na resztach modelu (od 3 do 5000 reszt).")
+    m$addIf(o$qq, "Założenia", "Wykres Q-Q reszt modelu wobec rozkładu normalnego.")
+    m$addIf(residPlot, "Założenia", "Wykres reszt wobec wartości dopasowanych.")
+    m$addIf(o$plotMeans, "Wykres", "Średnie brzegowe z literami; słupki błędów = %s.",
+            switch(o$errorBars, se = "błąd standardowy (SE)", ci = sprintf("przedział ufności %g%%", 100 * (1 - alpha)), "brak"))
+    m$addIf(o$plotInteraction && length(factorsAll) >= 2, "Wykres",
+            "Wykres interakcji: średnie komórek dla „%s” × „%s” (pierwsze dwa czynniki).", factorsAll[1], factorsAll[2])
+    invisible(m)
+}
+
+# ---------------------------------------------------------------------------
 # Plots
 # ---------------------------------------------------------------------------
 

@@ -177,6 +177,50 @@ qqPlotResid <- function(image, ggtheme, theme) {
 }
 
 # ---------------------------------------------------------------------------
+# Methods description shared by the three analyses (jmvcore::metodyNew)
+# ---------------------------------------------------------------------------
+
+# kind: "one" | "two" | "paired"; diffLab: what "difference" means in this analysis
+# homog: only ttesttwo has the option (o$homog would throw elsewhere)
+metodyWspolne <- function(m, o, kind, diffLab, homog = FALSE) {
+    what <- if (kind == "one") "średnia − wartość testowa" else "różnica"
+    m$add("Testy", "%s; H₁: %s; przedziały ufności %g%%.", diffLab, altLabel(o$hypothesis, what), o$ciWidth)
+    if (isTRUE(o$nonpar))
+        m$add("Testy", paste(
+            if (kind == "two") "U Manna-Whitneya" else "Test Wilcoxona rangowanych znaków",
+            "z przybliżeniem normalnym i poprawką ciągłości; estymator = %s Hodgesa-Lehmanna z przedziałem ufności."),
+            if (kind == "two") "przesunięcie" else "pseudomediana")
+    m$add("Wielkość efektu", "d Cohena = %s; przedział ufności z rozkładu niecentralnego t.",
+          switch(kind, one = "(średnia − wartość testowa) / SD",
+                 two = "różnica średnich / łączone SD (Studenta)",
+                 paired = "średnia różnica / SD różnic"))
+    m$addIf(o$nonpar, "Wielkość efektu", "Dla testu rangowego: r rangowo-dwuseryjne (%s), bez przedziału ufności.",
+            if (kind == "two") "1 − 2U / (n₁ n₂)" else "z sumy rang dodatnich i ujemnych")
+    m$addIf(o$desc, "Dodatkowe", "Statystyki opisowe: n, średnia, mediana, SD, SE%s.",
+            if (kind == "paired") " — dla obu zmiennych i dla różnic" else if (kind == "two") " — osobno w grupach" else "")
+    m$addIf(o$norm, "Założenia", "Normalność: test Shapiro-Wilka %s (od 3 do 5000 obserwacji).",
+            switch(kind, one = "zmiennej", two = "osobno w każdej grupie", paired = "różnic"))
+    m$addIf(homog, "Założenia", "Jednorodność wariancji: test Levene’a na odchyleniach od mediany (car::leveneTest).")
+    m$addIf(o$qq, "Założenia", "Wykres Q-Q: kwantyle %s wobec kwantyli rozkładu normalnego.",
+            switch(kind, one = "standaryzowanej zmiennej", two = "reszt w grupach (wartości minus średnia grupy)",
+                   paired = "standaryzowanych różnic"))
+    if (isTRUE(o$plot)) {
+        if (kind == "two" && identical(o$plotType, "box"))
+            m$add("Wykres", "Pudełkowy z punktami: pudełko = mediana i kwartyle, romb = średnia.")
+        else if (kind == "one")
+            m$add("Wykres", "Punkty obserwacji, romb = średnia z przedziałem ufności %g%%, linia przerywana = wartość testowa.", o$ciWidth)
+        else
+            m$add("Wykres", paste(
+                "Estymacyjny (Gardner-Altman): punkty%s, romby = średnie z przedziałami ufności %g%%;",
+                "różnica z przedziałem na osi po prawej, zakotwiczonej w średniej drugiej grupy%s."),
+                if (kind == "paired") " połączone liniami w pary, różnice jako punkty przy „Różnica”" else "",
+                o$ciWidth,
+                if (kind == "two" && isTRUE(o$welch)) " (przedział różnicy z t Welcha)" else "")
+    }
+    invisible(m)
+}
+
+# ---------------------------------------------------------------------------
 # Table helpers shared by the three analyses
 # ---------------------------------------------------------------------------
 

@@ -18,6 +18,14 @@ ttesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (nlevels(droplevels(gAll[!is.na(gAll)])) != 2) {
                 tt$setNote("g", "Zmienna grupująca musi mieć dokładnie 2 poziomy (odfiltruj pozostałe)."); return()
             }
+            m <- jmvcore::metodyNew()
+            lvAll <- levels(droplevels(gAll[!is.na(gAll)]))
+            m$add("Dane", "Zmienne zależne: %s; zmienna grupująca „%s” z poziomami „%s” i „%s”; braki pomijane osobno dla każdej zmiennej.",
+                  jmvcore::metodyCyt(o$vars), o$group, lvAll[1], lvAll[2])
+            m$addIf(o$student, "Testy", "t Studenta dla prób niezależnych (wspólna wariancja), df = n₁ + n₂ − 2.")
+            m$addIf(o$welch, "Testy", "t Welcha (osobne wariancje, df Welcha-Satterthwaite’a).")
+            metodyWspolne(m, o, "two", sprintf("Różnica = „%s” − „%s”", lvAll[1], lvAll[2]), homog = isTRUE(o$homog))
+            m$render(self$results$metody)
             for (v in o$vars) {
                 y <- jmvcore::toNumeric(self$data[[v]]); ok <- !is.na(y) & !is.na(gAll)
                 y <- y[ok]; g <- droplevels(gAll[ok]); lv <- levels(g)
@@ -39,9 +47,8 @@ ttesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     est = mean(x1) - mean(x2), lower = td$conf.int[1], upper = td$conf.int[2], level = level, ylab = v))
                 self$results$qq$get(key = v)$setState(list(x = c(x1 - mean(x1), x2 - mean(x2)), label = paste(v, "(reszty w grupach)")))
             }
-            tt$setNote("h", sprintf("Różnica = %s − %s; H₁: %s; przedziały ufności %g%%. d Cohena z łączonym SD i przedziałem (niecentralny t)%s.",
-                lv[1], lv[2], altLabel(o$hypothesis), o$ciWidth,
-                if (isTRUE(o$nonpar)) "; dla Manna-Whitneya r rangowo-dwuseryjne i przesunięcie Hodgesa-Lehmanna z CI" else ""))
+            # kierunek roznicy musi byc widoczny bez opisu metod — zostaje jedno zdanie
+            tt$setNote("h", sprintf("Różnica = %s − %s.", lvAll[1], lvAll[2]))
         },
         .plot = function(image, ggtheme, theme, ...) {
             if (self$options$plotType == "box") boxPlotTwo(image, ggtheme, theme) else estimationPlot(image, ggtheme, theme)

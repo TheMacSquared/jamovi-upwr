@@ -67,3 +67,32 @@ test_that("ART main-effect comparisons produce letters", {
     expect_true(all(nchar(m$letters) >= 1))
     expect_equal(nrow(res$artPairs$get(key = "dose")$asDF), 3)
 })
+
+test_that("opis metod: anova i anovarm", {
+    res <- jANOVA:::anova(data = PlantGrowth, dep = "weight", factors = "group")
+    expect_false(res$metody$visible)
+    tg <- ToothGrowth; tg$dose <- factor(tg$dose)
+    res <- jANOVA:::anova(data = tg, dep = "len", factors = c("supp", "dose"), welch = TRUE, nonpar = TRUE,
+                          showPairs = TRUE, phES = TRUE, partEta = TRUE, homog = TRUE, norm = TRUE,
+                          contrastType = "polynomial", plotInteraction = TRUE, metody = TRUE)
+    h <- res$metody$content
+    expect_true(res$metody$visible)
+    expect_true(grepl("„supp”, „dose”", h) && grepl("typu III", h) && grepl("zrównoważony", h))
+    expect_true(grepl("Welcha-Jamesa", h) && grepl("Aligned Rank Transform", h))
+    expect_true(grepl("test Tukeya", h) && grepl("HSD", h) && grepl("√MS błędu", h))
+    expect_true(grepl("wielomianowe", h) && grepl("Bartletta", h) && grepl("Wykres interakcji", h))
+    expect_lt(regexpr("<b>Dane</b>", h), regexpr("<b>Model</b>", h))
+    expect_lt(regexpr("<b>Model</b>", h), regexpr("<b>Testy</b>", h))
+    expect_lt(regexpr("<b>Założenia</b>", h), regexpr("<b>Wykres</b>", h))
+    expect_false(grepl(sprintf("%.3f", res$anova$asDF$F[1]), h))
+    # noty pod tabelami sa jednozdaniowe
+    txt <- paste(capture.output(print(res$means$get(key = "supp"))), collapse = "\n")
+    expect_true(grepl("Ta sama litera", txt))
+    expect_false(grepl("emmeans", txt))
+
+    data(oats, package = "MASS")
+    oats$Y <- as.numeric(oats$Y); oats$plot <- interaction(oats$B, oats$V)
+    rm <- jANOVA:::anovarm(data = oats, dep = "Y", subject = "plot", within = "N", between = "V",
+                           spherCorr = "GG", pes = TRUE, homog = TRUE, metody = TRUE)$metody$content
+    expect_true(grepl("aov_ez", rm) && grepl("Greenhouse", rm) && grepl("Mauchly", rm) && grepl("η²p", rm))
+})

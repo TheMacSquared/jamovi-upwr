@@ -83,6 +83,15 @@ children:
                 name: plotMeans
               - type: CheckBox
                 name: plotInteraction
+  - type: LayoutBox
+    margin: large
+    stretchFactor: 1
+    children:
+      - type: Label
+        label: Opis metod
+        children:
+          - type: CheckBox
+            name: metody
   - type: CollapseBox
     label: Założenia
     collapsed: true

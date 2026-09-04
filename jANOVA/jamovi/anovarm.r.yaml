@@ -473,4 +473,8 @@ items:
       renderFun: .qqPlot
       clearWith: *cw
 
+    - name: metody
+      title: Zastosowane metody
+      type: Html
+      visible: (metody)
 ...

@@ -68,6 +68,11 @@ children:
             children:
               - type: CheckBox
                 name: plot
+          - type: Label
+            label: Opis metod
+            children:
+              - type: CheckBox
+                name: metody
 
   - type: LayoutBox
     margin: large

@@ -39,14 +39,14 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             }
             if (method == "none") {
                 mt$getColumn("letters")$setVisible(FALSE)
-                mt$setNote("emm", sprintf("Średnie brzegowe z modelu (emmeans), %g%% CI.", 100 * (1 - alpha)))
+                mt$setNote("emm", sprintf("Przedziały ufności %g%%.", 100 * (1 - alpha)))
             } else if (method == "dunnett") {
                 mt$getColumn("letters")$setTitle("vs kontrola")
-                mt$setNote("dun", paste0("Kontrola = pierwszy poziom; * różni się istotnie od kontroli; ", cmp$critNote))
+                mt$setNote("dun", "* = różni się istotnie od kontroli (pierwszy poziom).")
             } else {
-                mt$setNote("cld", paste0(if (what == "means") "Średnie brzegowe z modelu; " else "",
-                    phMethodLabel(method), "; ", cmp$critNote,
-                    ". Poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią."))
+                # konwencja liter jest potrzebna do odczytu tabeli — reszta w opisie metod
+                mt$setNote("cld", paste0("Ta sama litera = brak istotnej różnicy (a = najniższa średnia)",
+                    if (!is.null(cmp$critNote)) paste0("; ", cmp$critNote) else "", "."))
             }
             if (!is.null(cmp$pairs)) {
                 for (i in seq_len(nrow(cmp$pairs))) {
@@ -60,8 +60,8 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                         for (cn in c("crit", "lower", "upper")) pt$getColumn(cn)$setVisible(FALSE)
                         pt$setNote("holm", "p skorygowane metodą Holma.")
                     } else {
-                        pt$setNote("crit", sprintf("%s; przedział ufności = różnica ± %s (poziom %g%%).",
-                            phMethodLabel(method), phCritLabel(method), 100 * (1 - alpha)))
+                        pt$setNote("crit", sprintf("Przedział ufności %g%% = różnica ± %s.",
+                            100 * (1 - alpha), phCritLabel(method)))
                     }
                 }
             }
@@ -99,6 +99,26 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             method <- opts$postHoc; alpha <- opts$alpha
             oneFactor <- length(factors) == 1 && length(blocks) == 0 && length(covs) == 0
             factorsOnly <- length(blocks) == 0 && length(covs) == 0
+            cells <- cellsFactor(d, factors)
+            balanced <- length(unique(table(cells))) == 1
+
+            # --- methods description (jmvcore::metodyNew): data and model first,
+            # tests/post-hoc appended where they are computed, rendered at the end
+            md <- jmvcore::metodyNew()   # `m` is reused below for matrices/means
+            md$add("Dane", "Zmienna zależna „%s”; czynniki: %s%s%s; N = %d obserwacji kompletnych (wiersze z brakiem w którejkolwiek zmiennej pominięte).",
+                  dep, jmvcore::metodyCyt(factors),
+                  if (length(blocks)) paste0("; czynniki blokujące (addytywne): ", jmvcore::metodyCyt(blocks)) else "",
+                  if (length(covs)) paste0("; kowarianty: ", jmvcore::metodyCyt(covs)) else "", nrow(d))
+            md$add("Model", "Model liniowy (lm): czynniki %s%s%s; sumy kwadratów typu %s%s; układ %s.",
+                  if (isTRUE(opts$interactions) && length(factors) > 1) "z pełnymi interakcjami" else "bez interakcji (efekty główne)",
+                  if (length(blocks)) " + bloki addytywne" else "",
+                  if (length(covs)) " + kowarianty (ANCOVA)" else "",
+                  switch(opts$ss, '1' = "I (sekwencyjne, w kolejności wierszy)", '2' = "II", "III"),
+                  if (opts$ss != "1") " (car::Anova, kontrasty sumowe)" else "",
+                  if (balanced) "zrównoważony" else "niezrównoważony")
+            es <- c(if (isTRUE(opts$eta)) "η² = SS efektu / SS ogółem", if (isTRUE(opts$partEta)) "η²p = SS efektu / (SS efektu + SS błędu)",
+                    if (isTRUE(opts$omega)) "ω² (nieobciążone)")
+            md$addIf(length(es) > 0, "Model", "Wielkości efektu: %s.", paste(es, collapse = "; "))
 
             # --- ANOVA table
             at <- self$results$anova
@@ -107,10 +127,8 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 at$addRow(rowKey = r$term, values = list(source = r$source, ss = r$ss, df = r$df,
                     ms = r$ms, F = r$F, p = r$p, eta = r$eta, partEta = r$partEta, omega = r$omega))
             }
-            at$setNote("ss", switch(opts$ss, '1' = "Sumy kwadratów typu I (sekwencyjne, w kolejności wierszy).",
-                '2' = "Sumy kwadratów typu II.", '3' = "Sumy kwadratów typu III."))
-            cells <- cellsFactor(d, factors)
-            if (length(unique(table(cells))) > 1 && opts$ss == "1")
+            # typ SS przenosi sie do opisu metod; zostaje ostrzezenie, bez ktorego tabela myli
+            if (!balanced && opts$ss == "1")
                 at$setNote("unbal", "Układ niezrównoważony: przy typie I wynik zależy od kolejności czynników.")
 
             # --- Welch / Welch-James
@@ -126,7 +144,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                             r <- w[i, ]
                             wt$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
                         }
-                        wt$setNote("wj", if (length(factors) == 1) "Test Welcha: osobne wariancje grup, przybliżone stopnie swobody."
+                        md$add("Testy", if (length(factors) == 1) "Test Welcha (oneway.test): osobne wariancje grup, przybliżone stopnie swobody."
                             else "Test Welcha-Jamesa (Johansen, 1980): osobne wariancje komórek, przybliżone stopnie swobody, pełny model czynnikowy.")
                     }
                 }
@@ -149,7 +167,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 kw <- kruskalTable(y, g)
                 npt <- self$results$npTests
                 npt$addRow(rowKey = "kw", values = list(test = kw$test, stat = kw$stat, df = kw$df, p = kw$p, es = kw$es))
-                npt$setNote("es", "Test Kruskala-Wallisa na rangach; ε² = H/(n − 1).")
+                md$add("Testy", "Nieparametrycznie (jeden czynnik): test Kruskala-Wallisa na rangach, ε² = H / (n − 1); post-hoc test Dunna z poprawką Holma (α = %g) i literami grup jednorodnych.", alpha)
                 dn <- dunnPairs(y, g, adjust = "holm", alpha = alpha)
                 nm <- self$results$npMeans
                 for (i in seq_len(nrow(dn$levels))) {
@@ -157,7 +175,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     nm$addRow(rowKey = r$level, values = list(level = r$level, n = r$n, median = r$median,
                         meanRank = r$meanRank, letters = r$letters))
                 }
-                nm$setNote("dunn", "Test Dunna z poprawką Holma; poziomy z tą samą literą nie różnią się istotnie; litera a = grupa z najniższą średnią rangą.")
+                nm$setNote("dunn", "Ta sama litera = brak istotnej różnicy (a = najniższa średnia ranga).")
                 np <- self$results$npPairs
                 for (i in seq_len(nrow(dn$pairs))) {
                     r <- dn$pairs[i, ]
@@ -173,22 +191,26 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                         r <- at2[i, ]
                         artT$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
                     }
-                    artT$setNote("art", paste0("Aligned Rank Transform (Wobbrock i in., 2011): dla każdego efektu odpowiedź ",
-                        "wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE typu III; raportowany jest F tego efektu. ",
-                        "Przy kilku czynnikach to nieparametryczny odpowiednik ANOVY czynnikowej."))
+                    md$add("Testy", paste(
+                        "Nieparametrycznie (kilka czynników): Aligned Rank Transform (Wobbrock i in., 2011) — dla każdego efektu",
+                        "odpowiedź wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE typu III; raportowany F tego efektu."))
+                    md$addIf(method != "none", "Testy", "Porównania efektów głównych ART na wyrównanych rangach: %s, α = %g.", phMethodLabel(method), alpha)
                     if (method != "none") for (f in factors) {
                         mt <- self$results$artMeans$get(key = f)
                         pt <- self$results$artPairs$get(key = f)
                         cmp <- tryCatch(artMainEffectComparisons(d, dep, factors, f, method, alpha), error = function(e) e)
                         if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
                         private$.fillComparison(mt, pt, cmp, method, alpha, "art")
-                        mt$setNote("cld", paste0("Rangi wyrównane dla efektu ", f, "; ", phMethodLabel(method), "; ",
-                            cmp$critNote %||% "", ". Poziomy z tą samą literą nie różnią się istotnie."))
+                        mt$setNote("cld", "Ta sama litera = brak istotnej różnicy (a = najniższa średnia ranga).")
                     }
                 }
             }
 
             # --- parametric comparisons
+            metodyAnovaWspolne(md, opts, factors, residPlot = isTRUE(opts$residPlot))
+            md$addIf(opts$homog, "Założenia", "Jednorodność wariancji między komórkami czynników: test Levene’a (odchylenia od mediany) i test Bartletta.")
+            md$addIf(opts$residsOV, "Dodatkowe", "Reszty modelu zapisane do arkusza (NA dla wierszy pominiętych).")
+            md$render(self$results$metody)
             keys <- private$.termKeys()
             for (k in names(keys)) {
                 term <- keys[[k]]
@@ -238,7 +260,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (isTRUE(opts$homog)) {
                 ht <- self$results$homog
                 for (r in homogeneityTable(d[[dep]], cells)) ht$addRow(rowKey = r$test, values = r)
-                ht$setNote("cells", "Jednorodność wariancji między komórkami (kombinacjami czynników).")
+                ht$setNote("cells", "Między komórkami czynników.")
             }
             resid <- stats::residuals(res$fit)
             if (isTRUE(opts$norm)) {

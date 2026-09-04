@@ -97,4 +97,9 @@ options:
       type: Bool
       default: false
 
+    # --- opis metod (wspólny mechanizm jUPWR: jmvcore::metodyNew) ---
+    - name: metody
+      title: Opis zastosowanych metod
+      type: Bool
+      default: false
 ...
