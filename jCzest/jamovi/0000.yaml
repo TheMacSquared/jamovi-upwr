@@ -10,19 +10,19 @@ description: >
   Analizy tabel liczności z prostym panelem: test χ², V Craméra i procenty
   widoczne od razu, automatyczna kontrola liczebności oczekiwanych.
 analyses:
-  - title: Tabela kontyngencji
-    name: tabela
-    ns: jCzest
-    menuGroup: Częstości
-    menuTitle: Tabela kontyngencji
-    menuSubtitle: dwie zmienne jakościowe
-    category: analyses
   - title: Test zgodności
     name: zgodnosc
     ns: jCzest
     menuGroup: Częstości
     menuTitle: Jedna zmienna
     menuSubtitle: zgodność z oczekiwanymi proporcjami
+    category: analyses
+  - title: Tabela kontyngencji
+    name: tabela
+    ns: jCzest
+    menuGroup: Częstości
+    menuTitle: Tabela kontyngencji
+    menuSubtitle: dwie zmienne jakościowe
     category: analyses
   - title: Próby zależne
     name: zalezne

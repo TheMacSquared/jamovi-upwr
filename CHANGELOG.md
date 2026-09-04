@@ -3,6 +3,28 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 0.9.5.5 — 2026-09-04
+- Analizy częstości z jmv są ukryte w menu — zastępuje je jCzest. Ukryte:
+  `contTables`, `contTablesPaired`, `propTest2`, `propTestN`; ich kod zostaje
+  w dystrybucji, więc zapisane pliki `.omv` nadal się otwierają. `logLinear`
+  pozostaje widoczny jako jedyne narzędzie do tabel wielowymiarowych
+  (ten sam wyjątek co MANCOVA).
+- Kolejność w menu „Częstości" ustawiona dydaktycznie: Jedna zmienna →
+  Tabela kontyngencji → Próby zależne.
+- Próby zależne: wielkość efektu (OR par niezgodnych z przedziałem) przeniesiona
+  do głównej tabeli testu zamiast osobnej tabeli z jednym wierszem; przy trzech
+  i więcej pomiarach OR jest podawany parami w porównaniach post-hoc, bo jest
+  miarą pary, a nie zestawu pomiarów. Tabela par przeniesiona do rdzenia panelu
+  i włączona domyślnie, a jej brzegi (liczność z udziałem, np. „42 (35.0%)")
+  niosą rozkłady obu pomiarów — osobna tabela udziałów powtarzała te same liczby.
+- Próby zależne: nowy wykres udziałów w kolejnych pomiarach. Słupki połączone
+  linią, bo to te same jednostki mierzone kilka razy — to pierwszy wykres
+  w dystrybucji dla danych z powtórzonymi pomiarami w formacie szerokim
+  (zob. CLAUDE.md, zadanie 18).
+- Moduły bez zmian: jmv 2.8.4, scatr 2.9.0, jdistrACTION 1.3.2, jCI 0.1.0,
+  jperm 0.1.0, jboot 0.3.0, jDane 0.7.0, jANOVA 0.3.0, jTestyT 0.2.0,
+  jCzest 0.1.0; opcjonalne: jRISK 0.3.3, jSpace 0.2.2, jRol 0.1.0.
+
 ## 0.9.5 — 2026-09-03
 - Nowy moduł jCzest 0.1.0 (wbudowany, menu „Częstości"): analizy tabel liczności
   z panelem pod dydaktyczną prostotę. Diagnoza kategorii w jmv była odwrotna niż
