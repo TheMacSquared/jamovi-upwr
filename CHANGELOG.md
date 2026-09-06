@@ -3,7 +3,10 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
-## Niewydane
+## 1.0.1 — 2026-09-06
+Wydanie poprawkowe: naprawione obliczenia w trzech modułach kursu podstawowego.
+Bez zmian w menu, panelach i modułach opcjonalnych.
+
 - jperm 0.2.1: dokładne testy permutacyjne liczą p z pełnej enumeracji bez
   korekty Monte Carlo „+1”; opis metod rozróżnia oba schematy.
 - jCI 0.3.1: regresja bootstrapowa pomija nieestymowalne pary współczynników,
