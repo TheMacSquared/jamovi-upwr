@@ -2,7 +2,7 @@
 # Pure R implementation using sample()/replicate() for didactic clarity
 
 #' Calculate permutation p-value
-#' Uses (sum + 1) / (B + 1) correction so p is never exactly 0
+#' Full enumeration includes the observed arrangement; Monte Carlo uses plus one.
 #'
 #' @param observed numeric, observed test statistic
 #' @param permDist numeric vector, permutation distribution
@@ -17,6 +17,7 @@ permPValue <- function(observed, permDist, hypothesis) {
         less     = sum(permDist <= observed)
     )
 
+    if (isTRUE(attr(permDist, "exact"))) return(count / B)
     return((count + 1) / (B + 1))
 }
 
@@ -181,7 +182,7 @@ metodyPerm <- function(m, o, kind, diffLab) {
     m$add("Testy", "%s; statystyka testowa = %s; H₁: %s.", diffLab,
           switch(kind, one = "średnia − wartość testowa", two = "różnica średnich grup", paired = "średnia różnic"),
           altLabel(o$hypothesis, if (kind == "one") "średnia − wartość testowa" else "różnica"))
-    m$add("Testy", "Rozkład przy H₀ przez %s; p = (liczba układów ze statystyką co najmniej tak skrajną jak obserwowana + 1) / (liczba układów + 1)%s.",
+    m$add("Testy", "Rozkład przy H₀ przez %s%s; b = liczba układów ze statystyką co najmniej tak skrajną jak obserwowana. Pełna enumeracja: p = b / B (układ obserwowany już wliczony); Monte Carlo: p = (b + 1) / (B + 1).",
           if (kind == "two") "losowe przetasowanie etykiet grup" else "losową zmianę znaków odchyleń (sign-flip)",
           if (o$hypothesis == "different") ", dwustronnie po wartości bezwzględnej" else "")
     if (isTRUE(o$exact))

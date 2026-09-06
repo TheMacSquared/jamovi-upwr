@@ -142,6 +142,39 @@ qqResidPlot <- function(resid, ggtheme, theme) {
 # Logistic regression helpers
 # ---------------------------------------------------------------------------
 
+# LR degrees of freedom count estimable directions, including singular designs.
+logisticLR <- function(fit, null) {
+    chi <- max(0, 2 * as.numeric(stats::logLik(fit) - stats::logLik(null)))
+    df <- stats::df.residual(null) - stats::df.residual(fit)
+    list(chi = chi, df = df, p = if (df > 0) stats::pchisq(chi, df, lower.tail = FALSE) else NA_real_)
+}
+
+# Complete or quasi-complete separation exists iff signed margins can all be
+# nonnegative with at least one strictly positive. Maximize their sum subject
+# to ||beta||_1 <= 1; split beta into nonnegative positive/negative parts.
+# A null-space direction alone has objective zero, so aliasing is not separation.
+# See https://search.r-project.org/CRAN/refmans/detectseparation/html/detect_separation.html
+logisticSeparation <- function(fit, tolerance = 1e-7) {
+    X <- stats::model.matrix(fit)
+    y <- fit$y
+    # Center with the intercept and scale columns to improve LP conditioning.
+    if ("(Intercept)" %in% colnames(X)) {
+        cols <- colnames(X) != "(Intercept)"
+        X[, cols] <- scale(X[, cols, drop = FALSE], center = TRUE, scale = FALSE)
+    }
+    sizes <- apply(abs(X), 2, max)
+    X <- sweep(X, 2, ifelse(sizes > 0, sizes, 1), "/")
+    signed <- X * (2 * y - 1)
+    A <- cbind(signed, -signed)
+    result <- tryCatch(lpSolve::lp("max", colSums(A), rbind(A, rep(1, ncol(A))),
+                                  c(rep(">=", nrow(A)), "<="), c(rep(0, nrow(A)), 1)),
+                       error = function(e) NULL)
+    if (is.null(result) || result$status != 0) return(NA)
+    margins <- as.vector(A %*% result$solution)
+    if (any(margins < -tolerance)) return(NA)
+    sum(margins) > tolerance
+}
+
 #' Classification at a cut-off: confusion counts and accuracy / sensitivity / specificity
 classify <- function(y, prob, cutoff = 0.5) {
     pred <- as.integer(prob >= cutoff)

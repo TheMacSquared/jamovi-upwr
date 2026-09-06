@@ -176,7 +176,7 @@ if (-not (Test-Path "$BaseR\Rcpp"))      { & $R --vanilla --slave -e "options(re
 if (-not (Test-Path "$BaseR\RProtoBuf")) { & $R --vanilla --slave -e "options(repos=c(CRAN='$CranRepo')); install.packages('RProtoBuf', lib='$($BaseR -replace '\\','/')', INSTALL_opts='--no-multiarch')" | Out-Null }
 
 # 4b. zaleznosci modulow (do user-lib) — jmc oczekuje ich na sciezce
-$deps13 = "multcomp emmeans vcd vcdExtra GGally BayesFactor psych GPArotation afex mvnormtest lavaan ROCR Hmisc".Split(' ')
+$deps13 = "multcomp emmeans vcd vcdExtra GGally lpSolve BayesFactor psych GPArotation afex mvnormtest lavaan ROCR Hmisc".Split(' ')
 $missing = $deps13 | Where-Object { -not (Test-Path "$UserLib\$_") }
 if ($missing) { & $R --vanilla --slave -e "options(repos=c(CRAN='$CranRepo')); install.packages(c('$($missing -join "','")'), lib='$($UserLib -replace '\\','/')', dependencies=c('Depends','Imports','LinkingTo'))" | Out-Null }
 

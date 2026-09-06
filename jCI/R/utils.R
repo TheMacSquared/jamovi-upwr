@@ -14,13 +14,19 @@ bootLabel <- function(method) switch(method, perc = "bootstrap percentylowy", bc
 # data: vector or data.frame; statFun(data, idx) -> numeric (length 1 or k).
 # Returns for each statistic: est, se (sd of replicates), lower, upper, reps,
 # fallback (TRUE when boot.ci failed and percentile quantiles were used).
-bootCI <- function(data, statFun, nBoot, seed, method = "perc", level = 0.95, strata = NULL) {
+bootCI <- function(data, statFun, nBoot, seed, method = "perc", level = 0.95, strata = NULL, minValid = 2) {
     if (!is.null(seed) && seed > 0) set.seed(seed)
     b <- if (is.null(strata)) boot::boot(data, statFun, R = nBoot)
          else boot::boot(data, statFun, R = nBoot, strata = strata)
     k <- ncol(b$t)
     out <- lapply(seq_len(k), function(j) {
         reps <- b$t[, j]
+        reps[!is.finite(reps)] <- NA_real_
+        b$t[, j] <- reps
+        nValid <- sum(is.finite(reps))
+        if (nValid < minValid)
+            return(list(est = unname(b$t0[j]), se = NA_real_, lower = NA_real_, upper = NA_real_,
+                        reps = reps, fallback = FALSE, nValid = nValid, nFailed = nBoot - nValid, sufficient = FALSE))
         ci <- tryCatch(suppressWarnings({
             # boot.ci prints (not signals) "All values of t are equal" and returns NULL
             junk <- utils::capture.output(c0 <- boot::boot.ci(b, conf = level, type = method, index = j))
@@ -33,9 +39,29 @@ bootCI <- function(data, statFun, nBoot, seed, method = "perc", level = 0.95, st
                        upper = unname(stats::quantile(reps, 1 - a, na.rm = TRUE)), fallback = TRUE)
         }
         list(est = unname(b$t0[j]), se = stats::sd(reps, na.rm = TRUE), lower = ci$lower, upper = ci$upper,
-             reps = reps, fallback = ci$fallback)
+             reps = reps, fallback = ci$fallback, nValid = nValid, nFailed = nBoot - nValid, sufficient = TRUE)
     })
     if (k == 1) out[[1]] else out
+}
+
+# Keep intercept and slope paired: a rank-deficient resample estimates neither
+# statistic for the purpose of this joint bootstrap distribution.
+regressionBootStatistic <- function(d, i) {
+    fit <- stats::lm(y ~ x, data = d[i, , drop = FALSE])
+    cf <- stats::coef(fit)
+    if (fit$rank < 2 || any(!is.finite(cf))) return(c(NA_real_, NA_real_))
+    unname(cf)
+}
+
+# Pointwise percentile band, irrespective of the coefficient CI method.
+regressionBootBand <- function(xg, coefficients, reps0, reps1, level) {
+    keep <- is.finite(reps0) & is.finite(reps1)
+    if (sum(keep) < 2) return(NULL)
+    a <- (1 - level) / 2
+    limits <- vapply(xg, function(x) stats::quantile(reps0[keep] + x * reps1[keep],
+                                                   probs = c(a, 1 - a), names = FALSE), numeric(2))
+    data.frame(x = xg, fit = coefficients[1] + coefficients[2] * xg,
+               lower = limits[1, ], upper = limits[2, ])
 }
 
 # ---------------------------------------------------------------------------
@@ -127,7 +153,7 @@ ciNote <- function(table, o, method, classicLabel, fallback = FALSE) {
     txt <- if (isBoot(method)) sprintf("%g%% CI: %s, B = %s.", o$ciWidth, bootLabel(method), format(o$nBoot, big.mark = " "))
            else sprintf("%g%% CI: %s.", o$ciWidth, classicLabel)
     table$setNote("ci", txt)
-    if (isTRUE(fallback)) table$setNote("fb", "Metody BCa nie dało się policzyć (za mało zróżnicowane replikacje) — użyto kwantyli percentylowych.")
+    if (isTRUE(fallback)) table$setNote("fb", sprintf("Nie udało się wyznaczyć przedziału metodą %s — użyto empirycznych kwantyli percentylowych.", bootLabel(method)))
 }
 
 # ---------------------------------------------------------------------------

@@ -46,3 +46,14 @@ test_that("paired permutation delegates to sign flips of differences", {
     one <- permDistOneSample(d, 0, 100, seed = 9, exact = TRUE)
     expect_identical(paired, one)
 })
+
+test_that("full enumeration includes the observed arrangement exactly once", {
+    d <- permDistOneSample(1:6, 0, 100, 1, TRUE)
+    expect_equal(permPValue(3.5, d, "different"), 2 / 64)
+    expect_equal(permPValue(3.5, d, "greater"), 1 / 64)
+    expect_equal(permPValue(3.5, d, "less"), 1)
+    g <- factor(c("a", "a", "b", "b"))
+    d <- permDistTwoSample(c(1, 2, 5, 8), g, 100, 1, TRUE)
+    expect_equal(permPValue(-5, d, "less"), 1 / 6)
+    expect_equal(permPValue(-5, d, "different"), 2 / 6)
+})

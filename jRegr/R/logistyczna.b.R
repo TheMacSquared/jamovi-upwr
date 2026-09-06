@@ -16,32 +16,47 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             y <- as.integer(d[[dep]] == event); n <- nrow(d)
             if (sum(y) == 0 || sum(y) == n) { ct$setNote("err", "Zmienna zależna musi mieć obserwacje w obu kategoriach."); return() }
             d$.y <- y
-            fit <- suppressWarnings(stats::glm(regressionFormula(".y", covs, factors), data = d, family = stats::binomial()))
+            fitWarnings <- character()
+            fit <- withCallingHandlers(stats::glm(regressionFormula(".y", covs, factors), data = d, family = stats::binomial()),
+                warning = function(w) { fitWarnings <<- c(fitWarnings, conditionMessage(w)); invokeRestart("muffleWarning") })
             null <- stats::glm(.y ~ 1, data = d, family = stats::binomial())
+            separated <- logisticSeparation(fit)
+            reliable <- isFALSE(separated) && isTRUE(fit$converged)
+            if (isTRUE(separated)) {
+                note <- "Separacja całkowita lub quasi-całkowita: skończone oszacowania MNW nie istnieją dla części współczynników; b i OR są przybliżeniami numerycznymi. Nie podano SE, testów Walda ani przedziałów OR."
+                ct$setNote("separation", note)
+                ft$setNote("separation", "Separacja: dopasowanie i klasyfikacja opisują graniczne dopasowanie numeryczne.")
+                self$results$classStats$setNote("separation", "Separacja: miary opisują graniczne dopasowanie na danych uczących.")
+            } else if (is.na(separated))
+                ct$setNote("separation", "Nie udało się sprawdzić separacji — nie podano SE, testów Walda ani przedziałów OR.")
+            if (anyNA(stats::coef(fit)))
+                ct$setNote("rank", "Współliniowe predyktory: część współczynników nie jest estymowalna i została pominięta; df testu LR uwzględnia rangę modelu.")
+            if (length(fitWarnings)) ct$setNote("glm", paste("Ostrzeżenia dopasowania:", paste(unique(fitWarnings), collapse = "; ")))
             simple <- length(covs) == 1 && length(factors) == 0
-            self$results$plot$setVisible(simple && isTRUE(o$plot))
+            self$results$plot$setVisible(simple && isTRUE(o$plot) && reliable)
 
             m <- jmvcore::metodyNew()
             m$add("Dane", "Zmienna zależna „%s”: zdarzenie = „%s” (kodowane 1), odniesienie = „%s”%s; predyktory ilościowe: %s; jakościowe: %s; N = %d obserwacji bez braków, zdarzeń = %d.",
                   dep, event, setdiff(lv, event)[1], if (!optNonEmpty(o$event)) " (domyślnie drugi poziom — wybierz w panelu)" else "",
                   if (length(covs)) jmvcore::metodyCyt(covs) else "brak", if (length(factors)) jmvcore::metodyCyt(factors) else "brak", n, sum(y))
             for (v in factors) m$add("Dane", "„%s” kodowana zero-jedynkowo, poziom odniesienia „%s”.", v, levels(d[[v]])[1])
-            m$add("Model", "Regresja logistyczna dwumianowa (glm, logit, największa wiarygodność), bez interakcji; test modelu = test ilorazu wiarygodności wobec modelu z samym wyrazem wolnym (χ², df = liczba parametrów).")
+            m$add("Model", "Regresja logistyczna dwumianowa (glm, logit, największa wiarygodność), bez interakcji; test modelu = test ilorazu wiarygodności wobec modelu z samym wyrazem wolnym (χ², df = różnica rang modelu pełnego i zerowego).")
             m$add("Model", "R² McFaddena = 1 − LL(model)/LL(zerowy); R² Nagelkerkego = R² Coxa-Snella / maksimum.")
             m$add("Model", "Współczynniki: test Walda z (b/SE), przedziały ufności %g%% b ± z · SE; iloraz szans OR = e^b z przedziałem e^(granice b) — zmiana szans zdarzenia na jednostkę predyktora (dla zero-jedynkowych: wobec poziomu odniesienia).", o$ciWidth)
+            if (!reliable) m$add("Model", "Diagnostyka separacji lub zbieżności nie pozwala na wiarygodne wnioskowanie Walda; SE, testy Walda i przedziały OR pominięto.")
             m$add("Klasyfikacja", "Przewidywane zdarzenie, gdy P ≥ %g; trafność = (TP + TN)/N, czułość = TP/(TP + FN), swoistość = TN/(TN + FP).", o$cutoff)
             m$addIf(o$roc, "Klasyfikacja", "Krzywa ROC: czułość wobec 1 − swoistość dla wszystkich progów; AUC = P(losowe zdarzenie ma większe P niż losowe niezdarzenie) (statystyka Manna-Whitneya).")
             m$addIf(o$ic, "Model", "AIC i BIC: kryteria informacyjne, mniejsze = lepsze.")
             m$addIf(o$vif, "Założenia", "Współliniowość: VIF z regresji liniowej każdej kolumny predyktorów na pozostałe; tolerancja = 1/VIF.")
             m$addIf(o$cooks, "Założenia", "Odległość Cooka dla obserwacji; liczba powyżej progu 4/n.")
-            m$addIf(simple && o$plot, "Wykres", "Punkty = obserwacje (0/1, lekko rozproszone), krzywa = P(zdarzenie) z pasmem ±1.96 SE na skali logitu.")
+            m$addIf(simple && o$plot && reliable, "Wykres", "Punkty = obserwacje (0/1, lekko rozproszone), krzywa = P(zdarzenie) z pasmem ±1.96 SE na skali logitu.")
             m$addIf(o$predictOV, "Dodatkowe", "Do arkusza zapisane prawdopodobieństwa zdarzenia (NA dla wierszy pominiętych).")
             m$render(self$results$metody)
 
             ll <- as.numeric(stats::logLik(fit)); ll0 <- as.numeric(stats::logLik(null))
-            lr <- 2 * (ll - ll0); dfm <- length(stats::coef(fit)) - 1
+            lrTest <- logisticLR(fit, null); lr <- lrTest$chi; dfm <- lrTest$df
             r2cs <- 1 - exp(-lr / n); r2n <- r2cs / (1 - exp(2 * ll0 / n))
-            ft$setRow(rowNo = 1, values = list(dev = stats::deviance(fit), chi = lr, df = dfm, p = stats::pchisq(lr, dfm, lower.tail = FALSE),
+            ft$setRow(rowNo = 1, values = list(dev = stats::deviance(fit), chi = lr, df = dfm, p = lrTest$p,
                 mcf = 1 - ll / ll0, nag = r2n, aic = stats::AIC(fit), bic = stats::BIC(fit)))
             ft$setNote("n", sprintf("N = %d; zdarzenie = „%s”.", n, event))
 
@@ -49,10 +64,10 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             z <- stats::qnorm(1 - (1 - level) / 2)
             for (i in seq_len(nrow(cf))) {
                 nm <- rownames(cf)[i]; b <- cf[i, 1]; se <- cf[i, 2]
-                ct$addRow(rowKey = nm, values = list(term = if (!is.na(lab[nm])) lab[[nm]] else nm, b = b, se = se, z = cf[i, 3], p = cf[i, 4],
-                    or = exp(b), orLower = exp(b - z * se), orUpper = exp(b + z * se)))
+                ct$addRow(rowKey = nm, values = list(term = if (!is.na(lab[nm])) lab[[nm]] else nm, b = b, se = if (reliable) se else NA_real_, z = if (reliable) cf[i, 3] else NA_real_, p = if (reliable) cf[i, 4] else NA_real_,
+                    or = exp(b), orLower = if (reliable) exp(b - z * se) else NA_real_, orUpper = if (reliable) exp(b + z * se) else NA_real_))
             }
-            if (!fit$converged) ct$setNote("conv", "Algorytm nie osiągnął zbieżności — sprawdź separację (predyktor idealnie rozdziela kategorie).")
+            if (!fit$converged) ct$setNote("conv", "Algorytm nie osiągnął zbieżności — nie podano SE, testów Walda ani przedziałów OR.")
 
             prob <- stats::fitted(fit); cl <- classify(y, prob, o$cutoff); other <- setdiff(lv, event)[1]
             tt <- self$results$classTable
@@ -67,7 +82,7 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                 else for (i in seq_len(nrow(v))) vt$addRow(rowKey = v$term[i], values = list(term = if (!is.na(lab[v$term[i]])) lab[[v$term[i]]] else v$term[i], vif = v$vif[i], tol = v$tol[i]))
             }
             if (isTRUE(o$cooks)) { cs <- cooksSummary(fit); self$results$cooks$setRow(rowNo = 1, values = list(mean = cs$mean, max = cs$max, nHigh = cs$nHigh, thr = cs$thr)) }
-            if (simple) self$results$plot$setState(list(x = d[[covs]], y = y, xlab = covs, eventLabel = event, fit = fit, covName = covs))
+            if (simple && reliable) self$results$plot$setState(list(x = d[[covs]], y = y, xlab = covs, eventLabel = event, fit = fit, covName = covs))
             complete <- stats::complete.cases(self$data[c(dep, covs, factors)])
             if (isTRUE(o$predictOV) && self$results$predictOV$isNotFilled()) { full <- rep(NA_real_, length(complete)); full[complete] <- prob; self$results$predictOV$setValues(full) }
         },

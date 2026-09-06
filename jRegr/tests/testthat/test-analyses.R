@@ -61,3 +61,20 @@ test_that("logistic regression matches glm, event level choice, classification a
     expect_true(grepl("manual", paste(capture.output(print(r2$fit)), collapse = "")))
     expect_equal(r2$coef$asDF$term[3], "vs: 0 (vs 1)"); expect_false(r2$plot$visible); expect_equal(nrow(r2$vif$asDF), 2)
 })
+
+test_that("logistic analysis reports aliasing and suppresses Wald inference under separation", {
+    mt <- mtcars; mt$am <- factor(mt$am); mt$wt2 <- 2 * mt$wt
+    res <- jRegr:::logistyczna(data = mt, dep = "am", covs = c("wt", "wt2"), factors = NULL, refLevels = NULL)
+    fit <- glm(I(am == "1") ~ wt + wt2, mt, family = binomial())
+    ref <- anova(update(fit, . ~ 1), fit, test = "LRT")
+    expect_equal(res$fit$asDF$df, 1)
+    expect_equal(res$fit$asDF$p, ref$`Pr(>Chi)`[2])
+    expect_match(paste(capture.output(print(res$coef)), collapse = " "), "Współliniowe")
+    d <- data.frame(y = factor(rep(0:1, each = 6)), x = rep(c(-1, 1), each = 6))
+    res <- jRegr:::logistyczna(data = d, dep = "y", covs = "x", factors = NULL, refLevels = NULL, metody = TRUE)
+    expect_match(paste(capture.output(print(res$coef)), collapse = " "), "Separacja")
+    expect_true(all(is.na(res$coef$asDF$p)))
+    expect_true(all(is.na(res$coef$asDF$orLower)))
+    expect_false(res$plot$visible)
+    expect_match(res$metody$content, "pominięto")
+})

@@ -195,7 +195,7 @@ RUN jmc --install . --to /usr/lib/jamovi/modules --rhome $R_HOME --rlibs /usr/li
 # prebuilt jamovi-deps base image: ridgeline -> ggridges, hexbin -> hexbin,
 # correlation matrix plot -> GGally.
 # Installed into the module R library so the test-load and runtime find them.
-RUN R -e "install.packages(c('ggridges', 'hexbin', 'GGally'), repos='https://cloud.r-project.org', lib='/usr/lib/jamovi/modules/base/R', INSTALL_opts='--no-data --no-help --no-demo --no-html --no-docs --no-multiarch --clean')"
+RUN R -e "install.packages(c('ggridges', 'hexbin', 'GGally', 'lpSolve'), repos='https://cloud.r-project.org', lib='/usr/lib/jamovi/modules/base/R', INSTALL_opts='--no-data --no-help --no-demo --no-html --no-docs --no-multiarch --clean')"
 
 COPY $JAMOVI_ROOT/plots/ /tmp/source/plots
 WORKDIR /tmp/source/plots

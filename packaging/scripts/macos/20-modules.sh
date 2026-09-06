@@ -43,7 +43,7 @@ R_LIBS="$BASE_R" R CMD INSTALL "$REPO_ROOT/jmvcore" --library="$BASE_R"
 # available for package 'scatr'" i moduł scatr w ogóle się nie buduje (brak R/ w payloadzie).
 # GGally: wykres macierzy korelacji (jmv/plots) — również musi być widoczny w $BASE_R.
 log "Instalacja zależności ridge/hexbin/GGally (ggridges, hexbin, GGally) do $BASE_R ..."
-"$R_HOME_SYS/bin/R" -e "install.packages(c('ggridges', 'hexbin', 'GGally'), repos='https://cloud.r-project.org', lib='$BASE_R')" \
+"$R_HOME_SYS/bin/R" -e "install.packages(c('ggridges', 'hexbin', 'GGally', 'lpSolve'), repos='https://cloud.r-project.org', lib='$BASE_R')" \
   || die "Nie udało się zainstalować ggridges/hexbin/GGally — moduły plots/jmv nie zbudują się poprawnie!"
 
 # Moduły w kolejności jak w docker/jamovi-Dockerfile.

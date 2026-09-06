@@ -35,3 +35,38 @@ test_that("logistic helpers: classification, AUC equals Wilcoxon-based value, RO
     expect_equal(aucValue(y, p), unname(w) / (4 * 4))
     roc <- rocCurve(y, p); expect_equal(roc$fpr[1], 0); expect_equal(roc$tpr[nrow(roc)], 1)
 })
+
+test_that("logistic LR uses estimable df and handles a constant predictor", {
+    set.seed(4)
+    d <- data.frame(y = rbinom(40, 1, .5), x = rnorm(40))
+    d$x2 <- 2 * d$x
+    full <- glm(y ~ x + x2, d, family = binomial())
+    null <- glm(y ~ 1, d, family = binomial())
+    ref <- anova(null, full, test = "LRT")
+    result <- logisticLR(full, null)
+    expect_equal(result$df, 1)
+    expect_equal(result$p, ref$`Pr(>Chi)`[2])
+    d$constant <- 1
+    result <- logisticLR(glm(y ~ constant, d, family = binomial()), null)
+    expect_equal(result$df, 0)
+    expect_true(is.na(result$p))
+})
+
+test_that("separation detection distinguishes overlap, aliasing and quasi-separation", {
+    d <- data.frame(y = rep(0:1, each = 6), x = rep(c(-1, 1), each = 6))
+    fit <- glm(y ~ x, d, family = binomial())
+    expect_true(fit$converged)
+    expect_true(logisticSeparation(fit))
+    # Two shared boundary observations; only some coefficients diverge.
+    q <- data.frame(y = c(0, 0, 1, 1), x = c(-1, 0, 0, 1))
+    expect_true(logisticSeparation(glm(y ~ x, q, family = binomial())))
+    overlap <- data.frame(y = rep(0:1, 3), x = rep(-1:1, each = 2))
+    overlap$x2 <- 2 * overlap$x
+    expect_false(logisticSeparation(glm(y ~ x + x2, overlap, family = binomial())))
+    d$x <- 1e9 + 1e6 * d$x
+    expect_true(logisticSeparation(glm(y ~ x, d, family = binomial())))
+    # Separation by a combination, with overlapping ranges of each predictor.
+    multi <- data.frame(y = c(0, 0, 1, 1), x = c(-2, 1, -1, 2), z = c(1, -2, 2, -1))
+    expect_true(logisticSeparation(suppressWarnings(glm(y ~ x + z, multi, family = binomial()))))
+    expect_false(logisticSeparation(glm(am ~ wt, mtcars, family = binomial())))
+})

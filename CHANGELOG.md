@@ -3,6 +3,22 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## Niewydane
+- jperm 0.2.1: dokładne testy permutacyjne liczą p z pełnej enumeracji bez
+  korekty Monte Carlo „+1”; opis metod rozróżnia oba schematy.
+- jCI 0.3.1: regresja bootstrapowa pomija nieestymowalne pary współczynników,
+  raportuje liczbę poprawnych replik i wymaga co najmniej połowy zadanych
+  losowań (nie mniej niż 50); stały predyktor daje czytelny komunikat.
+  Pasmo jest punktowo percentylowe i ma właściwy podpis także przy BCa dla
+  współczynników; wyłączony wykres nie powoduje obliczania pasma.
+- jRegr 0.1.1: df testu LR uwzględnia rangę modelu; automatyczna diagnostyka
+  separacji całkowitej i quasi-całkowitej (lpSolve) ostrzega także przy pozornej
+  zbieżności glm. Przy separacji lub braku zbieżności pomijane są SE, testy
+  Walda, przedziały OR i krzywa z pasmem; b i OR oznaczono jako przybliżenia.
+- CI: obowiązkowa kontrola metadanych obejmuje wersję instalatora Windows;
+  sprawdzanie lokalnych .jmo można oddzielić przez --metadata-only.
+  Dodano testy kontroli wydania oraz kompilację i testy R jperm/jCI/jRegr.
+
 ## 1.0.0 — 2026-09-04
 Pierwsze wydanie „pełne": każde menu kursu podstawowego (Eksploracja, Przedziały
 ufności, Testy t, ANOVA, Regresja, Częstości, Testy permutacyjne) ma analizy

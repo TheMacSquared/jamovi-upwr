@@ -1,7 +1,7 @@
 Package: jRegr
 Type: Package
 Title: Korelacja i regresja jUPWR dla jamovi
-Version: 0.1.0
+Version: 0.1.1
 # UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
 # przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
 Author: jUPWR Team
@@ -16,6 +16,7 @@ Imports:
     jmvcore (>= 2.4.2),
     R6,
     car,
+    lpSolve,
     ggplot2
 Suggests:
     testthat (>= 3.0.0)

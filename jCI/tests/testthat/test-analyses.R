@@ -99,3 +99,25 @@ test_that("effect size with noncentral-t interval and the Student interval (move
     dd <- w$a - w$b; expect_equal(pr$d, mean(dd) / sd(dd)); expect_true(pr$dLower < pr$d && pr$d < pr$dUpper)
     expect_false(jCI:::cipairedmeans(data = w, var1 = "a", var2 = "b", plot = FALSE)$table$getColumn("dLower")$visible)
 })
+
+test_that("regression survives singular bootstrap replicates and labels the band correctly", {
+    d <- data.frame(x = c(0, 0, 0, 1), y = 1:4)
+    for (method in c("perc", "bca")) for (show in c(FALSE, TRUE)) {
+        res <- jCI:::ciregression(data = d, dep = "y", pred = "x", ciMethod = method,
+                                 seed = 1, nBoot = 500, plot = show, metody = TRUE)
+        expect_equal(nrow(res$table$asDF), 2)
+        expect_true(all(is.finite(res$table$asDF$lower)))
+        expect_match(paste(capture.output(print(res$table)), collapse = " "), "Poprawne repliki")
+        if (show) {
+            expect_match(res$plot$state$bandLabel, "percentylowy")
+            expect_false(grepl("BCa", res$plot$state$bandLabel))
+            expect_true(all(is.finite(as.matrix(res$plot$state$band))))
+        } else expect_null(res$plot$state)
+    }
+    d$x <- 1
+    for (method in c("t", "perc", "bca")) {
+        res <- jCI:::ciregression(data = d, dep = "y", pred = "x", ciMethod = method)
+        expect_equal(nrow(res$table$asDF), 0)
+        expect_match(paste(capture.output(print(res$table)), collapse = " "), "Predyktor musi być zmienny")
+    }
+})
