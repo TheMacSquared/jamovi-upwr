@@ -193,6 +193,13 @@ class Main {  // this is constructed at the bottom
         });
     }
 
+    // jUPWR: results font size, set from the preferences menu; everything in
+    // the results CSS is relative to the 12px body font
+    _applyFontSize(percent) {
+        let size = typeof percent === 'number' && percent > 0 ? percent : 100;
+        document.body.style.fontSize = `${ 12 * size / 100 }px`;
+    }
+
     _reallyNotifyResize() {
         let rect = this.$results.getBoundingClientRect();
         let width = rect.width + 40;
@@ -265,6 +272,7 @@ class Main {  // this is constructed at the bottom
         if (hostEvent.type === 'results') {
             document.body.dir = I18ns.get('app').isRTL(eventData.languageCode) ? 'rtl' : 'ltr';
             this.resultsDefn = eventData;
+            this._applyFontSize(eventData.fontSize);
             this._analysisSelected = eventData.selected;
             this._annotationSelected = eventData.annotationSelected;
             this._annotationState = eventData.editState;

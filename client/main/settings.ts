@@ -51,6 +51,7 @@ interface SettingsData {
     syntaxMode: boolean,
     selectedLanguage: string,
     zoom: number,
+    resultsFontSize: number,
     updateStatus: string,
     format: string,
     settingsRecieved: boolean,
@@ -78,6 +79,7 @@ class Settings extends EventMap<SettingsData> {
             syntaxMode: false,
             selectedLanguage: '',
             zoom: 100,
+            resultsFontSize: 100,
             updateStatus: 'na',
             format: '{"t":"sf","n":3,"p":3}',
             settingsRecieved: false

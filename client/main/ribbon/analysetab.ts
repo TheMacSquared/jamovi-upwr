@@ -114,6 +114,17 @@ export class AnalyseTab extends RibbonTab {
         this.buttons.push(button);
 
         let menus = { };
+
+        // jUPWR: when every jmv analysis in a group is hidden, the group is created by
+        // a jUPWR module which ships no translations, and the module translator returns
+        // the raw key — fall back to the client catalogue, which has the group names
+        const translateMenu = (translate: (key: string) => string, key: string): string => {
+            if (typeof key !== 'string' || key === '')
+                return translate(key);
+            const value = translate(key);
+            return value === key ? _(key) : value;
+        };
+
         for (let module of modules) {
             let _translate = await module.getTranslator;
             let isNew = module.new;
@@ -125,7 +136,7 @@ export class AnalyseTab extends RibbonTab {
 
                 let groupName = analysis.menuGroup;
                 let subgroup = analysis.menuSubgroup;
-                let menu = groupName in menus ? menus[groupName] : { _title: _translate(analysis.menuGroup) };
+                let menu = groupName in menus ? menus[groupName] : { _title: translateMenu(_translate, analysis.menuGroup) };
                 if (analysis.ns === 'jmv' || menu.ns !== 'jmv')
                     menu.ns = analysis.ns;
 
@@ -134,7 +145,7 @@ export class AnalyseTab extends RibbonTab {
                 if (subgroup in menu)
                     submenu = menu[subgroup];
                 else
-                    submenu = { name: subgroup, title: _translate(subgroup), items: [ ] };
+                    submenu = { name: subgroup, title: translateMenu(_translate, subgroup), items: [ ] };
                 let item = {
                     name: analysis.name,
                     ns: analysis.ns,

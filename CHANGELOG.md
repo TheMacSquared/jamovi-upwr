@@ -3,6 +3,20 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.0.2 — 2026-09-07
+Wydanie poprawkowe interfejsu: czytelność wyników na rzutniku i polskie nazwy
+w menu Analizy. Bez zmian w modułach i obliczeniach.
+
+- Preferencje → Wyniki: „Rozmiar czcionki wyników" (100–200 %). Skaluje tabele,
+  tytuły i noty w panelu wyników, nie zmieniając wielkości arkusza, wstążki
+  ani panelu opcji — w odróżnieniu od Zoomu, który skaluje całą aplikację
+  i zabiera obszar pracy. Ustawienie jest zapamiętywane. Wykresy zachowują
+  swój rozmiar (renderuje je serwer).
+- Menu Analizy: grupy „Eksploracja" i „Testy t" po polsku. Tytuł grupy tłumaczył
+  moduł, który ją tworzy; gdy wszystkie analizy jmv w grupie są ukryte, tworzą ją
+  moduły jUPWR bez własnych tłumaczeń i zostawał angielski klucz. Klient używa
+  teraz własnego katalogu, gdy moduł nie ma tłumaczenia.
+
 ## 1.0.1 — 2026-09-06
 Wydanie poprawkowe: naprawione obliczenia w trzech modułach kursu podstawowego.
 Bez zmian w menu, panelach i modułach opcjonalnych.

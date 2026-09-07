@@ -34,6 +34,7 @@ export class AppMenuButton extends EventDistributor {
     $nFormatList: HTMLSelectElement;
     $pFormatList: HTMLSelectElement;
     $refsModeList: HTMLSelectElement;
+    $fontSizeList: HTMLSelectElement;
     $themeList: HTMLSelectElement;
     $paletteList: HTMLSelectElement;
     $decSymbolList: HTMLSelectElement;
@@ -131,6 +132,23 @@ export class AppMenuButton extends EventDistributor {
         let $results = h('div', { class: 'jmv-results', role: 'group', 'aria-labelledby': resultsId });
         $content.append($results);
         $results.append(h('div', { id: resultsId, class: 'jmv-ribbon-appmenu-subheading' }, _('Results')));
+
+        // jUPWR: results font size — the results CSS is relative to a 12px
+        // body, so scaling the body font scales tables, headings and notes
+        // without shrinking the work area the way the app zoom does
+        let fontSizeId = interactionManager.nextAriaId('label');
+        let $fontSize = appMenuItem();
+        $results.append($fontSize);
+        $fontSize.append(h('div', { id: fontSizeId }, _('Font size')));
+        this.$fontSizeList = h('select', { 'aria-labelledby': fontSizeId },
+            selectOption('100', '100%'),
+            selectOption('125', '125%'),
+            selectOption('150', '150%'),
+            selectOption('175', '175%'),
+            selectOption('200', '200%'));
+        $fontSize.append(this.$fontSizeList);
+        this.$fontSizeList.addEventListener('click', event => event.stopPropagation());
+        this.$fontSizeList.addEventListener('change', event => this._changeFontSize());
 
         let nFormatId = interactionManager.nextAriaId('label');
         let $nFormat = appMenuItem();
@@ -303,6 +321,7 @@ export class AppMenuButton extends EventDistributor {
         this.model.settings().on('change:format',       () => this._updateUI());
         this.model.settings().on('change:missings',     () => this._updateUI());
         this.model.settings().on('change:refsMode',     () => this._updateUI());
+        this.model.settings().on('change:resultsFontSize', () => this._updateUI());
         this.model.settings().on('change:selectedLanguage', () => this._updateUI());
 
         let availableGroup = optGroup(_('Available'));
@@ -374,6 +393,10 @@ export class AppMenuButton extends EventDistributor {
         });
     }
 
+    _changeFontSize() {
+        this.model.settings().setSetting('resultsFontSize', parseInt(this.$fontSizeList.value));
+    }
+
     _changeRefsMode() {
         this.model.settings().setSetting('refsMode', this.$refsModeList.value);
     }
@@ -400,6 +423,11 @@ export class AppMenuButton extends EventDistributor {
 
         let refsMode = settings.getSetting('refsMode', 'bottom');
         this.$refsModeList.value = refsMode;
+
+        let fontSize = settings.getSetting('resultsFontSize', 100);
+        this.$fontSizeList.value = `${ fontSize }`;
+        if (this.$fontSizeList.selectedIndex === -1)
+            this.$fontSizeList.value = '100';
 
         let theme = settings.getSetting('theme', Theme.JUPWR_JASNY);
         this.$themeList.value = theme;
