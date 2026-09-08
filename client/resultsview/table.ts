@@ -701,13 +701,42 @@ export class View extends Elem.View<Model> {
 
         this.$columnHeaderRow.replaceChildren(...headerCells);
 
+        let nPhysCols = Math.max(1, cells.header.length);
+
+        let footerRows: HTMLTableRowElement[] = [];
+        for (let i = 0; i < table.notes.length; i++) {
+            let noteCell = h('td', { class: 'table-note', colspan: nPhysCols.toString() });
+            let paragraphs = richParagraphs(table.notes[i].note);
+            if (paragraphs.length === 0)
+                paragraphs.push(h('p'));
+            paragraphs[0].prepend(h('i', {}, `${ _('Note') }.`), ' ');
+            noteCell.append(...paragraphs);
+            footerRows.push(h('tr', {}, noteCell));
+        }
+
+        for (let i = 0; i < footnotes.length; i++) {
+            let footnoteCell = h('td', { colspan: nPhysCols.toString() });
+            footnoteCell.append(SUPSCRIPTS[i] + ' ', rich(footnotes[i]));
+            footerRows.push(h('tr', {}, footnoteCell));
+        }
+
+        this.$tableFooter.replaceChildren(...footerRows);
+
+        if (this.refs.hasVisibleContent()) {
+            let $refsRow = h('tr', { class: 'jmvrefs' }, h('td', { colspan: nPhysCols.toString() }));
+            // class="jmvrefs" excludes this from some exports/copy
+            $refsRow.childNodes[0].appendChild(this.refs);
+            this.$tableFooter.append($refsRow);
+        }
+        else
+            this.refs.remove();
+
         if (cells.header.length === 0) {
             this.$titleCell.setAttribute('colspan', '1');
             this.$titleCell.setAttribute('scope', 'col');
+            this.$tableBody.replaceChildren();
             return;
         }
-
-        let nPhysCols = cells.header.length;
 
         if (cells.body.length === 0 || cells.body[0].length === 0) {
             this.$titleCell.setAttribute('colspan', nPhysCols.toString());
@@ -803,34 +832,6 @@ export class View extends Elem.View<Model> {
         }
 
         this.$tableBody.replaceChildren(...bodyRows);
-
-        let footerRows: HTMLTableRowElement[] = [];
-        for (let i = 0; i < table.notes.length; i++) {
-            let noteCell = h('td', { class: 'table-note', colspan: nPhysCols.toString() });
-            let paragraphs = richParagraphs(table.notes[i].note);
-            if (paragraphs.length === 0)
-                paragraphs.push(h('p'));
-            paragraphs[0].prepend(h('i', {}, `${ _('Note') }.`), ' ');
-            noteCell.append(...paragraphs);
-            footerRows.push(h('tr', {}, noteCell));
-        }
-
-        for (let i = 0; i < footnotes.length; i++) {
-            let footnoteCell = h('td', { colspan: nPhysCols.toString() });
-            footnoteCell.append(SUPSCRIPTS[i] + ' ', rich(footnotes[i]));
-            footerRows.push(h('tr', {}, footnoteCell));
-        }
-
-        this.$tableFooter.replaceChildren(...footerRows);
-
-        if (this.refs.hasVisibleContent()) {
-            let $refsRow = h('tr', { class: 'jmvrefs' }, h('td', { colspan: nPhysCols.toString() }));
-            // class="jmvrefs" excludes this from some exports/copy
-            $refsRow.childNodes[0].appendChild(this.refs);
-            this.$tableFooter.append($refsRow);
-        }
-        else
-            this.refs.remove();
 
         this._ascButtons = this.$tableHeader.querySelectorAll('button.sort-asc');
         this._descButtons = this.$tableHeader.querySelectorAll('button.sort-desc');

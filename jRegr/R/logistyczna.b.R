@@ -12,7 +12,9 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             if (nlevels(d[[dep]]) != 2) { ct$setNote("err", "Zmienna zależna musi mieć dokładnie 2 poziomy (odfiltruj pozostałe)."); return() }
             for (v in factors) if (nlevels(d[[v]]) < 2) { ct$setNote("err", sprintf("Predyktor „%s” musi mieć co najmniej 2 poziomy.", v)); return() }
             lv <- levels(d[[dep]])
-            event <- if (optNonEmpty(o$event) && as.character(o$event) %in% lv) as.character(o$event) else lv[2]
+            if (optNonEmpty(o$event) && !(as.character(o$event) %in% lv))
+                stop(sprintf("Nie można obliczyć modelu: poziom zdarzenia «%s» zmiennej «%s» nie jest dostępny w kompletnych obserwacjach.", o$event, dep), call. = FALSE)
+            event <- if (optNonEmpty(o$event)) as.character(o$event) else lv[2]
             y <- as.integer(d[[dep]] == event); n <- nrow(d)
             if (sum(y) == 0 || sum(y) == n) { ct$setNote("err", "Zmienna zależna musi mieć obserwacje w obu kategoriach."); return() }
             d$.y <- y

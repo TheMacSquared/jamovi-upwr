@@ -80,7 +80,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             complete <- stats::complete.cases(d)
             d <- d[complete, , drop = FALSE]
             for (v in c(factors, blocks)) d[[v]] <- droplevels(d[[v]])
-            if (nrow(d) < 3) return()
+            if (nrow(d) < 3) stop(sprintf("«%s»: %d kompletnych obserwacji; bieżąca implementacja modelu wymaga co najmniej 3.", dep, nrow(d)), call. = FALSE)
             for (v in c(factors, blocks)) if (nlevels(d[[v]]) < 2) {
                 self$results$anova$setNote("err", sprintf("Zmienna %s musi mieć co najmniej 2 poziomy.", v))
                 return()
@@ -89,7 +89,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             res <- tryCatch(fitAnova(d, dep, factors, blocks, covs, isTRUE(opts$interactions), opts$ss),
                 error = function(e) e)
             if (inherits(res, "error")) {
-                self$results$anova$setNote("err", paste("Błąd dopasowania modelu:", conditionMessage(res)))
+                self$results$anova$setNote("err", paste("Nie udało się dopasować modelu. Szczegóły:", conditionMessage(res)))
                 return()
             }
             if (!is.finite(res$mse) || res$dfe < 1) {

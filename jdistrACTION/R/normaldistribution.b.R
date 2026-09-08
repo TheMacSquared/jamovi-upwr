@@ -7,6 +7,9 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
     
     ########### 1) Main-Function ##########
     .run = function() {
+        if (!is.finite(self$options$dp2) || self$options$dp2 < 0)
+          stop(sprintf("Nie można obliczyć rozkładu: odchylenie standardowe musi być skończone i nieujemne (podano %s).", self$options$dp2), call. = FALSE)
+
       
 
       ###### 1.1) Preparation ######

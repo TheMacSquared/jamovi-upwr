@@ -137,5 +137,10 @@ metodyWspolne <- function(m, o, kind, diffLab, homog = FALSE) {
 # ---------------------------------------------------------------------------
 
 addTestRow <- function(table, key, var, r) {
+    r <- tryCatch(r, error = function(e) e)
+    if (inherits(r, "error")) {
+        table$setNote(paste0("error-", key), sprintf("Nie można obliczyć testu dla «%s»: %s", var, conditionMessage(r)))
+        return(invisible(NULL))
+    }
     table$addRow(rowKey = key, values = list(var = var, test = r$test, stat = r$stat, df = r$df, p = r$p, est = r$est, es = r$es))
 }

@@ -8,7 +8,7 @@ cidiffpropClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (!optNonEmpty(o$dep) || !optNonEmpty(o$group)) return()
             level <- o$ciWidth / 100; t <- self$results$table; method <- o$ciMethod
             column <- self$data[[o$dep]]
-            lv <- pickLevel(column, o$level); if (is.null(lv)) return()
+            lv <- pickLevel(column, o$level); if (is.null(lv)) stop(sprintf("«%s»: brak obserwacji i dostępnych kategorii.", o$dep), call. = FALSE)
             outcome <- as.character(column); g <- factor(self$data[[o$group]])
             ok <- !is.na(outcome) & !is.na(g); outcome <- outcome[ok]; g <- droplevels(g[ok])
             sel <- pickTwoLevels(t, levels(g), o$groupLevel1, o$groupLevel2); if (is.null(sel)) return()

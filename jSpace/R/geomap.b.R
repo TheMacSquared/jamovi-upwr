@@ -20,10 +20,7 @@ geomapClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             validIdx <- !is.na(lon) & !is.na(lat) &
                 lon >= -180 & lon <= 180 & lat >= -90 & lat <= 90
             if (sum(validIdx) < 1) {
-                self$results$regiony$setNote("err", paste(
-                    "Brak poprawnych wspolrzednych — lon w [-180, 180],",
-                    "lat w [-90, 90]."))
-                return()
+                stop(sprintf("Brak poprawnych współrzędnych: «%s» musi należeć do [-180, 180], a «%s» do [-90, 90].", self$options$lon, self$options$lat), call. = FALSE)
             }
             lon <- lon[validIdx]
             lat <- lat[validIdx]

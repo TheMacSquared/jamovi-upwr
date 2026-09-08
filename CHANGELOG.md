@@ -3,6 +3,45 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.0.3 — 2026-09-08
+Wydanie poprawkowe: komunikaty „nie da się policzyć, bo…". Analiza, której nie
+można wykonać na wskazanym wejściu, mówi dlaczego — z nazwą zmiennej, liczbą
+obserwacji/grup/par i wymaganym minimum bieżącej implementacji. Bez nowych
+ostrzeżeń metodologicznych i bez zmian w wynikach poprawnie wykonalnych analiz
+(zakres: `docs/audits/2026-09-08-komunikaty-bledow.md`, kategoria 1).
+
+- Klient: nota pod pustą tabelą jest widoczna. Renderer tabel kończył rysowanie
+  pustego body przed stopką, więc komunikat błędu zapisany w R (np. „zmienna
+  grupująca ma 3 poziomy") nie docierał na ekran; przejście poprawny wynik →
+  błąd → poprawny wynik czyści stare noty. Test `client/resultsview/test/
+  table-notes.test.ts`.
+- jTestyT 0.4.1, jperm 0.2.2: komunikaty o liczbie poziomów, obserwacji w grupach
+  i kompletnych par z konkretnymi liczbami; wyjątek testu głównego dla jednej
+  zmiennej (np. stałe dane) daje notę dla tej zmiennej, nie kasując pozostałych
+  wierszy.
+- jANOVA 0.4.1, jRol 0.1.1: za mało kompletnych obserwacji zgłaszane jawnie
+  zamiast cichego powrotu; błąd dopasowania modelu z prefiksem „Nie udało się
+  dopasować modelu. Szczegóły:"; w jRol wskazana nieistniejąca kontrola Dunnetta
+  jest błędem zamiast cichej podmiany na pierwszy poziom.
+- jCI 0.3.2: jawnie wskazana nieistniejąca kategoria zdarzenia lub grupa jest
+  błędem (bez podmiany na pierwszy poziom); brak kategorii w zmiennej zgłaszany.
+- jRegr 0.1.2: nieistniejący poziom zdarzenia (logistyczna) lub poziom odniesienia
+  predyktora jest błędem; niewyznaczalna korelacja pary (stała zmienna, n < 3)
+  wyjaśniona zamiast pustego wiersza.
+- jCzest 0.2.1: ujemne lub nieskończone liczności zatrzymują analizę zamiast być
+  po cichu odfiltrowane.
+- jEksplor 0.1.1: szereg rozdzielczy podaje liczbę obserwacji przy n < 2.
+- distrACTION 1.3.3: parametry spoza dziedziny (ujemne SD, niecałkowite/ujemne n,
+  p poza [0, 1], niedodatnie df F) wskazują parametr zamiast błędu R.
+- scatr 2.9.1: samodzielny wykres, który nie powstaje (puste dane, suma liczności
+  ≤ 0, za mało zmiennych, brak rozmieszczonych słów/kafelków), wyjaśnia przyczynę
+  zamiast pustego obrazka; wykres współrzędnych równoległych nie przerywał się
+  błędem `data.frame` przy zerowej liczbie wierszy.
+- jRISK 0.3.4, jSpace 0.3.1 (opcjonalne): jawnie wskazany nieistniejący poziom
+  jest błędem; w jSpace komunikaty o współrzędnych, grupach, rastrze, TLE
+  i propagacji są błędami analizy, więc nie zależą od widoczności tabel
+  dodatkowych.
+
 ## 1.0.2 — 2026-09-07
 Wydanie poprawkowe interfejsu: czytelność wyników na rzutniku i polskie nazwy
 w menu Analizy. Bez zmian w modułach i obliczeniach.

@@ -119,6 +119,9 @@ lifetimeClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # second level (0/1, nie/tak)
         if (is.null(lev))
           lev <- levels(sv)[min(2, nlevels(sv))]
+        if (!is.null(self$options$failureLevel) && !(lev %in% levels(sv)))
+          stop(sprintf("Nie można wykonać obliczenia: poziom «%s» zmiennej «%s» nie istnieje.", lev, statusVarName), call. = FALSE)
+
         status <- as.integer(as.character(sv) == lev)
         status[is.na(sv)] <- NA_integer_
       }

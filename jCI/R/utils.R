@@ -300,10 +300,14 @@ buildConvPlot <- function(pd, ggtheme, theme) {
 
 #' Returns c(level1, level2) or NULL (after writing an error note)
 pickTwoLevels <- function(table, allLevs, level1, level2) {
-    if (optNonEmpty(level1) && optNonEmpty(level2)) {
+    for (level in list(level1, level2))
+        if (optNonEmpty(level) && !(as.character(level) %in% allLevs))
+            stop(sprintf("Nie można wykonać porównania: wskazana grupa «%s» nie istnieje.", level), call. = FALSE)
+    if (optNonEmpty(level1) || optNonEmpty(level2)) {
+        if (!optNonEmpty(level1) || !optNonEmpty(level2))
+            stop("Nie można wykonać porównania: wskazano tylko jedną z dwóch grup.", call. = FALSE)
         l1 <- as.character(level1); l2 <- as.character(level2)
         if (l1 == l2) { table$setNote("err", "Grupa 1 i Grupa 2 muszą być różne."); return(NULL) }
-        if (!(l1 %in% allLevs) || !(l2 %in% allLevs)) { table$setNote("err", "Wybrane grupy nie istnieją w zmiennej."); return(NULL) }
         return(c(l1, l2))
     }
     if (length(allLevs) < 2) { table$setNote("err", "Zmienna grupująca musi mieć co najmniej 2 poziomy."); return(NULL) }
@@ -315,8 +319,13 @@ pickTwoLevels <- function(table, allLevs, level1, level2) {
 
 #' First level of a factor-like column when the user has not chosen one
 pickLevel <- function(column, level) {
-    if (optNonEmpty(level)) return(as.character(level))
-    if (is.factor(column)) return(levels(column)[1])
+    if (optNonEmpty(level)) {
+        available <- if (is.factor(column)) levels(column) else as.character(unique(column[!is.na(column)]))
+        if (!(as.character(level) %in% available))
+            stop(sprintf("Nie można obliczyć proporcji: wskazana kategoria zdarzenia «%s» nie istnieje.", level), call. = FALSE)
+        return(as.character(level))
+    }
+    if (is.factor(column)) return(if (nlevels(column)) levels(column)[1] else NULL)
     v <- sort(unique(column[!is.na(column)])); if (length(v) == 0) NULL else as.character(v[1])
 }
 

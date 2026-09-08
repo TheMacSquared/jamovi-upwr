@@ -17,6 +17,9 @@ bernoulliClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       # second level (0/1, nie/tak)
       if (is.null(lev)) lev <- levels(fo)[min(2, nlevels(fo))]
 
+      if (!is.null(self$options$successLevel) && !(lev %in% levels(fo)))
+        stop(sprintf("Nie można wykonać obliczenia: poziom «%s» zmiennej «%s» nie istnieje.", lev, outcomeVar), call. = FALSE)
+
       orderVar <- self$options$orderVar
       if (is.null(orderVar)) {
         ord <- seq_along(fo)

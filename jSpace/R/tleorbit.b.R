@@ -36,11 +36,9 @@ tleorbitClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         .run = function() {
             tle <- private$.pobierzTLE()
             if (is.null(tle)) {
-                if (self$options$zrodlo == "wlasne")
-                    self$results$elementy$setNote("err", paste(
-                        "Wprowadz dwie pelne linie TLE (po 69 znakow).",
-                        "Dane TLE znajdziesz np. na celestrak.org."))
-                return()
+                if (self$options$zrodlo == "wlasne" &&
+                        (!nzchar(trimws(self$options$tle1)) || !nzchar(trimws(self$options$tle2)))) return()
+                stop("Nie można wczytać danych TLE: wymagane są dwie poprawne linie TLE po 69 znaków.", call. = FALSE)
             }
 
             # mean semi-major axis and altitude from Kepler's third law
@@ -71,10 +69,7 @@ tleorbitClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             # propagate with SGP4/SDP4 (asteRisk picks the algorithm)
             czasy <- seq(0, self$options$czasProp * 60, by = self$options$krok)
             if (length(czasy) > 5000) {
-                self$results$staty$setNote("err", paste(
-                    "Za wiele punktow propagacji (max 5000) —",
-                    "zwieksz krok lub skroc czas."))
-                return()
+                stop(sprintf("Nie można wykonać propagacji: %d punktów; bieżąca implementacja obsługuje maksymalnie 5000 (czas i krok propagacji).", length(czasy)), call. = FALSE)
             }
 
             epoka <- as.POSIXct(tle$dateTime, tz = "UTC")
@@ -96,12 +91,10 @@ tleorbitClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                       predkosc = sqrt(sum(st$velocity^2)))
                 })
                 as.data.frame(do.call(rbind, punkty))
-            }, error = function(e) NULL)
+            }, error = function(e) e)
 
-            if (is.null(wynik)) {
-                self$results$staty$setNote("err",
-                    "Propagacja nie powiodla sie — sprawdz poprawnosc TLE.")
-                return()
+            if (inherits(wynik, "error")) {
+                stop(paste("Nie udało się obliczyć propagacji orbity. Szczegóły:", conditionMessage(wynik)), call. = FALSE)
             }
 
             if (self$options$pokazStaty) {

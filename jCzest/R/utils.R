@@ -8,7 +8,11 @@ optNonEmpty <- function(x) !is.null(x) && length(x) > 0 && nzchar(x[1])
 #' (dane zagregowane) albo NULL (jedna obserwacja = jeden wiersz).
 buildTable <- function(rows, cols, counts = NULL) {
     ok <- !is.na(rows) & !is.na(cols)
-    if (!is.null(counts)) ok <- ok & !is.na(counts) & counts >= 0
+    if (!is.null(counts)) {
+        if (any(!is.na(counts) & (!is.finite(counts) | counts < 0)))
+            stop("Nie można obliczyć tabeli: liczności muszą być skończone i nieujemne.", call. = FALSE)
+        ok <- ok & !is.na(counts)
+    }
     rows <- droplevels(factor(rows[ok])); cols <- droplevels(factor(cols[ok]))
     if (is.null(counts)) return(table(rows, cols))
     tab <- tapply(counts[ok], list(rows, cols), sum)
@@ -183,7 +187,11 @@ pairwiseRows <- function(tab, method = "holm") {
 gofCounts <- function(x, counts = NULL) {
     if (!is.factor(x)) x <- factor(x)
     ok <- !is.na(x)
-    if (!is.null(counts)) ok <- ok & !is.na(counts) & counts >= 0
+    if (!is.null(counts)) {
+        if (any(!is.na(counts) & (!is.finite(counts) | counts < 0)))
+            stop("Nie można obliczyć tabeli: liczności muszą być skończone i nieujemne.", call. = FALSE)
+        ok <- ok & !is.na(counts)
+    }
     x <- x[ok]
     if (is.null(counts)) return(table(x))
     out <- tapply(counts[ok], x, sum)
@@ -270,7 +278,11 @@ pairedTable <- function(v1, v2, counts = NULL) {
     lv <- union(levels(factor(v1)), levels(factor(v2)))
     f1 <- factor(v1, levels = lv); f2 <- factor(v2, levels = lv)
     ok <- !is.na(f1) & !is.na(f2)
-    if (!is.null(counts)) ok <- ok & !is.na(counts) & counts >= 0
+    if (!is.null(counts)) {
+        if (any(!is.na(counts) & (!is.finite(counts) | counts < 0)))
+            stop("Nie można obliczyć tabeli: liczności muszą być skończone i nieujemne.", call. = FALSE)
+        ok <- ok & !is.na(counts)
+    }
     f1 <- f1[ok]; f2 <- f2[ok]
     if (is.null(counts)) return(table(f1, f2))
     tab <- tapply(counts[ok], list(f1, f2), sum)

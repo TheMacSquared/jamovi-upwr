@@ -29,8 +29,8 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                 k <- paste(p$i1, "−", p$i2)
                 a <- jmvcore::toNumeric(self$data[[p$i1]]); b <- jmvcore::toNumeric(self$data[[p$i2]])
                 ok <- !is.na(a) & !is.na(b); a <- a[ok]; b <- b[ok]; dif <- a - b
-                if (length(dif) < 2) { tt$setNote(paste0("n", k), sprintf("%s: za mało par.", k)); next }
-                if (isTRUE(o$student)) { r <- oneSampleT(dif, 0, o$hypothesis); r$test <- "t Studenta (pary)"; addTestRow(tt, paste(k, "t"), k, r) }
+                if (length(dif) < 2) { tt$setNote(paste0("n", k), sprintf("«%s»: %d kompletnych par; bieżąca implementacja wymaga co najmniej 2.", k, length(dif))); next }
+                if (isTRUE(o$student)) addTestRow(tt, paste(k, "t"), k, { r <- oneSampleT(dif, 0, o$hypothesis); r$test <- "t Studenta (pary)"; r })
                 if (isTRUE(o$nonpar)) addTestRow(tt, paste(k, "w"), k, wilcoxOne(dif, 0, o$hypothesis))
                 if (isTRUE(o$desc)) {
                     self$results$desc$addRow(rowKey = paste(k, 1), values = c(list(var = k, group = p$i1), descRow(a)))

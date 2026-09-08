@@ -19,6 +19,12 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       levB <- self$options$levelB
       if (is.null(levB)) levB <- levels(fb)[1]
 
+      if (!is.null(self$options$levelA) && !(levA %in% levels(fa)))
+        stop(sprintf("Nie można wykonać obliczenia: poziom «%s» zmiennej «%s» nie istnieje.", levA, varA), call. = FALSE)
+
+      if (!is.null(self$options$levelB) && !(levB %in% levels(fb)))
+        stop(sprintf("Nie można wykonać obliczenia: poziom «%s» zmiennej «%s» nie istnieje.", levB, varB), call. = FALSE)
+
       keep <- !is.na(fa) & !is.na(fb)
       A <- as.character(fa[keep]) == levA
       B <- as.character(fb[keep]) == levB

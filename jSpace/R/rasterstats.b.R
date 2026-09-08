@@ -21,33 +21,25 @@ rasterstatsClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                 w <- jmvcore::toNumeric(self$data[[self$options$wartoscKol]])
                 ok <- !is.na(x) & !is.na(y)
                 if (sum(ok) < 4)
-                    return(NULL)
+                    stop(sprintf("Nie można utworzyć rastra: %d poprawnych par współrzędnych; wymagane co najmniej 4.", sum(ok)), call. = FALSE)
                 # a regular x/y grid in a spreadsheet IS a raster —
                 # teaching bridge to how terra/TorchGeo see imagery
                 r <- tryCatch(
                     terra::rast(data.frame(x = x[ok], y = y[ok], z = w[ok]),
                                 type = "xyz", crs = "EPSG:4326"),
-                    error = function(e) NULL)
-                if (is.null(r))
-                    return(NULL)
+                    error = function(e) stop(paste("Nie udało się utworzyć rastra z kolumn x, y i wartości. Szczegóły:", conditionMessage(e)), call. = FALSE))
                 list(r = r, etykieta = self$options$wartoscKol)
             }
         },
 
         .run = function() {
             zr <- private$.wczytajRaster()
-            if (is.null(zr)) {
-                if (self$options$zrodlo == "kolumny")
-                    self$results$staty$setNote("err", paste(
-                        "Wybierz kolumny x, y i wartosci tworzace regularna",
-                        "siatke (np. zbior 'NDVI — okolice Wroclawia')."))
-                return()
-            }
+            if (is.null(zr)) return()
 
             w <- terra::values(zr$r)[, 1]
             w <- w[!is.na(w)]
             if (length(w) == 0)
-                return()
+                stop("Nie można obliczyć wyniku: raster nie zawiera komórek z wartościami.", call. = FALSE)
 
             kw <- quantile(w, c(0.25, 0.5, 0.75))
             self$results$staty$setRow(rowNo = 1, values = list(

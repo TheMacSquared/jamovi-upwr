@@ -8,7 +8,7 @@ szeregClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (!optNonEmpty(o$var)) return()
             x <- jmvcore::toNumeric(self$data[[o$var]]); x <- x[!is.na(x)]
             ct <- self$results$classes; st <- self$results$stats
-            if (length(x) < 2) { ct$setNote("n", "Za mało obserwacji (n < 2)."); return() }
+            if (length(x) < 2) { ct$setNote("n", sprintf("«%s»: %d obserwacji; bieżąca implementacja wymaga co najmniej 2.", o$var, length(x))); return() }
             start <- if (isTRUE(o$startAuto)) NULL else o$start
             if (!is.null(start) && start > min(x)) { ct$setNote("s", sprintf("Początek pierwszej klasy (%g) musi być ≤ minimum (%g).", start, min(x))); return() }
             br <- classBreaks(x, o$method, o$nClasses, o$width, start)

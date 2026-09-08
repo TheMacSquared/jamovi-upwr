@@ -218,7 +218,9 @@ pairwiseTable <- function(means, ns, errFun, method, alpha, control = NULL) {
     levs <- names(means)
     k <- length(levs)
     if (method == "dunnett") {
-        if (is.null(control) || !(control %in% levs)) control <- levs[1]
+        if (!is.null(control) && !(control %in% levs))
+            stop(sprintf("Nie można wykonać porównania: wskazana kontrola «%s» nie istnieje.", control), call. = FALSE)
+        if (is.null(control)) control <- levs[1]
         others <- setdiff(levs, control)
         pairs <- cbind(others, rep(control, length(others)))
     } else {
@@ -314,7 +316,9 @@ compareTerm <- function(term, method, alpha, control = NULL) {
     pairs <- pairwiseTable(means, ns, term$errFun, method, alpha, control)
     ord <- st$levels[order(means)]
     if (method == "dunnett") {
-        if (is.null(control) || !(control %in% st$levels)) control <- st$levels[1]
+        if (!is.null(control) && !(control %in% st$levels))
+            stop(sprintf("Nie można wykonać porównania: wskazana kontrola «%s» nie istnieje.", control), call. = FALSE)
+        if (is.null(control)) control <- st$levels[1]
         mark <- rep("", length(st$levels)); names(mark) <- st$levels
         mark[control] <- "(kontrola)"
         sigVs <- pairs$g1[pairs$sig]
@@ -371,7 +375,7 @@ runDesignAnalysis <- function(self, design) {
     for (v in setdiff(needed, dep)) d[[v]] <- factor(d[[v]])
     d <- d[stats::complete.cases(d), , drop = FALSE]
     for (v in setdiff(needed, dep)) d[[v]] <- droplevels(d[[v]])
-    if (nrow(d) < 3) return()
+    if (nrow(d) < 3) stop(sprintf("«%s»: %d kompletnych obserwacji; bieżąca implementacja modelu wymaga co najmniej 3.", dep, nrow(d)), call. = FALSE)
     if (nlevels(d[[A]]) < 2) {
         self$results$anova$setNote("err", "Czynnik musi mieć co najmniej 2 poziomy.")
         return()
@@ -388,7 +392,7 @@ runDesignAnalysis <- function(self, design) {
     res <- tryCatch(fitDesign(design, d, dep, A, B, block, row, col),
         error = function(e) e)
     if (inherits(res, "error")) {
-        self$results$anova$setNote("err", paste("Błąd dopasowania modelu:",
+        self$results$anova$setNote("err", paste("Nie udało się dopasować modelu. Szczegóły:",
             conditionMessage(res)))
         return()
     }

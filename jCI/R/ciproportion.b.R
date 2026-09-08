@@ -8,7 +8,7 @@ ciproportionClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Clas
             if (!optNonEmpty(o$dep)) return()
             level <- o$ciWidth / 100; t <- self$results$table; method <- o$ciMethod
             column <- self$data[[o$dep]]
-            lv <- pickLevel(column, o$level); if (is.null(lv)) return()
+            lv <- pickLevel(column, o$level); if (is.null(lv)) stop(sprintf("«%s»: brak obserwacji i dostępnych kategorii.", o$dep), call. = FALSE)
             x <- as.character(column); x <- x[!is.na(x)]; n <- length(x)
             if (n < 1) { t$setNote("err", "Brak obserwacji."); return() }
             succ <- as.integer(x == lv); k <- sum(succ); phat <- k / n

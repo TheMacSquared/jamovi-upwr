@@ -15,7 +15,7 @@ permtesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             gAll <- factor(self$data[[o$group]])
             lvAll <- levels(droplevels(gAll[!is.na(gAll)]))
             if (length(lvAll) != 2) {
-                tt$setNote("g", "Zmienna grupująca musi mieć dokładnie 2 poziomy (odfiltruj pozostałe)."); return()
+                tt$setNote("g", sprintf("Zmienna «%s» ma %d poziomów; test wymaga dokładnie 2.", o$group, length(lvAll))); return()
             }
             m <- jmvcore::metodyNew()
             m$add("Dane", "Zmienne: %s; zmienna grupująca „%s” z poziomami „%s” i „%s”; braki pomijane osobno dla każdej zmiennej.",
@@ -25,7 +25,7 @@ permtesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             for (v in o$vars) {
                 x <- jmvcore::toNumeric(self$data[[v]]); ok <- !is.na(x) & !is.na(gAll)
                 x <- x[ok]; g <- droplevels(gAll[ok]); lv <- levels(g)
-                if (nlevels(g) != 2 || any(table(g) < 1)) { tt$setNote(paste0("n", v), sprintf("%s: za mało obserwacji w grupie.", v)); next }
+                if (nlevels(g) != 2 || any(table(g) < 1)) { tt$setNote(paste0("n", v), sprintf("«%s»: liczby obserwacji bez braków w grupach «%s» wynoszą %s; bieżąca implementacja wymaga co najmniej 1 w każdej grupie.", v, paste(lvAll, collapse = "», «"), paste(as.integer(table(factor(g, levels = lvAll))), collapse = ", "))); next }
                 observed <- mean(x[g == lv[1]]) - mean(x[g == lv[2]])
                 permDist <- permDistTwoSample(x, g, o$nPerm, o$seed, o$exact)
                 tt$addRow(rowKey = v, values = list(var = v, group1 = lv[1], group2 = lv[2], stat = observed,

@@ -68,7 +68,11 @@ regressionFrame <- function(data, dep, covs, factors, refLevels = list(), depFac
         if (!is.null(refs[v]) && !is.na(refs[v]) && refs[[v]] %in% levels(d[[v]])) d[[v]] <- stats::relevel(d[[v]], ref = refs[[v]])
     }
     d <- d[stats::complete.cases(d), , drop = FALSE]
-    for (v in factors) d[[v]] <- droplevels(d[[v]])
+    for (v in factors) {
+        d[[v]] <- droplevels(d[[v]])
+        if (!is.na(refs[v]) && !(refs[[v]] %in% levels(d[[v]])))
+            stop(sprintf("Nie można obliczyć modelu: poziom odniesienia «%s» zmiennej «%s» nie jest dostępny w kompletnych obserwacjach.", refs[[v]], v), call. = FALSE)
+    }
     d
 }
 

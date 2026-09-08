@@ -41,6 +41,10 @@ korelacjaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
 
             if (pairMode) {
                 r <- corPair(d[[1]], d[[2]], o$method, level, o$hypothesis)
+                if (!is.finite(r$r)) {
+                    reason <- if (r$n < 3) sprintf("%d kompletnych par; wymagane co najmniej 3", r$n) else "co najmniej jedna zmienna jest stała"
+                    stop(sprintf("Nie można obliczyć korelacji «%s» i «%s»: %s.", vars[1], vars[2], reason), call. = FALSE)
+                }
                 t <- self$results$pair
                 t$getColumn("r")$setTitle(switch(o$method, pearson = "r", spearman = "ρ", kendall = "τ-b"))
                 t$setRow(rowNo = 1, values = list(var1 = vars[1], var2 = vars[2], n = r$n, r = r$r, lower = r$lower, upper = r$upper, p = r$p))

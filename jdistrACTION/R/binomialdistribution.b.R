@@ -7,6 +7,11 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       
       ########### 1) Main-Function ##########
       .run = function() {
+        if (!is.finite(self$options$dp1) || self$options$dp1 < 0 || self$options$dp1 != floor(self$options$dp1))
+          stop(sprintf("Nie można obliczyć rozkładu: n musi być skończoną, nieujemną liczbą całkowitą (podano %s).", self$options$dp1), call. = FALSE)
+        if (!is.finite(self$options$dp2) || self$options$dp2 < 0 || self$options$dp2 > 1)
+          stop(sprintf("Nie można obliczyć rozkładu: p musi należeć do [0, 1] (podano %s).", self$options$dp2), call. = FALSE)
+
         
         
         ###### 1.1) Preparation ######

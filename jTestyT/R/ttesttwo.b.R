@@ -15,7 +15,7 @@ ttesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             gAll <- factor(self$data[[o$group]])
             tt <- self$results$ttest
             if (nlevels(droplevels(gAll[!is.na(gAll)])) != 2) {
-                tt$setNote("g", "Zmienna grupująca musi mieć dokładnie 2 poziomy (odfiltruj pozostałe)."); return()
+                tt$setNote("g", sprintf("Zmienna «%s» ma %d poziomów; test wymaga dokładnie 2.", o$group, nlevels(droplevels(gAll[!is.na(gAll)])))); return()
             }
             m <- jmvcore::metodyNew()
             lvAll <- levels(droplevels(gAll[!is.na(gAll)]))
@@ -28,7 +28,7 @@ ttesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             for (v in o$vars) {
                 y <- jmvcore::toNumeric(self$data[[v]]); ok <- !is.na(y) & !is.na(gAll)
                 y <- y[ok]; g <- droplevels(gAll[ok]); lv <- levels(g)
-                if (nlevels(g) != 2 || any(table(g) < 2)) { tt$setNote(paste0("n", v), sprintf("%s: za mało obserwacji w grupie.", v)); next }
+                if (nlevels(g) != 2 || any(table(g) < 2)) { tt$setNote(paste0("n", v), sprintf("«%s»: liczby obserwacji bez braków w grupach «%s» wynoszą %s; bieżąca implementacja wymaga co najmniej 2 w każdej grupie.", v, paste(lvAll, collapse = "», «"), paste(as.integer(table(factor(g, levels = lvAll))), collapse = ", "))); next }
                 if (isTRUE(o$student)) addTestRow(tt, paste(v, "t"), v, twoSampleT(y, g, FALSE, o$hypothesis))
                 if (isTRUE(o$welch)) addTestRow(tt, paste(v, "tw"), v, twoSampleT(y, g, TRUE, o$hypothesis))
                 if (isTRUE(o$nonpar)) addTestRow(tt, paste(v, "mw"), v, mannWhitney(y, g, o$hypothesis))

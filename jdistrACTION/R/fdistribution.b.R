@@ -7,6 +7,11 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       
       ########### 1) Main-Function ##########
       .run = function() {
+        if (is.na(self$options$dp1) || self$options$dp1 <= 0)
+          stop(sprintf("Nie można obliczyć rozkładu: df1 musi być dodatnie (podano %s).", self$options$dp1), call. = FALSE)
+        if (is.na(self$options$dp2) || self$options$dp2 <= 0)
+          stop(sprintf("Nie można obliczyć rozkładu: df2 musi być dodatnie (podano %s).", self$options$dp2), call. = FALSE)
+
         
         
         ###### 1.1) Preparation ######

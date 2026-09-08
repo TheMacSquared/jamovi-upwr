@@ -22,7 +22,7 @@ ttestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             m$render(self$results$metody)
             for (v in o$vars) {
                 x <- jmvcore::toNumeric(self$data[[v]]); x <- x[!is.na(x)]
-                if (length(x) < 2) { tt$setNote(paste0("n", v), sprintf("%s: za mało obserwacji.", v)); next }
+                if (length(x) < 2) { tt$setNote(paste0("n", v), sprintf("«%s»: %d obserwacji bez braków; bieżąca implementacja wymaga co najmniej 2.", v, length(x))); next }
                 if (isTRUE(o$student)) addTestRow(tt, paste(v, "t"), v, oneSampleT(x, mu, o$hypothesis))
                 if (isTRUE(o$nonpar)) addTestRow(tt, paste(v, "w"), v, wilcoxOne(x, mu, o$hypothesis))
                 if (isTRUE(o$desc)) self$results$desc$addRow(rowKey = v, values = c(list(var = v, group = ""), descRow(x)))
