@@ -16,7 +16,7 @@ ciregressionClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Clas
             d <- data.frame(x = x, y = y); fit <- stats::lm(y ~ x, data = d); cf <- stats::coef(fit)
 
             m <- jmvcore::metodyNew()
-            m$add("Dane", "Regresja liniowa „%s” ~ „%s” (MNK); N = %d obserwacji bez braków; R² = %.3f.", o$dep, o$pred, n, summary(fit)$r.squared)
+            m$add("Dane", "Regresja liniowa „%s” ~ „%s” (MNK); N = %d (obserwacje bez braków); R² = %.3f.", o$dep, o$pred, n, summary(fit)$r.squared)
             metodyPrzedzial(m, o, method, "Przedziały t-Studenta dla współczynników: b ± t(df = n − 2) · SE(b)",
                             "losowanie n obserwacji (par x, y) ze zwracaniem i ponowne dopasowanie prostej; statystyki = wyraz wolny i nachylenie z tej samej replikacji")
             m$addIf(o$plot, "Wykres", "Rozrzut z prostą regresji i pasmem przedziału ufności dla wartości średniej (%s).",
@@ -31,7 +31,7 @@ ciregressionClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Clas
                 minValid <- max(50, ceiling(o$nBoot / 2))
                 r <- bootCI(d, regressionBootStatistic, o$nBoot, o$seed, method, level, minValid = minValid)
                 if (r[[1]]$nFailed > 0) {
-                    note <- sprintf("Poprawne repliki: %d z %d; pominięto %d replik bez estymowalnej pary współczynników.", r[[1]]$nValid, o$nBoot, r[[1]]$nFailed)
+                    note <- sprintf("Poprawne repliki: %d z %d; repliki pominięte (brak estymowalnej pary współczynników): %d.", r[[1]]$nValid, o$nBoot, r[[1]]$nFailed)
                     t$setNote("replicas", note)
                     m$add("Przedział ufności", "%s", note)
                     m$render(self$results$metody)

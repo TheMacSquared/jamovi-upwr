@@ -38,7 +38,7 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             self$results$plot$setVisible(simple && isTRUE(o$plot) && reliable)
 
             m <- jmvcore::metodyNew()
-            m$add("Dane", "Zmienna zależna „%s”: zdarzenie = „%s” (kodowane 1), odniesienie = „%s”%s; predyktory ilościowe: %s; jakościowe: %s; N = %d obserwacji bez braków, zdarzeń = %d.",
+            m$add("Dane", "Zmienna zależna „%s”: zdarzenie = „%s” (kodowane 1), odniesienie = „%s”%s; predyktory ilościowe: %s; jakościowe: %s; N = %d (obserwacje bez braków), liczba zdarzeń = %d.",
                   dep, event, setdiff(lv, event)[1], if (!optNonEmpty(o$event)) " (domyślnie drugi poziom — wybierz w panelu)" else "",
                   if (length(covs)) jmvcore::metodyCyt(covs) else "brak", if (length(factors)) jmvcore::metodyCyt(factors) else "brak", n, sum(y))
             for (v in factors) m$add("Dane", "„%s” kodowana zero-jedynkowo, poziom odniesienia „%s”.", v, levels(d[[v]])[1])

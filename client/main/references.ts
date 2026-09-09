@@ -347,7 +347,7 @@ export class References extends HTMLElement {
 
             h1 {
                 font-size: 160%;
-                color: #3E6DA9;
+                color: #832034;
                 white-space: nowrap;
                 font-weight: bold ;
             }
@@ -385,8 +385,8 @@ export class Reference extends HTMLElement {
                 }
 
                 .body[data-checked='1'] {
-                    background-color: #B5CAEF ;
-                    border: 2px solid #8BA4D6;
+                    background-color: #e6bec4 ;
+                    border: 2px solid #d48d99;
                 }
 
                 input {

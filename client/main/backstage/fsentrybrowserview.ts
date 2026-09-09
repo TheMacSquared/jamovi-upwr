@@ -18,7 +18,7 @@ import { EventDistributor } from '../../common/eventmap';
 const TAG_COLORS = [
     { bg: '#f0e2e4', border: '#9c3b4a' },
     { bg: '#f9f0e6', border: '#d99a5b' },
-    { bg: '#e2e9f0', border: '#3f6f9e' },
+    { bg: '#f0e2e4', border: '#9e3f4f' },
     { bg: '#ebf0ee', border: '#7a9b8e' },
     { bg: '#f3ecf2', border: '#b183a8' },
     { bg: '#f6e6dd', border: '#c2571f' },

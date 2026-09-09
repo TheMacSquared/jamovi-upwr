@@ -28,12 +28,12 @@
 [focusmode="hover"] .split-button-arrow:not([aria-disabled]):hover,
 [focusmode="default"] .split-button-main:not([aria-disabled]):hover,
 [focusmode="default"] .split-button-arrow:not([aria-disabled]):hover {
-    background-color: #d5dfeb;
+    background-color: #ebd5d9;
 }
 
 [keyboardfocus="true"] .split-button-main:focus,
 [keyboardfocus="true"] .split-button-arrow:focus {
-    background-color: #d5dfeb;
+    background-color: #ebd5d9;
 }
 
 .split-button-menu .jmv-ribbon-button-label {

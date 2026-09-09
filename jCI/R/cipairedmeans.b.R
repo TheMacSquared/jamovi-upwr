@@ -12,7 +12,7 @@ cipairedmeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
             if (n < 2) { t$setNote("err", "Za mało kompletnych par (n < 2)."); return() }
 
             m <- jmvcore::metodyNew()
-            m$add("Dane", "Pomiary „%s” i „%s” tych samych jednostek; różnica = „%s” − „%s”; N = %d par bez braków.",
+            m$add("Dane", "Pomiary „%s” i „%s” tych samych jednostek; różnica = „%s” − „%s”; N = %d (pary bez braków).",
                   o$var1, o$var2, o$var1, o$var2, n)
             metodyPrzedzial(m, o, method, "Przedział t-Studenta dla średniej różnic: średnia ± t(df = n − 1) · SD różnic/√n",
                             "losowanie n par (różnic) ze zwracaniem, statystyka = średnia różnic")

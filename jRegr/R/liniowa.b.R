@@ -17,7 +17,7 @@ liniowaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             self$results$plot$setVisible(simple && isTRUE(o$plot))
 
             m <- jmvcore::metodyNew()
-            m$add("Dane", "Zmienna zależna „%s”; predyktory ilościowe: %s; jakościowe: %s; N = %d obserwacji bez braków.", dep,
+            m$add("Dane", "Zmienna zależna „%s”; predyktory ilościowe: %s; jakościowe: %s; N = %d (obserwacje bez braków).", dep,
                   if (length(covs)) jmvcore::metodyCyt(covs) else "brak", if (length(factors)) jmvcore::metodyCyt(factors) else "brak", n)
             for (v in factors) m$add("Dane", "„%s” kodowana zero-jedynkowo, poziom odniesienia „%s” (współczynnik = różnica średnich wobec tego poziomu przy stałych pozostałych predyktorach).", v, levels(d[[v]])[1])
             m$add("Model", "Regresja liniowa metodą najmniejszych kwadratów (lm), bez interakcji; R² = SS modelu / SS ogółem, R² skorygowane = 1 − (1 − R²)(n − 1)/(n − p − 1); RMSE = √(SS reszt / n); test F całego modelu wobec modelu z samym wyrazem wolnym.")

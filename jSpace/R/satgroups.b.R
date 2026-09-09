@@ -16,7 +16,7 @@ satgroupsClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             grp <- droplevels(grp[validIdx])
 
             if (length(x) < 3 || nlevels(grp) < 2) {
-                stop(sprintf("«%s», grupowanie «%s»: %d obserwacji i %d grup; bieżąca implementacja wymaga co najmniej 3 obserwacji i 2 grup.", dep, self$options$group, length(x), nlevels(grp)), call. = FALSE)
+                stop(sprintf("«%s», grupowanie «%s»: liczba obserwacji: %d, liczba grup: %d; bieżąca implementacja wymaga co najmniej 3 obserwacji i 2 grup.", dep, self$options$group, length(x), nlevels(grp)), call. = FALSE)
             }
 
             for (g in levels(grp)) {

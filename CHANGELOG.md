@@ -3,6 +3,45 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.0.4 — 2026-09-09
+Wydanie poprawkowe: polska odmiana liczebników w komunikatach i spójny kolor
+ikon belki statusu. Bez zmian w wynikach analiz.
+
+- Komunikaty z liczbą (33 miejsca w 9 modułach) nie odmieniają już rzeczownika
+  po liczebniku — forma dopełniacza pasowała tylko do 0 i 5+, więc „2 kompletnych
+  obserwacji” albo „3 kategorii” były błędne przy typowych, małych liczbach.
+  Wzorzec: liczba przed dwukropkiem („liczba kompletnych obserwacji: 2”) albo
+  rzeczownik w nawiasie („N = 22 (pary bez braków)”).
+  - komunikaty blokujące („nie da się policzyć, bo…”, gdzie liczba z definicji
+    jest mała): jANOVA 0.4.2, jRol 0.1.2, jTestyT 0.4.2, jperm 0.2.3,
+    jEksplor 0.1.2, jRegr 0.1.3, jSpace 0.3.2,
+  - opisy zastosowanych metod i noty: jCzest 0.2.2 (liczba pomiarów, kategorii,
+    porównań), jEksplor 0.1.2 (liczba klas, grup równolicznych),
+    jCI 0.3.3 (liczba prób i replik bootstrapu), jRol 0.1.2 (plan doświadczenia:
+    obiekty, powtórzenia, bloki, poletka),
+  - „N = %d ⟨rzeczownik⟩”: jCI 0.3.3, jRegr 0.1.3, jANOVA 0.4.2, jCzest 0.2.2.
+- Klient: interfejs przeszedł z niebieskiego na burgund jUPWR. Ikona „O zbiorze”
+  jest pierwsza w obu belkach statusu (arkusz i zakładka Zmienne) i burgundowa;
+  przekolorowane ikony belki i panelu filtrów (oko widoczności, dodawanie filtru,
+  formuła, strzałki) oraz cała paleta chromu w CSS: zaznaczenie i podświetlenie
+  nagłówków w arkuszu, panel filtrów, edytor zmiennych i przekształceń, backstage
+  (Otwórz/Zapisz), wstążka, menu, sklep z modułami, panel opcji analizy
+  i podświetlenie wybranej analizy w wynikach (82 podmiany w 22 plikach CSS),
+  style pisane wprost w kodzie (`formatio.ts` — style kopiowanych i eksportowanych
+  wyników, `references.ts`, `infobox.ts`, `clipboardprompt.ts`, `msgdialog.ts`,
+  przeglądarka plików backstage) oraz ikony ekranu Otwórz/Zapisz (`place-*`,
+  `document-*`, `bs-check-items`, wskaźnik pracy). Nagłówki wyników — na ekranie
+  i w wyniku kopiowania — są burgundowe.
+  Zasada: tła pod tekstem dostają jasny wariant (odcień, nie pełny kolor), więc
+  kontrast tekstu nie spada; linie, obramowania i wypełnienia z białym tekstem
+  dostają nasycony burgund. Kolory z dotychczasowej mapy jUPWR zachowane
+  (`#3e6da9` → `#832034`, `#658ec2`/`#6b9de8` → `#b05263`, `#a9c6f2` → `#e9c6cd`),
+  reszta przeliczona przez obrót odcienia na 350° z zachowaniem jasności
+  i wytłumieniem nasycenia. Świadomie bez zmian: paleta kolorów tekstu w notatkach
+  (przyciski nazwane wprost kolorem), ikony biblioteki metro, niebieska ikona
+  powiadomienia „info” (znaczenie semantyczne, obok czerwonego błędu), logo jamovi,
+  ikony modułów z biblioteki (cudze) i ikony zakładki Wykresy (decyzja z sierpnia).
+
 ## 1.0.3 — 2026-09-08
 Wydanie poprawkowe: komunikaty „nie da się policzyć, bo…". Analiza, której nie
 można wykonać na wskazanym wejściu, mówi dlaczego — z nazwą zmiennej, liczbą

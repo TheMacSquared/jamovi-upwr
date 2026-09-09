@@ -53,7 +53,7 @@
      id="g4">
     <g
        transform="matrix(.077244 0 0 .077244 -8.718 998.54)"
-       stroke="#325787"
+       stroke="#863341"
        stroke-width="12.946"
        fill="#fff"
        id="g6">
@@ -69,10 +69,10 @@
     </g>
     <g
        transform="translate(.17857 -1.7857)"
-       stroke="#6e96ca"
+       stroke="#c96f7e"
        stroke-linecap="round"
        stroke-width=".91246"
-       fill="#6e96ca"
+       fill="#c96f7e"
        id="g12">
       <rect
          height="1.5381"
@@ -95,10 +95,10 @@
     </g>
     <g
        transform="translate(.17857 -1.8875)"
-       stroke="#6e96ca"
+       stroke="#c96f7e"
        stroke-linecap="round"
        stroke-width=".91246"
-       fill="#6e96ca"
+       fill="#c96f7e"
        id="g20">
       <rect
          height="1.5381"
@@ -121,10 +121,10 @@
     </g>
     <g
        transform="translate(.17857 -1.6323)"
-       stroke="#6e96ca"
+       stroke="#c96f7e"
        stroke-linecap="round"
        stroke-width=".91246"
-       fill="#6e96ca"
+       fill="#c96f7e"
        id="g28">
       <rect
          height="1.5381"
@@ -147,10 +147,10 @@
     </g>
     <g
        transform="translate(.17857 2.1429)"
-       stroke="#6e96ca"
+       stroke="#c96f7e"
        stroke-linecap="round"
        stroke-width=".91246"
-       fill="#6e96ca"
+       fill="#c96f7e"
        id="g36">
       <rect
          height="1.5381"
@@ -180,7 +180,7 @@
      x="7.1864395"
      y="10.847457" />
   <path
-     style="fill:#3e6da9;fill-opacity:1;stroke:#f0f4fa;stroke-width:0.19195046;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     style="fill:#832034;fill-opacity:1;stroke:#f9f0f2;stroke-width:0.19195046;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      d="m 9.1139802,19.616384 0,-7.133638 1.8806888,0 1.880681,0 0,4.937438 0,4.937429 0.291838,-0.0905 c 1.150845,-0.35692 2.906292,-1.564119 4.013507,-2.760045 1.671504,-1.805424 2.537446,-3.723954 2.892422,-6.408232 l 0.08147,-0.616087 1.860391,0 1.860393,0 -0.057,0.551234 c -0.330715,3.197806 -1.090511,5.287783 -2.787915,7.668599 -1.654135,2.320149 -4.066506,4.133917 -6.933562,5.213069 -1.093746,0.411688 -3.217706,0.834371 -4.1926498,0.834371 l -0.79027,0 z"
      id="path4694-7"
      inkscape:connector-curvature="0"

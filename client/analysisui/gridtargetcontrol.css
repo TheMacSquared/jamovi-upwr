@@ -46,8 +46,8 @@ body[dir="rtl"] .jmv-toolbar-button.jmv-variable-interaction-transfer > .jmv-too
 }
 
 .jmv-toolbar:not(.jmv-toolbar-disabled) .jmv-toolbar-button:not(.jmv-toolbar-disabled):hover {
-    background-color: #dbe7f7;
-    border-color: #518fdd;
+    background-color: #f3dfe2;
+    border-color: #c66878;
 }
 
 .jmv-toolbar-group-body .jmv-toolbar-button.jmv-variable-transfer > .jmv-toolbar-button-menu {
@@ -69,7 +69,7 @@ body[dir="rtl"] .jmv-toolbar-button.jmv-variable-interaction-transfer > .jmv-too
 }
 
 .silky-target-list.sub-targetGrid.selected-sub-targetlist {
-    background-color: #eaf0fa;
+    background-color: #f8ecee;
 }
 
 .silky-target-list.sub-targetGrid.selected-sub-targetlist .column-ghost-label {

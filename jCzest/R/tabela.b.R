@@ -332,7 +332,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                                                    stat = pw$stat[i], df = pw$df[i], p = pw$p[i]))
             private$.metody$add("Post-hoc", paste(
                 "Porównania par wierszy: dla każdej pary χ² na podtabeli 2 × %d",
-                "(%d porównań), p skorygowane metodą Holma."), ncol(tab), nrow(pw))
+                "(liczba porównań: %d), p skorygowane metodą Holma."), ncol(tab), nrow(pw))
         },
 
         .plot = function(image, ...) {

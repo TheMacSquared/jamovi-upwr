@@ -375,7 +375,7 @@ runDesignAnalysis <- function(self, design) {
     for (v in setdiff(needed, dep)) d[[v]] <- factor(d[[v]])
     d <- d[stats::complete.cases(d), , drop = FALSE]
     for (v in setdiff(needed, dep)) d[[v]] <- droplevels(d[[v]])
-    if (nrow(d) < 3) stop(sprintf("«%s»: %d kompletnych obserwacji; bieżąca implementacja modelu wymaga co najmniej 3.", dep, nrow(d)), call. = FALSE)
+    if (nrow(d) < 3) stop(sprintf("«%s»: liczba kompletnych obserwacji: %d; bieżąca implementacja modelu wymaga co najmniej 3.", dep, nrow(d)), call. = FALSE)
     if (nlevels(d[[A]]) < 2) {
         self$results$anova$setNote("err", "Czynnik musi mieć co najmniej 2 poziomy.")
         return()

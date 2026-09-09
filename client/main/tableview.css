@@ -33,7 +33,7 @@
          z-index: 30;
          border-right-style: double;
          border-width: 4px;
-         border-color: #3e6da9;
+         border-color: #832034;
          background-color: #ff000000;
      }
 
@@ -42,7 +42,7 @@
          opacity: 0;
          width: 16px;
          height: 16px;
-         border: 2px solid #5E8BC4;
+         border: 2px solid #b05263;
          border-radius: 10px;
          background-color: white;
          box-shadow: 0 0 0 1px #FFF;
@@ -96,23 +96,23 @@
 
 .dialog-widget input:focus {
     outline: none !important;
-    border: 1px solid #3E6DA9 !important;
+    border: 1px solid #832034 !important;
 }
 
 .dialog-widget .ok, .dialog-widget .cancel {
     border-radius: 2px !important;
     color: inherit !important;
-    background-color: #A9C6F2 !important;
+    background-color: #e9c6cd !important;
     width: calc(50% - 5px) !important;
 }
 
 .dialog-widget .ok:hover, .dialog-widget .cancel:hover {
-    background-color: #7fAAEC !important;
+    background-color: #d9a3ae !important;
 }
 
 .dialog-widget .ok:focus, .dialog-widget .cancel:focus {
     outline: none !important;
-    border: 1px solid #3E6DA9 !important;
+    border: 1px solid #832034 !important;
 }
 
 .dialog-widget .url {
@@ -131,8 +131,8 @@
 }
 
 .cell-edited {
-    color: #376095;
-    background-color: rgba(55, 96, 149, .06);
+    color: #832034;
+    background-color: rgba(131, 32, 52, .06);
 }
 
 .jmv-table-container {
@@ -264,7 +264,7 @@
 .jmv-column-header.highlighted,
 .jmv-row-header-cell.highlighted {
     background-color: #CCCCCC ;
-    color: #3E6DA9 ;
+    color: #832034 ;
 }
 
 .select-all {
@@ -273,7 +273,7 @@
 
 .jmv-column-header:not(.place-holder):hover,
 .jmv-row-header-cell:hover {
-    background-color: #A6BEDE;
+    background-color: #e4c8ce;
 }
 
 .jmv-column-cell,
@@ -382,7 +382,7 @@
 
 .jmv-column[data-fmlaok="1"] > .jmv-column-cell[data-filtered="1"].cell-edited {
     color: #C2C2C2 ;
-    background-color: #e2e6e9 ;
+    background-color: #e9e2e3 ;
 }
 
 .jmv-column-cell[data-missing="1"] {
@@ -412,10 +412,10 @@
     z-index: 10 ;
     box-sizing: border-box ;
     transition: inset-inline-start 0.1s, top 0.1s, width 0.1s, height 0.1s ;
-    box-shadow: 0 0 0 2px #5E8BC4 ;
+    box-shadow: 0 0 0 2px #b05263 ;
     padding: 2px 4px ;
     white-space: no-wrap;
-    background-color: rgba(94, 139, 196, .1);
+    background-color: rgba(131, 32, 52, .1);
     font-size: 12.8px ;
 
     inset-inline-start: -100px ; /* overridden by code */
@@ -428,7 +428,7 @@
     visibility: hidden;
     width: 100%;
     position: absolute;
-    border-inline-end: 2px solid #5e8bc4;
+    border-inline-end: 2px solid #b05263;
     box-sizing: border-box;
     top: 0px;
     inset-inline-end: -1px;
@@ -442,7 +442,7 @@
     visibility: hidden;
     height: 100%;
     position: absolute;
-    border-bottom: 2px solid #5e8bc4;
+    border-bottom: 2px solid #b05263;
     box-sizing: border-box;
     inset-inline-start: 0px;
     bottom: -1px;
@@ -479,7 +479,7 @@
 }
 
 input.jmv-table-cell-selected.copying {
-    border: 1px dashed #5E8BC4 ;
+    border: 1px dashed #b05263 ;
 }
 
 .jmv-table-cell-selected:not(.editing) {
@@ -517,7 +517,7 @@ input.jmv-table-cell-selected.copying {
 }
 
 .jmv-table-row-highlight {
-    border-inline-end: 2px solid #5E8BC4 ;
+    border-inline-end: 2px solid #b05263 ;
     transition: top 0.1s, width 0.1s, height 0.1s ;
     box-sizing: border-box;
     top: -100px ; /* overridden by code */
@@ -527,7 +527,7 @@ input.jmv-table-cell-selected.copying {
 .jmv-table-column-highlight {
     top: -2px ;
     inset-inline-start: -100px ; /* overridden by code */
-    border-bottom: 2px solid #5E8BC4 ;
+    border-bottom: 2px solid #b05263 ;
     transition: inset-inline-start 0.1s, width 0.1s, height 0.1s ;
     pointer-events: none ;
 }
@@ -623,7 +623,7 @@ body[dir='rtl'] .jmv-row-header-cell {
 
 .jmv-row-header-cell.split-above {
     border-image: none ;
-    border-top: 3px solid #5E8BC4 ;
+    border-top: 3px solid #b05263 ;
 }
 
 @media (forced-colors: active) {

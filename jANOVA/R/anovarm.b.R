@@ -81,7 +81,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             for (v in c(within, between)) d[[v]] <- factor(d[[v]])
             d <- d[stats::complete.cases(d), , drop = FALSE]
             for (v in c(subject, within, between)) d[[v]] <- droplevels(d[[v]])
-            if (nrow(d) < 4) stop(sprintf("«%s»: %d kompletnych obserwacji; bieżąca implementacja modelu wymaga co najmniej 4.", dep, nrow(d)), call. = FALSE)
+            if (nrow(d) < 4) stop(sprintf("«%s»: liczba kompletnych obserwacji: %d; bieżąca implementacja modelu wymaga co najmniej 4.", dep, nrow(d)), call. = FALSE)
             at <- self$results$anova
             for (v in c(within, between)) if (nlevels(d[[v]]) < 2) {
                 at$setNote("err", sprintf("Zmienna %s musi mieć co najmniej 2 poziomy.", v)); return()
@@ -108,7 +108,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             }
             method <- o$postHoc; alpha <- o$alpha
             md <- jmvcore::metodyNew()   # `m` is reused below for matrices/means
-            md$add("Dane", "Zmienna zależna „%s” w formacie długim; jednostka „%s” (%d jednostek, %d obserwacji kompletnych); czynniki wewnątrzobiektowe: %s%s%s.",
+            md$add("Dane", "Zmienna zależna „%s” w formacie długim; jednostka „%s” (liczba jednostek: %d, obserwacje kompletne: %d); czynniki wewnątrzobiektowe: %s%s%s.",
                   dep, subject, nlevels(d[[subject]]), nrow(d), jmvcore::metodyCyt(within),
                   if (length(between)) paste0("; międzyobiektowe: ", jmvcore::metodyCyt(between)) else "",
                   if (length(covs)) paste0("; kowarianty: ", jmvcore::metodyCyt(covs)) else "")

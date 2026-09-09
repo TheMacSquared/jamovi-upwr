@@ -23,13 +23,13 @@ jmv-results-table {
 
 #results.weights .title {
     font-size: 160%;
-    color: #3E6DA9;
+    color: #832034;
     margin-bottom: 3px;
     white-space: nowrap;
 }
 
 #results.weights:not(.analysis-selected) {
-    border: 1px solid #3e6da9cc;
+    border: 1px solid #832034cc;
     border-left-width: 5px;
 }
 
@@ -152,7 +152,7 @@ jmv-results-table {
     align-items: center;
     margin: 0px 10px;
     border: 1px solid #a0a0a0;
-    /*background-color: #f1f7ff;*/
+    /*background-color: #fbf5f6;*/
     border-radius: 5px;
     padding: 5px 12px;
     border-left-width: 4px;
@@ -175,7 +175,7 @@ body {
 
 h1 {
     font-size: 160% ;
-    color: #3E6DA9 ;
+    color: #832034 ;
     margin-bottom: 3px ;
     white-space: nowrap ;
 }
@@ -184,7 +184,7 @@ h1 {
     transition: 0.2s padding, 0.2s background-color, 0.2s margin;
     cursor: text;
     outline-style: none;
-    background-color: #ecf3fb;
+    background-color: #f9eef0;
     transition: .2s background-color
 }
 
@@ -215,26 +215,26 @@ h1 {
 }
 
 #results.edit-state:not(.no-analysis-selected):not(.analysis-selected):not(.edit-focus).annotation-selected.annotation .jmv-editable-header > h1 {
-    background-color: #cddae8;
+    background-color: #e8cdd2;
 }
 
 #results.edit-state.no-analysis-selected.hovering .jmv-editable-header > h1 {
-    background-color: #cddae8;
+    background-color: #e8cdd2;
 }
 
 #results.edit-state.analysis-selected .jmv-editable-header > h1:hover {
-    background-color: #d2e3f3;
+    background-color: #efd6da;
 }
 
 #results.edit-state.analysis-selected .jmv-editable-header.focused > h1 {
-    background-color: #f3f7fc;
+    background-color: #fbf4f5;
 }
 
 h2 {
     font-size: 130% ;
     margin-bottom: 3px ;
     margin-top: 3px ;
-    color: #3E6DA9 ;
+    color: #832034 ;
 }
 
 h3, h4, h5 {
@@ -274,8 +274,8 @@ input, [contenteditable], [contenteditable] * {
     top: 20px ;
     width: 20px ;
     height: 20px ;
-    background-color: #B5CAEF ;
-    border: 2px solid #8BA4D6;
+    background-color: #e6bec4 ;
+    border: 2px solid #d48d99;
     z-index: -1 ;
     opacity: 0 ;
     transition: 200ms opacity ;
@@ -557,7 +557,7 @@ table.row-selectable tr.content-row:hover:not(.selected) th[scope=rowgroup]  {
 table.row-selectable tr.selected td,
 table.row-selectable tr.selected th[scope=row],
 table.row-selectable tr.selected th[scope=rowgroup] {
-    background-color: #6B9DE8 ;
+    background-color: #b05263 ;
     color: white ;
 }
 

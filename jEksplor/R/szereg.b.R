@@ -8,7 +8,7 @@ szeregClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (!optNonEmpty(o$var)) return()
             x <- jmvcore::toNumeric(self$data[[o$var]]); x <- x[!is.na(x)]
             ct <- self$results$classes; st <- self$results$stats
-            if (length(x) < 2) { ct$setNote("n", sprintf("«%s»: %d obserwacji; bieżąca implementacja wymaga co najmniej 2.", o$var, length(x))); return() }
+            if (length(x) < 2) { ct$setNote("n", sprintf("«%s»: liczba obserwacji: %d; bieżąca implementacja wymaga co najmniej 2.", o$var, length(x))); return() }
             start <- if (isTRUE(o$startAuto)) NULL else o$start
             if (!is.null(start) && start > min(x)) { ct$setNote("s", sprintf("Początek pierwszej klasy (%g) musi być ≤ minimum (%g).", start, min(x))); return() }
             br <- classBreaks(x, o$method, o$nClasses, o$width, start)
@@ -17,7 +17,7 @@ szeregClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
 
             m <- jmvcore::metodyNew()
             m$add("Dane", "Zmienna „%s”; N = %d (braki pominięte); minimum %s, maksimum %s.", o$var, length(x), format(signif(min(x), 6)), format(signif(max(x), 6)))
-            m$add("Klasy", "%s: k = %d klas o szerokości h = %s, od %s; przedziały lewostronnie domknięte [a; b), ostatni [a; b].",
+            m$add("Klasy", "%s: liczba klas k = %d, szerokość klasy h = %s, od %s; przedziały lewostronnie domknięte [a; b), ostatni [a; b].",
                   switch(o$method, sturges = "Reguła Sturgesa k = ⌈log₂ n + 1⌉", count = "Zadana liczba klas", width = "Zadana szerokość klasy"),
                   k, format(signif(br$h, 6)), if (is.null(start)) "minimum" else format(signif(start, 6)))
             m$add("Klasy", "Środek klasy = (a + b)/2; częstość = n_i / N; skumulowane = suma do danej klasy włącznie.")

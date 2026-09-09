@@ -126,7 +126,7 @@
 
 .jmv-variables-body .cell.selected {
     scroll-margin-top: 30px;
-    background-color: rgba(94, 139, 196, .1);
+    background-color: rgba(131, 32, 52, .1);
 }
 
 .jmv-variables-body .column-header {
@@ -214,13 +214,13 @@
     justify-content: center;
     width: 50px;
     height: 50px;
-    background-color: #3e6da9;
+    background-color: #832034;
     border-radius: 50%;
 }
 
 .add-new-variable:hover {
-    background: #3cb0fd;
-    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+    background: #9c3b4a;
+    background-image: linear-gradient(to bottom, #9c3b4a, #832034);
 }
 
 .cell.new-variable {

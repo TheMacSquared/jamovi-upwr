@@ -2,7 +2,7 @@
 .jmv-annotation {
     position: relative;
     transition: .2s height, .2s background-color, .2s border-color;
-    color: #3E6DA9;
+    color: #832034;
     margin-top: 3px;
     margin-bottom: 3px;
     border-bottom: 1px dashed transparent;
@@ -58,7 +58,7 @@
     padding-top: 0px;
     padding-bottom: 0px;
     margin-top: 0px;
-    background-color: #ecf3fb;
+    background-color: #f9eef0;
 
     padding-inline-start: 10px;
     /*padding-inline-end: 10px;*/
@@ -67,23 +67,23 @@
 }
 
 #results.edit-state:not(.analysis-selected):not(.no-analysis-selected):not(.edit-focus) .jmv-annotation .editor-box {
-    background-color: unset; /*#cddae8;*/
+    background-color: unset; /*#e8cdd2;*/
 }
 
 #results.edit-state:not(.analysis-selected):not(.no-analysis-selected):not(.edit-focus).annotation-selected.annotation .jmv-annotation .editor-box {
-    background-color: #cddae8;
+    background-color: #e8cdd2;
 }
 
 #results.edit-state.no-analysis-selected.hovering .jmv-annotation .editor-box {
-    background-color: #cddae8;
+    background-color: #e8cdd2;
 }
 
 #results.edit-state.analysis-selected .jmv-annotation .editor-box:hover {
-    background-color: #d2e3f3;
+    background-color: #efd6da;
 }
 
 #results.edit-state.analysis-selected .jmv-annotation.focused .editor-box {
-    background-color: #f3f7fc
+    background-color: #fbf4f5
 }
 
 .jmv-annotation .ql-editor {
@@ -241,7 +241,7 @@ https://github.com/quilljs/quill/issues/1157
     transition: 0.2s opacity, 0.2s visibility;
     transition-delay: 0.2s;
     font-style: normal;
-    color: #3E6DA9;
+    color: #832034;
     visibility: hidden;
 }
 

@@ -69,7 +69,7 @@ tleorbitClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             # propagate with SGP4/SDP4 (asteRisk picks the algorithm)
             czasy <- seq(0, self$options$czasProp * 60, by = self$options$krok)
             if (length(czasy) > 5000) {
-                stop(sprintf("Nie można wykonać propagacji: %d punktów; bieżąca implementacja obsługuje maksymalnie 5000 (czas i krok propagacji).", length(czasy)), call. = FALSE)
+                stop(sprintf("Nie można wykonać propagacji: liczba punktów: %d; bieżąca implementacja obsługuje maksymalnie 5000 (czas i krok propagacji).", length(czasy)), call. = FALSE)
             }
 
             epoka <- as.POSIXct(tle$dateTime, tz = "UTC")

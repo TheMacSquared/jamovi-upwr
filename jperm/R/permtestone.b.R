@@ -19,7 +19,7 @@ permtestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             m$render(self$results$metody)
             for (v in o$vars) {
                 x <- jmvcore::toNumeric(self$data[[v]]); x <- x[!is.na(x)]
-                if (length(x) < 2) { tt$setNote(paste0("n", v), sprintf("«%s»: %d obserwacji bez braków; bieżąca implementacja wymaga co najmniej 2.", v, length(x))); next }
+                if (length(x) < 2) { tt$setNote(paste0("n", v), sprintf("«%s»: liczba obserwacji bez braków: %d; bieżąca implementacja wymaga co najmniej 2.", v, length(x))); next }
                 observed <- mean(x) - mu
                 permDist <- permDistOneSample(x, mu, o$nPerm, o$seed, o$exact)
                 tt$addRow(rowKey = v, values = list(var = v, stat = observed,

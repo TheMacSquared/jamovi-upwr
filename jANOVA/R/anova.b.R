@@ -80,7 +80,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             complete <- stats::complete.cases(d)
             d <- d[complete, , drop = FALSE]
             for (v in c(factors, blocks)) d[[v]] <- droplevels(d[[v]])
-            if (nrow(d) < 3) stop(sprintf("«%s»: %d kompletnych obserwacji; bieżąca implementacja modelu wymaga co najmniej 3.", dep, nrow(d)), call. = FALSE)
+            if (nrow(d) < 3) stop(sprintf("«%s»: liczba kompletnych obserwacji: %d; bieżąca implementacja modelu wymaga co najmniej 3.", dep, nrow(d)), call. = FALSE)
             for (v in c(factors, blocks)) if (nlevels(d[[v]]) < 2) {
                 self$results$anova$setNote("err", sprintf("Zmienna %s musi mieć co najmniej 2 poziomy.", v))
                 return()
@@ -105,7 +105,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             # --- methods description (jmvcore::metodyNew): data and model first,
             # tests/post-hoc appended where they are computed, rendered at the end
             md <- jmvcore::metodyNew()   # `m` is reused below for matrices/means
-            md$add("Dane", "Zmienna zależna „%s”; czynniki: %s%s%s; N = %d obserwacji kompletnych (wiersze z brakiem w którejkolwiek zmiennej pominięte).",
+            md$add("Dane", "Zmienna zależna „%s”; czynniki: %s%s%s; N = %d (obserwacje kompletne; wiersze z brakiem w którejkolwiek zmiennej pominięte).",
                   dep, jmvcore::metodyCyt(factors),
                   if (length(blocks)) paste0("; czynniki blokujące (addytywne): ", jmvcore::metodyCyt(blocks)) else "",
                   if (length(covs)) paste0("; kowarianty: ", jmvcore::metodyCyt(covs)) else "", nrow(d))

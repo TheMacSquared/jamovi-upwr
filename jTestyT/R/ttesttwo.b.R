@@ -15,7 +15,7 @@ ttesttwoClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             gAll <- factor(self$data[[o$group]])
             tt <- self$results$ttest
             if (nlevels(droplevels(gAll[!is.na(gAll)])) != 2) {
-                tt$setNote("g", sprintf("Zmienna «%s» ma %d poziomów; test wymaga dokładnie 2.", o$group, nlevels(droplevels(gAll[!is.na(gAll)])))); return()
+                tt$setNote("g", sprintf("Liczba grup w zmiennej «%s»: %d. Test wymaga dokładnie 2 grup.", o$group, nlevels(droplevels(gAll[!is.na(gAll)])))); return()
             }
             m <- jmvcore::metodyNew()
             lvAll <- levels(droplevels(gAll[!is.na(gAll)]))

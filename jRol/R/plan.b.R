@@ -19,20 +19,20 @@ planClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     B = if (hasB) df$B[i] else ""))
             }
             desc <- switch(design,
-                crd = sprintf(paste0("<p>Układ całkowicie losowy: %d obiektów × %d powtórzeń ",
-                    "= %d poletek. Obiekty rozlosowano w całym polu bez ograniczeń.</p>"),
+                crd = sprintf(paste0("<p>Układ całkowicie losowy: liczba obiektów %d × liczba powtórzeń %d ",
+                    "= liczba poletek %d. Obiekty rozlosowano w całym polu bez ograniczeń.</p>"),
                     o$nTreat, o$nRep, nrow(df)),
-                rcbd = sprintf(paste0("<p>Układ losowanych bloków: %d obiektów w %d blokach ",
-                    "= %d poletek. Każdy obiekt występuje raz w każdym bloku; ",
+                rcbd = sprintf(paste0("<p>Układ losowanych bloków: liczba obiektów %d, liczba bloków %d ",
+                    "= liczba poletek %d. Każdy obiekt występuje raz w każdym bloku; ",
                     "losowanie osobno w obrębie bloku.</p>"), o$nTreat, o$nRep, nrow(df)),
                 latin = sprintf(paste0("<p>Kwadrat łaciński %d × %d: każdy obiekt raz ",
                     "w każdym wierszu i w każdej kolumnie (kontrola dwóch kierunków ",
                     "zmienności). Wylosowano permutacje wierszy, kolumn i obiektów.</p>"),
                     o$nTreat, o$nTreat),
-                splitplot = sprintf(paste0("<p>Split-plot: %d bloków; w każdym bloku ",
-                    "obiekty czynnika A (%d) rozlosowano na dużych poletkach, a w obrębie ",
-                    "każdego dużego poletka poziomy czynnika B (%d) na małych poletkach ",
-                    "= %d małych poletek.</p>"), o$nRep, o$nTreat, o$nSub, nrow(df)))
+                splitplot = sprintf(paste0("<p>Split-plot: liczba bloków %d; w każdym bloku ",
+                    "obiekty czynnika A (liczba poziomów: %d) rozlosowano na dużych poletkach, ",
+                    "a w obrębie każdego dużego poletka poziomy czynnika B (liczba poziomów: %d) ",
+                    "na małych poletkach; liczba małych poletek: %d.</p>"), o$nRep, o$nTreat, o$nSub, nrow(df)))
             self$results$info$setContent(paste0(desc,
                 sprintf("<p>Ziarno losowania: %d (ten sam plan przy tym samym ziarnie).</p>", o$seed)))
             self$results$map$setState(list(plan = df, design = design,

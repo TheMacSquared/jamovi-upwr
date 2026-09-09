@@ -70,14 +70,14 @@ class ClipboardPrompt extends HTMLElement {
             .copy {
                 width: 80px;
                 line-height: 25px;
-                background-color: #3E6DA9;
+                background-color: #832034;
                 color: white;
                 border: 1px solid transparent;
                 border-radius: 2px;
             }
 
             .copy:hover {
-                background-color: #224a80;
+                background-color: #802232;
             }
 
             .message {

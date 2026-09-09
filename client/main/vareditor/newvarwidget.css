@@ -17,7 +17,7 @@
     border-radius: 4px;
     text-align: center;
     margin: 7px;
-    color: #214067;
+    color: #67212d;
     border: none;
     padding: 0px;
     align-items: stretch;
@@ -31,7 +31,7 @@
     background-repeat: no-repeat;
     background-position: center;
     margin-inline-end: 2px;
-    background-color: #cadaf3;
+    background-color: #edd0d5;
     border: 1px solid transparent;
     transition: .2s background-color ease-out, .2s border-color ease-out;
 }
@@ -43,19 +43,19 @@
     text-transform: uppercase;
     flex: 1;
     padding: 20px;
-    background-color: #cadaf3;
+    background-color: #edd0d5;
     border: 1px solid transparent;
     transition: .2s background-color ease-out, .2s border-color ease-out;
 }
 
 .jmv-variable-new-container > .button:hover > .icon {
-    background-color: #e6ebf3;
-    border: 1px solid #cadaf3;
+    background-color: #f3e6e8;
+    border: 1px solid #edd0d5;
 }
 
 .jmv-variable-new-container > .button:hover > .text {
-    background-color: #e6ebf3;
-    border: 1px solid #cadaf3;
+    background-color: #f3e6e8;
+    border: 1px solid #edd0d5;
 }
 
 .jmv-variable-new-container .data-variable .icon {

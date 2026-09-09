@@ -142,7 +142,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (is.null(q)) { t$setNote("n", "Brak kompletnych obserwacji."); return() }
             md <- private$.metody
             lv1 <- levels(factor(self$data[[vars[1]]]))[1]
-            md$add("Dane", "%d pomiary tych samych jednostek: %s; jednostka = wiersz arkusza; N = %d jednostek bez braków.",
+            md$add("Dane", "Liczba pomiarów: %d — %s; te same jednostki, jednostka = wiersz arkusza; N = %d (jednostki bez braków).",
                    length(vars), jmvcore::metodyCyt(vars), q$n)
             md$add("Dane", "Kategoria traktowana jako „wystąpiło”: „%s” (pierwsza alfabetycznie w pierwszym pomiarze) — jej dotyczą udziały i wykres.",
                    lv1)
@@ -176,7 +176,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                             stat = pw$stat[i], p = pw$p[i],
                             or = pw$or[i], lower = pw$lower[i], upper = pw$upper[i]))
                     md$add("Post-hoc", paste(
-                        "Dla każdej pary pomiarów test McNemara (%d porównań), p skorygowane metodą Holma;",
+                        "Dla każdej pary pomiarów test McNemara (liczba porównań: %d), p skorygowane metodą Holma;",
                         "OR par niezgodnych z 95%% przedziałem ufności, 1 = brak zmiany."), nrow(pw))
                 }
             } else if (isTRUE(o$effSize)) {

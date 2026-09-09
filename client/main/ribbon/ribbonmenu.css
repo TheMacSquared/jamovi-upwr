@@ -91,9 +91,9 @@
 }
 
 @-webkit-keyframes pulsate {
-    0% {background: rgba(199, 216, 242, 0);}
-    50% {background: rgba(199, 216, 242, 1);}
-    100% {background: rgba(199, 216, 242, 0);}
+    0% {background: rgba(233, 198, 205, 0);}
+    50% {background: rgba(233, 198, 205, 1);}
+    100% {background: rgba(233, 198, 205, 0);}
 }
 
 .jmv-ribbon-button.contains-new {
@@ -102,11 +102,11 @@
 }
 
 [focusmode="default"] .jmv-ribbon-button:not([aria-disabled]):not(.maintain-color):hover {
-    background-color: #d5dfeb;
+    background-color: #ece0e3;
 }
 
 [focusmode="hover"] .jmv-ribbon-button:not([aria-disabled]):not(.maintain-color):hover {
-    background-color: #d5dfeb;
+    background-color: #ece0e3;
 }
 
 .jmv-ribbon-button.maintain-color:not([aria-disabled]):hover {
@@ -160,7 +160,7 @@
 }
 
 .jmv-ribbon-menu-item.new {
-    background-color: #C7D8F2 ;
+    background-color: #eed7dc ;
 }
 
 .jmv-analyses-button .jmv-ribbon-button-menu {
@@ -286,15 +286,15 @@ body[dir='rtl'] .to-analyses-arrow {
 }
 
 [focusmode="hover"] .jmv-ribbon-menu-item:hover {
-    background-color: #d5dfeb;
+    background-color: #ece0e3;
 }
 
 [keyboardfocus="true"] .jmv-ribbon-menu-item:focus {
-    background-color: #d5dfeb;
+    background-color: #ece0e3;
 }
 
 /*.jmv-ribbon-menu-item:focus-within {
-    background-color: #3e6da93b ;
+    background-color: #8320343b ;
 }*/
 
 /*.jmv-ribbon-menu-item.open {

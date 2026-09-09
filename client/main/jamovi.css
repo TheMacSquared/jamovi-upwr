@@ -32,7 +32,7 @@ body {
 }
 
 :focus {
-    /*outline-color: #4e5966;*/
+    /*outline-color: #664e52;*/
 }
 
 [focusmode="default"] :focus {
@@ -83,8 +83,8 @@ hr {
 
 .upgrade-button {
     padding: 6px 20px;
-    background-color: #3e6da9;
-    border: 1px solid #3e6da9;
+    background-color: #832034;
+    border: 1px solid #832034;
     color: white;
     border-radius: 4px;
     cursor: pointer;
@@ -92,17 +92,17 @@ hr {
 
 .upgrade-button.light {
     color: white;
-    border: 1px solid #c1dbff;
-    color: #3e6da9;
+    border: 1px solid #e9c6cd;
+    color: #832034;
     background-color: white;
 }
 
 .upgrade-button:hover {
-    background-color: #5e8bc5;
+    background-color: #9c3b4a;
 }
 
 .upgrade-button.light:hover {
-    background-color: #f3f8ff;
+    background-color: #fcf6f7;
 }
 
 .upgrade-button:active {
@@ -207,7 +207,7 @@ body.windows.electron #header-buttons {
 }
 
 .header-button:hover {
-    background-color: #6E96CA ;
+    background-color: #9c3b4a ;
 }
 
 .header-button .header-button-icon {

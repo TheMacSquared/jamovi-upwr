@@ -50,7 +50,7 @@
 }
 
 .jmv-results-panel.all-selected {
-    background-color: #B5CAEF;
+    background-color: #e6bec4;
 }
 
 @media (forced-colors: active) {
@@ -119,6 +119,6 @@ jmv-references {
 }
 
 jmv-references.activated {
-    background-color: #B5CAEF ;
-    border: 2px solid #8BA4D6;
+    background-color: #e6bec4 ;
+    border: 2px solid #d48d99;
 }

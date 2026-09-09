@@ -13,7 +13,7 @@ cicorrelationClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
             corLab <- if (o$method == "pearson") "r Pearsona" else "ρ Spearmana"
 
             m <- jmvcore::metodyNew()
-            m$add("Dane", "Zmienne „%s” i „%s”; N = %d par bez braków; współczynnik: %s%s.", o$var1, o$var2, n, corLab,
+            m$add("Dane", "Zmienne „%s” i „%s”; N = %d (pary bez braków); współczynnik: %s%s.", o$var1, o$var2, n, corLab,
                   if (o$method == "spearman") " (korelacja rang)" else "")
             metodyPrzedzial(m, o, method,
                 if (o$method == "pearson") "Transformacja Fishera z: tanh(atanh(r) ± z/√(n − 3))"

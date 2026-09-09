@@ -99,7 +99,7 @@
     background-size: 60%;
     background-position: center;
     background-repeat: no-repeat ;
-    border: 1.5px solid #6B9DE8 ;
+    border: 1.5px solid #9c3b4a ;
     box-sizing: border-box;
 }
 
@@ -109,8 +109,8 @@
 
 .jmv-store-module-button {
     background-color: white ;
-    border: 1.5px solid #6B9DE8 ;
-    color: #6B9DE8 ;
+    border: 1.5px solid #9c3b4a ;
+    color: #9c3b4a ;
     margin-top: 8px ;
     padding: 5px 8px ;
     box-sizing: border-box;
@@ -142,7 +142,7 @@
 }
 
 .jmv-store-module-button:enabled:hover {
-    background-color: #6B9DE8 ;
+    background-color: #9c3b4a ;
     color: white ;
 }
 
@@ -159,7 +159,7 @@
 
 .jmv-store-module .authors {
     font-size: 80% ;
-    color: #6B9DE8 ;
+    color: #9c3b4a ;
     margin-bottom: 6px ;
 }
 
@@ -283,7 +283,7 @@
 .jmv-store-progress-bar {
     width: 0 ;
     height: 100% ;
-    background-color: #6B9DE8 ;
+    background-color: #9c3b4a ;
 }
 
 [data-status='installing'] .jmv-store-progress-bar {

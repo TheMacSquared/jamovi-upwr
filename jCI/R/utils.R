@@ -312,7 +312,7 @@ pickTwoLevels <- function(table, allLevs, level1, level2) {
     }
     if (length(allLevs) < 2) { table$setNote("err", "Zmienna grupująca musi mieć co najmniej 2 poziomy."); return(NULL) }
     if (length(allLevs) > 2)
-        table$setNote("info", sprintf("Zmienna ma %d poziomów — użyto pierwszych dwóch (%s, %s); wybierz grupy w panelu.",
+        table$setNote("info", sprintf("Liczba poziomów zmiennej grupującej: %d — użyto pierwszych dwóch (%s, %s); wybierz grupy w panelu.",
                                       length(allLevs), allLevs[1], allLevs[2]))
     allLevs[1:2]
 }

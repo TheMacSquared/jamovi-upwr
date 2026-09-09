@@ -132,12 +132,12 @@ class VariablesView extends HTMLElement  implements DataSetView {
         this.statusbar = new Statusbar();
         this.append(this.statusbar);
         this.statusbar.addInfoLabel('editStatus', { dock: 'left', value: _('Ready') });
+        this.statusbar.addActionButton('datasetInfo', { dock: 'left', label: 'O zbiorze' });
         this.statusbar.addActionButton('editFilters', { dock: 'left' });
         this.statusbar.addActionButton('toggleFilterVisible', { dock: 'left' });
         this.statusbar.addInfoLabel('activeFilters', { dock: 'left', label: _('Filters'), value: 0 });
         this.statusbar.addInfoLabel('columnCount', { dock: 'right', label: _('Variables'), value: 0 });
         this.statusbar.addInfoLabel('selectedCount', { dock: 'right', label: _('Selected'), value: 0 });
-        this.statusbar.addActionButton('datasetInfo', { dock: 'left', label: 'O zbiorze' });
 
         this.$body      = this.querySelector('.jmv-variables-body');
         this.$container = this.querySelector('.jmv-variables-container');

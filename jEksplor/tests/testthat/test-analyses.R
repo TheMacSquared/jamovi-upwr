@@ -43,7 +43,7 @@ test_that("advanced statistics, percentiles, cut points, extreme values, normali
     n <- res$norm$asDF
     expect_equal(n$w, shapiro.test(x)$statistic[[1]]); expect_equal(n$d, lillieTest(x)$stat); expect_equal(n$a, adTest(x)$stat)
     h <- res$metody$content
-    expect_true(grepl("MAD", h) && grepl("Lilliefors", h) && grepl("Percentyle P10, P90", h) && grepl("3 równoliczne", h))
+    expect_true(grepl("MAD", h) && grepl("Lilliefors", h) && grepl("Percentyle P10, P90", h) && grepl("liczba grup: 3", h))
     expect_lt(regexpr("<b>Statystyki</b>", h), regexpr("<b>Założenia</b>", h))
 })
 

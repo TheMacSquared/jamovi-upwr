@@ -43,7 +43,7 @@ template.content.append(
       background: #dcdcdc;
     }
     .msg-dialog-inner button:focus {
-      outline: 2px solid #005a9e;
+      outline: 2px solid #9e001a;
       outline-offset: 2px;
     }
   `),

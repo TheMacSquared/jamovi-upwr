@@ -50,7 +50,7 @@
 
 .add-row > .plus::before {
     content: '+';
-    color: #3E6DA9;
+    color: #832034;
     font-weight: bold;
     margin-inline-end: 4px;
 }
@@ -90,7 +90,7 @@
 
 .jmv-conditions-builder .tag {
     font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
-    color: #3E6DA9;
+    color: #832034;
     min-width: 3em;
 }
 
@@ -106,7 +106,7 @@
 
 .jmv-conditions-builder select.join {
     min-width: 3em;
-    color: #3E6DA9;
+    color: #832034;
     font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 
@@ -137,7 +137,7 @@
     align-self: flex-start;
     border: none;
     background: none;
-    color: #3E6DA9;
+    color: #832034;
     padding: 0 2px;
     font-size: 11px;
     cursor: default;
@@ -193,7 +193,7 @@
 .jmv-conditions-builder .group-body {
     flex: 1 1 auto;
     min-width: 0;
-    border-inline-start: 2px solid #3E6DA9;
+    border-inline-start: 2px solid #832034;
     border-radius: 3px 0 0 3px;
     background: hsla(212, 46%, 45%, 0.05);
     padding: 3px 4px;

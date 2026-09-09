@@ -45,15 +45,15 @@
 }
 
 [keyboardfocus="true"] .jmv-toolbar-button:focus {
-    background-color: #d5dfeb !important;
+    background-color: #ebd5d9 !important;
 }
 
 [focusmode="default"] .jmv-toolbar-button:not([aria-disabled]):hover {
-    background-color: #d5dfeb;
+    background-color: #ebd5d9;
 }
 
 [focusmode="hover"] .jmv-toolbar-button:not([aria-disabled]):hover {
-    background-color: #d5dfeb;
+    background-color: #ebd5d9;
 }
 
 .jmv-toolbar-menu-arrow {

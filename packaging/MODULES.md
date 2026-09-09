@@ -12,17 +12,17 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.4 |
 | `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 26 wykresów) | wbudowany | 2.9.1 |
 | `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.3.3 |
-| `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.2 |
-| `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.2 |
+| `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.3 |
+| `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.3 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.7.1 |
-| `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.2.1 |
-| `jEksplor/` | jEksplor | eksploracja jUPWR: zmienne ilościowe (rdzeń N/braki/średnia/mediana/kwartyle/SD/min/max/V, miary pozycyjne, Gini i Lorenz, Lilliefors i Anderson-Darling), zmienne jakościowe (tabele liczności, także w grupach), szereg rozdzielczy; zastępuje w menu Eksploracja jmv::descriptives i jmv::qualitative (ukryte w kliencie) | wbudowany | 0.1.1 |
-| `jRegr/` | jRegr | regresja jUPWR: korelacja (para = jeden wiersz, więcej = macierz), regresja liniowa, logistyczna dwumianowa; zastępuje w menu Regresja jmv::simpleCorr, corrMatrix, linReg, logRegBin (ukryte w kliencie) | wbudowany | 0.1.2 |
-| `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery/NIR; zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.4.1 |
-| `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem — tylko testowanie: statystyka, p, różnica i d Cohena jako punkty (przedziały ufności i wykres estymacyjny są w jCI); zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.4.1 |
+| `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.2.2 |
+| `jEksplor/` | jEksplor | eksploracja jUPWR: zmienne ilościowe (rdzeń N/braki/średnia/mediana/kwartyle/SD/min/max/V, miary pozycyjne, Gini i Lorenz, Lilliefors i Anderson-Darling), zmienne jakościowe (tabele liczności, także w grupach), szereg rozdzielczy; zastępuje w menu Eksploracja jmv::descriptives i jmv::qualitative (ukryte w kliencie) | wbudowany | 0.1.2 |
+| `jRegr/` | jRegr | regresja jUPWR: korelacja (para = jeden wiersz, więcej = macierz), regresja liniowa, logistyczna dwumianowa; zastępuje w menu Regresja jmv::simpleCorr, corrMatrix, linReg, logRegBin (ukryte w kliencie) | wbudowany | 0.1.3 |
+| `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery/NIR; zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.4.2 |
+| `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem — tylko testowanie: statystyka, p, różnica i d Cohena jako punkty (przedziały ufności i wykres estymacyjny są w jCI); zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.4.2 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.4 |
-| `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.1 |
-| `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.1 |
+| `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
+| `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.2 |
 
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
 jeden kurs jest **opcjonalny** i trafia do studentów jako plik `.jmo` (Moduły → Sideload).
@@ -64,6 +64,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.0.4 | 28.2 | 0.3.4 | ✅ 2026-09-09 | ⬜ do zbudowania |
 | 1.0.3 | 28.2 | 0.3.4 | ✅ 2026-09-08 | ✅ 2026-09-08 |
 | 1.0.2 | 28.2 | 0.3.3 | ✅ 2026-09-07 | ✅ 2026-09-07 |
 | 1.0.1 | 28.2 | 0.3.3 | ✅ 2026-09-07 | ✅ 2026-09-06 |
@@ -89,6 +90,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.0.4 | 28.2 | 0.3.2 | ✅ 2026-09-09 | ⬜ do zbudowania |
 | 1.0.3 | 28.2 | 0.3.1 | ✅ 2026-09-08 | ✅ 2026-09-08 |
 | 1.0.2 | 28.2 | 0.3.0 | ✅ 2026-09-07 | ✅ 2026-09-07 |
 | 1.0.1 | 28.2 | 0.3.0 | ✅ 2026-09-07 | ✅ 2026-09-06 |
@@ -112,6 +114,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.0.4 | 28.2 | 0.1.2 | ✅ 2026-09-09 | ⬜ do zbudowania |
 | 1.0.3 | 28.2 | 0.1.1 | ✅ 2026-09-08 | ✅ 2026-09-08 |
 | 1.0.2 | 28.2 | 0.1.0 | ✅ 2026-09-07 | ✅ 2026-09-07 |
 | 1.0.1 | 28.2 | 0.1.0 | ✅ 2026-09-07 | ✅ 2026-09-06 |

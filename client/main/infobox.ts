@@ -480,14 +480,14 @@ export class InfoBox extends HTMLElement {
             .button-box button {
                 width: 80px;
                 line-height: 25px;
-                background-color: #3E6DA9;
+                background-color: #832034;
                 color: white;
                 border: 1px solid transparent;
                 border-radius: 2px;
             }
 
             .button-box button:hover {
-                background-color: #224a80;
+                background-color: #802232;
             }
 
             .cancel {
@@ -518,7 +518,7 @@ export class InfoBox extends HTMLElement {
                 background-repeat: no-repeat;
                 background-size: 100%;
                 background-position: center;
-                background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3Csvg width='32px' height='32px' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='xMidYMid' class='uil-ring'%3E%3Crect x='0' y='0' width='100' height='100' fill='none' class='bk'%3E%3C/rect%3E%3Ccircle cx='50' cy='50' r='40' stroke-dasharray='163.36281798666926 87.9645943005142' stroke='%233e6da9' fill='none' stroke-width='20'%3E%3CanimateTransform attributeName='transform' type='rotate' values='0 50 50;180 50 50;360 50 50;' keyTimes='0;0.5;1' dur='1s' repeatCount='indefinite' begin='0s'%3E%3C/animateTransform%3E%3C/circle%3E%3C/svg%3E");
+                background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3Csvg width='32px' height='32px' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='xMidYMid' class='uil-ring'%3E%3Crect x='0' y='0' width='100' height='100' fill='none' class='bk'%3E%3C/rect%3E%3Ccircle cx='50' cy='50' r='40' stroke-dasharray='163.36281798666926 87.9645943005142' stroke='%23832034' fill='none' stroke-width='20'%3E%3CanimateTransform attributeName='transform' type='rotate' values='0 50 50;180 50 50;360 50 50;' keyTimes='0;0.5;1' dur='1s' repeatCount='indefinite' begin='0s'%3E%3C/animateTransform%3E%3C/circle%3E%3C/svg%3E");
             }
 
         `;

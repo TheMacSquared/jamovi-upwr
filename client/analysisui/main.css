@@ -88,7 +88,7 @@ body {
 }
 
 :focus {
-    /*outline-color: #4e5966;*/
+    /*outline-color: #664e52;*/
 }
 
 [focusmode="default"] :focus {
@@ -183,7 +183,7 @@ h1 {
 }
 
 .silky-layout-cell.selected {
-    background-color: #B5CAEF;
+    background-color: #e6bec4;
 }
 
 
@@ -500,7 +500,7 @@ input[type=text].silky-option-listitem {
 }
 
 input[type=text].silky-option-listitem:focus {
-    box-shadow: 0 0 5px rgba(181, 202, 239, 1);
+    box-shadow: 0 0 5px rgba(230, 190, 196, 1);
     padding-top: 3px;
     padding-inline-end: 4px;
     padding-bottom: 3px;
@@ -509,7 +509,7 @@ input[type=text].silky-option-listitem:focus {
     margin-bottom: 3px;
     margin-inline-start: 0px;
     margin-inline-end: 1px;
-    border: 1px solid rgba(181, 202, 239, 1);
+    border: 1px solid rgba(230, 190, 196, 1);
     border-inline-start: none;
     border-inline-end: none;
     z-index: 99;

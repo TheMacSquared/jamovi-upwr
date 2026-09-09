@@ -27,7 +27,7 @@ permtestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cl
                 k <- paste(p$i1, "−", p$i2)
                 a <- jmvcore::toNumeric(self$data[[p$i1]]); b <- jmvcore::toNumeric(self$data[[p$i2]])
                 ok <- !is.na(a) & !is.na(b); dif <- a[ok] - b[ok]
-                if (length(dif) < 2) { tt$setNote(paste0("n", k), sprintf("«%s»: %d kompletnych par; bieżąca implementacja wymaga co najmniej 2.", k, length(dif))); next }
+                if (length(dif) < 2) { tt$setNote(paste0("n", k), sprintf("«%s»: liczba kompletnych par: %d; bieżąca implementacja wymaga co najmniej 2.", k, length(dif))); next }
                 observed <- mean(dif)
                 permDist <- permDistPaired(dif, o$nPerm, o$seed, o$exact)
                 tt$addRow(rowKey = k, values = list(var = k, stat = observed,

@@ -11,8 +11,8 @@ cibootstrapClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             if (n < 2) { self$results$summaryTable$setNote("err", "Za mało obserwacji (n < 2)."); return() }
 
             m <- jmvcore::metodyNew()
-            m$add("Dane", "Zmienna „%s”; N = %d obserwacji bez braków.", o$dep, n)
-            m$add("Przedział ufności", "Bootstrap „ręczny”: %d razy losowanych %d indeksów ze zwracaniem, z każdej próby liczona średnia; ziarno %d (te same próby przy każdym uruchomieniu).", o$nBoot, n, o$seed)
+            m$add("Dane", "Zmienna „%s”; N = %d (obserwacje bez braków).", o$dep, n)
+            m$add("Przedział ufności", "Bootstrap „ręczny”: liczba prób B = %d, w każdej próbie losowanie %d indeksów ze zwracaniem, z każdej próby liczona średnia; ziarno %d (te same próby przy każdym uruchomieniu).", o$nBoot, n, o$seed)
             m$add("Przedział ufności", "Przedział percentylowy %g%%: kwantyle %.3f i %.3f rozkładu średnich bootstrapowych; SE bootstrapowy = SD tych średnich; obciążenie = średnia bootstrapowa − średnia z danych.", o$ciWidth, a, 1 - a)
             m$addIf(o$showConvergence, "Przedział ufności", "Zbieżność: ten sam przedział percentylowy dla B = 50 … 5000 losowań (pakiet boot, to samo ziarno) — pokazuje, od jakiego B granice się stabilizują.")
             m$addIf(o$showConvergence, "Wykres", "Granice przedziału w funkcji B na osi logarytmicznej.")
@@ -38,7 +38,7 @@ cibootstrapClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                             list("lo", sprintf("Dolna granica CI %g%%", o$ciWidth), unname(stats::quantile(means, a))),
                             list("hi", sprintf("Górna granica CI %g%%", o$ciWidth), unname(stats::quantile(means, 1 - a)))))
                 su$addRow(rowKey = rw[[1]], values = list(stat = rw[[2]], value = rw[[3]]))
-            su$setNote("b", sprintf("B = %d prób; przy tak małym B przedział jest tylko ilustracją.", o$nBoot))
+            su$setNote("b", sprintf("B = %d; przy tak małym B przedział jest tylko ilustracją.", o$nBoot))
 
             if (isTRUE(o$showConvergence)) {
                 bs <- c(50, 100, 200, 500, 1000, 2000, 5000); ct <- self$results$convTable

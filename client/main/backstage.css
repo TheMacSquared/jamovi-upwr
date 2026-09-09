@@ -45,7 +45,7 @@
     height: 100px;
     line-height: 100px;
     font-size: 30px;
-    color: #3e6da9;
+    color: #832034;
     font-weight: lighter;
     text-indent: 10px;
     margin-top: -20px;
@@ -166,7 +166,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-back-button:hover > div {
-    background-color: #B2C2D7 ;
+    background-color: #e0c3ca ;
 }
 
 .silky-bs-op-list {
@@ -200,7 +200,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-op-button:hover {
-    background-color: #f3f6fb ;
+    background-color: #fbf3f5 ;
 }
 
 .selected > .silky-bs-op-button {
@@ -240,7 +240,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-op-place.selected-place {
-    background-color: #e1e9f4 ;
+    background-color: #f6ecee ;
     padding-top: 8px;
     padding-inline-end: 0px;
     padding-bottom: 8px;
@@ -265,7 +265,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-op-place:not(.selected-place):hover {
-    background-color: #f6f9fd ;
+    background-color: #fcf7f8 ;
 }
 
 .silky-bs-op-place .keytip-key-tag {
@@ -324,7 +324,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-op-recents .silky-bs-fslist-entry:hover {
-    background-color: #f3f6fb ;
+    background-color: #fbf3f5 ;
 }
 
 .silky-bs-op-recents .silky-bs-fslist-entry-meta {
@@ -390,12 +390,12 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-place:hover {
-    background-color: #DBE4F3 ;
+    background-color: #f3e6e9 ;
 }
 
 .silky-bs-place:active,
 .silky-bs-place[data-selected] {
-    background-color: #BACDE6 ;
+    background-color: #e4c8ce ;
 }
 
 .silky-bs-place[data-place="recent"] {
@@ -463,7 +463,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-fslist-entry:hover, .silky-bs-fslist-item:hover {
-    background-color: #DBE4F3 ;
+    background-color: #f3e6e9 ;
 }
 
 .silky-bs-fslist-entry-icon {
@@ -769,11 +769,11 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-fslist-browser-import-name:hover {
-    border-color: #B1C5DE ;
+    border-color: #dfbec6 ;
 }
 
 .silky-bs-fslist-browser-save-name:hover, .silky-bs-fslist-browser-save-filetype:hover {
-    border-color: #B1C5DE ;
+    border-color: #dfbec6 ;
 }
 
 .silky-bs-fslist-browser-save-button, .silky-bs-fslist-browser-import-button {
@@ -794,7 +794,7 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-fslist-selected-item {
-    background-color: #BACDE6 ;
+    background-color: #e4c8ce ;
     border-style: solid;
     border-width: 2px;
 }
@@ -808,8 +808,8 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-fslist-browser-save-button:not(.disabled-div):hover, .silky-bs-fslist-browser-import-button:not(.disabled-div):hover {
-    border-color: #B1C5DE ;
-    background-color: #DBE4F3 ;
+    border-color: #dfbec6 ;
+    background-color: #f3e6e9 ;
 }
 
 .silky-bs-fslist-browser-location {
@@ -842,8 +842,8 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-fslist-browse-button:hover {
-    /*border-color: #B1C5DE ;*/
-    background-color: #DBE4F3 ;
+    /*border-color: #dfbec6 ;*/
+    background-color: #f3e6e9 ;
 }
 
 .silky-bs-fslist-browser-location-icon {
@@ -896,15 +896,15 @@ body[dir="rtl"] .silky-bs-back-button > div {
 }
 
 .silky-bs-fslist-browser-back-button:hover {
-    background-color: #DBE4F3 ;
+    background-color: #f3e6e9 ;
 }
 
 .silky-bs-fslist-browser-check-button:hover {
-    background-color: #DBE4F3 ;
+    background-color: #f3e6e9 ;
 }
 
 .silky-bs-fslist-browser-check-button.on {
-    background-color: #bacde6 ;
+    background-color: #e4c8ce ;
 }
 
 .silky-bs-fslist {

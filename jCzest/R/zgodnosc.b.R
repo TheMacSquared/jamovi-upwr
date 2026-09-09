@@ -54,7 +54,7 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             o <- self$options
             m <- private$.metody
             n <- sum(obs)
-            m$add("Dane", "Zmienna „%s”, %d kategorii w kolejności poziomów; N = %s (braki pominięte).",
+            m$add("Dane", "Zmienna „%s”, liczba kategorii: %d, w kolejności poziomów; N = %s (braki pominięte).",
                   o$var, length(obs), format(n, big.mark = " "))
             m$addIf(optNonEmpty(o$counts), "Dane",
                     "Dane zagregowane: liczności z kolumny „%s”.", o$counts)
@@ -130,7 +130,7 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 t$addRow(rowKey = "chi", values = list(
                     test = "χ² zgodności", stat = r$stat, df = r$df, p = r$p))
                 t$setNote("N", sprintf("N = %s.", format(n, big.mark = " ")))
-                m$add("Testy", "%d kategorii → χ² zgodności Pearsona, df = k − 1 = %d.", k, r$df)
+                m$add("Testy", "Liczba kategorii: %d → χ² zgodności Pearsona, df = k − 1 = %d.", k, r$df)
                 if (isTRUE(o$chiSqCorr))
                     t$setNote("cc", "Poprawka ciągłości dotyczy wyłącznie dwóch kategorii.")
             }

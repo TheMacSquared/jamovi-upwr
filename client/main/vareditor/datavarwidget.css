@@ -80,7 +80,7 @@
 
 .jmv-variable-editor-level.selected,
 .jmv-variable-editor-level.selected > .jmv-variable-editor-level-label:not(:focus):not(:hover) {
-    background-color: #B5CAEF ;
+    background-color: #e6bec4 ;
 }
 
 .jmv-variable-editor-widget-move {

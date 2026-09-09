@@ -21,7 +21,7 @@ rasterstatsClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                 w <- jmvcore::toNumeric(self$data[[self$options$wartoscKol]])
                 ok <- !is.na(x) & !is.na(y)
                 if (sum(ok) < 4)
-                    stop(sprintf("Nie można utworzyć rastra: %d poprawnych par współrzędnych; wymagane co najmniej 4.", sum(ok)), call. = FALSE)
+                    stop(sprintf("Nie można utworzyć rastra: liczba poprawnych par współrzędnych: %d; wymagane co najmniej 4.", sum(ok)), call. = FALSE)
                 # a regular x/y grid in a spreadsheet IS a raster —
                 # teaching bridge to how terra/TorchGeo see imagery
                 r <- tryCatch(

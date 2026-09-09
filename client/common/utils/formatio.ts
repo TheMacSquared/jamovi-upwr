@@ -183,7 +183,7 @@ export function exportElem(el, format=undefined, options: { exclude?: string[], 
 
     h1 {
         font-size: 160% ;
-        color: #3E6DA9 ;
+        color: #832034 ;
         margin-bottom: 12px ;
         white-space: nowrap ;
     }
@@ -191,7 +191,7 @@ export function exportElem(el, format=undefined, options: { exclude?: string[], 
     h2 {
         font-size: 130% ;
         margin-bottom: 12px ;
-        color: #3E6DA9 ;
+        color: #832034 ;
     }
 
     h3, h4, h5 {
