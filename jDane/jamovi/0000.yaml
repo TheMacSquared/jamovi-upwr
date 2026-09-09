@@ -248,7 +248,7 @@ datasets:
     tags:
       - przyroda
       - statystyki opisowe
-  - name: Wzrost zębów
+  - name: Długość zębów
     path: ToothGrowth.csv
     description: Niezbyt ciekawy zbiór danych do obliczania testu ANOVA
     documentation:
