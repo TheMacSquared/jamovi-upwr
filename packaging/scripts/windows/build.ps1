@@ -440,4 +440,5 @@ if (Test-Path $zip) { Remove-Item $zip -Force }
 Compress-Archive -Path $AppDir -DestinationPath $zip
 Write-Host "`nGOTOWE: $zip" -ForegroundColor Green
 Write-Host "Uruchom: `"$Bin\$AppName.exe`"" -ForegroundColor Green
-# NSIS (opcjonalnie, gdy zainstalowany makensis): makensis packaging\scripts\windows\jUPWR.nsi
+# NSIS (opcjonalnie, gdy zainstalowany makensis): cd packaging\scripts\windows; makensis jUPWR.nsi
+#   -> jUPWR-<wersja>-x64-setup.exe (MultiUser: per-user / dla wszystkich; /S /AllUsers /D=; 30-distribution.md)

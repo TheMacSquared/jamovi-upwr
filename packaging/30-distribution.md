@@ -44,11 +44,59 @@ komputer"*.
 ### Instrukcja dla studenta (Windows)
 1. Uruchom `jUPWR-...setup.exe`.
 2. W oknie SmartScreen kliknij **Więcej informacji** → **Uruchom mimo to**.
-3. Przejdź przez instalator (instaluje do `%LocalAppData%\Programs\jUPWR` lub `Program Files`).
-4. Wariant portable: rozpakuj `.zip` i uruchom `jUPWR.exe` (uwaga: rozpakuj do stałej lokalizacji,
+3. Przejdź przez instalator. Na zwykłym koncie instaluje się „tylko dla mnie" do
+   `%LocalAppData%\Programs\jUPWR` (bez uprawnień administratora); na koncie z prawami
+   administratora pojawia się wybór „dla wszystkich użytkowników" (`C:\Program Files\jUPWR`)
+   albo „tylko dla mnie".
+4. Wariant portable: rozpakuj `.zip` i uruchom `bin\jUPWR.exe` (uwaga: rozpakuj do stałej lokalizacji,
    nie z wnętrza archiwum).
 
 > Po zakupie certyfikatu code-signing (OV/EV) ostrzeżenie zniknie (EV od razu, OV po zbudowaniu reputacji).
+
+### Pracownia komputerowa (instrukcja dla administratora)
+
+Paczka jest samowystarczalna: własny R, Python, Electron, moduły i czcionki (rejestrowane
+w locie). Nie wymaga R, jamovi, VC++ Redistributable ani .NET. Instalator tylko kopiuje pliki,
+tworzy skróty i dopisuje wpis w „Odinstaluj"; nie rejestruje rozszerzenia `.omv`. Wszystkie
+ścieżki w `bin\env.conf` są względne, więc katalog można położyć gdziekolwiek.
+
+Poza katalogiem programu jUPWR pisze tylko do `%AppData%\jamovi` (ustawienia, moduły
+doinstalowane przez użytkownika) i `%Temp%` — zwykłe uprawnienia każdego konta wystarczą.
+Katalog `%AppData%\jamovi` jest wspólny ze standardowym jamovi; to nieszkodliwe (moduły
+zbudowane pod inną wersję R drugi program oznacza jako niekompatybilne i nie ładuje).
+Oba programy mogą być zainstalowane i uruchomione równolegle: osobne katalogi, skróty,
+wpisy deinstalacji, port serwera wybierany automatycznie.
+
+**Instalacja dla wszystkich kont (zalecana w pracowni):** uruchomić instalator jako
+administrator i wybrać „Dla wszystkich użytkowników tego komputera" — program trafi do
+`C:\Program Files\jUPWR`, skróty do wspólnego menu Start i pulpitu publicznego, wpis
+deinstalacji do HKLM. Działa niezależnie od tego, czy studenci logują się na wspólne
+konto lokalne, konta domenowe czy profil czyszczony po wylogowaniu (Deep Freeze i podobne
+trzeba odmrozić na czas instalacji).
+
+**Wdrożenie skryptem (GPO / Intune / SCCM / skrypt logowania):**
+
+```bat
+jUPWR-<wersja>-x64-setup.exe /S /AllUsers
+jUPWR-<wersja>-x64-setup.exe /S /AllUsers /D=C:\jUPWR
+```
+
+| Przełącznik | Znaczenie |
+|---|---|
+| `/S` | instalacja cicha; wykryta poprzednia wersja jest odinstalowywana bez pytania |
+| `/AllUsers` | tryb dla wszystkich (wymaga uprawnień administratora; bez nich instalator kończy się komunikatem) |
+| `/CurrentUser` | tryb „tylko dla mnie" (także na koncie administratora) |
+| `/D=C:\katalog` | katalog docelowy; musi być **ostatnim** argumentem i **bez cudzysłowów**, nawet gdy zawiera spacje |
+
+Deinstalacja cicha: `"C:\Program Files\jUPWR\uninstall.exe" /S` (klucz `QuietUninstallString`
+w rejestrze). Deinstalator sam rozpoznaje tryb, w którym program zainstalowano (wartość
+`InstallMode` we wpisie deinstalacji). Instalator uruchomiony ponownie na tej samej maszynie
+domyślnie proponuje ten sam tryb co poprzednio; instalując „dla wszystkich" usuwa też
+własną instalację „tylko dla mnie", żeby nie zostały dwie kopie.
+
+Instalator nie jest podpisany — jeśli polityka uczelni blokuje niepodpisane `.exe`
+(SmartScreen/AppLocker), wariant portable rozpakowany do `C:\Program Files\jUPWR`
+ze skrótem w `C:\Users\Public\Desktop` daje ten sam efekt bez instalatora.
 
 ---
 

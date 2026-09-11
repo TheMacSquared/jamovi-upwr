@@ -70,8 +70,10 @@ jRISK/jSpace dla win64 buduje się tą ścieżką (patrz macierz w `MODULES.md`)
   (ragg) działa. Rozważyć `svglite` albo dobundlowanie XQuartz.
 - **Podpis/notaryzacja** — instalki wywołują ostrzeżenia (świadomie pominięte; patrz `30-distribution.md`).
 - **Build Windows — instalator** — `build.ps1` przechodzi i produkuje `.jmo` (potwierdzone
-  2026-08-26, macierz w `MODULES.md`); pełny instalator NSIS wymaga jeszcze walidacji
-  na czystej maszynie Windows.
+  2026-08-26, macierz w `MODULES.md`). Instalator NSIS od 2026-09-11 jest MultiUser
+  (per-user / dla wszystkich, `/S`, `/AllUsers`, `/D=`; opis w `30-distribution.md`):
+  tryb per-user i cicha (de)instalacja sprawdzone na Windows 11; tryb „dla wszystkich"
+  (UAC, `C:\Program Files`, HKLM) wymaga jeszcze ręcznego testu na koncie administratora.
 - **Optymalizacja rozmiaru** — przyciąć bibliotekę R do domknięcia zależności modułów (~886 MB → mniej).
 
 ## Szybki start (macOS arm64)

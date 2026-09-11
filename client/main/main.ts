@@ -677,7 +677,9 @@ ready(async() => {
         if ('title' in event.changed) {
             let title = event.changed.title;
             $fileName.textContent = title;
-            document.title = title;
+            // jUPWR: the OS window / browser tab carries the distribution name,
+            // like the in-app header does (index.html), not the bare file name
+            document.title = title ? `jUPWR - ${ title }` : 'jUPWR';
         }
     });
 
