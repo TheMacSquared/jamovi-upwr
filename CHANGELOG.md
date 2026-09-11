@@ -9,20 +9,6 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   a ekran startowy (`electron/app/splash.html`) — znak „jU" w barwach jUPWR
   i napis „uruchamianie jUPWR…" zamiast niebieskiego logo jamovi
   i „starting jamovi...".
-- Instalator Windows (`packaging/scripts/windows/jUPWR.nsi`) przeszedł na
-  `MultiUser.nsh`: na zwykłym koncie instaluje „tylko dla mnie" jak dotąd
-  (`%LocalAppData%\Programs\jUPWR`), z uprawnieniami administratora daje wybór
-  „dla wszystkich użytkowników" (`C:\Program Files\jUPWR`, wspólne skróty, wpis
-  w HKLM) — wariant dla pracowni komputerowych. Przełączniki wdrożeniowe: `/S`
-  (cicho, poprzednia wersja usuwana bez pytania), `/AllUsers`, `/CurrentUser`,
-  `/D=katalog`; deinstalator rozpoznaje tryb z rejestru i ma
-  `QuietUninstallString`. Poprawka: przy aktualizacji poprzedni deinstalator był
-  uruchamiany z kopii w `%Temp%` bez `_?=`, więc jego `$INSTDIR` wskazywał na
-  `%Temp%` zamiast na katalog programu. Instrukcja dla administratora
-  w `packaging/30-distribution.md`. Druga poprawka: bez `SetRegView 64`
-  32-bitowy instalator zapisywał wpis „Odinstaluj" trybu dla wszystkich
-  do `HKLM\Software\WOW6432Node`, więc 64-bitowe narzędzia (PowerShell,
-  reguły wykrywania GPO/Intune) go nie widziały.
 
 ## 1.0.4 — 2026-09-09
 Wydanie poprawkowe: polska odmiana liczebników w komunikatach i spójny kolor

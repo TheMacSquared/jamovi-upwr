@@ -26,7 +26,7 @@ Toolchain jest **mieszany** (jak na macOS — różne komponenty, różne kompil
 | **cmake** | dowolny (np. ze Strawberry Perl) | build nanomsg |
 | **Boost 1.84** | `C:\local\boost_1_84_0` (prebuilt **MSVC** `boost_1_84_0-msvc-14.3-64.exe` z SourceForge) | core (vc143) + źródła do buildu mingw |
 | Internet | — | CRAN/posit (pakiety R), GitHub (Electron, nanomsg, PBS Python) |
-| NSIS (opcjonalnie) | `makensis` (NSIS 3 z `MultiUser.nsh`) | installer .exe (portable .zip nie wymaga) |
+| NSIS (opcjonalnie) | `makensis` | installer .exe (portable .zip nie wymaga) |
 
 **Czego NIE trzeba:** Dockera; osobnego Pythona (bundlowy PBS); ręcznego budowania protobuf/abseil
 (są w RTools45); zainstalowanego jamovi (jmc po patchu nie wymaga — patrz pułapka #1).
@@ -48,22 +48,6 @@ powershell -ExecutionPolicy Bypass -File packaging\scripts\windows\build.ps1
 
 Wynik: `packaging\build\dist\jUPWR\` + `packaging\build\dist\jUPWR-<wersja>-portable-win64.zip`.
 Uruchomienie: `packaging\build\dist\jUPWR\bin\jUPWR.exe`.
-
-Instalator (opcjonalnie, z katalogu `packaging\scripts\windows\`):
-
-```powershell
-makensis jUPWR.nsi          # -> packaging\build\dist\jUPWR-<wersja>-x64-setup.exe
-```
-
-Skrypt `jUPWR.nsi` używa `MultiUser.nsh`: na zwykłym koncie instaluje „tylko dla mnie"
-(`%LocalAppData%\Programs\jUPWR`, HKCU), z uprawnieniami administratora daje wybór
-„dla wszystkich" (`C:\Program Files\jUPWR`, HKLM, wspólne skróty). Przełączniki
-`/S`, `/AllUsers`, `/CurrentUser`, `/D=` opisane w `30-distribution.md`. Do szybkiego
-testu samego instalatora (bez pełnego payloadu) skrypt przyjmuje `/DAPPNAME=jUPWRtest
-/DPAYLOAD=<mały katalog> /DOUTFILE=<plik.exe>` — instalacja testowa nie dotyka
-prawdziwego jUPWR (osobny katalog i klucz rejestru). Na koncie administratora
-testowy `.exe` wywołuje UAC; przy automatycznym teście trybu per-user pomaga
-`$env:__COMPAT_LAYER = "RunAsInvoker"`.
 
 Katalogi robocze (ignorowane przez git): `packaging\build\{stage,dist,deps,dl}`.
 
