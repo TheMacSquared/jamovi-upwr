@@ -9,6 +9,12 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   a ekran startowy (`electron/app/splash.html`) — znak „jU" w barwach jUPWR
   i napis „uruchamianie jUPWR…" zamiast niebieskiego logo jamovi
   i „starting jamovi...".
+- Instalator Windows: dwie poprawki w ścieżce aktualizacji. Poprzedni
+  deinstalator był uruchamiany z kopii w `%TEMP%` bez `_?=`, więc jego
+  `$INSTDIR` wskazywał na `%TEMP%`, który sekcja deinstalacji kasuje przez
+  `RMDir /r`. Dodatkowo `UninstallString` zapisany w cudzysłowach nie był
+  rozpoznawany, więc stara wersja zostawała nadpisana zamiast odinstalowana.
+  Przy okazji `/S` jest naprawdę cichy (`/SD` w oknach dialogowych).
 
 ## 1.0.4 — 2026-09-09
 Wydanie poprawkowe: polska odmiana liczebników w komunikatach i spójny kolor

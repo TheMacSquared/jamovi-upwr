@@ -4,6 +4,9 @@
 ;   makensis /DVERSION=0.7.7 jUPWR.nsi      ; nadpisanie wersji
 ; Zaklada gotowy payload w PAYLOAD (zmontowany jUPWR\ przez build.ps1).
 
+!include FileFunc.nsh
+!insertmacro GetParent
+
 !define APPNAME    "jUPWR"
 !define COMPANY    "Uniwersytet Przyrodniczy we Wroclawiu"
 !ifndef VERSION
@@ -37,6 +40,10 @@ Var UninstallResult
 Function .onInit
     ReadRegStr $ExistingUninstaller HKCU "${UNINST_KEY}" "UninstallString"
     StrCmp $ExistingUninstaller "" done
+    ; wartosc bywa w cudzyslowach - IfFileExists by ja odrzucilo
+    StrCpy $0 $ExistingUninstaller 1
+    StrCmp $0 '"' 0 +2
+    StrCpy $ExistingUninstaller $ExistingUninstaller -1 1
 
     ReadRegStr $ExistingVersion HKCU "${UNINST_KEY}" "DisplayVersion"
     StrCmp $ExistingVersion "" 0 haveVersion
@@ -45,21 +52,25 @@ Function .onInit
 haveVersion:
     MessageBox MB_ICONQUESTION|MB_YESNO \
         "Wykryto istniejaca instalacje ${APPNAME} $ExistingVersion.$\r$\n$\r$\nOdinstalowac ja przed instalacja ${APPNAME} ${VERSION}?" \
-        IDYES uninstallExisting
+        /SD IDYES IDYES uninstallExisting
     Abort "Instalacja przerwana. Odinstaluj poprzednia wersje ${APPNAME} albo uruchom instalator ponownie i potwierdz odinstalowanie."
 
 uninstallExisting:
     IfFileExists $ExistingUninstaller 0 missingUninstaller
     StrCpy $ExistingUninstallerCopy "$TEMP\${APPNAME}-previous-uninstall.exe"
     CopyFiles /SILENT $ExistingUninstaller $ExistingUninstallerCopy
-    ExecWait '"$ExistingUninstallerCopy" /S' $UninstallResult
+    ; _?= wskazuje katalog programu; bez tego $INSTDIR kopii to %TEMP%,
+    ; ktory sekcja deinstalacji skasowalaby przez RMDir /r
+    ${GetParent} $ExistingUninstaller $0
+    ExecWait '"$ExistingUninstallerCopy" /S _?=$0' $UninstallResult
     Delete $ExistingUninstallerCopy
     IntCmp $UninstallResult 0 done
     Abort "Nie udalo sie odinstalowac poprzedniej wersji ${APPNAME}. Kod bledu: $UninstallResult"
 
 missingUninstaller:
     MessageBox MB_ICONEXCLAMATION|MB_OK \
-        "Wykryto wpis poprzedniej instalacji ${APPNAME}, ale nie znaleziono pliku odinstalowania:$\r$\n$ExistingUninstaller$\r$\n$\r$\nInstalator bedzie kontynuowal i nadpisze istniejace pliki."
+        "Wykryto wpis poprzedniej instalacji ${APPNAME}, ale nie znaleziono pliku odinstalowania:$\r$\n$ExistingUninstaller$\r$\n$\r$\nInstalator bedzie kontynuowal i nadpisze istniejace pliki." \
+        /SD IDOK
 
 done:
 FunctionEnd
