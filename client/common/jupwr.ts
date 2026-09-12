@@ -8,6 +8,13 @@
 //   PATCH — fixes
 export const JUPWR_VERSION = '1.0.4';
 
+// Build variant of this checkout. '' on main (regular jUPWR); 'legacy' on the
+// legacy/win81 branch (Electron 22 build for Windows 8.1 classrooms, see
+// packaging/30-legacy-win81.md). Kept separate from JUPWR_VERSION on purpose:
+// build.ps1 and release-check.sh parse the version with a [0-9.]+ pattern and
+// a suffix there would break them. Shown to the user next to the version.
+export const JUPWR_BUILD_VARIANT = 'legacy';
+
 // Upstream jmv analyses hidden from the ribbon menus in jUPWR. The analyses
 // still exist (files saved elsewhere open and re-run), they are only not
 // offered from the menu because a jUPWR module replaces them:

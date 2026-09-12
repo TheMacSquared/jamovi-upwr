@@ -246,6 +246,13 @@ app.commandLine.appendSwitch('no-proxy-server');
 if (process.windowsStore || readConfig().env.JAMOVI_NETWORK_SANDBOX === '1')
     app.commandLine.appendSwitch('enable-features', 'NetworkServiceSandbox');
 
+// legacy/win81 (Electron 22 on Windows 8.1): chromium 108 on 2013-2014 GPUs with
+// old drivers can render a black window; software rendering is slower but
+// works everywhere. build.ps1 bakes JAMOVI_DISABLE_GPU=1 into the legacy
+// env.conf; the regular build does not set it. must be set before app 'ready'.
+if (readConfig().env.JAMOVI_DISABLE_GPU === '1')
+    app.disableHardwareAcceleration();
+
 const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
 const dialog = electron.dialog;

@@ -25,6 +25,8 @@ i SmartScreen (Windows). Obejścia dla studentów: [`30-distribution.md`](30-dis
 - [`10-build-macos.md`](10-build-macos.md) — build macOS arm64 krok po kroku (przetestowany).
 - [`20-build-windows.md`](20-build-windows.md) — build Windows x64 (do walidacji).
 - [`30-distribution.md`](30-distribution.md) — wydanie studentom, obejścia ostrzeżeń, instrukcja instalacji.
+- [`30-legacy-win81.md`](30-legacy-win81.md) — wariant **jUPWR Legacy** dla sal z Windows 8.1
+  (gałąź `legacy/win81`: Electron 22, `jUPWR-legacy.nsi`, skrypt diagnostyczny `legacy-diag.ps1`).
 
 ## Skrypty (macOS)
 

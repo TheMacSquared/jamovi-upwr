@@ -7,9 +7,9 @@ name: Spójność wydania
 
 on:
   push:
-    branches: [main]
+    branches: [main, legacy/win81]
   pull_request:
-    branches: [main]
+    branches: [main, legacy/win81]
   workflow_dispatch:
 
 concurrency:

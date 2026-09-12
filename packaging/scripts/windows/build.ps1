@@ -12,6 +12,7 @@
 # Skrypt jest IDEMPOTENTNY tam gdzie to tanie (pomija gotowe kroki). Artefakty:
 #   packaging/build/{stage,dist,deps}/   (ignorowane przez git)
 # Wynik: packaging/build/dist/jUPWR/  + (opcjonalnie) jUPWR-<wersja>-portable-win64.zip
+# Galaz legacy/win81: blok LEGACY OVERRIDES ponizej (Electron 22, dist-legacy, -legacy-win81).
 #
 # UWAGA — ten skrypt zaklada, ze w drzewie ZRODLOWYM sa juz nasze patche:
 #   * jamovi-compiler/index.js  (galaz win32 honoruje --rhome)
@@ -53,6 +54,23 @@ $PbsUrl     = "https://github.com/astral-sh/python-build-standalone/releases/dow
 $NanomsgUrl = "https://github.com/nanomsg/nanomsg/archive/refs/tags/1.2.tar.gz"
 $CranRepo   = "https://packagemanager.posit.co/cran/latest"
 $Modules    = @('jmv','plots','jperm','jCI','jdistrACTION','jDane','jANOVA','jTestyT','jCzest','jEksplor','jRegr')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f, jRol 4g
+
+# --- LEGACY OVERRIDES (galaz legacy/win81; packaging/30-legacy-win81.md) -----------------
+# Jedyny blok rozniacy build.ps1 od main - przy merge main -> legacy bierz wersje z main
+# i naloz ten blok z powrotem. $AppName i $Modules NIE zmieniac (NSIS, release-check.sh).
+$Variant    = "legacy"
+$VerTag     = "$JupwrVer-$Variant"
+# Electron 22.3.27 = ostatnia linia z obsluga Windows 7/8/8.1 (Chromium 108, Node 16.17);
+# EOL od 2023-10 - wariant przejsciowy z data wygaszenia (ryzyko R4 w dokumencie).
+$ElectronVer= "22.3.27"
+$AsarVer    = "3.2.8"                                     # przypiete: npx --yes bralo latest
+$Dist       = Join-Path $BuildDir "dist-legacy"           # nie nadpisuj dist\jUPWR glownej wersji
+# VC++ runtime app-local: instalator vc_redist 14.4x wymaga Windows 10, a jamovi-engine.exe
+# nie ma obok siebie zadnego msvcp140/vcruntime140 (do bundla trafiaja tylko z tarballa Pythona)
+$VcRedistDir= (Get-ChildItem "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Redist\MSVC" -Directory -EA SilentlyContinue |
+               Where-Object { $_.Name -match '^\d' } | Sort-Object Name -Descending | Select-Object -First 1 |
+               ForEach-Object { Join-Path $_.FullName "x64\Microsoft.VC143.CRT" })
+# --- koniec LEGACY OVERRIDES ---------------------------------------------------------------
 
 $ProgressPreference = 'SilentlyContinue'
 function Step($m){ Write-Host "`n==> $m" -ForegroundColor Cyan }
@@ -389,10 +407,18 @@ if (-not (Test-Path $ElectronZip)) { Invoke-WebRequest "https://github.com/elect
 Expand-Archive $ElectronZip -DestinationPath $Bin -Force
 Rename-Item "$Bin\electron.exe" "$AppName.exe" -Force
 Remove-Item "$Bin\resources\default_app.asar" -Force -EA SilentlyContinue
-& "$env:WINDIR\System32\cmd.exe" /c "set NoDefaultCurrentDirectoryInExePath=&& npx --yes @electron/asar pack `"$RepoRoot\electron\app`" `"$Bin\resources\app.asar`"" | Out-Null
+& "$env:WINDIR\System32\cmd.exe" /c "set NoDefaultCurrentDirectoryInExePath=&& npx --yes @electron/asar@$AsarVer pack `"$RepoRoot\electron\app`" `"$Bin\resources\app.asar`"" | Out-Null
 # silnik + DLL do bin
 Copy-Item (Join-Path $RepoRoot "engine\jamovi-engine.exe") "$Bin\jamovi-engine.exe" -Force
 Copy-Item "$Deps\nanomsg\bin\libnanomsg.dll" "$Bin\libnanomsg.dll" -Force
+# LEGACY: VC++ runtime obok jamovi-engine.exe / jUPWR.exe i python.exe (patrz LEGACY OVERRIDES)
+if ($VcRedistDir -and (Test-Path $VcRedistDir)) {
+    foreach ($d in 'msvcp140.dll','msvcp140_1.dll','msvcp140_2.dll','vcruntime140.dll','vcruntime140_1.dll','concrt140.dll') {
+        Copy-Item (Join-Path $VcRedistDir $d) "$Bin\$d" -Force -EA SilentlyContinue
+        Copy-Item (Join-Path $VcRedistDir $d) "$Payload\python\$d" -Force -EA SilentlyContinue
+    }
+    Info "VC++ runtime app-local z $VcRedistDir"
+} else { Write-Warning "LEGACY: nie znaleziono katalogu VC Redist - brak msvcp140.dll obok silnika (ryzyko R2)" }
 # R: payload\R = kopia R 4.6 + scalona user-lib
 if (-not (Test-Path "$Payload\R\bin\x64\R.dll")) {
     & robocopy "$RHome" "$Payload\R" /E /NFL /NDL /NJH /NJS /MT:8 | Out-Null
@@ -412,7 +438,8 @@ Copy-Item (Join-Path $RepoRoot "version") "$AppDir\Resources\version" -Force
 Copy-Item (Join-Path $RepoRoot "platform\fonts") "$AppDir\Resources\fonts" -Recurse -Force
 # nanomsg.dll obok python.exe (Py3.8+ ctypes)
 Copy-Item "$Deps\nanomsg\bin\libnanomsg.dll" "$AppDir\Frameworks\python\nanomsg.dll" -Force
-# env.conf (sciezki wzgledem bin; JAMOVI_R_VERSION = rVersion modulu; bez NETWORK_SANDBOX dla portable)
+# env.conf (sciezki wzgledem bin; JAMOVI_R_VERSION = rVersion modulu; bez NETWORK_SANDBOX dla portable;
+# LEGACY: JAMOVI_DISABLE_GPU=1 -> main.js wola app.disableHardwareAcceleration())
 $rVer = (Select-String -Path "$AppDir\Resources\modules\jmv\jamovi-full.yaml" -Pattern "^rVersion:\s*(.+)$").Matches.Groups[1].Value.Trim()
 @"
 [ENV]
@@ -428,6 +455,7 @@ JAMOVI_SERVER_CMD=../Frameworks/python/python -u -Xutf8 -m jamovi.server 0 --std
 JAMOVI_R_VERSION=$rVer
 JAMOVI_VERSION_PATH=../Resources/version
 PYTHONPATH=../Resources/server
+JAMOVI_DISABLE_GPU=1
 "@ | ForEach-Object { [System.IO.File]::WriteAllText("$Bin\env.conf", $_) }
 Info "OK montaz: $AppDir"
 
@@ -435,9 +463,9 @@ Info "OK montaz: $AppDir"
 # FAZA 9 — pakowanie portable .zip
 # ---------------------------------------------------------------------------
 Step "Pakowanie portable .zip"
-$zip = "$Dist\$AppName-$JupwrVer-portable-win64.zip"
+$zip = "$Dist\$AppName-$VerTag-portable-win81.zip"
 if (Test-Path $zip) { Remove-Item $zip -Force }
 Compress-Archive -Path $AppDir -DestinationPath $zip
 Write-Host "`nGOTOWE: $zip" -ForegroundColor Green
 Write-Host "Uruchom: `"$Bin\$AppName.exe`"" -ForegroundColor Green
-# NSIS (opcjonalnie, gdy zainstalowany makensis): makensis packaging\scripts\windows\jUPWR.nsi
+# NSIS (opcjonalnie, gdy zainstalowany makensis): makensis packaging\scripts\windows\jUPWR-legacy.nsi

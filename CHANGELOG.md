@@ -4,6 +4,13 @@ Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modu
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
 ## Niewydane
+- Gałąź `legacy/win81`: wariant **jUPWR Legacy** dla sal z Windows 8.1 x64
+  (ten sam numer wersji, osobny wskaźnik `JUPWR_BUILD_VARIANT` w kliencie,
+  Electron 22.3.27, instalator `jUPWR-legacy.nsi` instalowany obok zwykłego
+  jUPWR, VC++ runtime app-local, `JAMOVI_DISABLE_GPU`). Skrypt diagnostyczny
+  `packaging/scripts/windows/legacy-diag.ps1` do uruchomienia w sali przed
+  pierwszym buildem. Plan i brama decyzyjna: `packaging/30-legacy-win81.md`.
+  Bez zmian w wynikach analiz; `main` nie zawiera tych zmian.
 - Nazwa dystrybucji w miejscach, gdzie została jeszcze marka jamovi:
   nagłówek okna i tytuł karty/paska zadań pokazują „jUPWR" zamiast „jamovi",
   a ekran startowy (`electron/app/splash.html`) — znak „jU" w barwach jUPWR

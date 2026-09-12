@@ -27,6 +27,9 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
 jeden kurs jest **opcjonalny** i trafia do studentów jako plik `.jmo` (Moduły → Sideload).
 Dzięki temu poprawka w takim module nie wymaga reinstalacji aplikacji.
+Wariant **jUPWR Legacy** (Windows 8.1, gałąź `legacy/win81`, [`30-legacy-win81.md`](30-legacy-win81.md))
+niesie wyłącznie moduły wbudowane; modułów opcjonalnych (`.jmo`) nie buduje się dla niego
+i nie ma ich w macierzy poniżej.
 
 Gdzie jest zdefiniowana lista wbudowanych (musi być identyczna w trzech miejscach):
 `docker/jamovi-Dockerfile` (bloki `COPY`+`jmc --install`), `packaging/scripts/macos/20-modules.sh`

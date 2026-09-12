@@ -14,6 +14,10 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
       'vite': (command === 'serve'),
     },
     build: {
+      // legacy/win81: Electron 22 = Chromium 108. Vite's default baseline is
+      // close to this already; pinning it stops a future Vite major from
+      // silently emitting syntax the legacy renderer cannot parse.
+      target: ['chrome108'],
       rollupOptions: {
         plugins: [
 

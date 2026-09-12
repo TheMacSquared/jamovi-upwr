@@ -1,16 +1,17 @@
 'use strict';
 import { htmlTrusted }  from './htmlelementcreator';
 import upwrLogo from '../assets/upwr-logotyp-pl-poziomy.png';
-import { JUPWR_VERSION } from './jupwr';
+import { JUPWR_VERSION, JUPWR_BUILD_VARIANT } from './jupwr';
 
 class jamoviIcon {
     el: HTMLElement;
 
     constructor(version: string) {
+        const variant = JUPWR_BUILD_VARIANT ? ' ' + JUPWR_BUILD_VARIANT.charAt(0).toUpperCase() + JUPWR_BUILD_VARIANT.slice(1) : '';
         this.el = htmlTrusted(`<div class="icon-info-box">
             <div class="icon-version" style="flex-direction: column; align-items: center; gap: 16px;">
                 <img src="${upwrLogo}" style="height: 80px;" alt="UPWr">
-                <div class="version-text">jUPWR ${JUPWR_VERSION} <span style="font-size: 0.8em; color: #BBBBBB;">(jamovi <span id="version"></span>)</span></div>
+                <div class="version-text">jUPWR ${JUPWR_VERSION}${variant} <span style="font-size: 0.8em; color: #BBBBBB;">(jamovi <span id="version"></span>)</span></div>
             </div>
         </div>`);
         this.el.querySelector('#version').textContent = this.cleanVersion(version);
