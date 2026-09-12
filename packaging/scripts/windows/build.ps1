@@ -348,6 +348,12 @@ $env:PROTOBUF_DIR    = ($RtoolsMingw -replace '\\','/')
 $env:INCLUDES        = "-I$($BoostRoot -replace '\\','/') -I$($Deps -replace '\\','/')/nanomsg/include -I$($RtoolsMingw -replace '\\','/')/include"
 $env:EXTRA_LIBS      = "$abslGroup -lbcrypt -ldbghelp -lws2_32 -lmswsock -ladvapi32"
 Push-Location (Join-Path $RepoRoot "engine")
+# LEGACY: zawsze od zera. make jest przyrostowy, a w jednym worktree buduje sie pod dwa
+# toolchainy (r46: gcc 14 + naglowki R 4.6, r41: gcc 8 + R 4.1.3). Przy buildzie r41 make
+# uznal obiekty engine\engine\*.o z r46 za aktualne i do paczki trafil silnik z R 4.6
+# (import R_getVarEx, R >= 4.5 -> STATUS_ENTRYPOINT_NOT_FOUND na R 4.1). Koszt: ~2-3 min.
+Get-ChildItem "$RepoRoot\engine" -Recurse -Filter *.o | Remove-Item -Force -EA SilentlyContinue
+Remove-Item "$RepoRoot\engine\jamovi-engine.exe" -Force -EA SilentlyContinue
 # make z RTools (usr\bin) + jawne CXX=g++: mingw32-make spoza RTools (np. Strawberry)
 # ma zapieczony domyslny CXX ze sciezka buildu, ktora nie istnieje na tej maszynie
 & "$RtoolsUsr\make.exe" CXX=g++ -j4 2>&1 | Out-Null
