@@ -45,6 +45,7 @@ $UserLib    = "$env:LOCALAPPDATA\R\win-library\4.6"        # tu sa ciezkie pakie
 $RtoolsMingw= "C:\rtools45\x86_64-w64-mingw32.static.posix"
 $RtoolsUsr  = "C:\rtools45\usr\bin"
 $BoostRoot  = "C:\local\boost_1_84_0"                      # zrodla + prebuilt MSVC (lib64-msvc-14.3)
+$BoostStage = "stage-mingw"                                # stagedir Boosta mingw (r41: osobny, gcc 8)
 $Vcvars     = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
 
 # Electron 43 = najstarsza wspierana linia (EOL 2027-01); 32.x poza wsparciem od 03.2025.
@@ -70,6 +71,26 @@ $Dist       = Join-Path $BuildDir "dist-legacy"           # nie nadpisuj dist\jU
 $VcRedistDir= (Get-ChildItem "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Redist\MSVC" -Directory -EA SilentlyContinue |
                Where-Object { $_.Name -match '^\d' } | Sort-Object Name -Descending | Select-Object -First 1 |
                ForEach-Object { Join-Path $_.FullName "x64\Microsoft.VC143.CRT" })
+# Toolchain (Faza 3 dokumentu): JUPWR_TOOLCHAIN=r41 -> R 4.1.3 + Rtools40 (linia MSVCRT, bez
+# UCRT; ta sama, na ktorej jamovi 2.3 dzialalo na Windows 8.1). Domyslnie r46 = jak main.
+# Osobne stage/deps/dist i stagedir Boosta, zeby oba warianty daly sie budowac z jednego
+# worktree bez mieszania binariow gcc 14 / gcc 8. Wymaga: R 4.1.3 w Program Files,
+# C:\rtools40 + pacman -S mingw-w64-x86_64-protobuf mingw-w64-x86_64-make.
+$Toolchain  = if ($env:JUPWR_TOOLCHAIN) { $env:JUPWR_TOOLCHAIN } else { "r46" }
+if ($Toolchain -eq "r41") {
+    $RHome      = "C:\Program Files\R\R-4.1.3"
+    $RHomeShort = (& "$RHome\bin\x64\R.exe" RHOME).Trim()
+    $UserLib    = (& "$RHome\bin\x64\Rscript.exe" -e "cat(Sys.getenv('R_LIBS_USER'))").Trim()   # R 4.1: Dokumenty\R\win-library\4.1
+    $RtoolsMingw= "C:\rtools40\mingw64"
+    $RtoolsUsr  = "C:\rtools40\usr\bin"
+    $BoostStage = "stage-mingw-gcc8"
+    $CranRepo   = "https://packagemanager.posit.co/cran/2023-04-07"   # snapshot jamovi dla R 4.1.3 (snapshots.js)
+    $Stage      = Join-Path $BuildDir "stage-r41"
+    $Payload    = Join-Path $Stage "jamovi"
+    $Deps       = Join-Path $BuildDir "deps-r41"
+    $Dist       = Join-Path $BuildDir "dist-legacy-r41"
+    $VerTag     = "$JupwrVer-$Variant-r41"
+}
 # --- koniec LEGACY OVERRIDES ---------------------------------------------------------------
 
 $ProgressPreference = 'SilentlyContinue'
@@ -115,8 +136,8 @@ function Use-Mingw {
 # ---------------------------------------------------------------------------
 Step "Weryfikacja narzedzi"
 foreach ($p in @(
-    @{n='R 4.6';     t="$RHome\bin\x64\R.exe"},
-    @{n='RTools45';  t="$RtoolsMingw\bin\gcc.exe"},
+    @{n="R ($Toolchain)"; t="$RHome\bin\x64\R.exe"},
+    @{n='RTools';    t="$RtoolsMingw\bin\gcc.exe"},
     @{n='protoc';    t="$RtoolsMingw\bin\protoc.exe"},
     @{n='VS2022';    t=$Vcvars},
     @{n='Boost src'; t="$BoostRoot\bootstrap.bat"},
@@ -133,14 +154,14 @@ Info "jUPWR $JupwrVer (jamovi $JamoviVer)"
 # FAZA 1 — Boost mingw (filesystem/system/nowide) z tych samych zrodel co MSVC
 # ---------------------------------------------------------------------------
 Step "Boost mingw (layout=system)"
-if (-not (Test-Path "$BoostRoot\stage-mingw\lib\libboost_filesystem.a")) {
+if (-not (Test-Path "$BoostRoot\$BoostStage\lib\libboost_filesystem.a")) {
     Use-Mingw
     if (-not (Test-Path "$BoostRoot\b2.exe")) {
         & "$env:WINDIR\System32\cmd.exe" /c "set NoDefaultCurrentDirectoryInExePath=&& cd /d `"$BoostRoot`" && bootstrap.bat gcc" | Out-Null
     }
-    & "$env:WINDIR\System32\cmd.exe" /c "set NoDefaultCurrentDirectoryInExePath=&& cd /d `"$BoostRoot`" && b2.exe toolset=gcc address-model=64 --layout=system variant=release link=static runtime-link=shared threading=multi --with-filesystem --with-system --with-nowide --stagedir=stage-mingw -j4" | Out-Null
+    & "$env:WINDIR\System32\cmd.exe" /c "set NoDefaultCurrentDirectoryInExePath=&& cd /d `"$BoostRoot`" && b2.exe toolset=gcc address-model=64 --layout=system variant=release link=static runtime-link=shared threading=multi --with-filesystem --with-system --with-nowide --stagedir=$BoostStage -j4" | Out-Null
 }
-if (-not (Test-Path "$BoostRoot\stage-mingw\lib\libboost_filesystem.a")) { throw "Boost mingw nieudany" }
+if (-not (Test-Path "$BoostRoot\$BoostStage\lib\libboost_filesystem.a")) { throw "Boost mingw nieudany" }
 Info "OK boost mingw"
 
 # ---------------------------------------------------------------------------
@@ -195,6 +216,10 @@ if (-not (Test-Path "$BaseR\RProtoBuf")) { & $R --vanilla --slave -e "options(re
 
 # 4b. zaleznosci modulow (do user-lib) — jmc oczekuje ich na sciezce
 $deps13 = "multcomp emmeans vcd vcdExtra GGally lpSolve BayesFactor psych GPArotation afex mvnormtest lavaan ROCR Hmisc".Split(' ')
+if ($Toolchain -eq 'r41') {
+    # LEGACY r41: user-lib R 4.1 jest pusta - pelna unia Imports modulow wbudowanych (+ czcionki)
+    $deps13 = "afex base64enc BayesFactor boot car carData dplyr emmeans exact2x2 GGally ggplot2 ggrepel ggridges GPArotation hexbin Hmisc jmvReadWrite jsonlite lavaan lpSolve magrittr MASS matrixStats multcomp mvnormtest mvtnorm nnet psych R6 ragg RColorBrewer rlang ROCR scales semPlot systemfonts vcd vcdExtra".Split(' ')
+}
 $missing = $deps13 | Where-Object { -not (Test-Path "$UserLib\$_") }
 if ($missing) { & $R --vanilla --slave -e "options(repos=c(CRAN='$CranRepo')); install.packages(c('$($missing -join "','")'), lib='$($UserLib -replace '\\','/')', dependencies=c('Depends','Imports','LinkingTo'))" | Out-Null }
 
@@ -309,15 +334,17 @@ $mfin = Get-Content (Join-Path $RepoRoot "engine\Makefile.in") -Raw
 foreach ($ph in '%PREFIX%','%LIBDIR%','%CFLAGS%','%MFLAGS%','%CXXFLAGS%','%R_PATH%','%BASE_MODULE_PATH%','%R_HOME%') { $mfin = $mfin.Replace($ph,'') }
 [System.IO.File]::WriteAllText((Join-Path $RepoRoot "engine\Makefile"), ($mfin -replace "`r`n","`n"))
 # lista abseil + utf8 (grupa) z RTools
-$absl = (Get-ChildItem "$RtoolsMingw\lib\libabsl_*.a" | ForEach-Object { '-l' + ($_.BaseName -replace '^lib','') }) -join ' '
+$absl = (Get-ChildItem "$RtoolsMingw\lib\libabsl_*.a" -EA SilentlyContinue | ForEach-Object { '-l' + ($_.BaseName -replace '^lib','') }) -join ' '
+# protobuf 3.21 (rtools40, toolchain r41) nie ma abseil ani utf8_range - wtedy bez grupy
+$abslGroup = if ($absl) { "-Wl,--start-group $absl -lutf8_range -lutf8_validity -Wl,--end-group" } else { "" }
 Use-Mingw
 $env:R_HOME          = ($RHomeShort -replace '\\','/')   # backslashe gubi sh przy ekspansji w Makefile
 $env:BASE_MODULE_PATH= ($BaseR -replace '\\','/')
-$env:BOOST_LIBDIR    = "$($BoostRoot -replace '\\','/')/stage-mingw/lib"
+$env:BOOST_LIBDIR    = "$($BoostRoot -replace '\\','/')/$BoostStage/lib"
 $env:NANOMSG_DIR     = "$($Deps -replace '\\','/')/nanomsg"
 $env:PROTOBUF_DIR    = ($RtoolsMingw -replace '\\','/')
 $env:INCLUDES        = "-I$($BoostRoot -replace '\\','/') -I$($Deps -replace '\\','/')/nanomsg/include -I$($RtoolsMingw -replace '\\','/')/include"
-$env:EXTRA_LIBS      = "-Wl,--start-group $absl -lutf8_range -lutf8_validity -Wl,--end-group -lbcrypt -ldbghelp -lws2_32 -lmswsock -ladvapi32"
+$env:EXTRA_LIBS      = "$abslGroup -lbcrypt -ldbghelp -lws2_32 -lmswsock -ladvapi32"
 Push-Location (Join-Path $RepoRoot "engine")
 # make z RTools (usr\bin) + jawne CXX=g++: mingw32-make spoza RTools (np. Strawberry)
 # ma zapieczony domyslny CXX ze sciezka buildu, ktora nie istnieje na tej maszynie
