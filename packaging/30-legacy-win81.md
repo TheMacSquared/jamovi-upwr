@@ -1,7 +1,8 @@
 # jUPWR Legacy — wariant dla Windows 8.1 x64
 
-> **Status (2026-09-12): gałąź `legacy/win81` przygotowana, Faza 0 NIE wykonana,
-> build NIE uruchamiany.** Dokument utrzymywać na obu gałęziach (`main`
+> **Status (2026-09-12, wieczór): Faza 1 ZBUDOWANA i sprawdzona na Windows 11
+> (portable + instalator w `dist-legacy`); Faza 3 (R 4.1.3) w budowie; Faza 0
+> w sali NIE wykonana.** Dokument utrzymywać na obu gałęziach (`main`
 > i `legacy/win81`). Konsensus dwóch wcześniejszych planów z 2026-09-07
 > (`40-jupwr-old-plan.md`, `40-legacy-win81.md`); fakty zweryfikowane na
 > `main` = e94edc57 (jUPWR 1.0.4).
@@ -182,6 +183,36 @@ Electron 21 przepisał tę metodę, marginesy/format mogą się różnić od 43.
    ostrzeżenie `AtLeastWin10` faktycznie się pokazuje.
 5. `bash packaging/scripts/release-check.sh --metadata-only` — bez ostrzeżeń.
 6. Sala: Faza 0 na obu paczkach + pełny scenariusz jednych zajęć (patrz Wydanie).
+
+### Dziennik wykonania (fakty z buildów, 2026-09-12)
+
+- **Worktree** `D:\praca\jamovi-upwr-legacy` (gałąź `legacy/win81`), submoduły
+  zainicjowane; drzewo główne na `main` nietknięte.
+- **Faza 1 zbudowana** (`build.ps1`, ~1 h): `dist-legacy\jUPWR-1.0.4-legacy-portable-win81.zip`
+  (754 MB) i `jUPWR-1.0.4-legacy-win81-x64-setup.exe` (makensis `jUPWR-legacy.nsi`).
+  W `bin\`: Electron 22.3.27, `msvcp140/vcruntime140/concrt140` obok
+  `jamovi-engine.exe`; `env.conf` ma `JAMOVI_DISABLE_GPU=1`, `JAMOVI_R_VERSION=4.6.0-x64`.
+  Smoke test na Windows 11: `jUPWR.exe` startuje (4 procesy Electrona), serwer
+  Python nasłuchuje na 127.0.0.1, 4 procesy `jamovi-engine.exe`, instancja
+  otwiera się. Checklista ręczna (schowek, PDF, dialogi, język) — jeszcze nie.
+- **`legacy-diag.ps1` sprawdzony na paczce legacy** (Win 11, `-NoGui`): kroki 3–7
+  OK, krok 8 HTTP 200. Pułapka naprawiona: `jamovi.server <port>` **ignoruje
+  podany port** — losuje trzy własne i wypisuje
+  `accessible from: 127.0.0.1:<port>/?access_key=<klucz>`; bez klucza HTTP
+  odmawia. Skrypt czyta adres z logu stdout serwera.
+- **Toolchain r41 zainstalowany**: R 4.1.3 (`C:\Program Files\R\R-4.1.3`),
+  Rtools40 (`C:\rtools40`, gcc 8.3) + `pacman -S mingw-w64-x86_64-protobuf`
+  (3.21.12, bez abseil) `mingw-w64-x86_64-make`. Biblioteka użytkownika R 4.1 to
+  `Dokumenty\R\win-library\4.1` (R < 4.2; skrypt pyta `R_LIBS_USER`); 39 pakietów
+  Imports modułów (+ zależności, 178 razem) ze snapshotu PPM 2023-04-07 — komplet.
+- **Build r41 = `$env:JUPWR_TOOLCHAIN='r41'; build.ps1`** (osobne `stage-r41`,
+  `deps-r41`, `dist-legacy-r41`, Boost `stage-mingw-gcc8`). Po drodze:
+  - nanomsg: `CMakeCache` w `dl\nanomsg-1.2\build` pamiętał gcc z rtools45 →
+    r41 buduje w `build-r41`;
+  - **R 4.1 nie czyta komentarzy `#` w `DESCRIPTION`** („error reading file",
+    obsługa od R 4.3) → usunięte z 12 modułów jUPWR na gałęzi legacy
+    (kandydat do cherry-picka na `main`);
+  - jmv 2.8.4, plots 2.9.1 i jmvcore kompilują się pod R 4.1.3 bez zmian w kodzie.
 
 ## Faza 2 — rezerwa: launcher bez Electrona
 
