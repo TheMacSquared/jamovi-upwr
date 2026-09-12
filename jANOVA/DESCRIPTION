@@ -2,8 +2,6 @@ Package: jANOVA
 Type: Package
 Title: ANOVA jUPWR dla jamovi
 Version: 0.4.2
-# UWAGA: wersję modułu jamovi bierze z jamovi/0000.yaml (jmc nie czyta jej stąd);
-# przy zmianie wersji zmień OBA pliki — release-check.sh pilnuje zgodności.
 Author: jUPWR Team
 Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 Description: Analiza wariancji w jednym miejscu: jedno- i wieloczynnikowa ANOVA

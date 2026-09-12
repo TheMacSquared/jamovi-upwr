@@ -177,9 +177,11 @@ if (-not (Test-Path "$Deps\nanomsg\lib\libnanomsg.dll.a")) {
         Pop-Location
     }
     Use-Mingw
-    New-Item -ItemType Directory -Force -Path "$nm\build" | Out-Null
+    # osobny katalog builda per toolchain: CMakeCache pamieta sciezke gcc (rtools45 vs rtools40)
+    $nmBuild = if ($Toolchain -eq 'r41') { "$nm\build-r41" } else { "$nm\build" }
+    New-Item -ItemType Directory -Force -Path $nmBuild | Out-Null
     $mk = (Get-Command mingw32-make).Source
-    & "$env:WINDIR\System32\cmd.exe" /c "set NoDefaultCurrentDirectoryInExePath=&& cd /d `"$nm\build`" && cmake .. -G `"MinGW Makefiles`" -DCMAKE_BUILD_TYPE=Release -DNN_TESTS=OFF -DNN_TOOLS=OFF -DNN_ENABLE_DOC=OFF `"-DCMAKE_C_FLAGS=-fpermissive -w`" `"-DCMAKE_MAKE_PROGRAM=$($mk -replace '\\','/')`" `"-DCMAKE_INSTALL_PREFIX=$($Deps -replace '\\','/')/nanomsg`" && `"$mk`" -j4 install" | Out-Null
+    & "$env:WINDIR\System32\cmd.exe" /c "set NoDefaultCurrentDirectoryInExePath=&& cd /d `"$nmBuild`" && cmake .. -G `"MinGW Makefiles`" -DCMAKE_BUILD_TYPE=Release -DNN_TESTS=OFF -DNN_TOOLS=OFF -DNN_ENABLE_DOC=OFF `"-DCMAKE_C_FLAGS=-fpermissive -w`" `"-DCMAKE_MAKE_PROGRAM=$($mk -replace '\\','/')`" `"-DCMAKE_INSTALL_PREFIX=$($Deps -replace '\\','/')/nanomsg`" && `"$mk`" -j4 install" | Out-Null
 }
 if (-not (Test-Path "$Deps\nanomsg\lib\libnanomsg.dll.a")) { throw "nanomsg nieudany" }
 Info "OK nanomsg"
