@@ -15,6 +15,15 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   `RMDir /r`. Dodatkowo `UninstallString` zapisany w cudzysłowach nie był
   rozpoznawany, więc stara wersja zostawała nadpisana zamiast odinstalowana.
   Przy okazji `/S` jest naprawdę cichy (`/SD` w oknach dialogowych).
+- Build macOS: `20-modules.sh` dokłada do `modules/base/R` cztery zależności
+  `Imports` z `jmv/DESCRIPTION` — `afex`, `mvnormtest`, `lavaan`, `Hmisc`.
+  Dotąd przychodziły z systemowego R; gdy zniknęły z R.framework, build padał
+  na `jmc --install jmv` („dependencies … are not available for package 'jmv'").
+  `R CMD INSTALL` wymaga obecności `Imports` niezależnie od tego, czy analiza
+  jest w jUPWR widoczna, a `jmc` ogranicza `R_LIBS` do `modules/base/R`, więc
+  `--skip-deps` tego nie omija. Windows (`$deps13` w `build.ps1`) miał tę
+  czwórkę od dawna — to był rozjazd między platformami, nie nowa zależność.
+  Bez zmian w wynikach analiz.
 
 ## 1.0.4 — 2026-09-09
 Wydanie poprawkowe: polska odmiana liczebników w komunikatach i spójny kolor

@@ -42,9 +42,21 @@ R_LIBS="$BASE_R" R CMD INSTALL "$REPO_ROOT/jmvcore" --library="$BASE_R"
 # --skip-deps. Bez tego kroku instalacja modułu 'plots' pada z "dependency 'hexbin' is not
 # available for package 'scatr'" i moduł scatr w ogóle się nie buduje (brak R/ w payloadzie).
 # GGally: wykres macierzy korelacji (jmv/plots) — również musi być widoczny w $BASE_R.
-log "Instalacja zależności ridge/hexbin/GGally (ggridges, hexbin, GGally) do $BASE_R ..."
-"$R_HOME_SYS/bin/R" -e "install.packages(c('ggridges', 'hexbin', 'GGally', 'lpSolve'), repos='https://cloud.r-project.org', lib='$BASE_R')" \
-  || die "Nie udało się zainstalować ggridges/hexbin/GGally — moduły plots/jmv nie zbudują się poprawnie!"
+#
+# Z tego samego powodu trzymamy tu zależności `Imports` z jmv/DESCRIPTION, których nie ma
+# w domyślnej instalacji R.framework. R CMD INSTALL odmawia instalacji pakietu z niedostępnym
+# `Imports` NIEZALEŻNIE od tego, czy analiza jest w jUPWR widoczna, więc brak choćby jednego
+# wywala cały build na "dependencies ... are not available for package 'jmv'":
+#   afex        — ANOVA powtórzonych pomiarów (jANOVA ma go też we własnym Imports), jmv anovaRM
+#   mvnormtest  — mshapiro.test w jmv mancova (widoczna, JUPWR_MENU_LAST)
+#   lavaan      — jmv cfa (konfirmacyjna analiza czynnikowa, widoczna)
+#   Hmisc       — wtd.quantile w jmv descriptives; analiza jest ukryta (zastąpiona przez
+#                 jEksplor), ale `Imports` i tak wymusza obecność pakietu przy instalacji
+# Do 2026-09-12 przychodziły z systemowego R i dlatego nie było ich na liście; gdy zniknęły
+# z R.framework, build padł na jmv. Odpowiednik $deps13 z packaging/scripts/windows/build.ps1.
+log "Instalacja zależności plots/jmv (ggridges, hexbin, GGally, lpSolve, afex, mvnormtest, lavaan, Hmisc) do $BASE_R ..."
+"$R_HOME_SYS/bin/R" -e "install.packages(c('ggridges', 'hexbin', 'GGally', 'lpSolve', 'afex', 'mvnormtest', 'lavaan', 'Hmisc'), repos='https://cloud.r-project.org', lib='$BASE_R')" \
+  || die "Nie udało się zainstalować zależności CRAN — moduły plots/jmv nie zbudują się poprawnie!"
 
 # Moduły w kolejności jak w docker/jamovi-Dockerfile.
 # R znajduje zależności w $R_HOME_SYS/library (systemowy R), jmvcore w base/R.
