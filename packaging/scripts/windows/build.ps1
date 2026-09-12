@@ -352,14 +352,29 @@ Push-Location (Join-Path $RepoRoot "engine")
 # toolchainy (r46: gcc 14 + naglowki R 4.6, r41: gcc 8 + R 4.1.3). Przy buildzie r41 make
 # uznal obiekty engine\engine\*.o z r46 za aktualne i do paczki trafil silnik z R 4.6
 # (import R_getVarEx, R >= 4.5 -> STATUS_ENTRYPOINT_NOT_FOUND na R 4.1). Koszt: ~2-3 min.
-Get-ChildItem "$RepoRoot\engine" -Recurse -Filter *.o | Remove-Item -Force -EA SilentlyContinue
+# obiekty leza w engine\engine\ ORAZ server\jamovi\common\ (wspolne zrodla silnika i serwera)
+Get-ChildItem "$RepoRoot\engine", "$RepoRoot\server\jamovi\common" -Recurse -Filter *.o | Remove-Item -Force -EA SilentlyContinue
 Remove-Item "$RepoRoot\engine\jamovi-engine.exe" -Force -EA SilentlyContinue
-# make z RTools (usr\bin) + jawne CXX=g++: mingw32-make spoza RTools (np. Strawberry)
-# ma zapieczony domyslny CXX ze sciezka buildu, ktora nie istnieje na tej maszynie
-& "$RtoolsUsr\make.exe" CXX=g++ -j4 2>&1 | Out-Null
-if ($LASTEXITCODE -ne 0) { & "$RtoolsUsr\make.exe" CXX=g++ 2>&1 | Out-Null }
+# jamovi.pb.cc/.h w repo sa wygenerowane protoc 29 (rtools45) i wymagaja naglowkow, ktorych
+# protobuf 3.21 (rtools40) nie ma. Regula w Makefile odtwarza je z jamovi.proto protoc-em
+# z PATH (= toolchain builda, jak w Dockerze), wiec kasujemy je przed make i po buildzie
+# przywracamy bajt w bajt (to artefakt, nie zmiana zrodel - patrz CLAUDE.md, sekcja protobuf).
+$PbFiles = @("$RepoRoot\engine\jamovi.pb.cc", "$RepoRoot\engine\jamovi.pb.h")
+$PbBackup = @{}
+foreach ($f in $PbFiles) { if (Test-Path $f) { $PbBackup[$f] = [System.IO.File]::ReadAllBytes($f); Remove-Item $f -Force } }
+$engineLog = "$BuildDir\engine-make-$Toolchain.log"
+try {
+    # make z RTools (usr\bin) + jawne CXX=g++: mingw32-make spoza RTools (np. Strawberry)
+    # ma zapieczony domyslny CXX ze sciezka buildu, ktora nie istnieje na tej maszynie.
+    # Wyjscie do pliku (nie Out-Null): po bledzie trzeba wiedziec, co nie poszlo.
+    & "$RtoolsUsr\make.exe" CXX=g++ -j4 2>&1 | Out-File $engineLog -Encoding utf8
+    if ($LASTEXITCODE -ne 0) { & "$RtoolsUsr\make.exe" CXX=g++ 2>&1 | Out-File $engineLog -Encoding utf8 -Append }
+}
+finally {
+    foreach ($kv in $PbBackup.GetEnumerator()) { [System.IO.File]::WriteAllBytes($kv.Key, $kv.Value) }
+}
 Pop-Location
-if (-not (Test-Path (Join-Path $RepoRoot "engine\jamovi-engine.exe"))) { throw "silnik nieudany" }
+if (-not (Test-Path (Join-Path $RepoRoot "engine\jamovi-engine.exe"))) { Get-Content $engineLog -Tail 30 | ForEach-Object { Write-Host "    $_" -ForegroundColor Red }; throw "silnik nieudany (log: $engineLog)" }
 Info "OK silnik"
 
 # ---------------------------------------------------------------------------
