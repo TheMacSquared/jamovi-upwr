@@ -1,8 +1,8 @@
 # jUPWR Legacy — wariant dla Windows 8.1 x64
 
-> **Status (2026-09-12, wieczór): Faza 1 ZBUDOWANA i sprawdzona na Windows 11
-> (portable + instalator w `dist-legacy`); Faza 3 (R 4.1.3) w budowie; Faza 0
-> w sali NIE wykonana.** Dokument utrzymywać na obu gałęziach (`main`
+> **Status (2026-09-12, wieczór): Faza 1 (Electron 22, R 4.6) i Faza 3 (R 4.1.3,
+> Rtools40) ZBUDOWANE i sprawdzone na Windows 11 — portable + instalatory
+> w `dist-legacy` i `dist-legacy-r41`; Faza 0 w sali NIE wykonana.** Dokument utrzymywać na obu gałęziach (`main`
 > i `legacy/win81`). Konsensus dwóch wcześniejszych planów z 2026-09-07
 > (`40-jupwr-old-plan.md`, `40-legacy-win81.md`); fakty zweryfikowane na
 > `main` = e94edc57 (jUPWR 1.0.4).
@@ -212,7 +212,35 @@ Electron 21 przepisał tę metodę, marginesy/format mogą się różnić od 43.
   - **R 4.1 nie czyta komentarzy `#` w `DESCRIPTION`** („error reading file",
     obsługa od R 4.3) → usunięte z 12 modułów jUPWR na gałęzi legacy
     (kandydat do cherry-picka na `main`);
-  - jmv 2.8.4, plots 2.9.1 i jmvcore kompilują się pod R 4.1.3 bez zmian w kodzie.
+  - jmv 2.8.4, plots 2.9.1 i jmvcore kompilują się pod R 4.1.3 bez zmian w kodzie;
+  - **silnik**: `make` jest przyrostowy, a obiekty leżą w `engine\engine\` **i**
+    `server\jamovi\common\` — pierwszy build r41 przelinkował/skopiował silnik
+    z R 4.6 (import `R_getVarEx`, R ≥ 4.5 → `STATUS_ENTRYPOINT_NOT_FOUND`, 0 silników;
+    diagnoza: `objdump -p` importy vs eksporty `R.dll`). Teraz `build.ps1` kasuje
+    wszystkie `*.o` i `jamovi-engine.exe` przed `make` (koszt ~2–3 min);
+  - `engine\jamovi.pb.cc/.h` (niesledzone, generowane) z protoc 29 wymagają
+    `runtime_version.h`, którego protobuf 3.21 nie ma → `build.ps1` kasuje je
+    przed `make`, reguła Makefile odtwarza je protoc-em z PATH toolchainu;
+  - wyjście `make` silnika idzie do `packaging\build\engine-make-<toolchain>.log`
+    (wcześniej `Out-Null` — po błędzie nie było czego czytać).
+- **Faza 3 zbudowana**: `dist-legacy-r41\jUPWR-1.0.4-legacy-r41-portable-win81.zip`
+  (592 MB) + `jUPWR-1.0.4-legacy-r41-win81-x64-setup.exe` (`makensis /DDISTDIR=
+  dist-legacy-r41 /DTAG=legacy-r41 jUPWR-legacy.nsi`). `env.conf`:
+  `JAMOVI_R_VERSION=4.1.3`. **Silnik r41 importuje tylko `msvcrt.dll`, `R.dll`,
+  `libnanomsg.dll` + systemowe** (r46: zestaw `api-ms-win-crt-*`, czyli UCRT) —
+  to jest sedno Fazy 3 na 8.1. `legacy-diag.ps1` na paczce r41 (Win 11): 3–8 OK,
+  HTTP 200, 4 silniki; `jUPWR.exe` startuje (4 procesy Electrona, serwer, 4 silniki).
+  Kontrola kodu analiz pod R 4.1.3 (Rscript paczki, `jmv::descriptives`,
+  `jmv::ttestIS`, `jEksplor:::ilosciowe`, `jCzest:::tabela`, `jTestyT:::ttesttwo`,
+  `jANOVA:::anova`, `jRegr:::liniowa`, `jCI:::cionemean`, `jperm:::permtesttwo`):
+  identyczne zachowanie jak pod R 4.6 (analizy z wykresem poza silnikiem padają
+  na „niepoprawny typ czcionki" w OBU wersjach — brak rejestracji czcionek
+  jUPWR poza aplikacją, nie problem R 4.1; z `plot = FALSE` liczą).
+- **Co dalej dla obu paczek**: checklista ręczna na Win 11 (schowek, PDF, dialogi,
+  język, „O programie" z dopiskiem Legacy), a potem Faza 0 w sali z obiema
+  paczkami na pendrive. Kolejność testu w sali: r41 najpierw (najgłębszy
+  fallback), potem r46 (Electron 22 + R 4.6) — jeśli r46 działa, jest lżejszy
+  w utrzymaniu (ten sam R co `main`).
 
 ## Faza 2 — rezerwa: launcher bez Electrona
 
