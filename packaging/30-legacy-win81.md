@@ -28,7 +28,17 @@ Decyzje (2026-09-12):
 - **downgrade R / MSVC / Pythona zostaje w planie jako Faza 3**, gotowa do
   uruchomienia, gdy backend 1.0.4 nie ładuje się na 8.1;
 - ze względu na termin **build Fazy 1 robimy od razu, równolegle z Fazą 0**,
-  żeby jedna wizyta w sali przetestowała oba pakiety.
+  żeby jedna wizyta w sali przetestowała oba pakiety;
+- **jeden interfejs wszędzie** (2026-09-12): nie da się uczyć na różnych
+  interfejsach w różnych tygodniach, więc „wariant zerowy" to NIE jamovi
+  2.3.28 stock, tylko jUPWR po pełnym downgradzie (Faza 3). Faza 3 startuje
+  **równolegle** z Fazą 1, nie warunkowo — jeśli Faza 1 wystarczy, Fazę 3 się
+  odkłada; jeśli nie, jest już w toku;
+- **cała praca Legacy poza drzewem głównym**: worktree
+  `D:\praca\jamovi-upwr-legacy` (`git worktree add ..\jamovi-upwr-legacy
+  legacy/win81` + `git submodule update --init --recursive`). Buildy, cache
+  `packaging/build`, artefakty i instalacje R 4.1/Rtools40 nie dotykają
+  `D:\praca\jamovi-upwr`, które zostaje na `main`.
 
 ## Drabina wariantów (od góry: najtańszy → najgłębszy)
 
@@ -36,18 +46,18 @@ Decyzje (2026-09-12):
 |---|---|---|---|---|---|
 | 1 | **Electron 22** (Faza 1) | tylko powłoka | ~100 % | 2–3 dni | backend 1.0.4 działa na 8.1 |
 | 2 | **Launcher bez Electrona** (Faza 2) | powłoka = przeglądarka sali | ~90 % (bez PDF, drag&drop) | 1–2 dni | brak KB2919355 / czarne okno / weto IT |
-| 3 | **Downgrade toolchainu** (Faza 3) | R 4.1.3 + Rtools40 (MSVCRT), Electron 22, ew. starszy Python | ~100 % (analizy identyczne) | 1–2 tygodnie | `import jamovi.core` lub `R.dll` nie ładuje się na 8.1 |
-| 0 | **Wariant zerowy: jamovi 2.3.28 stock** | nic — gotowy instalator | 0 % jUPWR (jmv, scatr z epoki) | 0 dni | gwarancja na dzień 1 zajęć, gdy 1–3 nie zdążą |
+| 3 | **Downgrade toolchainu** (Faza 3) = wariant zerowy | R 4.1.3 + Rtools40 (MSVCRT), Electron 22, ew. starszy Python | ~100 % (analizy identyczne) | 1–2 tygodnie | startuje równolegle z 1; wydawany, gdy 1 nie wystarczy |
 
-Wariant 0 jest **zawsze przygotowany** (instalator na pendrive, sprawdzony
-w sali w Fazie 0). Dzięki temu termin jest bezpieczny niezależnie od tego,
-jak potoczą się warianty 1–3.
+Wariant 3 jest gwarancją na dzień 1 zajęć: to ten sam jUPWR (klient, moduły,
+wyniki), tylko zbudowany na linii, na której jamovi 2.3 działało w tych salach.
+jamovi 2.3.28 stock **nie jest** wariantem dydaktycznym — służy w Fazie 0 tylko
+jako test, czy system w ogóle uruchamia stary toolchain.
 
 ## Konsensus dwóch planów
 
 | Kwestia | old-plan | legacy-win81 | Decyzja |
 |---|---|---|---|
-| Baza | odbudować z jamovi 2.3.4 | obecny jUPWR + Electron 22 | obecny jUPWR; baza 2.3 tylko jako wariant zerowy (nie uniesie modułów: fork jmvcore `metodyNew()`, motywy, `jmvcore >= 2.4.2`) |
+| Baza | odbudować z jamovi 2.3.4 | obecny jUPWR + Electron 22 | obecny jUPWR (kod), toolchain jamovi 2.3 (R 4.1) tylko jako Faza 3; sam jamovi 2.3 nie uniesie modułów (fork jmvcore `metodyNew()`, motywy, `jmvcore >= 2.4.2`) |
 | Zakres | minimum dydaktyczne po macierzy | wszystkie wbudowane, opcjonalne poza zakresem | wszystkie wbudowane; macierz = tabela wyników testów |
 | Bramka | lista pytań | procedura 0a–0d na portable | procedura w sali przez `legacy-diag.ps1`, **ale build Fazy 1 równolegle** (termin) |
 | Bez Electrona | brak | równoprawna Faza 2 | rezerwa (wariant 2) |
@@ -84,7 +94,7 @@ potrzebuje UCRT i **jest dokładnie tym, na czym jamovi 2.3 działało w sali**.
 Pendrive: rozpakowany `packaging/build/dist/jUPWR-1.0.4-portable-win64.zip` jako
 `<pendrive>\jUPWR\`, **rozpakowana paczka legacy** (Faza 1, jeśli zdążyła się
 zbudować) jako `<pendrive>\jUPWR-legacy\`, `legacy-diag.ps1`, plik `.omv`,
-instalator jamovi 2.3.28 (wariant zerowy). W sali (bez admina, PowerShell 4.0):
+instalator jamovi 2.3.28 (tylko test toolchainu). W sali (bez admina, PowerShell 4.0):
 
 ```
 powershell -ExecutionPolicy Bypass -File D:\legacy-diag.ps1
@@ -109,7 +119,7 @@ Skrypt loguje do `legacy-diag-<komputer>-<data>.log` obok siebie:
    w przeglądarce (otwórz `.omv` → Eksploracja → Zmienne ilościowe → tabela i wykres);
 9. `jUPWR.exe` — dla 1.0.4 oczekiwany błąd (treść okna przepisać), dla paczki
    legacy oczekiwane okno aplikacji;
-10. jamovi 2.3.28 ręcznie — instalacja i jedna analiza (potwierdzenie wariantu zerowego).
+10. jamovi 2.3.28 ręcznie — instalacja i jedna analiza (potwierdza, że linia R 4.1/MSVCRT z Fazy 3 na tej maszynie chodzi).
 
 Jeśli pojawi się okno „Nie znaleziono punktu wejścia…", **najpierw przepisać
 treść**, potem OK — skrypt czeka. Równolegle zapytać IT (pisemnie) o: możliwość
@@ -123,9 +133,9 @@ Brama decyzyjna:
 | paczka legacy (krok 9) startuje i liczy analizę | **Faza 1 gotowa** → wydanie pilotażowe |
 | 3–8 na 1.0.4 przechodzą, legacy `jUPWR.exe` pada | sprawdzić KB2919355 i GPU; → Faza 2 (launcher) |
 | 8 działa, 6 pada na części pakietów | Faza 1/2 + decyzja per analiza (nie blokuje) |
-| 4 pada (`import jamovi.core`) lub 5 pada (`R.dll`) mimo UCRT | **→ Faza 3 (downgrade)**; do dnia 1 zajęć wariant zerowy |
+| 4 pada (`import jamovi.core`) lub 5 pada (`R.dll`) mimo UCRT | **→ Faza 3** staje się wariantem wydawanym (już w toku) |
 | brak KB2999226 / ucrtbase i IT nie doinstaluje | **→ Faza 3** (R 4.1.3/Rtools40 nie potrzebuje UCRT; Python → sprawdzić PBS 3.10 albo oficjalny embeddable 3.8, ostatni z obsługą 8.1 bez UCRT… — do ustalenia w Fazie 3) |
-| jamovi 2.3.28 (krok 10) też nie działa | problem w systemie, nie w toolchainie — IT, wariant zerowy niemożliwy, eskalacja |
+| jamovi 2.3.28 (krok 10) też nie działa | problem w systemie, nie w toolchainie — Faza 3 nie pomoże, eskalacja do IT z logiem |
 
 Opcjonalnie na maszynie buildowej (0a): audyt importów PE (`pefile`) wszystkich
 `*.exe/*.dll/*.pyd` bundla wobec eksportów DLL-i systemowych 8.1 — wymaga kopii
@@ -158,12 +168,12 @@ Electron 21 przepisał tę metodę, marginesy/format mogą się różnić od 43.
 
 ### Kolejność (build przed wizytą w sali)
 
-1. `git checkout legacy/win81`, `git merge main` (jeśli `main` poszedł dalej).
-2. `packaging\scripts\windows\build.ps1` na dev-maszynie Windows 11 (toolchain
-   bez zmian). Wynik: `packaging/build/dist-legacy/jUPWR/` + portable zip.
-   Build w drzewie głównym korzysta z cache `packaging/build` (szybciej), ale
-   blokuje drzewo na czas builda; alternatywa: `git worktree add
-   ..\jamovi-upwr-legacy legacy/win81` (pełny rebuild zależności, ~+30 min).
+1. W worktree `D:\praca\jamovi-upwr-legacy`: `git merge main` (jeśli `main`
+   poszedł dalej). **Nigdy nie budować w `D:\praca\jamovi-upwr`.**
+2. `packaging\scripts\windows\build.ps1` w worktree, na dev-maszynie Windows 11
+   (toolchain bez zmian). Wynik: `D:\praca\jamovi-upwr-legacy\packaging\build\
+   dist-legacy\jUPWR\` + portable zip. Pierwszy build w worktree buduje
+   zależności od zera (nanomsg, Python, moduły) — ok. 1 h.
 3. **Weryfikacja na Windows 11** wg `20-build-windows.md` sekcja 5 + schowek
    (`clipboard.readHTML`), eksport PDF (porównać z paczką `main`), dialogi,
    drag&drop `.omv`, zmiana języka, napis „jUPWR 1.0.4 Legacy" w oknie „O programie".
@@ -198,6 +208,12 @@ Gdy Electron 22 nie startuje (brak KB2919355), renderuje wadliwie mimo
 Cel: ten sam kod modułów i klienta, ale binaria zbudowane pod linię, która na
 8.1 **na pewno** działa — tę, na której działało jamovi 2.3 (R 4.1, MSVCRT).
 Nakład 1–2 tygodnie, głównie buildy i testy; ryzyko: kompilacja pakietów R.
+**Startuje równolegle z Fazą 1** (decyzja 2026-09-12), w tym samym worktree,
+jako drugi zestaw nadpisań w `build.ps1` (`$Toolchain = 'r41'` obok bloku
+LEGACY OVERRIDES; wyjście do `dist-legacy-r41`), żeby oba warianty dało się
+zbudować z jednej gałęzi. R 4.1.3 i Rtools40 instalują się obok R 4.6/Rtools45
+(osobne katalogi, osobny `$UserLib` `win-library\4.1`) — nie ruszają toolchainu
+`main`.
 
 Zasada: **schodzić po jednym komponencie**, w kolejności od najbardziej
 podejrzanego, i po każdym kroku wozić paczkę do sali (albo prosić IT o jedną
@@ -246,25 +262,25 @@ Faza 2 (launcher) zamyka temat po stronie powłoki.
 - `release-check.sh` nie porównuje wersji R — nic do zmiany.
 - Docker i macOS nietknięte (Faza 3 żyje tylko w `build.ps1` na gałęzi legacy).
 
-## Wariant zerowy — jamovi 2.3.28 stock
+## Dwie wersje jUPWR, jeden interfejs
 
-Instalator jamovi 2.3.28 (win64) na pendrive, zweryfikowany w Fazie 0 (krok 10).
-Zero funkcji jUPWR, ale: Eksploracja, testy t, ANOVA, częstości, regresja,
-wykresy jmv/scatr z epoki — wystarczy na pierwsze tygodnie kursu podstawowego.
-Materiały na zajęcia trzymać w wersji „neutralnej" (nazwy analiz jmv), dopóki
-Legacy nie jest w sali. Nie próbować sideloadować modułów jUPWR do 2.3.28
-(niezgodne jmvcore).
+`main` = wersja domyślna, o którą prosimy IT wszędzie. Legacy = ta sama
+aplikacja (klient, moduły, wyniki, pliki `.omv`) na starszym toolchainie dla
+sal, których IT nie zaktualizuje na czas. Student i materiały do zajęć nie
+widzą różnicy poza dopiskiem „Legacy" w oknie „O programie". jamovi 2.3.28
+stock nie jest wariantem dydaktycznym; nie próbować sideloadować modułów jUPWR
+do 2.3.28 (niezgodne jmvcore).
 
 ## Harmonogram do 1 października 2026
 
 | Termin | Krok | Wyjście |
 |---|---|---|
-| do 2026-09-15 | build Fazy 1 na dev-maszynie; weryfikacja na Win 11; pendrive (1.0.4, legacy, 2.3.28, skrypt) | dwie paczki + pendrive |
-| do 2026-09-17 | **wizyta w sali nr 1**: Faza 0 na obu paczkach + krok 10; pytanie do IT | log, decyzja z bramy |
-| 09-18 → 09-22 | ścieżka A (Faza 1 OK): instalator, pilot na jednej maszynie sali; ścieżka B (Faza 2): launcher; ścieżka C (Faza 3): 3a R 4.1.3 | paczka pilotażowa albo paczka 3a |
+| do 2026-09-15 | build Fazy 1 w worktree; weryfikacja na Win 11; pendrive (1.0.4, legacy, 2.3.28 jako test, skrypt); **start Fazy 3a** (R 4.1.3 + Rtools40 obok 4.6) | paczka Fazy 1 + pendrive |
+| do 2026-09-17 | **wizyta w sali nr 1**: Faza 0 na obu paczkach + krok 10; pismo do IT | log, decyzja z bramy |
+| 09-18 → 09-22 | A (Faza 1 OK): instalator, pilot na jednej maszynie; B: launcher; C: dokończyć 3a (już w toku) | paczka pilotażowa albo paczka 3a |
 | do 2026-09-25 | **wizyta w sali nr 2**: pilot/scenariusz zajęć (A/B) albo Faza 0 na paczce 3a (C) | wynik pilotażu |
 | 09-26 → 09-30 | poprawki; przy C ewentualnie 3b; instalacja w całej sali (IT) | sala gotowa |
-| 2026-10-01 | zajęcia: Legacy, a jeśli nie zdążyło — wariant zerowy | — |
+| 2026-10-01 | zajęcia na jUPWR Legacy (Faza 1 albo 3) — ten sam interfejs co `main` | — |
 
 Reguła: **każda wizyta w sali testuje wszystko, co jest gotowe** (nie po jednym
 wariancie na wizytę). Brak dostępu do sali w danym tygodniu przesuwa decyzję,
@@ -311,8 +327,8 @@ nie plan — wtedy prosić IT o maszynę testową lub obraz VM.
 - **R5** brak podpisu kodu / antywirus (pewne / uciążliwe): test w sali.
 - **R6** brak VM 8.1 i dostępu do sali: każda iteracja = wizyta; skrypt zbiera
   wszystko za jednym razem; przy Fazie 3 maszyna testowa od IT jest warunkiem.
-- **R7** termin (pewne): mitygacja = wariant zerowy zawsze na pendrive
-  i build Fazy 1 równolegle z Fazą 0.
+- **R7** termin (pewne): mitygacja = Faza 1 i Faza 3 równolegle od pierwszego
+  dnia, każda wizyta w sali testuje wszystko, co gotowe.
 
 ## Źródła
 
