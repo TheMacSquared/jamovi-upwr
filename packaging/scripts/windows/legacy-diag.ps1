@@ -181,33 +181,41 @@ $srvOut = Join-Path $LogDir "legacy-diag-server-$stamp.out.log"
 $srvErr = Join-Path $LogDir "legacy-diag-server-$stamp.err.log"
 $srvArgs = @('-u', '-X', 'utf8', '-m', 'jamovi.server', "$Port", '--start-wb')
 Log ("> " + $Py + " " + ($srvArgs -join ' '))
-$srv = $null; $http = $false
+$srv = $null; $http = $false; $srvUrl = $null
 try {
     $srv = Start-Process -FilePath $Py -ArgumentList $srvArgs -WorkingDirectory $Bin `
         -RedirectStandardOutput $srvOut -RedirectStandardError $srvErr -PassThru -NoNewWindow
-    $deadline = (Get-Date).AddSeconds(90)
+    # serwer NIE uzywa podanego portu: losuje trzy wlasne i wypisuje na stdout
+    # "jamovi accessible from: 127.0.0.1:<port>/?access_key=<klucz>" - bez klucza HTTP odmawia
+    $deadline = (Get-Date).AddSeconds(120)
     while ((Get-Date) -lt $deadline) {
         if ($srv.HasExited) { break }
-        try {
-            $r = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/" -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop
-            if ($r.StatusCode -eq 200) { $http = $true; break }
-        } catch { }
+        if (-not $srvUrl -and (Test-Path $srvOut)) {
+            $m = Select-String -Path $srvOut -Pattern 'accessible from:\s*(\S+)' | Select-Object -First 1
+            if ($m) { $srvUrl = "http://" + $m.Matches[0].Groups[1].Value; Log "adres serwera: $srvUrl" }
+        }
+        if ($srvUrl) {
+            try {
+                $r = Invoke-WebRequest -Uri $srvUrl -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop
+                if ($r.StatusCode -eq 200) { $http = $true; break }
+            } catch { }
+        }
         Start-Sleep -Seconds 2
     }
     if ($srv.HasExited) {
         Log ("serwer zakonczyl sie sam: " + (DecodeExit $srv.ExitCode))
     } elseif ($http) {
-        Log "HTTP 200 z http://127.0.0.1:$Port/ - serwer dziala"
+        Log "HTTP 200 z $srvUrl - serwer dziala"
         Log ("procesy silnika: " + ((Get-Process jamovi-engine -ErrorAction SilentlyContinue | Measure-Object).Count))
         if (-not $NoGui) {
-            Log "W przegladarce (otworzyla sie sama albo wejdz na http://127.0.0.1:$Port/):"
+            Log "W przegladarce (otworzyla sie sama albo wejdz na $srvUrl):"
             Log "  otworz plik .omv (ikona folderu) -> Eksploracja -> Zmienne ilosciowe -> dodaj zmienna"
             Log "  oczekiwane: tabela + wykres (nie wieczny spinner)"
             $ans = Read-Host "Wpisz wynik (np. 'OK tabela i wykres' albo opis bledu) i nacisnij Enter"
             Log "WYNIK KROKU 8 (reka): $ans"
         }
     } else {
-        Log "serwer nie odpowiedzial na HTTP w 90 s (proces zyje: $(-not $srv.HasExited))"
+        Log "serwer nie odpowiedzial na HTTP w 120 s (proces zyje: $(-not $srv.HasExited); adres z logu: $srvUrl)"
     }
 } catch {
     Log ("blad uruchamiania serwera: " + $_)
