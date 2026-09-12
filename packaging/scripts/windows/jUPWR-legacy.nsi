@@ -25,11 +25,19 @@
 !ifndef VERSION
   !define VERSION  "1.0.4"                   ; wersja jUPWR (client/common/jupwr.ts) - rownac z jUPWR.nsi
 !endif
-!define PAYLOAD    "..\..\build\dist-legacy\jUPWR"
+; wariant 1 (Electron 22, R 4.6): domyslnie; wariant 3 (R 4.1.3):
+;   makensis /DDISTDIR=dist-legacy-r41 /DTAG=legacy-r41 jUPWR-legacy.nsi
+!ifndef DISTDIR
+  !define DISTDIR  "dist-legacy"
+!endif
+!ifndef TAG
+  !define TAG      "legacy"
+!endif
+!define PAYLOAD    "..\..\build\${DISTDIR}\jUPWR"
 !define ICON       "..\..\..\platform\app-icon.ico"
 
 Name "${APPDISPLAY} ${VERSION}"
-OutFile "..\..\build\dist-legacy\${APPNAME}-${VERSION}-legacy-win81-x64-setup.exe"
+OutFile "..\..\build\${DISTDIR}\${APPNAME}-${VERSION}-${TAG}-win81-x64-setup.exe"
 InstallDir "$LOCALAPPDATA\Programs\${APPID}"
 RequestExecutionLevel user            ; instalacja per-user (bez admina, idealne dla pracowni)
 SetCompressor /SOLID lzma
