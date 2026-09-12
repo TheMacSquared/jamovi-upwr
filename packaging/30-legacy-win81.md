@@ -364,12 +364,16 @@ nie plan — wtedy prosić IT o maszynę testową lub obraz VM.
   przejściowy **z zadeklarowaną datą wygaszenia** = modernizacja sal.
 - Próba na jednych zajęciach przed instalacją w całej sali; portable nie dotyka
   instalacji, więc powrót jest natychmiastowy.
-- Przy każdym wydaniu `main`: `git merge main` na legacy → konflikt w `build.ps1`
-  zawsze „weź `main`, nałóż blok LEGACY OVERRIDES" → zrównać `!define VERSION`
-  w obu `.nsi` → `release-check.sh --metadata-only` → build → test w sali tylko
-  gdy zmiana dotyczy zajęć w tej sali. W `CHANGELOG.md` wariant nie dostaje
-  własnego nagłówka `## x.y.z` (regex `release-check.sh:35`).
-- Zakończyć linię po modernizacji sal.
+- **Legacy jest ZAMROŻONE (decyzja 2026-09-12): bez merge `main → legacy`, bez
+  rozwoju, bez podbijania wersji.** Sale 8.1 dostają jUPWR 1.0.4 Legacy do czasu
+  modernizacji. Dotykać gałęzi tylko przy błędzie blokującym zajęcia: commit
+  wprost na `legacy/win81`, przebudowa wydanej paczki (A lub B), nowe sumy,
+  test w sali. Usunięte komentarze `#` z DESCRIPTION nie wymagają więc
+  cherry-picka na `main` (nie będzie merge'a, który by je przywrócił).
+- Zgodność `.omv`: pliki z Legacy otwierają się w nowszym jUPWR; pliki z nowszego
+  jUPWR z analizami nowszych modułów mogą nie otworzyć się w Legacy.
+- Zakończyć linię po modernizacji sal: odinstalować Legacy (osobny wpis),
+  zainstalować zwykły jUPWR.
 
 ## Ryzyka (malejąco)
 
