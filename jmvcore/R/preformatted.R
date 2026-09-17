@@ -76,7 +76,7 @@ Preformatted <- R6::R6Class("Preformatted",
         },
         asProtoBuf=function(incAsText=FALSE, status=NULL, includeState=TRUE) {
             element <- super$asProtoBuf(incAsText=TRUE, status=status, includeState=includeState)
-            element$preformatted <- private$.content
+            element$preformatted <- pbstr(private$.content)
             element
         }
     )

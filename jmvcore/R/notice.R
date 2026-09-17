@@ -67,7 +67,7 @@ Notice <- R6::R6Class("Notice",
         asProtoBuf=function(incAsText=FALSE, status=NULL, includeState=TRUE) {
             element <- super$asProtoBuf(incAsText=TRUE, status=status, includeState=includeState)
             element$notice$type <- private$.type
-            element$notice$content <- private$.content
+            element$notice$content <- pbstr(private$.content)
             element
         }
     )

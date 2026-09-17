@@ -240,9 +240,9 @@ Output <- R6::R6Class('Output',
 
                     outputPB <- RProtoBuf_new(jamovi.coms.ResultsOutput)
 
-                    outputPB$name <- private$.names[i]
-                    outputPB$title <- private$.titles[i]
-                    outputPB$description <- private$.descriptions[i]
+                    outputPB$name <- pbstr(private$.names[i])
+                    outputPB$title <- pbstr(private$.titles[i])
+                    outputPB$description <- pbstr(private$.descriptions[i])
                     outputPB$stale <- stale
 
                     mt <- private$.measureTypes[i]

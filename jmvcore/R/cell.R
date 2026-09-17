@@ -122,7 +122,7 @@ Cell <- R6::R6Class(
                 cell$i <- v
             }
             else if (inherits(v, "character")) {
-                cell$s <- v
+                cell$s <- pbstr(v)
             }
             else {
                 cell$o <- jamovi.coms.ResultsCell.Other$NOT_A_NUMBER

@@ -773,7 +773,7 @@ Table <- R6::R6Class('Table',
             for (column in private$.columns)
                 table$add('columns', column$asProtoBuf())
 
-            table$rowNames <- private$.rowNames
+            table$rowNames <- pbstr(private$.rowNames)
             table$swapRowsColumns <- private$.swapRowsColumns
             table$rowSelect <- substring(private$.rowSelect, 2, nchar(private$.rowSelect)-1)
             table$rowSelected <- self$rowSelected - 1

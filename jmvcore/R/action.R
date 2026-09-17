@@ -54,7 +54,7 @@ Action <- R6::R6Class("Action",
                 optionsPB$hasNames <- TRUE
                 for (value in private$.result) {
                     optionPB <- RProtoBuf::new(jamovi.coms.AnalysisOption)
-                    optionPB$s <- value
+                    optionPB$s <- pbstr(value)
                     optionsPB$add('options', optionPB)
                 }
                 element$action$result <- optionsPB

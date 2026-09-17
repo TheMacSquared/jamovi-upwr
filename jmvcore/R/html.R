@@ -139,9 +139,9 @@ Html <- R6::R6Class("Html",
         },
         asProtoBuf=function(incAsText=FALSE, status=NULL, includeState=TRUE) {
             element <- super$asProtoBuf(incAsText=TRUE, status=status, includeState=includeState)
-            element$html$content <- private$.content
-            element$html$scripts <- private$.scripts
-            element$html$stylesheets <- private$.stylesheets
+            element$html$content <- pbstr(private$.content)
+            element$html$scripts <- pbstr(private$.scripts)
+            element$html$stylesheets <- pbstr(private$.stylesheets)
             element
         }
     )

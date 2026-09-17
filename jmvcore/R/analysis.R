@@ -643,7 +643,7 @@ Analysis <- R6::R6Class('Analysis',
                 }
 
                 weightsInfo <- RProtoBuf_new(jamovi.coms.ResultsElement, name='.weights')
-                weightsInfo$notice$content <- message
+                weightsInfo$notice$content <- pbstr(message)
                 weightsInfo$notice$type <- type
                 prepend[[length(prepend)+1]] <- weightsInfo
             }
@@ -671,7 +671,7 @@ Analysis <- R6::R6Class('Analysis',
                         if ('type' %in% names)
                             refPB$type <- fullRef$type
                         if ('author' %in% names)
-                            refPB$authors$complete <- fullRef$author
+                            refPB$authors$complete <- pbstr(fullRef$author)
                         if ('year' %in% names) {
                             year <- fullRef$year
                             if (grepl('^[0-9]+$', year))
@@ -679,17 +679,17 @@ Analysis <- R6::R6Class('Analysis',
                             refPB$year2 <- as.character(year)
                         }
                         if ('title' %in% names)
-                            refPB$title <- fullRef$title
+                            refPB$title <- pbstr(fullRef$title)
                         if ('publisher' %in% names)
-                            refPB$publisher <- fullRef$publisher
+                            refPB$publisher <- pbstr(fullRef$publisher)
                         if ('url' %in% names)
-                            refPB$url <- fullRef$url
+                            refPB$url <- pbstr(fullRef$url)
                         if ('volume' %in% names)
                             refPB$volume <- paste(fullRef$volume)
                         if ('issue' %in% names)
                             refPB$issue <- paste(fullRef$issue)
                         if ('pages' %in% names)
-                            refPB$pages <- fullRef$pages
+                            refPB$pages <- pbstr(fullRef$pages)
                         response$add('references', refPB)
                     }
                 }
