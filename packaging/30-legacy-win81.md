@@ -286,10 +286,11 @@ administratora. Logi: `D:\PracaWspolne\sala-204-01-2026-09-17\`.
   działa). Paczki przepakowane z poprawionym jmvcore (jmvcore w `base/R`
   podmieniony w miejscu, potem `Compress-Archive` + `makensis`; nowe sumy
   w `SHA256SUMS-*.txt`). Wersje modułów bez bumpu (jmvcore to fork w drzewie).
-- **Ta sama poprawka należy się na `main`** — objaw dotknie każdą instalację
-  Windows, gdzie `.UTF-8` się nie ustawi (Windows 10 < 1803, nietypowe
-  konfiguracje). Legacy jest zamrożone, ale to „błąd blokujący zajęcia";
-  cherry-pick `71eaff4e` na `main` to osobna decyzja użytkownika (nie wykonana).
+- **Bez przenoszenia na `main`** (decyzja użytkownika 2026-09-17, powtórzona):
+  gałęzi legacy w żaden sposób nie miesza się z `main`. Objaw teoretycznie
+  dotyczy też zwykłego jUPWR tam, gdzie `.UTF-8` się nie ustawi (Windows 10
+  < 1803), ale to sprawa `main` do rozważenia osobno, poza tą gałęzią.
+- Gałąź `legacy/win81` wypchnięta na origin (2026-09-17).
 - Ścieżka do sprawdzenia w sali, nie do przewidywania: `enginer.cpp:266`
   `std::exit(1)` przy NULL z `serialize` (podwójna porażka) — nie wystąpiła.
 
