@@ -1,8 +1,10 @@
 # jUPWR Legacy — wariant dla Windows 8.1 x64
 
-> **Status (2026-09-12, wieczór): Faza 1 (Electron 22, R 4.6) i Faza 3 (R 4.1.3,
-> Rtools40) ZBUDOWANE i sprawdzone na Windows 11 — portable + instalatory
-> w `dist-legacy` i `dist-legacy-r41`; Faza 0 w sali NIE wykonana.** Dokument utrzymywać na obu gałęziach (`main`
+> **Status (2026-09-17): Faza 0 w sali WYKONANA (204-01, Windows 8.1 Pro) — obie
+> paczki startują, wczytują dane i rysują wykresy; każda analiza z tabelą padała
+> na kodowaniu (nie toolchain). Poprawka w jmvcore (`pbstr`, UTF-8 na granicy
+> R → protobuf) zrobiona i zweryfikowana lokalnie; paczki przepakowane.
+> Do zrobienia: pilot w sali z paczką A.** Dokument utrzymywać na obu gałęziach (`main`
 > i `legacy/win81`). Konsensus dwóch wcześniejszych planów z 2026-09-07
 > (`40-jupwr-old-plan.md`, `40-legacy-win81.md`); fakty zweryfikowane na
 > `main` = e94edc57 (jUPWR 1.0.4).
@@ -241,6 +243,55 @@ Electron 21 przepisał tę metodę, marginesy/format mogą się różnić od 43.
   paczkami na pendrive. Kolejność testu w sali: r41 najpierw (najgłębszy
   fallback), potem r46 (Electron 22 + R 4.6) — jeśli r46 działa, jest lżejszy
   w utrzymaniu (ten sam R co `main`).
+
+### Faza 0 w sali — wynik (2026-09-17, komputer 204-01)
+
+Maszyna: Windows 8.1 Pro 6.3.9600 x64, i3-4130, 12 GB, KB2919355 i KB2999226
+zainstalowane, ucrtbase 10.0.14393, ESET Endpoint 5.0 (nie blokował), konto
+administratora. Logi: `D:\PracaWspolne\sala-204-01-2026-09-17\`.
+
+- **Obie paczki (A: R 4.6, B: R 4.1.3): kroki 3–8 OK, `jUPWR.exe` startuje**,
+  dane z biblioteki wczytują się, wykresy się rysują. Cała drabina Faz 1–3
+  okazała się zabezpieczeniem przed ryzykiem, które nie wystąpiło — toolchain,
+  UCRT, Electron 22, pakiety R działają na 8.1.
+- **Każda analiza z tabelą** (opisowe, testy) kończyła się komunikatem „Analiza
+  została przerwana, prawdopodobnie z powodu przekroczenia limitu zasobów" —
+  w obu paczkach. Logi serwera: 4× `String field 'jamovi.coms.ResultsElement.title'
+  contains invalid UTF-8 data`, potem `DecodeError: String field had bad UTF-8`
+  w `engine.py:395 (_run_loop)` i `Restarting engine`. Silnik żył cały czas.
+- **Przyczyna** (diagnoza z handoffu macOS 2026-09-17, potwierdzona lokalnie):
+  `enginer.cpp:463` prosi o `Sys.setlocale('LC_ALL', '.UTF-8')`, co CRT honoruje
+  tylko z UCRT na Windows 10 ≥ 1803. Na 8.1 (i w każdym R z MSVCRT, czyli ≤ 4.1)
+  R zostaje w `Polish_Poland.1250`. `format()` zwraca napisy w kodowaniu
+  natywnym, RProtoBuf kopiuje bajty bez konwersji → CP1250 w polach `string`.
+  jamovi 2.3.28 nie miało tej linii (weszła 2024-04), stąd „kiedyś działało".
+- **Reprodukcja bez sali**: paczka B na Windows 11 zachowuje się identycznie
+  (MSVCRT nie zna `.UTF-8` niezależnie od wersji Windows). Skrypt: analiza
+  jEksplor/jTestyT z polskimi nazwami zmiennych i poziomów → `analysis$serialize()`
+  → `ParseFromString` w Pythonie paczki. Przed: `invalid UTF-8` w
+  `ResultsElement.title` i `ResultsColumn.title`, parse pada. Po: czysto,
+  parse OK, tytuły „Zmienne ilościowe", „Wartości skrajne: Długość działki".
+- **Poprawka** (commit na `legacy/win81`, jmvcore): `pbstr()` = `enc2utf8` dla
+  `character`; `RProtoBuf_new` konwertuje wszystkie argumenty tekstowe;
+  przypisania pól (`rowNames`, komórki tekstowe, html/notice/preformatted,
+  outputs, action, notice o wagach, referencje) przez `pbstr()`. No-op dla
+  ASCII i napisów już UTF-8. Test: `jmvcore/tests/testthat/test-protobuf-utf8.R`
+  (przechodzi pod R 4.1.3 i 4.6). Przez serwer + silnik paczki B: struktura
+  wyników z polskimi tytułami bez `DecodeError` i bez restartu.
+- **`legacy-diag.ps1`** wykrywa teraz `invalid UTF-8` / `Restarting engine`
+  w logach i mówi wprost, że to kodowanie, nie zasoby; brama decyzyjna
+  w podsumowaniu zaktualizowana.
+- **Decyzja**: wydać **paczkę A** (ten sam R co `main`) — obie działają na 8.1,
+  A jest lżejsza w utrzymaniu. B zostaje w zapasie (po tej samej poprawce też
+  działa). Paczki przepakowane z poprawionym jmvcore (jmvcore w `base/R`
+  podmieniony w miejscu, potem `Compress-Archive` + `makensis`; nowe sumy
+  w `SHA256SUMS-*.txt`). Wersje modułów bez bumpu (jmvcore to fork w drzewie).
+- **Ta sama poprawka należy się na `main`** — objaw dotknie każdą instalację
+  Windows, gdzie `.UTF-8` się nie ustawi (Windows 10 < 1803, nietypowe
+  konfiguracje). Legacy jest zamrożone, ale to „błąd blokujący zajęcia";
+  cherry-pick `71eaff4e` na `main` to osobna decyzja użytkownika (nie wykonana).
+- Ścieżka do sprawdzenia w sali, nie do przewidywania: `enginer.cpp:266`
+  `std::exit(1)` przy NULL z `serialize` (podwójna porażka) — nie wystąpiła.
 
 ## Faza 2 — rezerwa: launcher bez Electrona
 
