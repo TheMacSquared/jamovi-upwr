@@ -280,11 +280,21 @@ Log ("6 pakiety R:         " + (DecodeExit $c6) + "  (szczegoly wyzej)")
 Log ("7 jamovi-engine.exe: " + (DecodeExit $c7) + "  (blad o argumentach = OK)")
 if ($http) { Log "8 serwer HTTP:       OK" } else { Log "8 serwer HTTP:       NIE" }
 Log ""
-Log "Brama decyzyjna (packaging/30-legacy-win81.md, Faza 0):"
-Log "  3-8 OK, 9 pada          -> Faza 1 (Electron 22)"
-Log "  4 pada / 3 pada z UCRT  -> R1: nie cofac toolchainu, eskalacja do IT"
-Log "  brak KB2919355          -> Faza 2 (launcher bez Electrona)"
-Log "  brak KB2999226/ucrtbase -> IT musi doinstalowac UCRT"
+$utf8bad = 0
+foreach ($f in $srvOut, $srvErr, $exeOut, $exeErr) {
+    if (Test-Path $f) { $utf8bad += (Select-String -Path $f -Pattern 'invalid UTF-8|bad UTF-8|Restarting engine' | Measure-Object).Count }
+}
+if ($utf8bad -gt 0) {
+    Log "UWAGA: w logach serwera/Electrona sa wpisy 'invalid UTF-8' / 'Restarting engine' ($utf8bad)."
+    Log "  To NIE jest limit zasobow ani problem toolchainu: R pracuje w code page systemu (brak locale"
+    Log "  .UTF-8), a napisy trafiaja do protobufa bez konwersji. Paczka bez poprawki jmvcore (pbstr)."
+}
+Log "Brama decyzyjna (packaging/30-legacy-win81.md):"
+Log "  9 OK i analiza z tabela liczy sie  -> paczka gotowa do pilotazu"
+Log "  9 OK, tabele 'przerwane'            -> patrz UWAGA wyzej (kodowanie), nie toolchain"
+Log "  8 OK, 9 pada                        -> sprawdz KB2919355 i GPU; wariant bez Electrona"
+Log "  4 pada / 5 pada                     -> paczka r41 (R 4.1.3, bez UCRT); potem IT"
+Log "  brak KB2999226/ucrtbase            -> paczka r41 (silnik i R bez UCRT)"
 Log ""
 Log "Log zapisany: $LogFile"
 Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
