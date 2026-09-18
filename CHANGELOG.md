@@ -4,6 +4,22 @@ Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modu
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
 ## Niewydane
+- Wykresy (scatr 2.9.2), domyślne zachowanie bez zmian:
+  - wykres waflowy ze zmienną grupującą dostaje rozmiar z siatki paneli —
+    znikają białe pasy nad i pod rzędem paneli (kwadratowe kafelki
+    w kwadratowym obrazie 500×500),
+  - wykres radarowy, współrzędne równoległe i korelogram: przy zbyt małej
+    liczbie zmiennych notka „Ten wykres wymaga co najmniej N zmiennych"
+    zamiast pustego miejsca,
+  - wykres radarowy: lista „Skalowanie osi" — min–maks obserwacji (jak dotąd),
+    odporny min–maks (percentyle 5–95), procent największej średniej grupowej,
+    rangi percentylowe; przy skośnych danych min–maks ściskał wielokąty
+    do środka,
+  - wykres chmurowy, punktowy ze średnią i skrzypcowy: lista „Układ punktów"
+    z rojem (beeswarm, własna geometria, deterministyczna); w chmurowym
+    dodatkowo stosy punktów,
+  - wykres skrzypcowy z dwiema zmiennymi grupującymi: pudełko w środku
+    rysuje się po jednym na podgrupę (było jedno na kategorię).
 - Nazwa dystrybucji w miejscach, gdzie została jeszcze marka jamovi:
   nagłówek okna i tytuł karty/paska zadań pokazują „jUPWR" zamiast „jamovi",
   a ekran startowy (`electron/app/splash.html`) — znak „jU" w barwach jUPWR

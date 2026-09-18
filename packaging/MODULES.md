@@ -10,7 +10,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | Moduł (katalog) | Nazwa w jamovi | Rola | Dystrybucja | Wersja |
 |---|---|---|---|---|
 | `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.4 |
-| `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 26 wykresów) | wbudowany | 2.9.1 |
+| `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 26 wykresów) | wbudowany | 2.9.2 |
 | `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.3.3 |
 | `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.3 |
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.3 |
