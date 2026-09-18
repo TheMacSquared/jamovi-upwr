@@ -4,6 +4,12 @@ Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modu
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
 ## Niewydane
+
+## 1.0.5 — 2026-09-18
+Nowy moduł opcjonalny jPomiar, rozszerzenia wykresów (scatr 2.9.2), marka jUPWR
+w nagłówku okna i na ekranie startowym oraz poprawki instalatora Windows i builda
+macOS. Domyślne zachowanie istniejących analiz i wykresów bez zmian.
+
 - Nowy opcjonalny moduł jPomiar 0.2.0 (menu „Pomiary”): powtarzane pomiary,
   prosty budżet niepewności i propagacja dla sumy, różnicy, iloczynu i ilorazu
   z korelacją oraz kowariancja i elipsy 2D (standardowa, rozrzutu, ufności
