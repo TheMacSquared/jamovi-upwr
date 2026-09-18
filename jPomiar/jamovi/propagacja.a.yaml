@@ -1,0 +1,60 @@
+---
+name: propagacja
+title: Propagacja niepewności
+menuGroup: Pomiary
+version: 1.0.0
+jas: '1.2'
+options:
+  - name: data
+    type: Data
+  - name: model
+    title: Wzór
+    type: List
+    options:
+      - name: sum
+        title: 'Suma: z = x + y'
+      - name: difference
+        title: 'Różnica: z = x − y'
+      - name: product
+        title: 'Iloczyn: z = x × y'
+      - name: ratio
+        title: 'Iloraz: z = x / y (np. prędkość, gęstość)'
+    default: sum
+  - name: x
+    title: Wartość x
+    type: Number
+    default: 0
+  - name: ux
+    title: Niepewność standardowa u(x)
+    type: Number
+    default: 0
+    min: 0
+  - name: y
+    title: Wartość y
+    type: Number
+    default: 1
+  - name: uy
+    title: Niepewność standardowa u(y)
+    type: Number
+    default: 0
+    min: 0
+  - name: useCorrelation
+    title: Uwzględnij korelację wielkości wejściowych
+    type: Bool
+    default: false
+  - name: rho
+    title: Korelacja ρ
+    type: Number
+    default: 0
+    min: -1
+    max: 1
+  - name: coverageK
+    title: Mnożnik wyniku k (nie poziom ufności)
+    type: Number
+    default: 2
+    min: 0.001
+  - name: showPlot
+    title: Składniki wariancji wyniku
+    type: Bool
+    default: false
+...

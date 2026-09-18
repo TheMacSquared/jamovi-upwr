@@ -1,0 +1,68 @@
+---
+name: powtorzenia
+title: Powtarzane pomiary
+jrs: '1.1'
+items:
+  - name: summary
+    title: Seria pomiarowa
+    type: Table
+    rows: 0
+    clearWith:
+      - dep
+      - useReference
+      - reference
+      - showPlot
+    columns:
+      - name: n
+        title: n
+        type: integer
+      - name: missing
+        title: Pominięte braki
+        type: integer
+      - name: mean
+        title: Średnia
+        type: number
+      - name: sd
+        title: SD pojedynczego pomiaru
+        type: number
+      - name: se
+        title: u_A średniej
+        type: number
+  - name: comparison
+    title: Porównanie z odniesieniem
+    type: Table
+    rows: 0
+    clearWith:
+      - dep
+      - useReference
+      - reference
+      - showPlot
+    columns:
+      - name: reference
+        title: Odniesienie
+        type: number
+      - name: difference
+        title: Średnia − odniesienie
+        type: number
+    visible: (useReference)
+  - name: info
+    title: Interpretacja i założenia
+    type: Html
+    clearWith:
+      - dep
+      - useReference
+      - reference
+      - showPlot
+  - name: plot
+    title: Pomiary
+    type: Image
+    visible: (showPlot)
+    width: 580
+    height: 380
+    renderFun: .plot
+    clearWith:
+      - dep
+      - useReference
+      - reference
+      - showPlot
+...

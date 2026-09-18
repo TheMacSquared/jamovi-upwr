@@ -1,0 +1,39 @@
+---
+title: Propagacja niepewności
+name: propagacja
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: Label
+    label: Model i dane wejściowe
+    children:
+      - type: ComboBox
+        name: model
+      - type: TextBox
+        name: x
+        format: number
+      - type: TextBox
+        name: ux
+        format: number
+      - type: TextBox
+        name: y
+        format: number
+      - type: TextBox
+        name: uy
+        format: number
+  - type: Label
+    label: Zależność i wyniki
+    children:
+      - type: CheckBox
+        name: useCorrelation
+      - type: TextBox
+        name: rho
+        format: number
+        enable: (useCorrelation)
+      - type: TextBox
+        name: coverageK
+        format: number
+      - type: CheckBox
+        name: showPlot
+...

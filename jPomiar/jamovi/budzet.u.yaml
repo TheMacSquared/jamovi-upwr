@@ -1,0 +1,53 @@
+---
+title: Budżet niepewności
+name: budzet
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: Label
+    label: Wynik pomiaru
+    children:
+      - type: TextBox
+        name: value
+        format: number
+      - type: CheckBox
+        name: useCorrection
+      - type: TextBox
+        name: correction
+        format: number
+        enable: (useCorrection)
+  - type: Label
+    label: Niezależne składniki niepewności
+    children:
+      - type: CheckBox
+        name: includeA
+      - type: TextBox
+        name: uA
+        format: number
+        enable: (includeA)
+      - type: CheckBox
+        name: includeCalibration
+      - type: TextBox
+        name: calibrationU
+        format: number
+        enable: (includeCalibration)
+      - type: TextBox
+        name: calibrationK
+        format: number
+        enable: (includeCalibration)
+      - type: CheckBox
+        name: includeResolution
+      - type: TextBox
+        name: resolution
+        format: number
+        enable: (includeResolution)
+  - type: Label
+    label: Wyniki
+    children:
+      - type: TextBox
+        name: coverageK
+        format: number
+      - type: CheckBox
+        name: showPlot
+...

@@ -81,8 +81,9 @@ złagodzić wewnątrz skryptu — 5.1 przerywa na parsowaniu, przed pierwszą in
 Prereqs sprawdzane na starcie: VS2022 Build Tools (VCTools), RTools45, R 4.6.0,
 Boost 1.84, Node 20+, cmake, protoc.
 
-Skrypt jest idempotentny tam, gdzie to tanie. `.jmo` powstają w krokach **4e** (jRISK)
-i **4f** (jSpace); jSpace budowany jest **bez** `--skip-deps` — `jmc` dociąga `sf`/`terra`/
+Skrypt jest idempotentny tam, gdzie to tanie. `.jmo` powstają w krokach **4e** (jRISK),
+**4f** (jSpace), **4g** (jRol) i **4h** (jPomiar).
+jSpace budowany jest **bez** `--skip-deps` — `jmc` dociąga `sf`/`terra`/
 `asteRisk` z przypiętego snapshotu CRAN i pakuje je do `.jmo`, żeby moduł był
 samowystarczalny. Pierwszy build tego kroku trwa długo i wymaga internetu.
 

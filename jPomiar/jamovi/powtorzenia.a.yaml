@@ -1,0 +1,29 @@
+---
+name: powtorzenia
+title: Powtarzane pomiary
+menuGroup: Pomiary
+version: 1.0.0
+jas: '1.2'
+options:
+  - name: data
+    type: Data
+  - name: dep
+    title: Wynik pomiaru
+    type: Variable
+    suggested:
+      - continuous
+    permitted:
+      - numeric
+  - name: useReference
+    title: Porównaj z wartością odniesienia
+    type: Bool
+    default: false
+  - name: reference
+    title: Wartość odniesienia
+    type: Number
+    default: 0
+  - name: showPlot
+    title: Pomiary w kolejności wierszy
+    type: Bool
+    default: false
+...

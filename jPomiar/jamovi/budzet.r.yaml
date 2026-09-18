@@ -1,0 +1,111 @@
+---
+name: budzet
+title: Budżet niepewności
+jrs: '1.1'
+items:
+  - name: summary
+    title: Wynik i niepewność
+    type: Table
+    rows: 0
+    clearWith:
+      - value
+      - useCorrection
+      - correction
+      - includeA
+      - uA
+      - includeCalibration
+      - calibrationU
+      - calibrationK
+      - includeResolution
+      - resolution
+      - coverageK
+      - showPlot
+    columns:
+      - name: estimate
+        title: Wynik
+        type: number
+      - name: uc
+        title: Niepewność standardowa u_c
+        type: number
+      - name: k
+        title: k
+        type: number
+      - name: expanded
+        title: Niepewność rozszerzona U
+        type: number
+      - name: lower
+        title: Wynik − U
+        type: number
+      - name: upper
+        title: Wynik + U
+        type: number
+  - name: components
+    title: Budżet (c = 1 dla każdego składnika)
+    type: Table
+    rows: 0
+    clearWith:
+      - value
+      - useCorrection
+      - correction
+      - includeA
+      - uA
+      - includeCalibration
+      - calibrationU
+      - calibrationK
+      - includeResolution
+      - resolution
+      - coverageK
+      - showPlot
+    columns:
+      - name: source
+        title: Składnik
+        type: text
+      - name: method
+        title: Ocena
+        type: text
+      - name: u
+        title: Niepewność standardowa
+        type: number
+      - name: variance
+        title: Wkład do wariancji
+        type: number
+      - name: share
+        title: Udział (%)
+        type: number
+  - name: info
+    title: Interpretacja i założenia
+    type: Html
+    clearWith:
+      - value
+      - useCorrection
+      - correction
+      - includeA
+      - uA
+      - includeCalibration
+      - calibrationU
+      - calibrationK
+      - includeResolution
+      - resolution
+      - coverageK
+      - showPlot
+  - name: plot
+    title: Składniki wariancji
+    type: Image
+    visible: (showPlot)
+    width: 580
+    height: 380
+    renderFun: .plot
+    clearWith:
+      - value
+      - useCorrection
+      - correction
+      - includeA
+      - uA
+      - includeCalibration
+      - calibrationU
+      - calibrationK
+      - includeResolution
+      - resolution
+      - coverageK
+      - showPlot
+...

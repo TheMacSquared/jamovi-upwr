@@ -26,7 +26,8 @@ NSIS="$(awk '/^[[:space:]]*!define VERSION / {gsub(/"/, "", $3); print $3}' pack
 [ -n "$JUPWR" ] && [ "$JUPWR" = "$NSIS" ] && ok "Windows NSIS = $NSIS" || bad "wersja NSIS ($NSIS) != jupwr.ts ($JUPWR)"
 
 # listy modułów wbudowanych w trzech buildach
-DOCKER="$(grep -oE '^COPY \$JAMOVI_ROOT/[A-Za-z]+/ /tmp/source/' docker/jamovi-Dockerfile | grep -oE 'ROOT/[A-Za-z]+' | cut -d/ -f2 | grep -vE '^(server|client|engine|jmvcore|jamovi-compiler|readstat|platform|version|i18n)$' | sort | tr '\n' ' ')"
+# Only the jmv stage supplies preinstalled modules; optional artifact stages do not.
+DOCKER="$(awk '/^FROM / { bundled = ($0 ~ / AS jmv$/) } bundled { print }' docker/jamovi-Dockerfile | grep -oE '^COPY \$JAMOVI_ROOT/[A-Za-z]+/ /tmp/source/' | grep -oE 'ROOT/[A-Za-z]+' | cut -d/ -f2 | sort | tr '\n' ' ')"
 MAC="$(grep -oE '^MODULES=\([^)]*\)' packaging/scripts/macos/20-modules.sh | sed 's/MODULES=(//;s/)//' | tr ' ' '\n' | sort | tr '\n' ' ')"
 WIN="$(grep -oE "^\\\$Modules *= *@\([^)]*\)" packaging/scripts/windows/build.ps1 | grep -oE "'[A-Za-z]+'" | tr -d "'" | sort | tr '\n' ' ')"
 if [ -n "$DOCKER" ] && [ "$DOCKER" = "$MAC" ] && [ "$MAC" = "$WIN" ]; then ok "wbudowane (Docker = macOS = Windows): $MAC"

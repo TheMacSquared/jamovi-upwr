@@ -52,7 +52,7 @@ $ElectronVer= "43.4.1"
 $PbsUrl     = "https://github.com/astral-sh/python-build-standalone/releases/download/20250612/cpython-3.12.11+20250612-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
 $NanomsgUrl = "https://github.com/nanomsg/nanomsg/archive/refs/tags/1.2.tar.gz"
 $CranRepo   = "https://packagemanager.posit.co/cran/latest"
-$Modules    = @('jmv','plots','jperm','jCI','jdistrACTION','jDane','jANOVA','jTestyT','jCzest','jEksplor','jRegr')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f, jRol 4g
+$Modules    = @('jmv','plots','jperm','jCI','jdistrACTION','jDane','jANOVA','jTestyT','jCzest','jEksplor','jRegr')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f, jRol 4g, jPomiar 4h
 
 $ProgressPreference = 'SilentlyContinue'
 function Step($m){ Write-Host "`n==> $m" -ForegroundColor Cyan }
@@ -199,7 +199,7 @@ $jmc = Join-Path $RepoRoot "jamovi-compiler\index.js"
 # Bajty (a nie Get-Content/Set-Content), bo skrypt bywa uruchamiany pod Windows
 # PowerShell 5.1, gdzie `-Encoding UTF8` dopisuje BOM i psuje pliki.
 $YamlBackup = @{}
-foreach ($m in ($Modules + @('jRISK','jSpace','jRol'))) {   # + kazdy modul opcjonalny z krokow 4e-4g
+foreach ($m in ($Modules + @('jRISK','jSpace','jRol','jPomiar'))) {   # + kazdy modul opcjonalny z krokow 4e-4h
     $y = Join-Path $RepoRoot "$m\jamovi\0000.yaml"
     if (Test-Path $y) { $YamlBackup[$y] = [System.IO.File]::ReadAllBytes($y) }
 }
@@ -261,6 +261,18 @@ Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jRol"), '--jmo', $JmoR,
              '--assume-app-version', $JamoviVer, '--skip-deps') "jRol .jmo"
 if (-not (Test-Path $JmoR)) { throw "jRol: plik .jmo nie powstal" }
 Info "jRol .jmo OK ($JmoR)"
+
+# 4h. jPomiar jako modul OPCJONALNY — pomiary i niepewnosc; zaleznosci w base\R.
+$JpomiarVer = ((Select-String -Path (Join-Path $RepoRoot "jPomiar\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
+$JpomiarDesc = ((Select-String -Path (Join-Path $RepoRoot "jPomiar\DESCRIPTION") -Pattern "^Version:\s*([0-9.]+)").Matches.Groups[1].Value)
+if ($JpomiarVer -ne $JpomiarDesc) { throw "jPomiar: wersje 0000.yaml i DESCRIPTION roznia sie" }
+$JmoP = "$Dist\jPomiar_$JpomiarVer-win64.jmo"
+if (Test-Path $JmoP) { Remove-Item $JmoP -Force }
+Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jPomiar"), '--jmo', $JmoP,
+             '--rhome', $RHome, '--rlibs', "$BaseR;$UserLib",
+             '--assume-app-version', $JamoviVer, '--skip-deps') "jPomiar .jmo"
+if (-not (Test-Path $JmoP)) { throw "jPomiar: plik .jmo nie powstal" }
+Info "jPomiar .jmo OK ($JmoP)"
 
 }
 finally {

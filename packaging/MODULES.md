@@ -23,10 +23,13 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.4 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
 | `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.2 |
+| `jPomiar/` | jPomiar | powtarzane pomiary, budżet niepewności, propagacja z korelacją, kowariancja i elipsy 2D; pilotaż międzykierunkowy | **opcjonalny — `.jmo` (sideload)** | 0.2.0 |
 
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
 jeden kurs jest **opcjonalny** i trafia do studentów jako plik `.jmo` (Moduły → Sideload).
 Dzięki temu poprawka w takim module nie wymaga reinstalacji aplikacji.
+`jPomiar` jest opcjonalnym pilotażem międzykierunkowym; preinstalacja wymaga
+potwierdzenia wykorzystania w większości kursów.
 
 Gdzie jest zdefiniowana lista wbudowanych (musi być identyczna w trzech miejscach):
 `docker/jamovi-Dockerfile` (bloki `COPY`+`jmc --install`), `packaging/scripts/macos/20-modules.sh`
@@ -45,6 +48,9 @@ wymaga osobnego builda, na maszynie z tą platformą:
 | jSpace | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4f) | `packaging\build\dist\jSpace_<wersja>-win64.jmo` |
 | jRol | macOS arm64 | `packaging/scripts/macos/72-jmo-jrol.sh` | `packaging/build/dist/jRol_<wersja>-macos-arm64.jmo` |
 | jRol | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4g) | `packaging\build\dist\jRol_<wersja>-win64.jmo` |
+| jPomiar | Linux (Docker) | `packaging/scripts/build-jpomiar-docker.sh` | `packaging/build/dist/jPomiar_<wersja>-linux.jmo` |
+| jPomiar | macOS arm64 | `packaging/scripts/macos/73-jmo-jpomiar.sh` | `packaging/build/dist/jPomiar_<wersja>-macos-arm64.jmo` |
+| jPomiar | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4h) | `packaging\build\dist\jPomiar_<wersja>-win64.jmo` |
 
 Nowy moduł opcjonalny = kopia tych dwóch kroków z podmienioną nazwą + wiersz w tabeli wyżej.
 
@@ -125,6 +131,19 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 | 0.9.4 | 28.2 | 0.1.0 | ✅ 2026-09-03 | ✅ 2026-09-03 |
 | 0.9.2.2 | 28.2 | 0.1.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 
+### jPomiar
+
+| jUPWR | jamovi | jPomiar | `.jmo` macOS | `.jmo` Windows |
+|---|---|---|---|---|
+| 1.0.4 | 28.2 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |
+
+Pilotaż dodany po wydaniu 1.0.4; nie był częścią jego artefaktów. Testy obliczeń,
+kompilacja jmc i testy integracyjne wykonane lokalnie na Linux x64 / R 4.6.0.
+Docker oraz sideload w aplikacji pozostają do sprawdzenia (brak demona Docker
+w środowisku implementacji; podczas rozszerzania do 0.2.0 również brak
+działającego polecenia Docker Compose). Lokalny `.jmo` nie zastępuje artefaktu referencyjnego.
+Ćwiczenia i założenia: [`jPomiar/README.md`](../jPomiar/README.md).
+
 ## Procedura wydania jUPWR — checklist
 
 1. Bump wersji: `client/common/jupwr.ts` i tag w `docker-compose.yaml` (skrypty packagingu
@@ -132,7 +151,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 2. Wpis w `CHANGELOG.md` (wersja, data, zmiany, wersje modułów).
 3. Docker: `docker compose --profile main build` + smoke test.
 4. Build natywny dla bieżącej maszyny (macOS: `00`→`60`, **plus `70-jmo-*` dla każdego modułu
-   opcjonalnego**; Windows: `build.ps1`, który robi `.jmo` w krokach 4e i 4f).
+   opcjonalnego**; Windows: `build.ps1`, który robi `.jmo` w krokach 4e–4h).
    Pełna procedura z testami: Windows — [`docs/handouts/build-windows.md`](../docs/handouts/build-windows.md),
    macOS — [`docs/handouts/build-macos.md`](../docs/handouts/build-macos.md).
 5. Uzupełnij macierz zgodności wyżej (które `.jmo` zbudowano, na jakiej platformie).

@@ -1,0 +1,63 @@
+---
+name: budzet
+title: Budżet niepewności
+menuGroup: Pomiary
+version: 1.0.0
+jas: '1.2'
+options:
+  - name: data
+    type: Data
+  - name: value
+    title: Wartość zmierzona / średnia
+    type: Number
+    default: 0
+  - name: useCorrection
+    title: Zastosuj znaną poprawkę
+    type: Bool
+    default: false
+  - name: correction
+    title: Poprawka dodawana do wyniku
+    type: Number
+    default: 0
+  - name: includeA
+    title: Uwzględnij niepewność typu A
+    type: Bool
+    default: false
+  - name: uA
+    title: Niepewność standardowa typu A
+    type: Number
+    default: 0
+    min: 0
+  - name: includeCalibration
+    title: Uwzględnij niepewność wzorcowania
+    type: Bool
+    default: false
+  - name: calibrationU
+    title: Niepewność rozszerzona ze świadectwa U
+    type: Number
+    default: 0
+    min: 0
+  - name: calibrationK
+    title: Współczynnik k ze świadectwa
+    type: Number
+    default: 2
+    min: 0.001
+  - name: includeResolution
+    title: Uwzględnij rozdzielczość
+    type: Bool
+    default: false
+  - name: resolution
+    title: Krok wskazania d
+    type: Number
+    default: 0
+    min: 0
+  - name: coverageK
+    title: Mnożnik wyniku k (nie poziom ufności)
+    type: Number
+    default: 2
+    min: 0.001
+  - name: showPlot
+    title: Udziały składników w wariancji
+    type: Bool
+    default: false
+...

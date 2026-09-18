@@ -1,0 +1,30 @@
+---
+title: Powtarzane pomiary
+name: powtorzenia
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Wynik pomiaru
+        children:
+          - type: VariablesListBox
+            name: dep
+            isTarget: true
+            maxItemCount: 1
+  - type: Label
+    label: Porównanie i wykres
+    children:
+      - type: CheckBox
+        name: useReference
+      - type: TextBox
+        name: reference
+        format: number
+        enable: (useReference)
+      - type: CheckBox
+        name: showPlot
+...

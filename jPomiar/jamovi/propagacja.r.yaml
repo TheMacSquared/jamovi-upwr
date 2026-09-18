@@ -1,0 +1,117 @@
+---
+name: propagacja
+title: Propagacja niepewności
+jrs: '1.1'
+items:
+  - name: summary
+    title: Wynik i niepewność
+    type: Table
+    rows: 0
+    clearWith:
+      - model
+      - x
+      - ux
+      - y
+      - uy
+      - useCorrelation
+      - rho
+      - coverageK
+      - showPlot
+    columns:
+      - name: estimate
+        title: Wynik
+        type: number
+      - name: uc
+        title: Niepewność standardowa u_c
+        type: number
+      - name: k
+        title: k
+        type: number
+      - name: expanded
+        title: Niepewność rozszerzona U
+        type: number
+      - name: lower
+        title: Wynik − U
+        type: number
+      - name: upper
+        title: Wynik + U
+        type: number
+  - name: inputs
+    title: Współczynniki wrażliwości
+    type: Table
+    rows: 0
+    clearWith:
+      - model
+      - x
+      - ux
+      - y
+      - uy
+      - useCorrelation
+      - rho
+      - coverageK
+      - showPlot
+    columns:
+      - name: input
+        title: Wejście
+        type: text
+      - name: value
+        title: Wartość
+        type: number
+      - name: u
+        title: Niepewność standardowa
+        type: number
+      - name: c
+        title: Pochodna c
+        type: number
+  - name: components
+    title: Składniki wariancji
+    type: Table
+    rows: 0
+    clearWith:
+      - model
+      - x
+      - ux
+      - y
+      - uy
+      - useCorrelation
+      - rho
+      - coverageK
+      - showPlot
+    columns:
+      - name: source
+        title: Składnik
+        type: text
+      - name: variance
+        title: Wkład do wariancji
+        type: number
+  - name: info
+    title: Interpretacja i założenia
+    type: Html
+    clearWith:
+      - model
+      - x
+      - ux
+      - y
+      - uy
+      - useCorrelation
+      - rho
+      - coverageK
+      - showPlot
+  - name: plot
+    title: Składniki wariancji
+    type: Image
+    visible: (showPlot)
+    width: 580
+    height: 380
+    renderFun: .plot
+    clearWith:
+      - model
+      - x
+      - ux
+      - y
+      - uy
+      - useCorrelation
+      - rho
+      - coverageK
+      - showPlot
+...

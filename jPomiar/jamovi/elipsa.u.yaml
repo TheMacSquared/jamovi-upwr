@@ -1,0 +1,40 @@
+---
+name: elipsa
+title: Kowariancja i elipsa 2D
+jus: '3.0'
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: Współrzędna X
+        children:
+          - type: VariablesListBox
+            name: x
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Współrzędna Y
+        children:
+          - type: VariablesListBox
+            name: y
+            isTarget: true
+            maxItemCount: 1
+  - type: Label
+    label: Elipsa (wspólna jednostka współrzędnych)
+    children:
+      - type: ComboBox
+        name: ellipseType
+      - type: TextBox
+        name: level
+        format: number
+        enable: (ellipseType:scatter || ellipseType:mean)
+      - type: CheckBox
+        name: showPlot
+      - type: CheckBox
+        name: showAxes
+        enable: (showPlot)
+...

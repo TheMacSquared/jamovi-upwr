@@ -1,0 +1,49 @@
+---
+name: elipsa
+title: Kowariancja i elipsa 2D
+menuGroup: Pomiary
+version: 1.0.0
+jas: '1.2'
+options:
+  - name: data
+    type: Data
+  - name: x
+    title: Współrzędna X
+    type: Variable
+    suggested:
+      - continuous
+    permitted:
+      - numeric
+  - name: y
+    title: Współrzędna Y
+    type: Variable
+    suggested:
+      - continuous
+    permitted:
+      - numeric
+  - name: ellipseType
+    title: Rodzaj elipsy
+    type: List
+    options:
+      - name: standard
+        title: Elipsa standardowa (półosie 1 SD)
+      - name: scatter
+        title: Elipsa rozrzutu (przybliżenie normalne)
+      - name: mean
+        title: Obszar ufności średniego położenia (Hotelling)
+    default: standard
+  - name: level
+    title: Poziom (%) — rozrzut lub ufność średniej
+    type: Number
+    min: 50
+    max: 99.9
+    default: 95
+  - name: showPlot
+    title: Wykres elipsy i pomiarów
+    type: Bool
+    default: false
+  - name: showAxes
+    title: Osie główne na wykresie
+    type: Bool
+    default: false
+...

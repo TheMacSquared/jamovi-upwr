@@ -1,0 +1,19 @@
+Package: jPomiar
+Type: Package
+Title: Pomiary i niepewność dla jamovi
+Version: 0.2.0
+Author: jUPWR Team
+Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+Description: Podstawy analizy danych pomiarowych: powtarzane pomiary,
+    prosty budżet niepewności oraz propagacja niepewności z uwzględnieniem
+    korelacji dla sumy, różnicy, iloczynu i ilorazu. Kowariancja pomiarów
+    dwuwymiarowych, osie główne i elipsy rozrzutu oraz ufności średniej.
+License: GPL (>= 2)
+Encoding: UTF-8
+Imports:
+    jmvcore (>= 2.4.2),
+    R6,
+    ggplot2
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

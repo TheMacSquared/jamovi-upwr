@@ -56,15 +56,17 @@ module nie wymagają reinstalacji całej aplikacji.
 | **jRISK** | Ryzyko i niezawodność: zdarzenia i warunkowanie z danych (2×2, Bayes, częstości naturalne, metryki detektora), schemat Bernoulliego, modele czasu życia (R(t)/h(t)/MTTF oraz tryb „Dane": Kaplan–Meier i MLE wykładniczy/gamma/Weibull z cenzorowaniem prawostronnym, AIC/BIC), niezawodność systemów (topologie kanoniczne z mostkiem, funkcja struktury, ścieżki/przekroje, schemat blokowy) i drzewo błędów FTA. Zawiera zbiory „Bananpol" |
 | **jSpace** | Statystyka danych kosmicznych: orbity TLE/SGP4 (asteRisk), mapy punktowe i kartogramy oraz statystyki regionalne (sf), statystyki rastrów (terra), klasyfikacja k-NN i drzewo decyzyjne. Zawiera 4 zbiory danych |
 | **jRol** | Doświadczalnictwo rolnicze: układ całkowicie losowy, losowanych bloków, kwadrat łaciński i split-plot (ANOVA z właściwymi błędami), porównania wielokrotne (Tukey, NIR, Scheffé, Dunnett, Holm) z grupami jednorodnymi i wartością NIR, wykresy średnich z literami i interakcji, diagnostyka, generator planu doświadczenia z mapą pola oraz zbiory owies Yatesa (split-plot) i kwadrat łaciński z pszenicą |
+| **jPomiar** | Pilotaż: powtarzane pomiary, budżet niepewności (typ A, wzorcowanie, rozdzielczość) i propagacja z korelacją, kowariancja i elipsy 2D; dane syntetyczne i [ćwiczenia](jPomiar/README.md) |
 
 Plik `.jmo` zawiera pakiet R **skompilowany pod konkretną platformę**, dlatego każda
 platforma wymaga osobnego builda:
 
 | Platforma | Skrypt |
 |---|---|
-| macOS arm64 | `packaging/scripts/macos/70-jmo-jrisk.sh`, `71-jmo-jspace.sh` |
-| Windows x64 | `packaging/scripts/windows/build.ps1` (kroki 4e i 4f) |
+| macOS arm64 | `packaging/scripts/macos/70-jmo-jrisk.sh`, `71-jmo-jspace.sh`, `72-jmo-jrol.sh`, `73-jmo-jpomiar.sh` |
+| Windows x64 | `packaging/scripts/windows/build.ps1` (kroki 4e–4h) |
 
+Moduł jPomiar ma również build Linux przez `packaging/scripts/build-jpomiar-docker.sh`.
 Wynik trafia do `packaging/build/dist/`. Rejestr modułów i macierz zgodności:
 [`packaging/MODULES.md`](packaging/MODULES.md).
 
@@ -117,6 +119,7 @@ jCI/             # przedziały ufności
 jDane/           # zbiory danych do zajęć
 jRISK/           # ryzyko i niezawodność (opcjonalny — .jmo)
 jSpace/          # statystyka danych kosmicznych (opcjonalny — .jmo)
+jPomiar/         # pomiary i niepewność (opcjonalny pilotaż — .jmo)
 ```
 
 ## Zależności (build natywny Windows)

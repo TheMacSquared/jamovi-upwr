@@ -1,0 +1,81 @@
+---
+title: Pomiary i niepewność
+name: jPomiar
+version: 0.2.0
+jms: '1.0'
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: Powtarzane pomiary, budżet niepewności, propagacja, kowariancja i elipsy 2D.
+analyses:
+  - title: Powtarzane pomiary
+    name: powtorzenia
+    ns: jPomiar
+    menuGroup: Pomiary
+    menuTitle: Powtarzane pomiary
+    category: analyses
+  - title: Budżet niepewności
+    name: budzet
+    ns: jPomiar
+    menuGroup: Pomiary
+    menuTitle: Budżet niepewności
+    category: analyses
+  - title: Propagacja niepewności
+    name: propagacja
+    ns: jPomiar
+    menuGroup: Pomiary
+    menuTitle: Propagacja niepewności
+    category: analyses
+  - title: Kowariancja i elipsa 2D
+    name: elipsa
+    ns: jPomiar
+    menuGroup: Pomiary
+    menuTitle: Kowariancja i elipsa 2D
+    category: analyses
+datasets:
+  - name: Powtarzane pomiary długości (syntetyczne)
+    path: dlugosc.csv
+    description: 20 syntetycznych pomiarów długości tego samego przedmiotu w mm.
+    documentation:
+      summary: >-
+        Seria do porównania rozrzutu pojedynczego pomiaru z niepewnością średniej
+        i do zbudowania prostego budżetu niepewności.
+      details: >-
+        W Pomiary → Powtarzane pomiary wybierz dlugosc_mm i odniesienie 100 mm.
+        Oczekiwane: średnia 100,111 mm, SD około 0,026931 mm, u_A około 0,006022 mm.
+        W Budżecie niepewności wpisz tę średnią, poprawkę −0,100 mm, u_A,
+        wzorcowanie U = 0,080 mm z k = 2 i rozdzielczość d = 0,010 mm.
+        Przy niezależnych składnikach wynik wynosi 100,011 mm, u_c około
+        0,040554 mm. Sprawdź, który składnik najbardziej wpływa na niepewność.
+      variables:
+        - name: pomiar
+          description: Kolejność pomiaru (1–20).
+        - name: dlugosc_mm
+          description: Długość w milimetrach.
+      source: Dane syntetyczne zespołu jUPWR do ćwiczeń, nie rzeczywiste pomiary.
+    tags:
+      - pomiary
+      - niepewność
+  - name: Położenie punktu 2D (syntetyczne)
+    path: polozenie2d.csv
+    description: Powtarzane pomiary X i Y tego samego punktu w metrach.
+    documentation:
+      summary: Elipsa rozrzutu, kowariancja i niepewność średniego położenia.
+      details: >-
+        Wybierz Pomiary → Kowariancja i elipsa 2D, X = x_m, Y = y_m.
+        Włącz wykres i osie główne. Porównaj elipsę standardową,
+        przybliżony rozrzut 95% i obszar ufności średniego położenia 95%.
+        Dane opisują powtórzenia jednego punktu; współrzędne mają wspólną jednostkę.
+      variables:
+        - name: x_m
+          description: Lokalna współrzędna X w metrach.
+        - name: y_m
+          description: Lokalna współrzędna Y w metrach.
+      source: Dane syntetyczne zespołu jUPWR, nie rzeczywiste pomiary GNSS.
+    tags:
+      - pomiary
+      - kowariancja
+      - elipsa
+usesNative: true
+minApp: 1.0.8
+...

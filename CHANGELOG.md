@@ -4,6 +4,11 @@ Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modu
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
 ## Niewydane
+- Nowy opcjonalny moduł jPomiar 0.2.0 (menu „Pomiary”): powtarzane pomiary,
+  prosty budżet niepewności i propagacja dla sumy, różnicy, iloczynu i ilorazu
+  z korelacją oraz kowariancja i elipsy 2D (standardowa, rozrzutu, ufności
+  średniego położenia metodą Hotellinga). Zawiera dane, ćwiczenia i testy obliczeń.
+  Dodano eksport `.jmo` z Dockera oraz kroki budowania Windows/macOS.
 - Wykresy (scatr 2.9.2), domyślne zachowanie bez zmian:
   - wykres waflowy ze zmienną grupującą dostaje rozmiar z siatki paneli —
     znikają białe pasy nad i pod rzędem paneli (kwadratowe kafelki

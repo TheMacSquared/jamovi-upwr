@@ -1,0 +1,114 @@
+---
+name: elipsa
+title: Kowariancja i elipsa 2D
+jrs: '1.1'
+items:
+  - name: summary
+    title: Kompletne pary pomiarów
+    type: Table
+    rows: 0
+    clearWith: &id001
+      - x
+      - y
+      - ellipseType
+      - level
+      - showPlot
+      - showAxes
+    columns:
+      - name: n
+        title: n
+        type: integer
+      - name: missing
+        title: Pominięte wiersze
+        type: integer
+      - name: meanX
+        title: Średnia X
+        type: number
+      - name: meanY
+        title: Średnia Y
+        type: number
+      - name: r
+        title: Korelacja Pearsona
+        type: number
+  - name: covariance
+    title: Macierz kowariancji pomiarów S (dzielnik n − 1)
+    type: Table
+    rows: 0
+    clearWith: *id001
+    columns:
+      - name: coordinate
+        title: Współrzędna
+        type: text
+      - name: x
+        title: X
+        type: number
+      - name: y
+        title: Y
+        type: number
+  - name: meanCovariance
+    title: Oszacowana macierz kowariancji średniej S/n
+    type: Table
+    rows: 0
+    clearWith: *id001
+    columns:
+      - name: coordinate
+        title: Współrzędna
+        type: text
+      - name: x
+        title: X
+        type: number
+      - name: y
+        title: Y
+        type: number
+  - name: principal
+    title: Osie główne — PCA macierzy kowariancji S
+    type: Table
+    rows: 0
+    clearWith: *id001
+    columns:
+      - name: axis
+        title: Oś
+        type: text
+      - name: eigenvalue
+        title: Wariancja λ
+        type: number
+      - name: sd
+        title: SD wzdłuż osi
+        type: number
+      - name: share
+        title: Udział wariancji (%)
+        type: number
+      - name: angle
+        title: Kąt od +X (°)
+        type: number
+  - name: ellipse
+    title: Parametry wybranej elipsy
+    type: Table
+    rows: 0
+    clearWith: *id001
+    columns:
+      - name: kind
+        title: Rodzaj
+        type: text
+      - name: major
+        title: Duża półoś
+        type: number
+      - name: minor
+        title: Mała półoś
+        type: number
+      - name: angle
+        title: Kąt dużej osi (°)
+        type: number
+  - name: info
+    title: Interpretacja i założenia
+    type: Html
+    clearWith: *id001
+  - name: plot
+    title: Położenie i elipsa
+    type: Image
+    visible: (showPlot)
+    width: 600
+    height: 500
+    renderFun: .plot
+    clearWith: *id001
+...

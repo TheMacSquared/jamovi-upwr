@@ -181,6 +181,21 @@ WORKDIR /tmp/source/jamovi-compiler
 RUN npm install && npm install -g
 
 
+##### OPTIONAL JPOMIAR (.jmo only; not preinstalled) #####
+
+FROM compiler AS jpomiar
+ARG JAMOVI_ROOT=.
+COPY $JAMOVI_ROOT/jPomiar/ /tmp/source/jPomiar
+WORKDIR /tmp/source/jPomiar
+RUN mkdir -p /tmp/artifacts && \
+    MODULE_VERSION=$(sed -n 's/^Version: *//p' DESCRIPTION) && \
+    jmc --build . --jmo /tmp/artifacts/jPomiar_${MODULE_VERSION}-linux.jmo \
+        --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R \
+        --assume-app-version "$(cat /usr/lib/jamovi/version)" --skip-deps
+
+FROM scratch AS jpomiar-artifact
+COPY --from=jpomiar /tmp/artifacts/ /
+
 ##### JMV #####
 
 FROM compiler AS jmv

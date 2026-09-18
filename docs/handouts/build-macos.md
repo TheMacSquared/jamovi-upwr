@@ -71,10 +71,13 @@ bash packaging/scripts/macos/55-relocate.sh      # RELOKOWALNOSC + ponowny podpi
 bash packaging/scripts/macos/60-package-dmg.sh   # .dmg
 bash packaging/scripts/macos/70-jmo-jrisk.sh     # .jmo jRISK
 bash packaging/scripts/macos/71-jmo-jspace.sh    # .jmo jSpace
+bash packaging/scripts/macos/72-jmo-jrol.sh      # .jmo jRol
+bash packaging/scripts/macos/73-jmo-jpomiar.sh   # .jmo jPomiar
 ```
 
 Artefakty: `packaging/build/dist/` — `jUPWR.app`, `jUPWR-<wersja>-arm64.dmg`,
-`jRISK_<wersja>-macos-arm64.jmo`, `jSpace_<wersja>-macos-arm64.jmo`.
+`jRISK_<wersja>-macos-arm64.jmo`, `jSpace_<wersja>-macos-arm64.jmo`,
+`jRol_<wersja>-macos-arm64.jmo`, `jPomiar_<wersja>-macos-arm64.jmo`.
 
 **Kroku 55 nie pomijaj.** Po `50` aplikacja działa tylko na maszynie deweloperskiej —
 linkuje R i biblioteki Homebrew po ścieżkach absolutnych. `55` przenosi je do bundla
