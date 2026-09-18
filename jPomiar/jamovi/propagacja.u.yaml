@@ -36,4 +36,9 @@ children:
         format: number
       - type: CheckBox
         name: showPlot
+  - type: Label
+    label: Opis metod
+    children:
+      - type: CheckBox
+        name: metody
 ...

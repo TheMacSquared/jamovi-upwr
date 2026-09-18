@@ -3,13 +3,15 @@ powtorzeniaClass <- R6::R6Class("powtorzeniaClass",
     inherit = powtorzeniaBase,
     private = list(
         .run = function() {
-            self$results$info$setContent(paste0(
-                "<p>Wybierz serię pomiarów tej samej, niezmiennej wielkości. ",
-                "SD opisuje rozrzut pojedynczego pomiaru; u_A = SD/√n opisuje niepewność średniej. ",
-                "Zakładamy niezależne powtórzenia o jednakowej wariancji. ",
-                "Więcej powtórzeń nie usuwa wspólnego błędu przyrządu. ",
-                "Wykres według kolejności wierszy pomaga zauważyć dryft, ale nie jest testem niezależności.</p>"))
-            if (is.null(self$options$dep) || !nzchar(self$options$dep)) return()
+            o <- self$options
+            if (is.null(o$dep) || !nzchar(o$dep)) return()
+            md <- jmvcore::metodyNew()
+            md$add("Dane", "Zmienna %s; braki pominięto, pomiary w kolejności wierszy arkusza.", jmvcore::metodyCyt(o$dep))
+            md$add("Model", "Średnia, SD pojedynczego pomiaru (dzielnik n − 1) i niepewność standardowa średniej typu A: u_A = SD/√n, przy niezależnych powtórzeniach o jednakowej wariancji.")
+            md$addIf(o$useReference, "Model", "Różnica = średnia − wartość odniesienia (%s); opisowa, bez niepewności odniesienia.", format(o$reference))
+            md$addIf(o$showPlot, "Wykres", "Pomiary w kolejności wierszy; linia przerywana = średnia%s.",
+                     if (o$useReference) ", kropkowana = wartość odniesienia" else "")
+            md$render(self$results$metody)
             result <- tryCatch(measurementSeries(jmvcore::toNumeric(self$data[[self$options$dep]])), error = identity)
             if (inherits(result, "error")) stop(conditionMessage(result), call. = FALSE)
             self$results$summary$addRow(rowKey = 1, values = result[c("n", "missing", "mean", "sd", "se")])
@@ -18,8 +20,7 @@ powtorzeniaClass <- R6::R6Class("powtorzeniaClass",
                 difference <- result$mean - self$options$reference
                 measurementScalar(difference, "Różnica od odniesienia")
                 self$results$comparison$addRow(rowKey = 1, values = list(reference = self$options$reference, difference = difference))
-                self$results$comparison$setNote("reference", paste0(
-                    "Różnica względem odniesienia jest opisowa. Nie uwzględnia niepewności odniesienia i nie jest testem obciążenia."))
+                self$results$comparison$setNote("reference", "Różnica opisowa: nie uwzględnia niepewności odniesienia i nie jest testem obciążenia.")
             }
             if (result$sd == 0) self$results$summary$setNote("constant", "Brak rozrzutu w serii nie oznacza zerowej całkowitej niepewności pomiaru.")
             if (self$options$showPlot) self$results$plot$setState(list(x = result$x, index = result$index, mean = result$mean,

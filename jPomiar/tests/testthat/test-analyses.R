@@ -3,19 +3,21 @@ skip_if_not_installed("jPomiar")
 
 test_that("series results and missing-value handling reach the results tables", {
     r <- jPomiar:::powtorzenia(data = data.frame(v = c(9, NA, 10, 11)), dep = "v",
-                               useReference = TRUE, reference = 9.5, showPlot = TRUE)
+                               useReference = TRUE, reference = 9.5, showPlot = TRUE, metody = TRUE)
     expect_equal(r$summary$asDF$mean, 10)
     expect_equal(r$summary$asDF$missing, 1L)
     expect_equal(r$summary$asDF$se, 1 / sqrt(3))
     expect_equal(r$comparison$asDF$difference, 0.5)
     expect_equal(r$plot$state$index, c(1L, 3L, 4L))
-    expect_match(r$info$content, "niezależne")
+    expect_match(r$metody$content, "SD/√n")
+    expect_match(r$metody$content, "„v”")
+    expect_match(r$comparison$notes$reference$note, "opisowa")
 })
 
 test_that("disabled budget options do not contribute", {
     empty <- jPomiar:::budzet()
     expect_equal(nrow(empty$summary$asDF), 0)
-    expect_match(empty$info$content, "Włącz")
+    expect_match(empty$summary$notes$empty$note, "Włącz")
     r <- jPomiar:::budzet(value = 10, includeA = TRUE, uA = 0.2,
                          correction = 100, calibrationU = 100, resolution = 100,
                          showPlot = TRUE)
@@ -25,10 +27,12 @@ test_that("disabled budget options do not contribute", {
     expect_equal(nrow(r$plot$state), 1)
     corrected <- jPomiar:::budzet(value = 10, useCorrection = TRUE, correction = -0.5,
         includeCalibration = TRUE, calibrationU = 0.4, calibrationK = 2,
-        includeResolution = TRUE, resolution = 0.1)
+        includeResolution = TRUE, resolution = 0.1, metody = TRUE)
     expect_equal(corrected$summary$asDF$estimate, 9.5)
     expect_equal(corrected$summary$asDF$uc, sqrt(0.04 + 0.01/12))
-    expect_match(corrected$info$content, "nie są automatycznie")
+    expect_match(corrected$metody$content, "nie poziom ufności")
+    expect_match(corrected$metody$content, "U/k")
+    expect_false(grepl("Typ A", corrected$metody$content))
 })
 
 test_that("correlation toggle and negative covariance reach results and plot", {
@@ -39,6 +43,11 @@ test_that("correlation toggle and negative covariance reach results and plot", {
     expect_equal(on$summary$asDF$uc, sqrt(2))
     expect_equal(on$components$asDF$variance, c(4, 4, -6))
     expect_equal(on$plot$state$variance, c(4, 4, -6))
+    expect_match(on$metody$content, "ρ = 0.75")
+    expect_match(off$metody$content, "korelacja wyłączona")
+    ratio <- jPomiar:::propagacja(model = "ratio", x = 1, y = 0.1, ux = 0.1, uy = 0.02)
+    expect_setequal(names(ratio$summary$notes), c("linear", "denominator"))
+    expect_length(on$summary$notes, 0)
     expect_error(jPomiar:::propagacja(model = "ratio", y = 0), "mianownika")
 })
 

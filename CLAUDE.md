@@ -160,6 +160,20 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   modułem OPCJONALNYM jak jRISK, ale budowanym BEZ --skip-deps (jmc bundluje
   sf/terra/asteRisk do .jmo; macOS: 71-jmo-jspace.sh, Windows: build.ps1
   krok 4f); szczegóły w packaging/MODULES.md
+- jPomiar 0.2.0 (pomiary i niepewność, pilotaż międzykierunkowy; menu „Pomiary":
+  powtarzane pomiary z u_A, budżet niepewności typ A / wzorcowanie U/k /
+  rozdzielczość d/√12, propagacja sumy/różnicy/iloczynu/ilorazu z korelacją,
+  kowariancja i elipsy 2D: standardowa, rozrzutu χ², ufności średniej T²
+  Hotellinga; 2 zbiory syntetyczne) jest modułem OPCJONALNYM jak jRISK
+  (macOS: 73-jmo-jpomiar.sh, Windows: build.ps1 krok 4h, Linux: osobny target
+  Dockerfile `jpomiar-artifact` przez packaging/scripts/build-jpomiar-docker.sh).
+  Silnik w czystym R: `jPomiar/R/utils.R`, `R/ellipse.R`; pełny test (kompilacja
+  jmc + testthat): `packaging/scripts/test-jpomiar.sh`. Każda analiza ma „Opis
+  zastosowanych metod" (zadanie 19); objaśnienia założeń i ćwiczenia są
+  w `jPomiar/README.md`, nie w wynikach. PUŁAPKA: tabele budowane przez
+  `addRow()` w `.run` (rows: 0) muszą mieć w `clearWith` KAŻDĄ opcję analizy
+  (także `metody` i wykresy) — tabela niewyczyszczona wraca ze stanu,
+  a `addRow` dopisuje wiersze drugi raz.
 - zakładka „Wykresy" podzielona na kategorie dydaktyczne wg zastosowań
   (wzór: r-graph-gallery.com). Mechanizm: `menuGroup` w `plots/jamovi/*.a.yaml`
   → jedno menu na wstążce (client/main/ribbon/plotstab.ts, stała kolejność);

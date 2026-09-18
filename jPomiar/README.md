@@ -20,9 +20,10 @@ oraz zajęć laboratoryjnych. Nie wymaga jSpace ani bibliotek GIS.
   w tym osobny składnik kowariancyjny (może być ujemny). Bez arbitralnego
   przypisywania kowariancji do udziałów poszczególnych wejść.
 
-Opcjonalne funkcje i wykresy są domyślnie wyłączone. Budżet pozostaje pusty, dopóki
-użytkownik nie włączy przynajmniej jednego składnika. Objaśnienia założeń są zawsze
-widoczne. Wersja pilotażowa nie zawiera estymacji ważonej ani filtracji.
+Opcjonalne funkcje, wykresy i „Opis zastosowanych metod” są domyślnie wyłączone. Budżet pozostaje pusty, dopóki
+użytkownik nie włączy przynajmniej jednego składnika. Objaśnienia założeń zawiera ten dokument;
+opis metod w wynikach mówi tylko, co i jak policzono. Wersja pilotażowa nie zawiera estymacji
+ważonej ani filtracji.
 
 ## Założenia i jednostki
 
@@ -52,7 +53,8 @@ kolumn arkusza.
 Propagacja używa `u_c² = c_x² u(x)² + c_y² u(y)² + 2 c_x c_y ρ u(x) u(y)`.
 Dla sumy i różnicy jest to dokładna zależność wariancji, dla iloczynu i ilorazu —
 linearyzacja pierwszego rzędu. Przy `u(y)/|y| ≥ 0,1` iloraz otrzymuje dodatkowy
-komunikat; to wskazówka dydaktyczna, nie ścisłe kryterium poprawności.
+komunikat; to wskazówka dydaktyczna, nie ścisłe kryterium poprawności. Przy dużych
+niepewnościach potrzebna jest ocena nieliniowości, np. metodą Monte Carlo.
 Przy zerowej propagowanej wariancji modelu nieliniowego wynik jest wyraźnie
 opisany jako przybliżenie, które może pomijać istotne wyrazy wyższego rzędu.
 

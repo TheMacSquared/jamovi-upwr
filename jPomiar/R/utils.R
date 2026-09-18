@@ -84,24 +84,23 @@ measurementPropagation <- function(model, x, y, ux, uy, rho = 0, k = 2) {
     summary <- measurementSummary(spec$value, variance, k)
     notes <- character()
     if (model %in% c("product", "ratio"))
-        notes <- c(notes, "Propagacja pierwszego rzędu (linearyzacja): wynik jest przybliżony. Przy dużych niepewnościach potrzebna jest ocena nieliniowości, np. metodą Monte Carlo.")
+        notes <- c(notes, linear = "Propagacja pierwszego rzędu (linearyzacja): wynik jest przybliżony.")
     if (model == "ratio" && uy >= 0.1 * abs(y) && uy > 0)
-        notes <- c(notes, "Niepewność mianownika jest duża względem jego wartości (u(y)/|y| ≥ 0,1). Przybliżenie liniowe może być niedokładne; próg 0,1 jest wskazówką dydaktyczną, nie gwarancją poprawności poniżej progu.")
+        notes <- c(notes, denominator = "Niepewność mianownika jest duża względem jego wartości (u(y)/|y| ≥ 0,1): przybliżenie liniowe może być niedokładne.")
     if (model %in% c("product", "ratio") && variance == 0 && (ux > 0 || uy > 0))
-        notes <- c(notes, "Zerowa wariancja w przybliżeniu liniowym nie dowodzi braku niepewności: pominięte wyrazy wyższego rzędu mogą mieć znaczenie.")
+        notes <- c(notes, zero = "Zerowa wariancja w przybliżeniu liniowym nie dowodzi braku niepewności: pominięte wyrazy wyższego rzędu mogą mieć znaczenie.")
     list(summary = summary, inputs = data.frame(input = c("x", "y"), value = c(x, y), u = c(ux, uy), c = spec$c),
          components = data.frame(source = c("x: c_x² u(x)²", "y: c_y² u(y)²", "Kowariancja: 2 c_x c_y ρ u(x) u(y)"), variance = terms),
          formula = spec$formula, rho = rho, notes = notes)
 }
 
-measurementRows <- function(table, data) {
-    for (i in seq_len(nrow(data))) table$addRow(rowKey = i, values = as.list(data[i, , drop = FALSE]))
+# Named notes become one-sentence table notes keyed by their name.
+measurementNotes <- function(table, notes) {
+    for (key in names(notes)) table$setNote(key, notes[[key]])
 }
 
-measurementCoverageText <- function() {
-    paste0("<p>U = k · u_c. Granice wynik ± U nie są automatycznie przedziałem ufności 95%. ",
-           "Interpretacja probabilistyczna wymaga założeń o rozkładzie i stopniach swobody. ",
-           "Wartość k = 2 jest mnożnikiem, nie zadanym poziomem ufności.</p>")
+measurementRows <- function(table, data) {
+    for (i in seq_len(nrow(data))) table$addRow(rowKey = i, values = as.list(data[i, , drop = FALSE]))
 }
 
 measurementVariancePlot <- function(state, ggtheme, theme) {

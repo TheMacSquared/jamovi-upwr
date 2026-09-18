@@ -14,6 +14,7 @@ items:
       - level
       - showPlot
       - showAxes
+      - metody
     columns:
       - name: n
         title: n
@@ -99,10 +100,6 @@ items:
       - name: angle
         title: Kąt dużej osi (°)
         type: number
-  - name: info
-    title: Interpretacja i założenia
-    type: Html
-    clearWith: *id001
   - name: plot
     title: Położenie i elipsa
     type: Image
@@ -111,4 +108,8 @@ items:
     height: 500
     renderFun: .plot
     clearWith: *id001
+  - name: metody
+    title: Zastosowane metody
+    type: Html
+    visible: (metody)
 ...

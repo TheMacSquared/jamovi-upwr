@@ -27,4 +27,9 @@ children:
         enable: (useReference)
       - type: CheckBox
         name: showPlot
+  - type: Label
+    label: Opis metod
+    children:
+      - type: CheckBox
+        name: metody
 ...

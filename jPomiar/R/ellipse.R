@@ -22,14 +22,14 @@ measurementEllipse <- function(x, y, kind = "standard", level = 95) {
     if (isotropic) angles[] <- NA_real_
     correlation <- if (all(diag(covariance) > 0)) stats::cor(d)[1, 2] else NA_real_
     notes <- character()
-    if (singular) notes <- c(notes, "Macierz jest osobliwa lub niemal osobliwa. Elipsa opisowa może zdegenerować się do odcinka lub punktu; obszar Hotellinga jest niedostępny.")
-    if (isotropic) notes <- c(notes, "Brak wyróżnionego kierunku osi: jednakowe wariancje główne (koło lub punkt). Kąty pozostają nieokreślone.")
-    if (is.na(correlation)) notes <- c(notes, "Korelacja jest nieokreślona, gdy przynajmniej jedna współrzędna jest stała.")
+    if (singular) notes <- c(notes, singular = "Macierz kowariancji jest osobliwa lub niemal osobliwa: elipsa degeneruje się do odcinka lub punktu.")
+    if (isotropic) notes <- c(notes, isotropic = "Jednakowe wariancje główne (koło lub punkt): kierunki osi i kąty są nieokreślone.")
+    if (is.na(correlation)) notes <- c(notes, correlation = "Korelacja jest nieokreślona, gdy przynajmniej jedna współrzędna jest stała.")
     available <- TRUE
     scale <- switch(kind, standard = 1, scatter = sqrt(stats::qchisq(level / 100, df = 2)), mean = {
         if (n <= 2 || singular) {
             available <- FALSE
-            notes <- c(notes, "Obszar ufności średniej wymaga n > 2 i nieosobliwej macierzy kowariancji.")
+            notes <- c(notes, mean = "Obszar ufności średniej jest niedostępny: wymaga n > 2 i nieosobliwej macierzy kowariancji.")
             NA_real_
         } else sqrt(2 * (n - 1) / (n * (n - 2)) * stats::qf(level / 100, 2, n - 2))
     })

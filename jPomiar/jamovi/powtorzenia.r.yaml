@@ -12,6 +12,7 @@ items:
       - useReference
       - reference
       - showPlot
+      - metody
     columns:
       - name: n
         title: n
@@ -37,6 +38,7 @@ items:
       - useReference
       - reference
       - showPlot
+      - metody
     columns:
       - name: reference
         title: Odniesienie
@@ -45,14 +47,6 @@ items:
         title: Średnia − odniesienie
         type: number
     visible: (useReference)
-  - name: info
-    title: Interpretacja i założenia
-    type: Html
-    clearWith:
-      - dep
-      - useReference
-      - reference
-      - showPlot
   - name: plot
     title: Pomiary
     type: Image
@@ -65,4 +59,9 @@ items:
       - useReference
       - reference
       - showPlot
+      - metody
+  - name: metody
+    title: Zastosowane metody
+    type: Html
+    visible: (metody)
 ...

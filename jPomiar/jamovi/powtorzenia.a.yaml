@@ -26,4 +26,8 @@ options:
     title: Pomiary w kolejności wierszy
     type: Bool
     default: false
+  - name: metody
+    title: Opis zastosowanych metod
+    type: Bool
+    default: false
 ...

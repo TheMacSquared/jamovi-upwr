@@ -60,4 +60,8 @@ options:
     title: Udziały składników w wariancji
     type: Bool
     default: false
+  - name: metody
+    title: Opis zastosowanych metod
+    type: Bool
+    default: false
 ...

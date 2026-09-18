@@ -46,4 +46,8 @@ options:
     title: Osie główne na wykresie
     type: Bool
     default: false
+  - name: metody
+    title: Opis zastosowanych metod
+    type: Bool
+    default: false
 ...

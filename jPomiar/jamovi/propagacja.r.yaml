@@ -17,6 +17,7 @@ items:
       - rho
       - coverageK
       - showPlot
+      - metody
     columns:
       - name: estimate
         title: Wynik
@@ -50,6 +51,7 @@ items:
       - rho
       - coverageK
       - showPlot
+      - metody
     columns:
       - name: input
         title: Wejście
@@ -77,6 +79,7 @@ items:
       - rho
       - coverageK
       - showPlot
+      - metody
     columns:
       - name: source
         title: Składnik
@@ -84,19 +87,6 @@ items:
       - name: variance
         title: Wkład do wariancji
         type: number
-  - name: info
-    title: Interpretacja i założenia
-    type: Html
-    clearWith:
-      - model
-      - x
-      - ux
-      - y
-      - uy
-      - useCorrelation
-      - rho
-      - coverageK
-      - showPlot
   - name: plot
     title: Składniki wariancji
     type: Image
@@ -114,4 +104,9 @@ items:
       - rho
       - coverageK
       - showPlot
+      - metody
+  - name: metody
+    title: Zastosowane metody
+    type: Html
+    visible: (metody)
 ...

@@ -20,6 +20,7 @@ items:
       - resolution
       - coverageK
       - showPlot
+      - metody
     columns:
       - name: estimate
         title: Wynik
@@ -56,6 +57,7 @@ items:
       - resolution
       - coverageK
       - showPlot
+      - metody
     columns:
       - name: source
         title: Składnik
@@ -72,22 +74,6 @@ items:
       - name: share
         title: Udział (%)
         type: number
-  - name: info
-    title: Interpretacja i założenia
-    type: Html
-    clearWith:
-      - value
-      - useCorrection
-      - correction
-      - includeA
-      - uA
-      - includeCalibration
-      - calibrationU
-      - calibrationK
-      - includeResolution
-      - resolution
-      - coverageK
-      - showPlot
   - name: plot
     title: Składniki wariancji
     type: Image
@@ -108,4 +94,9 @@ items:
       - resolution
       - coverageK
       - showPlot
+      - metody
+  - name: metody
+    title: Zastosowane metody
+    type: Html
+    visible: (metody)
 ...

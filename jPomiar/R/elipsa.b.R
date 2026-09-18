@@ -3,7 +3,6 @@ elipsaClass <- R6::R6Class("elipsaClass",
     inherit = elipsaBase,
     private = list(
         .run = function() {
-            self$results$info$setContent("<p>Wybierz dwie współrzędne tego samego punktu, mierzone parami, w tej samej jednostce. Każdy wiersz stanowi jeden pomiar 2D. Wiersze z brakiem którejkolwiek współrzędnej pomijamy w całości.</p>")
             if (is.null(self$options$x) || !nzchar(self$options$x) ||
                 is.null(self$options$y) || !nzchar(self$options$y)) return()
             if (self$options$x == self$options$y) stop("Wybierz dwie różne kolumny współrzędnych.", call. = FALSE)
@@ -18,15 +17,25 @@ elipsaClass <- R6::R6Class("elipsaClass",
             measurementRows(self$results$principal, r$principal)
             if (r$available) self$results$ellipse$addRow(rowKey = 1, values = list(kind = r$label,
                 major = r$radii[1], minor = r$radii[2], angle = r$angle))
-            explanation <- switch(self$options$ellipseType,
-                standard = "Elipsa standardowa ma półosie √λ₁ i √λ₂. To elipsa rozrzutu 1 SD, nie obszar ufności średniej. Dla nieosobliwego dwuwymiarowego rozkładu normalnego i znanych parametrów obejmuje około 39,35% prawdopodobieństwa, nie 68% ani 95%.",
-                scatter = "Półosie wynoszą √(χ²₂(p) · λ). Parametry rozkładu zastępujemy oszacowaniami z próby: nominalny poziom jest przybliżonym pokryciem rozkładu normalnego, nie gwarancją odsetka punktów w próbie. To nie jest dokładny obszar predykcji nowego pomiaru ani obszar ufności średniej.",
-                mean = "Półosie wynoszą √[2(n−1)/(n(n−2)) · F₂,n−₂(p) · λ]. Jest to wspólny obszar ufności dla dwóch składowych średniej (T² Hotellinga), nie obszar rozrzutu pomiarów. Wymaga niezależnych obserwacji z dwuwymiarowego rozkładu normalnego i nieosobliwej kowariancji.")
-            self$results$info$setContent(paste0(self$results$info$content,
-                "<p>S opisuje rozrzut pojedynczych pomiarów; S/n jest oszacowaniem kowariancji średniej przy niezależnych powtórzeniach o wspólnej kowariancji. Jednostką elementów macierzy jest kwadrat jednostki współrzędnych. Wspólne błędy systematyczne nie są tu uwzględnione.</p>",
-                "<p>", explanation, "</p>",
-                "<p>Osie PC1 i PC2 pochodzą z macierzy kowariancji bez standaryzacji. Wartości własne λ to wariancje w ich kierunkach. Kąty liczymy przeciwnie do ruchu wskazówek zegara od dodatniej osi X, modulo 180°. Wykres zachowuje jednakową skalę obu osi. Długość i szerokość geograficzną należy najpierw przeliczyć na lokalne współrzędne płaskie.</p>",
-                if (length(r$notes)) paste0("<p>", paste(r$notes, collapse = " "), "</p>") else ""))
+            measurementNotes(self$results$summary, r$notes[names(r$notes) %in% "correlation"])
+            measurementNotes(self$results$principal, r$notes[names(r$notes) %in% c("singular", "isotropic")])
+            measurementNotes(self$results$ellipse, r$notes[names(r$notes) %in% "mean"])
+            o <- self$options
+            md <- jmvcore::metodyNew()
+            md$add("Dane", "Współrzędne: X = %s, Y = %s; każdy wiersz to jeden pomiar 2D, wiersze z brakiem którejkolwiek współrzędnej pominięto w całości.",
+                   jmvcore::metodyCyt(o$x), jmvcore::metodyCyt(o$y))
+            md$add("Model", "S = macierz kowariancji pomiarów (dzielnik n − 1); S/n = oszacowana kowariancja średniej; jednostka elementów = kwadrat jednostki współrzędnych.")
+            md$add("Model", "Osie główne: wektory i wartości własne λ macierzy S bez standaryzacji; kąty od dodatniej osi X przeciwnie do ruchu wskazówek zegara, modulo 180°.")
+            if (o$ellipseType == "standard")
+                md$add("Model", "Elipsa standardowa: półosie √λ₁ i √λ₂ (rozrzut 1 SD).")
+            else
+                md$add("Model", switch(o$ellipseType,
+                    scatter = "Elipsa rozrzutu %s%%: półosie √(χ²₂(p) · λ), parametry rozkładu normalnego oszacowane z próby.",
+                    mean = "Obszar ufności średniego położenia %s%% (T² Hotellinga): półosie √[2(n−1)/(n(n−2)) · F₂,ₙ₋₂(p) · λ]; wymaga n &gt; 2 i nieosobliwej S."),
+                    format(o$level))
+            md$addIf(o$showPlot, "Wykres", "Punkty = pomiary, krzyżyk = średnie położenie, linia ciągła = elipsa%s; jednakowa skala obu osi.",
+                     if (o$showAxes) ", linie przerywane = osie główne" else "")
+            md$render(self$results$metody)
             if (self$options$showPlot) self$results$plot$setState(list(result = r,
                 xLabel = self$options$x, yLabel = self$options$y, showAxes = self$options$showAxes))
         },

@@ -7,7 +7,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - Nowy opcjonalny moduł jPomiar 0.2.0 (menu „Pomiary”): powtarzane pomiary,
   prosty budżet niepewności i propagacja dla sumy, różnicy, iloczynu i ilorazu
   z korelacją oraz kowariancja i elipsy 2D (standardowa, rozrzutu, ufności
-  średniego położenia metodą Hotellinga). Zawiera dane, ćwiczenia i testy obliczeń.
+  średniego położenia metodą Hotellinga). Każda analiza ma „Opis zastosowanych metod”
+  (domyślnie wyłączony); objaśnienia założeń są w `jPomiar/README.md`.
+  Zawiera dane, ćwiczenia i testy obliczeń.
   Dodano eksport `.jmo` z Dockera oraz kroki budowania Windows/macOS.
 - Wykresy (scatr 2.9.2), domyślne zachowanie bez zmian:
   - wykres waflowy ze zmienną grupującą dostaje rozmiar z siatki paneli —
