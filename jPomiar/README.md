@@ -67,12 +67,14 @@ nie dowodzą braku niepewności pomiaru.
 
 ### 1. Czy powtarzanie pomiaru usuwa przesunięcie?
 
-Otwórz z biblioteki jPomiar **Powtarzane pomiary długości (syntetyczne)**
-(`data/dlugosc.csv`). Zmienna: `dlugosc_mm`, jednostka: mm.
-Wybierz **Pomiary → Powtarzane pomiary**, włącz wykres i odniesienie 100 mm.
+Otwórz z biblioteki jPomiar **Azotany w roztworze wzorcowym (syntetyczne)**
+(`data/azotany.csv`). Zmienna: `stezenie_mgL`, jednostka: mg/L. Laboratorium
+oczyszczalni sprawdza metodę na certyfikowanym wzorcu 50,00 mg/L, zanim wykona
+serię oznaczeń w ściekach.
+Wybierz **Pomiary → Powtarzane pomiary**, włącz wykres i odniesienie 50 mg/L.
 
-Oczekiwane wyniki: n = 20, średnia = 100,111 mm, SD ≈ 0,026931 mm,
-u_A ≈ 0,006022 mm, różnica względem odniesienia = 0,111 mm.
+Oczekiwane wyniki: n = 20, średnia = 50,1315 mg/L, SD ≈ 0,115361 mg/L,
+u_A ≈ 0,025796 mg/L, różnica względem odniesienia = 0,1315 mg/L.
 
 Porównaj wielkość rozrzutu z różnicą od odniesienia. Dlaczego duża liczba
 powtórzeń nie musi dać prawidłowej wartości? Odniesienie jest tu dydaktycznym
@@ -81,13 +83,15 @@ Dane są sztuczne i nie pochodzą z rzeczywistego przyrządu.
 
 ### 2. Co najbardziej ogranicza niepewność wyniku?
 
-W **Budżecie niepewności** wpisz średnią 100,111 mm, włącz poprawkę −0,100 mm.
-Włącz typ A: 0,00602189 mm; wzorcowanie: U = 0,080 mm, k = 2;
-rozdzielczość: d = 0,010 mm. Mnożnik wyniku: k = 2. Włącz wykres składników.
+W **Budżecie niepewności** wpisz średnią 50,1315 mg/L, włącz poprawkę
+−0,150 mg/L (obciążenie ze świadectwa).
+Włącz typ A: 0,0257957 mg/L; wzorcowanie: U = 0,250 mg/L, k = 2;
+rozdzielczość: d = 0,010 mg/L. Mnożnik wyniku: k = 2. Włącz wykres składników.
 W tym ćwiczeniu umownie przyjmujemy niezależność i brak podwójnego liczenia
 składnika rozdzielczości.
 
-Oczekiwane: wynik = 100,011 mm, u_c ≈ 0,040554 mm, U ≈ 0,081107 mm.
+Oczekiwane: wynik = 49,9815 mg/L, u_c ≈ 0,127667 mg/L, U ≈ 0,255334 mg/L.
+Wzorcowanie odpowiada za około 96% wariancji.
 Wzorcowanie dominuje w budżecie. Zmniejsz u_A dziesięciokrotnie i zobacz,
 jak niewiele zmienia się U. Następnie zmniejsz U wzorcowania dwukrotnie.
 Która poprawa daje większą korzyść i dlaczego?
@@ -197,8 +201,13 @@ Stała współrzędna oznacza nieokreśloną korelację, a nie korelację równ�
 
 ### Ćwiczenie 4. Rozrzut położenia a niepewność średniej
 
-Otwórz z biblioteki **Położenie punktu 2D (syntetyczne)** (`polozenie2d.csv`).
-Wybierz X = `x_m`, Y = `y_m`. Włącz wykres i osie główne.
+Otwórz z biblioteki **Lokalizacja poszkodowanego (syntetyczne)**
+(`lokalizacja.csv`): 30 kolejnych wyznaczeń pozycji nieruchomego poszkodowanego
+przez lokalizator GNSS. Wybierz X = `wschod_m`, Y = `polnoc_m`.
+Włącz wykres i osie główne.
+
+Oczekiwane: średnia (5,79 ; −3,31) m, SD 3,85 m i 2,18 m, r ≈ 0,37,
+osie główne ≈ 3,96 m i 1,97 m.
 
 1. Porównaj elementy pozadiagonalne macierzy S i kierunek dużej osi elipsy.
 2. Wybierz elipsę standardową, a następnie rozrzut 95%. Sprawdź, że półosie
@@ -208,10 +217,10 @@ Wybierz X = `x_m`, Y = `y_m`. Włącz wykres i osie główne.
 4. Porównaj S z S/n. Która macierz opisuje pojedynczy pomiar, a która średnią?
    Czy zmniejszenie S/n usuwa błąd wspólny dla wszystkich pomiarów?
 
-Dane są syntetyczne: 30 par utworzonych w R z `set.seed(2042)` i
-`z <- matrix(rnorm(60), ncol=2)`, następnie
-`x = 100 + 0.8*z[,1]`, `y = 200 + 0.5*z[,1] + 0.3*z[,2]`,
-zaokrąglone do czterech miejsc po przecinku.
+Operacyjnie: elipsa rozrzutu wyznacza obszar, który trzeba przeszukać,
+a obszar ufności średniej mówi tylko, jak dobrze znamy pozycję po 30 odczytach.
+
+Dane są syntetyczne — generuje je `data-raw/datasets.R` (ziarno 2026).
 
 Podstawy: [NIST — statystyka T² Hotellinga](https://www.itl.nist.gov/div898/software/dataplot/refman2/auxillar/1samphot.htm),
 [ESA — kowariancja i elipsa położenia](https://gssc.esa.int/navipedia/index.php/Positioning_Error).

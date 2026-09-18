@@ -1,7 +1,7 @@
 Package: jPomiar
 Type: Package
 Title: Pomiary i niepewność dla jamovi
-Version: 0.2.0
+Version: 0.3.0
 Author: jUPWR Team
 Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 Description: Podstawy analizy danych pomiarowych: powtarzane pomiary,

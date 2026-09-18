@@ -1,7 +1,7 @@
 ---
 title: Pomiary i niepewność
 name: jPomiar
-version: 0.2.0
+version: 0.3.0
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -33,49 +33,77 @@ analyses:
     menuTitle: Kowariancja i elipsa 2D
     category: analyses
 datasets:
-  - name: Powtarzane pomiary długości (syntetyczne)
-    path: dlugosc.csv
-    description: 20 syntetycznych pomiarów długości tego samego przedmiotu w mm.
+  - name: Azotany w roztworze wzorcowym (syntetyczne)
+    path: azotany.csv
+    description: >-
+      20 powtórzonych oznaczeń azotanów w certyfikowanym roztworze wzorcowym o
+      wartości 50,00 mg/L (inżynieria środowiska).
     documentation:
       summary: >-
-        Seria do porównania rozrzutu pojedynczego pomiaru z niepewnością średniej
-        i do zbudowania prostego budżetu niepewności.
+        Laboratorium oczyszczalni sprawdza metodę spektrofotometryczną na
+        wzorcu, zanim wykona serię oznaczeń w ściekach oczyszczonych. Zbiór
+        służy do porównania rozrzutu pojedynczego oznaczenia z niepewnością
+        średniej i do zbudowania pełnego budżetu niepewności.
       details: >-
-        W Pomiary → Powtarzane pomiary wybierz dlugosc_mm i odniesienie 100 mm.
-        Oczekiwane: średnia 100,111 mm, SD około 0,026931 mm, u_A około 0,006022 mm.
-        W Budżecie niepewności wpisz tę średnią, poprawkę −0,100 mm, u_A,
-        wzorcowanie U = 0,080 mm z k = 2 i rozdzielczość d = 0,010 mm.
-        Przy niezależnych składnikach wynik wynosi 100,011 mm, u_c około
-        0,040554 mm. Sprawdź, który składnik najbardziej wpływa na niepewność.
+        W Pomiary → Powtarzane pomiary wybierz stezenie_mgL i odniesienie 50
+        mg/L. Oczekiwane: średnia 50,1315 mg/L, SD około 0,115361 mg/L, u_A
+        około 0,025796 mg/L. Średnia leży powyżej wartości certyfikowanej — to
+        obciążenie metody, nie przypadek. W Budżecie niepewności wpisz tę
+        średnią, poprawkę −0,150 mg/L (obciążenie ze świadectwa), u_A,
+        wzorcowanie U = 0,250 mg/L przy k = 2 oraz rozdzielczość d = 0,010 mg/L.
+        Wynik: 49,9815 mg/L, u_c około 0,127667 mg/L, U około 0,255 mg/L przy k
+        = 2. Zwróć uwagę, że wzorcowanie odpowiada za około 96% wariancji —
+        zwiększanie liczby powtórzeń nie poprawi wyniku, bo zmniejsza tylko u_A.
+        Dalej w Propagacji niepewności policz ładunek azotanów odprowadzany do
+        odbiornika: iloczyn stężenia (49,98 mg/L, u = 0,128) i przepływu (1450
+        m³/d, u = 35 m³/d); wielkości są niezależne, więc korelację zostaw
+        wyłączoną.
       variables:
         - name: pomiar
-          description: Kolejność pomiaru (1–20).
-        - name: dlugosc_mm
-          description: Długość w milimetrach.
-      source: Dane syntetyczne zespołu jUPWR do ćwiczeń, nie rzeczywiste pomiary.
+          description: Kolejność oznaczenia (1–20).
+        - name: stezenie_mgL
+          description: Stężenie azotanów w miligramach na litr.
+      source: >-
+        Dane syntetyczne zespołu jUPWR do ćwiczeń, nie rzeczywiste wyniki
+        laboratorium.
     tags:
       - pomiary
       - niepewność
-  - name: Położenie punktu 2D (syntetyczne)
-    path: polozenie2d.csv
-    description: Powtarzane pomiary X i Y tego samego punktu w metrach.
+      - inżynieria środowiska
+  - name: Lokalizacja poszkodowanego (syntetyczne)
+    path: lokalizacja.csv
+    description: >-
+      30 kolejnych wyznaczeń pozycji nieruchomego poszkodowanego przez
+      lokalizator GNSS podczas akcji ratowniczej (inżynieria bezpieczeństwa).
     documentation:
-      summary: Elipsa rozrzutu, kowariancja i niepewność średniego położenia.
+      summary: >-
+        Elipsa rozrzutu jako obszar przeszukania: kowariancja składowych, osie
+        główne i niepewność średniego położenia.
       details: >-
-        Wybierz Pomiary → Kowariancja i elipsa 2D, X = x_m, Y = y_m.
-        Włącz wykres i osie główne. Porównaj elipsę standardową,
-        przybliżony rozrzut 95% i obszar ufności średniego położenia 95%.
-        Dane opisują powtórzenia jednego punktu; współrzędne mają wspólną jednostkę.
+        Wybierz Pomiary → Kowariancja i elipsa 2D, X = wschod_m, Y = polnoc_m.
+        Włącz wykres i osie główne. Oczekiwane: średnia (5,79 ; −3,31) m, SD
+        3,85 m na wschód i 2,18 m na północ, współczynnik korelacji około 0,37.
+        Osie główne mają około 3,96 m i 1,97 m, więc elipsa jest wyraźnie
+        wydłużona i pochylona — składowe nie są niezależne, bo zależą od tej
+        samej geometrii satelitów. Oś główna wskazuje kierunek najgorszej
+        dokładności. Porównaj elipsę standardową i przybliżony rozrzut 95% z
+        obszarem ufności średniego położenia 95%. Pierwsza mówi, gdzie trafi
+        następne wyznaczenie, druga — jak dobrze znamy pozycję po 30 odczytach.
+        Operacyjnie pierwsza wyznacza obszar, który trzeba przeszukać.
+        Współrzędne to odchyłki w metrach od punktu odniesienia przyjętego przez
+        kierującego akcją; obie mają tę samą jednostkę.
       variables:
-        - name: x_m
-          description: Lokalna współrzędna X w metrach.
-        - name: y_m
-          description: Lokalna współrzędna Y w metrach.
-      source: Dane syntetyczne zespołu jUPWR, nie rzeczywiste pomiary GNSS.
+        - name: wschod_m
+          description: Odchyłka na wschód od punktu odniesienia, w metrach.
+        - name: polnoc_m
+          description: Odchyłka na północ od punktu odniesienia, w metrach.
+      source: Dane syntetyczne zespołu jUPWR, nie rzeczywiste zapisy GNSS.
     tags:
       - pomiary
       - kowariancja
       - elipsa
+      - inżynieria bezpieczeństwa
 usesNative: true
 minApp: 1.0.8
+
 ...

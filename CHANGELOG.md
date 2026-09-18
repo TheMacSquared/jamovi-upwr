@@ -4,6 +4,17 @@ Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modu
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
 ## Niewydane
+- jPomiar 0.3.0: zbiory przykładowe opowiadają konkretną historię zamiast być
+  abstrakcyjnymi liczbami. `azotany.csv` (inżynieria środowiska) — 20 oznaczeń
+  azotanów w certyfikowanym wzorcu 50,00 mg/L, sprawdzenie metody przed serią
+  oznaczeń w ściekach; prowadzi przez powtarzane pomiary, budżet niepewności
+  (wzorcowanie odpowiada za ~96% wariancji, więc więcej powtórzeń nie pomoże)
+  i propagację ładunku = stężenie × przepływ. `lokalizacja.csv` (inżynieria
+  bezpieczeństwa) — 30 wyznaczeń pozycji poszkodowanego przez lokalizator GNSS,
+  gdzie elipsa rozrzutu jest obszarem przeszukania. Zastępują `dlugosc.csv`
+  i `polozenie2d.csv`. Dane są odtąd odtwarzalne skryptem `jPomiar/data-raw/datasets.R`.
+- Ikona menu „Pomiary” dla jPomiar (`client/assets/analysis-jpomiar.svg`);
+  wcześniej moduł dostawał domyślną ikonę.
 
 ## 1.0.5 — 2026-09-18
 Nowy moduł opcjonalny jPomiar, rozszerzenia wykresów (scatr 2.9.2), marka jUPWR

@@ -138,7 +138,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jPomiar | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.5 | 28.2 | 0.2.0 | ⬜ do zbudowania | ✅ 2026-09-18 |
+| 1.0.5 | 28.2 | 0.3.0 | ⬜ do zbudowania | ✅ 2026-09-18 |
 
 Pierwsze wydanie z modułem: jUPWR 1.0.5. Testy obliczeń, kompilacja jmc i testy
 integracyjne wykonane lokalnie na Linux x64 / R 4.6.0 (`packaging/scripts/test-jpomiar.sh`).
