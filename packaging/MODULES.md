@@ -70,7 +70,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.5 | 28.2 | 0.3.4 | ⬜ do zbudowania | ✅ 2026-09-18 |
+| 1.0.5 | 28.2 | 0.3.4 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.3.4 | ✅ 2026-09-09 | ✅ 2026-09-09 |
 | 1.0.3 | 28.2 | 0.3.4 | ✅ 2026-09-08 | ✅ 2026-09-08 |
 | 1.0.2 | 28.2 | 0.3.3 | ✅ 2026-09-07 | ✅ 2026-09-07 |
@@ -97,7 +97,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.5 | 28.2 | 0.3.2 | ⬜ do zbudowania | ✅ 2026-09-18 |
+| 1.0.5 | 28.2 | 0.3.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.3.2 | ✅ 2026-09-09 | ✅ 2026-09-09 |
 | 1.0.3 | 28.2 | 0.3.1 | ✅ 2026-09-08 | ✅ 2026-09-08 |
 | 1.0.2 | 28.2 | 0.3.0 | ✅ 2026-09-07 | ✅ 2026-09-07 |
@@ -122,7 +122,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.5 | 28.2 | 0.1.2 | ⬜ do zbudowania | ✅ 2026-09-18 |
+| 1.0.5 | 28.2 | 0.1.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.1.2 | ✅ 2026-09-09 | ✅ 2026-09-09 |
 | 1.0.3 | 28.2 | 0.1.1 | ✅ 2026-09-08 | ✅ 2026-09-08 |
 | 1.0.2 | 28.2 | 0.1.0 | ✅ 2026-09-07 | ✅ 2026-09-07 |
@@ -138,7 +138,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jPomiar | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.5 | 28.2 | 0.3.0 | ⬜ do zbudowania | ✅ 2026-09-18 |
+| 1.0.5 | 28.2 | 0.3.0 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 
 Pierwsze wydanie z modułem: jUPWR 1.0.5. Testy obliczeń, kompilacja jmc i testy
 integracyjne wykonane lokalnie na Linux x64 / R 4.6.0 (`packaging/scripts/test-jpomiar.sh`).
