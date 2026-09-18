@@ -4,30 +4,31 @@ Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modu
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
 ## Niewydane
-- jPomiar 0.3.0: zbiory przykładowe opowiadają konkretną historię zamiast być
-  abstrakcyjnymi liczbami. `azotany.csv` (inżynieria środowiska) — 20 oznaczeń
-  azotanów w certyfikowanym wzorcu 50,00 mg/L, sprawdzenie metody przed serią
-  oznaczeń w ściekach; prowadzi przez powtarzane pomiary, budżet niepewności
-  (wzorcowanie odpowiada za ~96% wariancji, więc więcej powtórzeń nie pomoże)
-  i propagację ładunku = stężenie × przepływ. `lokalizacja.csv` (inżynieria
-  bezpieczeństwa) — 30 wyznaczeń pozycji poszkodowanego przez lokalizator GNSS,
-  gdzie elipsa rozrzutu jest obszarem przeszukania. Zastępują `dlugosc.csv`
-  i `polozenie2d.csv`. Dane są odtąd odtwarzalne skryptem `jPomiar/data-raw/datasets.R`.
-- Ikona menu „Pomiary” dla jPomiar (`client/assets/analysis-jpomiar.svg`);
-  wcześniej moduł dostawał domyślną ikonę.
 
 ## 1.0.5 — 2026-09-18
 Nowy moduł opcjonalny jPomiar, rozszerzenia wykresów (scatr 2.9.2), marka jUPWR
 w nagłówku okna i na ekranie startowym oraz poprawki instalatora Windows i builda
 macOS. Domyślne zachowanie istniejących analiz i wykresów bez zmian.
 
-- Nowy opcjonalny moduł jPomiar 0.2.0 (menu „Pomiary”): powtarzane pomiary,
+- Nowy opcjonalny moduł jPomiar 0.3.0 (menu „Pomiary”): powtarzane pomiary,
   prosty budżet niepewności i propagacja dla sumy, różnicy, iloczynu i ilorazu
   z korelacją oraz kowariancja i elipsy 2D (standardowa, rozrzutu, ufności
   średniego położenia metodą Hotellinga). Każda analiza ma „Opis zastosowanych metod”
   (domyślnie wyłączony); objaśnienia założeń są w `jPomiar/README.md`.
   Zawiera dane, ćwiczenia i testy obliczeń.
   Dodano eksport `.jmo` z Dockera oraz kroki budowania Windows/macOS.
+- Zbiory przykładowe jPomiar opowiadają konkretną historię, a nie są zestawem
+  abstrakcyjnych liczb. `azotany.csv` (inżynieria środowiska) — 20 oznaczeń
+  azotanów w certyfikowanym wzorcu 50,00 mg/L: laboratorium oczyszczalni
+  sprawdza metodę przed serią oznaczeń w ściekach. Jeden zbiór prowadzi przez
+  wszystkie trzy analizy jednowymiarowe: powtarzane pomiary → budżet niepewności
+  (wzorcowanie odpowiada za około 96% wariancji, więc więcej powtórzeń nie pomoże)
+  → propagacja ładunku = stężenie × przepływ. `lokalizacja.csv` (inżynieria
+  bezpieczeństwa) — 30 wyznaczeń pozycji nieruchomego poszkodowanego przez
+  lokalizator GNSS, gdzie elipsa rozrzutu ma znaczenie operacyjne: to obszar,
+  który trzeba przeszukać. Dane są odtwarzalne skryptem `jPomiar/data-raw/datasets.R`.
+- Ikona menu „Pomiary” dla jPomiar (`client/assets/analysis-jpomiar.svg`);
+  wcześniej moduł dostawał domyślną ikonę.
 - Wykresy (scatr 2.9.2), domyślne zachowanie bez zmian:
   - wykres waflowy ze zmienną grupującą dostaje rozmiar z siatki paneli —
     znikają białe pasy nad i pod rzędem paneli (kwadratowe kafelki
