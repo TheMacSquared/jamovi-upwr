@@ -1,0 +1,154 @@
+---
+name: hydroregime
+title: "Reżim i sezonowość"
+jrs: "1.1"
+items:
+  - name: summary
+    title: "Reżim i sezonowość"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - aggregation
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: period
+        title: "Okres"
+        type: text
+      - name: expected
+        title: "Oczekiwane"
+        type: integer
+      - name: observed
+        title: "Pomiary"
+        type: integer
+      - name: coverage
+        title: "Kompletność [%]"
+        type: number
+      - name: value
+        title: "Agregat"
+        type: number
+      - name: reference
+        title: "Odniesienie"
+        type: number
+      - name: anomaly
+        title: "Anomalia"
+        type: number
+  - name: details
+    title: "Profil sezonowy (przyjęte miesiące)"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - aggregation
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: month
+        title: "Miesiąc"
+        type: integer
+      - name: n
+        title: "Liczba miesięcy"
+        type: integer
+      - name: mean
+        title: "Średnia"
+        type: number
+      - name: median
+        title: "Mediana"
+        type: number
+      - name: min
+        title: "Minimum"
+        type: number
+      - name: max
+        title: "Maksimum"
+        type: number
+  - name: plot
+    title: "Przebieg / charakterystyka"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - aggregation
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+  - name: plot2
+    title: "Diagnostyka / sezonowość"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot2
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - aggregation
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+  - name: metody
+    title: Zastosowane metody
+    type: Html
+    visible: (metody)
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - aggregation
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+...

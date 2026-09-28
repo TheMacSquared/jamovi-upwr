@@ -1,0 +1,154 @@
+---
+name: hydrotrend
+title: "Trendy i zmiany"
+jrs: "1.1"
+items:
+  - name: summary
+    title: "Trendy i zmiany"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - trendMode
+      - inferIndependent
+      - pettitt
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: n
+        title: "Okresy"
+        type: integer
+      - name: s
+        title: "S"
+        type: number
+      - name: slope
+        title: "Sen [jedn./rok]"
+        type: number
+      - name: lower
+        title: "Dolna granica 95%"
+        type: number
+      - name: upper
+        title: "Górna granica 95%"
+        type: number
+      - name: p
+        title: "p (niezależność)"
+        type: number
+      - name: acf1
+        title: "r lag 1 (reszty)"
+        type: number
+      - name: acf12
+        title: "r lag 12 (reszty)"
+        type: number
+      - name: change
+        title: "Zmiana po roku"
+        type: text
+      - name: pettittP
+        title: "p Pettitta (przybl.)"
+        type: number
+  - name: details
+    title: "Agregaty użyte w analizie"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - trendMode
+      - inferIndependent
+      - pettitt
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: period
+        title: "Okres"
+        type: text
+      - name: coverage
+        title: "Kompletność [%]"
+        type: number
+      - name: value
+        title: "Agregat"
+        type: number
+  - name: plot
+    title: "Przebieg / charakterystyka"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - trendMode
+      - inferIndependent
+      - pettitt
+      - showPlot
+      - metody
+  - name: plot2
+    title: "Diagnostyka / sezonowość"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot2
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - trendMode
+      - inferIndependent
+      - pettitt
+      - showPlot
+      - metody
+  - name: metody
+    title: Zastosowane metody
+    type: Html
+    visible: (metody)
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - trendMode
+      - inferIndependent
+      - pettitt
+      - showPlot
+      - metody
+...

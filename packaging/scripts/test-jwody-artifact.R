@@ -1,0 +1,15 @@
+# Usage: Rscript test-jwody-artifact.R archive.jmo tests-directory base-R-library
+args <- commandArgs(trailingOnly = TRUE)
+stopifnot(length(args) == 3L, file.exists(args[1]), dir.exists(args[2]), dir.exists(args[3]))
+work <- tempfile("jwody-artifact-")
+dir.create(work)
+utils::unzip(args[1], exdir = work)
+.libPaths(c(file.path(work, "jWody", "R"), args[3], .libPaths()))
+cat("Platform:", R.version$platform, "R:", as.character(getRversion()), "\n")
+ns <- loadNamespace("jWody")
+metadata <- readLines(file.path(work, "jWody", "jamovi.yaml"), warn = FALSE)
+version <- trimws(sub("^version:", "", grep("^version:", metadata, value = TRUE)))
+stopifnot(as.character(utils::packageVersion("jWody")) == version)
+Sys.unsetenv("JWODY_SOURCE_TESTS")
+tryCatch(testthat::test_dir(args[2], env = new.env(parent = ns), reporter = "summary", stop_on_failure = TRUE, stop_on_warning = TRUE),
+         finally = unlink(work, recursive = TRUE))

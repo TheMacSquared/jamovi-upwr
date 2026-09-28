@@ -52,7 +52,7 @@ $ElectronVer= "43.4.1"
 $PbsUrl     = "https://github.com/astral-sh/python-build-standalone/releases/download/20250612/cpython-3.12.11+20250612-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
 $NanomsgUrl = "https://github.com/nanomsg/nanomsg/archive/refs/tags/1.2.tar.gz"
 $CranRepo   = "https://packagemanager.posit.co/cran/latest"
-$Modules    = @('jmv','plots','jperm','jCI','jdistrACTION','jDane','jANOVA','jTestyT','jCzest','jEksplor','jRegr')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f, jRol 4g, jPomiar 4h
+$Modules    = @('jmv','plots','jperm','jCI','jdistrACTION','jDane','jANOVA','jTestyT','jCzest','jEksplor','jRegr')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f, jRol 4g, jPomiar 4h, jWody 4i
 
 $ProgressPreference = 'SilentlyContinue'
 function Step($m){ Write-Host "`n==> $m" -ForegroundColor Cyan }
@@ -199,7 +199,7 @@ $jmc = Join-Path $RepoRoot "jamovi-compiler\index.js"
 # Bajty (a nie Get-Content/Set-Content), bo skrypt bywa uruchamiany pod Windows
 # PowerShell 5.1, gdzie `-Encoding UTF8` dopisuje BOM i psuje pliki.
 $YamlBackup = @{}
-foreach ($m in ($Modules + @('jRISK','jSpace','jRol','jPomiar'))) {   # + kazdy modul opcjonalny z krokow 4e-4h
+foreach ($m in ($Modules + @('jRISK','jSpace','jRol','jPomiar','jWody'))) {   # + kazdy modul opcjonalny z krokow 4e-4i
     $y = Join-Path $RepoRoot "$m\jamovi\0000.yaml"
     if (Test-Path $y) { $YamlBackup[$y] = [System.IO.File]::ReadAllBytes($y) }
 }
@@ -273,6 +273,19 @@ Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jPomiar"), '--jmo', $JmoP,
              '--assume-app-version', $JamoviVer, '--skip-deps') "jPomiar .jmo"
 if (-not (Test-Path $JmoP)) { throw "jPomiar: plik .jmo nie powstal" }
 Info "jPomiar .jmo OK ($JmoP)"
+
+# 4i. jWody jako modul OPCJONALNY — hydrologia; zaleznosci w base\R.
+$JwodyVer = ((Select-String -Path (Join-Path $RepoRoot "jWody\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
+$JwodyDesc = ((Select-String -Path (Join-Path $RepoRoot "jWody\DESCRIPTION") -Pattern "^Version:\s*([0-9.]+)").Matches.Groups[1].Value)
+if ($JwodyVer -ne $JwodyDesc) { throw "jWody: wersje 0000.yaml i DESCRIPTION roznia sie" }
+$JmoW = "$Dist\jWody_$JwodyVer-win64.jmo"
+Remove-Item $JmoW -Force -EA SilentlyContinue
+Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jWody"), '--jmo', $JmoW,
+             '--rhome', $RHome, '--rlibs', "$BaseR;$UserLib",
+             '--assume-app-version', $JamoviVer, '--skip-deps') "jWody .jmo"
+if (-not (Test-Path $JmoW)) { throw "jWody: plik .jmo nie powstal" }
+Info "jWody .jmo OK ($JmoW)"
+
 
 }
 finally {

@@ -5,6 +5,16 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+- jWody: biblioteka danych z trzema wbudowanymi CSV, instrukcjami ćwiczeń,
+  słownikiem zmiennych, jednostkami i pochodzeniem według wzorca jSpace.
+
+- Opcjonalny jWody 0.1.1 (menu „Hydrologia”): kontrola szeregu, reżim i sezonowość,
+  przepływy charakterystyczne, trendy oraz niżówki. Dobowe/miesięczne dane,
+  wiele stacji, jawna kompletność i rok hydrologiczny; trzy syntetyczne zbiory
+  dydaktyczne. Testy obliczeń, paneli i wykresów oraz skrypty `.jmo` dla
+  Dockera, macOS i Windows. Wnioskowanie trendu pod założeniem niezależności
+  wymaga jawnego włączenia. Zakres i walidacja: `jWody/README.md`.
+
 ## 1.0.5 — 2026-09-18
 Nowy moduł opcjonalny jPomiar, rozszerzenia wykresów (scatr 2.9.2), marka jUPWR
 w nagłówku okna i na ekranie startowym oraz poprawki instalatora Windows i builda

@@ -1,0 +1,131 @@
+---
+name: hydrolow
+title: "Niżówki"
+menuGroup: Hydrologia
+version: 1.0.0
+jas: "1.2"
+weightsSupport: none
+options:
+  - name: data
+    type: "Data"
+  - name: date
+    title: "Data (tekst ISO: RRRR-MM-DD)"
+    type: "Variable"
+    suggested:
+      - nominal
+    permitted:
+      - factor
+  - name: value
+    title: "Wartość pomiaru"
+    type: "Variable"
+    suggested:
+      - continuous
+    permitted:
+      - numeric
+  - name: station
+    default: null
+    title: "Stacja / studnia (opcjonalnie)"
+    type: "Variable"
+    suggested:
+      - nominal
+    permitted:
+      - factor
+  - name: resolution
+    title: "Rozdzielczość"
+    type: "List"
+    default: "daily"
+    options:
+      - name: daily
+        title: "Dobowa"
+      - name: monthly
+        title: "Miesięczna (data = pierwszy dzień miesiąca)"
+  - name: kind
+    title: "Wielkość i jednostka"
+    type: "List"
+    default: "flow"
+    options:
+      - name: flow
+        title: "Przepływ [m³/s]"
+      - name: rain
+        title: "Suma opadu [mm]"
+      - name: stage
+        title: "Stan wody [cm]"
+      - name: depth
+        title: "Głębokość zwierciadła [m p.p.t.]"
+      - name: level
+        title: "Rzędna zwierciadła [m n.p.m.]"
+  - name: yearStart
+    title: "Pierwszy miesiąc roku hydrologicznego"
+    type: "Integer"
+    default: 11
+    min: 1
+    max: 12
+  - name: dateStart
+    title: "Początek okresu (RRRR-MM-DD; puste = cały)"
+    type: "String"
+    default: ""
+  - name: dateEnd
+    title: "Koniec okresu (RRRR-MM-DD; puste = cały)"
+    type: "String"
+    default: ""
+  - name: completeness
+    title: "Minimalna kompletność okresu [%]"
+    type: "Number"
+    default: 100
+    min: 1
+    max: 100
+  - name: thresholdMode
+    title: "Próg niżówki"
+    type: "List"
+    default: "quantile"
+    options:
+      - name: quantile
+        title: "Stały Qp z okresu odniesienia"
+      - name: monthly
+        title: "Osobny Qp dla każdego miesiąca"
+      - name: fixed
+        title: "Próg podany w m³/s"
+  - name: exceedance
+    title: "Prawdopodobieństwo przewyższenia progu [%]"
+    type: "Number"
+    default: 90
+    min: 1
+    max: 99
+  - name: threshold
+    title: "Próg stały [m³/s]"
+    type: "Number"
+    default: 1
+    min: 0
+  - name: minDuration
+    title: "Minimum dni poniżej progu"
+    type: "Integer"
+    default: 1
+    min: 1
+    max: 3660
+  - name: poolDays
+    title: "Połącz przez najwyżej tyle dni nad progiem"
+    type: "Integer"
+    default: 0
+    min: 0
+    max: 30
+  - name: refStart
+    title: "Pierwszy rok kalendarzowy odniesienia (0 = cały)"
+    type: "Integer"
+    default: 0
+    min: 0
+    max: 9999
+  - name: refEnd
+    title: "Ostatni rok kalendarzowy odniesienia (0 = cały)"
+    type: "Integer"
+    default: 0
+    min: 0
+    max: 9999
+  - name: showPlot
+    title: "Pokaż wykresy"
+    type: "Bool"
+    default: false
+  - name: metody
+    title: "Opis zastosowanych metod"
+    type: "Bool"
+    default: false
+...

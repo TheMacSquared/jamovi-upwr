@@ -1,0 +1,171 @@
+---
+name: hydrolow
+title: "Niżówki"
+jrs: "1.1"
+items:
+  - name: summary
+    title: "Niżówki"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - thresholdMode
+      - exceedance
+      - threshold
+      - minDuration
+      - poolDays
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: start
+        title: "Od"
+        type: text
+      - name: end
+        title: "Do"
+        type: text
+      - name: duration
+        title: "Rozpiętość [dni]"
+        type: integer
+      - name: lowDays
+        title: "Dni pod progiem"
+        type: integer
+      - name: minimum
+        title: "Minimum [m³/s]"
+        type: number
+      - name: deficit
+        title: "Deficyt [m³]"
+        type: number
+      - name: censored
+        title: "Ucięte przez lukę / granicę"
+        type: text
+  - name: details
+    title: "Roczne zestawienie wykrytych zdarzeń"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - thresholdMode
+      - exceedance
+      - threshold
+      - minDuration
+      - poolDays
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: period
+        title: "Rok"
+        type: text
+      - name: coverage
+        title: "Kompletność [%]"
+        type: number
+      - name: events
+        title: "Początki zdarzeń"
+        type: integer
+      - name: lowDays
+        title: "Dni pod progiem"
+        type: integer
+      - name: deficit
+        title: "Deficyt [m³]"
+        type: number
+  - name: plot
+    title: "Przebieg / charakterystyka"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - thresholdMode
+      - exceedance
+      - threshold
+      - minDuration
+      - poolDays
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+  - name: plot2
+    title: "Diagnostyka / sezonowość"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot2
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - thresholdMode
+      - exceedance
+      - threshold
+      - minDuration
+      - poolDays
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+  - name: metody
+    title: Zastosowane metody
+    type: Html
+    visible: (metody)
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - thresholdMode
+      - exceedance
+      - threshold
+      - minDuration
+      - poolDays
+      - refStart
+      - refEnd
+      - showPlot
+      - metody
+...

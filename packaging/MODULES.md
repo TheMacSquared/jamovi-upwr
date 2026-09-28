@@ -24,6 +24,7 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
 | `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.2 |
 | `jPomiar/` | jPomiar | powtarzane pomiary, budżet niepewności, propagacja z korelacją, kowariancja i elipsy 2D; pilotaż międzykierunkowy | **opcjonalny — `.jmo` (sideload)** | 0.2.0 |
+| `jWody/` | jWody | hydrologia: kontrola szeregu, reżim, przepływy, trendy i niżówki | **opcjonalny — `.jmo` (sideload)** | 0.1.1 |
 
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
 jeden kurs jest **opcjonalny** i trafia do studentów jako plik `.jmo` (Moduły → Sideload).
@@ -51,6 +52,9 @@ wymaga osobnego builda, na maszynie z tą platformą:
 | jPomiar | Linux (Docker) | `packaging/scripts/build-jpomiar-docker.sh` | `packaging/build/dist/jPomiar_<wersja>-linux.jmo` |
 | jPomiar | macOS arm64 | `packaging/scripts/macos/73-jmo-jpomiar.sh` | `packaging/build/dist/jPomiar_<wersja>-macos-arm64.jmo` |
 | jPomiar | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4h) | `packaging\build\dist\jPomiar_<wersja>-win64.jmo` |
+| jWody | Linux (Docker) | `packaging/scripts/build-jwody-docker.sh` | `packaging/build/dist/jWody_<wersja>-linux.jmo` |
+| jWody | macOS arm64 | `packaging/scripts/macos/74-jmo-jwody.sh` | `packaging/build/dist/jWody_<wersja>-macos-arm64.jmo` |
+| jWody | Windows x64 | `packaging/scripts/windows/build.ps1` (krok 4i) | `packaging\build\dist\jWody_<wersja>-win64.jmo` |
 
 Nowy moduł opcjonalny = kopia tych dwóch kroków z podmienioną nazwą + wiersz w tabeli wyżej.
 
@@ -147,6 +151,16 @@ Target Dockera `jpomiar-artifact` oraz sideload w aplikacji pozostają do sprawd
 referencyjnego.
 Ćwiczenia i założenia: [`jPomiar/README.md`](../jPomiar/README.md).
 
+### jWody
+
+| jUPWR | jamovi | jWody | `.jmo` macOS | `.jmo` Windows |
+|---|---|---|---|---|
+| 1.0.5 | 28.2 | 0.1.1 | ✅ 2026-09-28, arm64; testy artefaktu | ⬜ do zbudowania na Windows |
+
+Nowy moduł opcjonalny; status walidacji i metody: [`jWody/README.md`](../jWody/README.md).
+Testy: `packaging/scripts/test-jwody.sh`; referencyjny target Dockera: `jwody-artifact`.
+Wersja aplikacji nie jest podbijana przy dodawaniu osobnego modułu do sideloadu.
+
 ## Procedura wydania jUPWR — checklist
 
 1. Bump wersji: `client/common/jupwr.ts` i tag w `docker-compose.yaml` (skrypty packagingu
@@ -154,7 +168,7 @@ referencyjnego.
 2. Wpis w `CHANGELOG.md` (wersja, data, zmiany, wersje modułów).
 3. Docker: `docker compose --profile main build` + smoke test.
 4. Build natywny dla bieżącej maszyny (macOS: `00`→`60`, **plus `70-jmo-*` dla każdego modułu
-   opcjonalnego**; Windows: `build.ps1`, który robi `.jmo` w krokach 4e–4h).
+   opcjonalnego**; Windows: `build.ps1`, który robi `.jmo` w krokach 4e–4i).
    Pełna procedura z testami: Windows — [`docs/handouts/build-windows.md`](../docs/handouts/build-windows.md),
    macOS — [`docs/handouts/build-macos.md`](../docs/handouts/build-macos.md).
 5. Uzupełnij macierz zgodności wyżej (które `.jmo` zbudowano, na jakiej platformie).

@@ -1,0 +1,151 @@
+---
+name: hydrocheck
+title: "Kontrola szeregu"
+jrs: "1.1"
+items:
+  - name: summary
+    title: "Kontrola szeregu"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: start
+        title: "Od"
+        type: text
+      - name: end
+        title: "Do"
+        type: text
+      - name: rows
+        title: "Wiersze"
+        type: integer
+      - name: observed
+        title: "Pomiary"
+        type: integer
+      - name: missing
+        title: "Braki jawne"
+        type: integer
+      - name: absent
+        title: "Brakujące daty"
+        type: integer
+      - name: duplicates
+        title: "Nadmiarowe daty"
+        type: integer
+      - name: invalid
+        title: "Błędne daty"
+        type: integer
+      - name: negative
+        title: "Wartości < 0"
+        type: integer
+      - name: longest
+        title: "Najdłuższa luka [kroki]"
+        type: integer
+      - name: coverage
+        title: "Kompletność [%]"
+        type: number
+  - name: details
+    title: "Kompletność miesięcy i lat"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: scale
+        title: "Skala"
+        type: text
+      - name: period
+        title: "Okres"
+        type: text
+      - name: expected
+        title: "Oczekiwane"
+        type: integer
+      - name: observed
+        title: "Pomiary"
+        type: integer
+      - name: coverage
+        title: "Kompletność [%]"
+        type: number
+      - name: accepted
+        title: "Przyjęty"
+        type: text
+  - name: plot
+    title: "Przebieg / charakterystyka"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - showPlot
+      - metody
+  - name: plot2
+    title: "Diagnostyka / sezonowość"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot2
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - showPlot
+      - metody
+  - name: metody
+    title: Zastosowane metody
+    type: Html
+    visible: (metody)
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - showPlot
+      - metody
+...

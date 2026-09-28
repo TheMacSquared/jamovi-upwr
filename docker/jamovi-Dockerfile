@@ -196,6 +196,22 @@ RUN mkdir -p /tmp/artifacts && \
 FROM scratch AS jpomiar-artifact
 COPY --from=jpomiar /tmp/artifacts/ /
 
+##### OPTIONAL JWODY (.jmo only; not preinstalled) #####
+
+FROM compiler AS jwody
+ARG JAMOVI_ROOT=.
+COPY $JAMOVI_ROOT/jWody/ /tmp/source/jWody
+WORKDIR /tmp/source/jWody
+RUN mkdir -p /tmp/artifacts && \
+    MODULE_VERSION=$(sed -n 's/^Version: *//p' DESCRIPTION) && \
+    test "$MODULE_VERSION" = "$(sed -n 's/^version: *//p' jamovi/0000.yaml)" && \
+    jmc --build . --jmo /tmp/artifacts/jWody_${MODULE_VERSION}-linux.jmo \
+        --rhome $R_HOME --rlibs /usr/lib/jamovi/modules/base/R \
+        --assume-app-version "$(cat /usr/lib/jamovi/version)" --skip-deps
+
+FROM scratch AS jwody-artifact
+COPY --from=jwody /tmp/artifacts/ /
+
 ##### JMV #####
 
 FROM compiler AS jmv

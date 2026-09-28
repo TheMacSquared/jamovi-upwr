@@ -1,0 +1,56 @@
+---
+title: "Kontrola szeregu"
+name: hydrocheck
+jus: "3.0"
+stage: 0
+compilerMode: tame
+children:
+  - type: VariableSupplier
+    persistentItems: false
+    stretchFactor: 1
+    children:
+      - type: TargetLayoutBox
+        label: "Data (tekst ISO: RRRR-MM-DD)"
+        children:
+          - type: VariablesListBox
+            name: date
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: "Wartość pomiaru"
+        children:
+          - type: VariablesListBox
+            name: value
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
+        label: "Stacja / studnia (opcjonalnie)"
+        children:
+          - type: VariablesListBox
+            name: station
+            isTarget: true
+            maxItemCount: 1
+  - type: Label
+    label: Ustawienia szeregu i analizy
+    children:
+      - type: ComboBox
+        name: resolution
+      - type: ComboBox
+        name: kind
+      - type: TextBox
+        name: yearStart
+        format: number
+      - type: TextBox
+        name: dateStart
+        format: string
+      - type: TextBox
+        name: dateEnd
+        format: string
+      - type: TextBox
+        name: completeness
+        format: number
+      - type: CheckBox
+        name: showPlot
+      - type: CheckBox
+        name: metody
+...

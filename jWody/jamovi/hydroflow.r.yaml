@@ -1,0 +1,153 @@
+---
+name: hydroflow
+title: "Przepływy charakterystyczne"
+jrs: "1.1"
+items:
+  - name: summary
+    title: "Przepływy charakterystyczne"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - area
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: years
+        title: "Lata przyjęte"
+        type: integer
+      - name: nnq
+        title: "NNQ [m³/s]"
+        type: number
+      - name: snq
+        title: "SNQ [m³/s]"
+        type: number
+      - name: ssq
+        title: "SSQ [m³/s]"
+        type: number
+      - name: swq
+        title: "SWQ [m³/s]"
+        type: number
+      - name: wwq
+        title: "WWQ [m³/s]"
+        type: number
+      - name: q90
+        title: "Q90 [m³/s]"
+        type: number
+      - name: q95
+        title: "Q95 [m³/s]"
+        type: number
+      - name: specific
+        title: "Odpływ [l/s/km²]"
+        type: number
+  - name: details
+    title: "Charakterystyki lat hydrologicznych"
+    type: Table
+    rows: 0
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - area
+      - showPlot
+      - metody
+    columns:
+      - name: station
+        title: "Stacja"
+        type: text
+      - name: period
+        title: "Rok"
+        type: text
+      - name: coverage
+        title: "Kompletność [%]"
+        type: number
+      - name: minimum
+        title: "NQ [m³/s]"
+        type: number
+      - name: value
+        title: "SQ [m³/s]"
+        type: number
+      - name: maximum
+        title: "WQ [m³/s]"
+        type: number
+      - name: volume
+        title: "Zmierzona objętość [m³]"
+        type: number
+      - name: depth
+        title: "Zmierzona warstwa [mm]"
+        type: number
+  - name: plot
+    title: "Przebieg / charakterystyka"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - area
+      - showPlot
+      - metody
+  - name: plot2
+    title: "Diagnostyka / sezonowość"
+    type: Image
+    width: 700
+    height: 450
+    visible: (showPlot)
+    renderFun: .plot2
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - area
+      - showPlot
+      - metody
+  - name: metody
+    title: Zastosowane metody
+    type: Html
+    visible: (metody)
+    clearWith:
+      - date
+      - value
+      - station
+      - resolution
+      - kind
+      - yearStart
+      - dateStart
+      - dateEnd
+      - completeness
+      - area
+      - showPlot
+      - metody
+...

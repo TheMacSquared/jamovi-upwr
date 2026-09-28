@@ -1,0 +1,161 @@
+---
+title: Hydrologia
+name: jWody
+version: 0.1.1
+jms: "1.0"
+authors:
+  - jUPWR Team
+maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
+description: Kontrola szeregu, reżim, przepływy charakterystyczne, trendy i niżówki.
+analyses:
+  - title: "Kontrola szeregu"
+    name: hydrocheck
+    ns: jWody
+    menuGroup: Hydrologia
+    menuTitle: "Kontrola szeregu"
+    category: analyses
+  - title: "Reżim i sezonowość"
+    name: hydroregime
+    ns: jWody
+    menuGroup: Hydrologia
+    menuTitle: "Reżim i sezonowość"
+    category: analyses
+  - title: "Przepływy charakterystyczne"
+    name: hydroflow
+    ns: jWody
+    menuGroup: Hydrologia
+    menuTitle: "Przepływy charakterystyczne"
+    category: analyses
+  - title: "Trendy i zmiany"
+    name: hydrotrend
+    ns: jWody
+    menuGroup: Hydrologia
+    menuTitle: "Trendy i zmiany"
+    category: analyses
+  - title: "Niżówki"
+    name: hydrolow
+    ns: jWody
+    menuGroup: Hydrologia
+    menuTitle: "Niżówki"
+    category: analyses
+datasets:
+  - name: Przepływ dobowy — dwie rzeki (syntetyczne)
+    path: przeplyw.csv
+    description: 10 958 pomiarów dobowych z dwóch stacji (2010–2024); reżim, przepływy i niżówki.
+    documentation:
+      summary: >-
+        Dwa syntetyczne wodowskazy Rzeka_A i Rzeka_B, po 5479 dni od 2010-01-01
+        do 2024-12-31. Łącznie 10 958 wierszy, w tym 42 brakujące wartości Q.
+      details: >-
+        Zlewnie mają sezonowy przebieg przepływu, krótsze wahania i łagodny trend.
+        Rzeka_B ma mniejszy przepływ. W obu stacjach celowo pozostawiono luki:
+        pojedyncze dni oraz jeden odcinek 15-dniowy. Analiza: Hydrologia →
+        Kontrola szeregu; Data = data, Wartość pomiaru = przeplyw_m3s,
+        Stacja = stacja, Rozdzielczość = Dobowa, Wielkość = Przepływ [m³/s].
+        Następnie przejdź do Reżimu i sezonowości, Przepływów charakterystycznych
+        oraz Niżówek, używając tych samych kolumn. Włącz wykresy. Porównaj
+        minimalną kompletność 100% i 95% i wyjaśnij, dlaczego zmienia się liczba
+        przyjętych lat. W Niżówkach porównaj stały Q90 z progiem miesięcznym;
+        zdarzenia przy luce mają nieznany pełny czas trwania. To dane ćwiczeniowe,
+        nie pomiary z rzeczywistych rzek; nie służą do wnioskowania o klimacie.
+      variables:
+        - name: data
+          description: Data pomiaru dobowego, tekst ISO RRRR-MM-DD; lata przestępne zachowane.
+        - name: stacja
+          description: Identyfikator syntetycznego wodowskazu (Rzeka_A lub Rzeka_B); obliczenia osobno dla stacji.
+        - name: przeplyw_m3s
+          description: Syntetyczny średni przepływ dobowy w m³/s; pusta komórka oznacza brak pomiaru, nie zero.
+      source: Dane syntetyczne zespołu jUPWR, deterministyczny generator jWody/data-raw/generate.R; bez źródła terenowego.
+      provenance:
+        package: jWody
+        dataset: data-raw/generate.R — przeplyw.csv
+      changes:
+        - Przebieg sezonowy i wahania utworzone wzorami; stacja B ma przeskalowane Q oraz dodatkowe wahania.
+        - Wprowadzono jawne braki pomiarów; wartości zaokrąglono do 0,001 m³/s, bez interpolacji.
+    tags:
+      - hydrologia
+      - przepływ
+      - szeregi czasowe
+      - niżówki
+      - dane syntetyczne
+  - name: Opad dobowy — dni mokre i suche (syntetyczne)
+    path: opad.csv
+    description: 5479 dobowych sum opadu (2010–2024); zera, luki i agregacja miesięczna.
+    documentation:
+      summary: >-
+        Syntetyczna stacja Opad_A, 5479 dni od 2010-01-01 do 2024-12-31.
+        Szereg zawiera 3418 zmierzonych zer oraz 6 brakujących wartości opadu.
+      details: >-
+        Zbiór pokazuje różnicę między dniem bez opadu a brakiem pomiaru.
+        Analiza: Hydrologia → Kontrola szeregu; Data = data, Wartość pomiaru =
+        opad_mm, Stacja = stacja, Rozdzielczość = Dobowa, Wielkość = Suma opadu [mm].
+        W Reżimie i sezonowości wybierz agregację miesięczną i włącz wykresy.
+        Znajdź miesiąc z sześcioma brakującymi dniami; porównaj kompletność 100%
+        i 80%. Przy niższym progu otrzymasz sumę tylko zmierzonych dni, bez
+        przeskalowania do pełnego miesiąca. Nie zastępuj braków zerami.
+        Panele Przepływów charakterystycznych i Niżówek dotyczą Q, nie opadu.
+        Regularny schemat dni mokrych jest celowym uproszczeniem dydaktycznym,
+        a nie realistycznym generatorem pogody.
+      variables:
+        - name: data
+          description: Data dobowej sumy opadu, tekst ISO RRRR-MM-DD.
+        - name: stacja
+          description: Identyfikator syntetycznej stacji opadowej Opad_A.
+        - name: opad_mm
+          description: Dobowa suma opadu w mm; zero oznacza zmierzony brak opadu, pusta komórka oznacza brak danych.
+      source: Dane syntetyczne zespołu jUPWR, deterministyczny generator jWody/data-raw/generate.R; nie dane IMGW.
+      provenance:
+        package: jWody
+        dataset: data-raw/generate.R — opad.csv
+      changes:
+        - Dni mokre wybrano według powtarzalnego schematu; dodatnie sumy utworzono wzorami i zaokrąglono do 0,01 mm.
+        - Wprowadzono sześć kolejnych braków pomiarów; zera opadu zachowano jako liczby.
+    tags:
+      - hydrologia
+      - opad
+      - sezonowość
+      - braki danych
+      - dane syntetyczne
+  - name: Wody podziemne — zwierciadło w studni (syntetyczne)
+    path: studnia.csv
+    description: 360 miesięcznych pomiarów głębokości (1995–2024); sezonowość, trend i luka.
+    documentation:
+      summary: >-
+        Syntetyczna Studnia_A, 360 miesięcy od stycznia 1995 do grudnia 2024,
+        w tym 3 brakujące pomiary. Głębokość w m p.p.t.; większa liczba oznacza
+        niższe położenie zwierciadła.
+      details: >-
+        Głębokość łączy cykl roczny, łagodny trend i dłuższe wahania. Wzorcem
+        generatora jest liniowy wzrost głębokości o 0,024 m/rok, ale estymacja
+        z szeregu zawierającego dodatkowe wahania nie musi dać dokładnie tej
+        wartości. Analiza: Hydrologia → Kontrola szeregu; Data = data,
+        Wartość pomiaru = glebokosc_m, Stacja = stacja, Rozdzielczość = Miesięczna,
+        Wielkość = Głębokość zwierciadła [m p.p.t.]. Daty wskazują pierwszy dzień
+        miesiąca. W Trendach i zmianach porównaj wariant roczny z sezonowym,
+        miesięcznym; włącz wykresy i obejrzyj korelacje reszt. Dodatnie nachylenie
+        interpretuj jako obniżanie zwierciadła. Wnioskowanie p/PU wymaga
+        niezależności, której syntetyczny szereg z regularnymi wahaniami nie
+        gwarantuje. Nie traktuj go jako potwierdzenia rzeczywistej suszy.
+      variables:
+        - name: data
+          description: Miesiąc pomiaru zapisany jako pierwszy dzień miesiąca, tekst ISO RRRR-MM-DD.
+        - name: stacja
+          description: Identyfikator syntetycznej studni Studnia_A.
+        - name: glebokosc_m
+          description: Głębokość zwierciadła w metrach poniżej powierzchni terenu; wzrost oznacza obniżenie zwierciadła, pusta komórka to brak pomiaru.
+      source: Dane syntetyczne zespołu jUPWR, deterministyczny generator jWody/data-raw/generate.R; nie obserwacje PIG ani konkretnej studni.
+      provenance:
+        package: jWody
+        dataset: data-raw/generate.R — studnia.csv
+      changes:
+        - Dodano cykl roczny, trend 0,002 m/miesiąc i dłuższe wahania; wartości zaokrąglono do 0,001 m.
+        - Trzy kolejne miesiące pozostawiono jako braki, bez interpolacji.
+    tags:
+      - hydrologia
+      - wody podziemne
+      - trendy
+      - sezonowość
+      - dane syntetyczne
+usesNative: true
+minApp: 1.0.5
+...
