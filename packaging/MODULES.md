@@ -74,6 +74,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.0.5 | 28.2 | 0.4.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.0.5 | 28.2 | 0.3.4 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.3.4 | ✅ 2026-09-09 | ✅ 2026-09-09 |
 | 1.0.3 | 28.2 | 0.3.4 | ✅ 2026-09-08 | ✅ 2026-09-08 |

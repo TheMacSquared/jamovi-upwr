@@ -5,7 +5,27 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
-- Opcjonalny jRISK 0.4.0 (luki z audytu pokrycia ćwiczeń „Analiza ryzyka”):
+- jWody: biblioteka danych z trzema wbudowanymi CSV, instrukcjami ćwiczeń,
+  słownikiem zmiennych, jednostkami i pochodzeniem według wzorca jSpace.
+
+- Opcjonalny jWody 0.1.1 (menu „Hydrologia”): kontrola szeregu, reżim i sezonowość,
+  przepływy charakterystyczne, trendy oraz niżówki. Dobowe/miesięczne dane,
+  wiele stacji, jawna kompletność i rok hydrologiczny; trzy syntetyczne zbiory
+  dydaktyczne. Testy obliczeń, paneli i wykresów oraz skrypty `.jmo` dla
+  Dockera, macOS i Windows. Wnioskowanie trendu pod założeniem niezależności
+  wymaga jawnego włączenia. Zakres i walidacja: `jWody/README.md`.
+
+## 1.0.5 — 2026-09-18
+Nowy moduł opcjonalny jPomiar, rozszerzenia wykresów (scatr 2.9.2), marka jUPWR
+w nagłówku okna i na ekranie startowym oraz poprawki instalatora Windows i builda
+macOS. Domyślne zachowanie istniejących analiz i wykresów bez zmian.
+
+### Aktualizacja modułu opcjonalnego jRISK 0.4.0 (2026-10-02)
+Bez nowej wersji aplikacji: nowy `.jmo` instaluje się przez Moduły → Sideload na
+zainstalowanym jUPWR 1.0.5 (zastępuje jRISK 0.3.4). Zgodność: macierz w
+[`packaging/MODULES.md`](packaging/MODULES.md).
+
+- jRISK 0.4.0 (luki z audytu pokrycia ćwiczeń „Analiza ryzyka”):
   „Zdarzenia i warunkowanie” i „Schemat Bernoulliego” przyjmują kolumnę liczności
   (tabela zagregowana, np. Bayes z 4 wierszy) i respektują wagi danych jamovi;
   w schemacie Bernoulliego jednostronna górna granica p (Clopper–Pearson,
@@ -25,20 +45,7 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   „Analiza ryzyka” sprawdzane testami integracyjnymi.
   Domyślne zachowanie istniejących analiz bez zmian.
 
-- jWody: biblioteka danych z trzema wbudowanymi CSV, instrukcjami ćwiczeń,
-  słownikiem zmiennych, jednostkami i pochodzeniem według wzorca jSpace.
-
-- Opcjonalny jWody 0.1.1 (menu „Hydrologia”): kontrola szeregu, reżim i sezonowość,
-  przepływy charakterystyczne, trendy oraz niżówki. Dobowe/miesięczne dane,
-  wiele stacji, jawna kompletność i rok hydrologiczny; trzy syntetyczne zbiory
-  dydaktyczne. Testy obliczeń, paneli i wykresów oraz skrypty `.jmo` dla
-  Dockera, macOS i Windows. Wnioskowanie trendu pod założeniem niezależności
-  wymaga jawnego włączenia. Zakres i walidacja: `jWody/README.md`.
-
-## 1.0.5 — 2026-09-18
-Nowy moduł opcjonalny jPomiar, rozszerzenia wykresów (scatr 2.9.2), marka jUPWR
-w nagłówku okna i na ekranie startowym oraz poprawki instalatora Windows i builda
-macOS. Domyślne zachowanie istniejących analiz i wykresów bez zmian.
+### Wydanie 1.0.5
 
 - Nowy opcjonalny moduł jPomiar 0.3.0 (menu „Pomiary”): powtarzane pomiary,
   prosty budżet niepewności i propagacja dla sumy, różnicy, iloczynu i ilorazu
