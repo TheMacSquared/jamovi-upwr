@@ -36,6 +36,8 @@ children:
         name: innerGate
       - type: ComboBox
         name: topGate
+      - type: CheckBox
+        name: sharedEvents
   - type: Label
     label: Wyniki
     children:

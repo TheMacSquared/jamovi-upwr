@@ -24,6 +24,10 @@ items:
         - name: upper
           title: 95% CI górna
           type: number
+        - name: upperOne
+          title: 95% górna granica (jednostronna)
+          type: number
+          visible: (showUpperBound)
 
     - name: runPlot
       title: Częstość skumulowana sukcesów

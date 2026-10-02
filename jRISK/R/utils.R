@@ -192,6 +192,29 @@ riskFtaImportance <- function(probs, branch, innerGate, topGate) {
   }, 0)
 }
 
+# P(top) with shared basic events: `ev` maps every leaf to a distinct event
+# (index into `pEv`), so a repeated label is the same event in several
+# branches; exact by enumeration over the 2^m states of the distinct events
+riskFtaTopProbShared <- function(pEv, ev, branch, innerGate, topGate) {
+  m <- length(pEv)
+  S <- riskAllStates(m)
+  occ <- riskFtaOccurrence(branch, innerGate, topGate)
+  hit <- apply(S, 1, function(x) occ(x[ev]))
+  pr <- apply(S, 1, function(x) prod(ifelse(x == 1, pEv, 1 - pEv)))
+  sum(pr[hit == 1])
+}
+
+# importance for shared events: drop in P(top) when distinct event i is
+# made impossible
+riskFtaImportanceShared <- function(pEv, ev, branch, innerGate, topGate) {
+  top <- riskFtaTopProbShared(pEv, ev, branch, innerGate, topGate)
+  vapply(seq_along(pEv), function(i) {
+    p0 <- pEv
+    p0[i] <- 0
+    top - riskFtaTopProbShared(p0, ev, branch, innerGate, topGate)
+  }, 0)
+}
+
 # ---- system reliability ----------------------------------------------------
 # A system is a structure function phi: {0,1}^n -> {0,1}, monotone for
 # coherent systems. n <= 8 keeps full state enumeration exact and cheap.
@@ -222,31 +245,50 @@ riskPhiParallelSeries <- function(m, npb)
 
 # two-level structure with arbitrary group sizes (components assigned to
 # groups consecutively): inner gate within each group, outer gate across
-# groups; "series" = all must work, "parallel" = at least one must work
-riskPhiTwoLevel <- function(groupSizes, inner, outer) {
+# groups; "series" = all must work, "parallel" = at least one must work,
+# "koutofn" (inner only) = at least k components of the group must work
+riskPhiTwoLevel <- function(groupSizes, inner, outer, k = NULL) {
   ends <- cumsum(groupSizes)
   starts <- c(1, head(ends, -1) + 1)
   function(x) {
     g <- vapply(seq_along(groupSizes), function(j) {
       xs <- x[starts[j]:ends[j]]
       if (inner == "series") as.integer(all(xs == 1))
+      else if (inner == "koutofn") as.integer(sum(xs) >= k)
       else as.integer(any(xs == 1))
     }, 0L)
     if (outer == "series") as.integer(all(g == 1)) else as.integer(any(g == 1))
   }
 }
 
+# P(at least k of the independent components work) for unequal r
+# (Poisson-binomial distribution by dynamic programming)
+riskKofNReliability <- function(r, k) {
+  dp <- 1
+  for (ri in r)
+    dp <- c(dp * (1 - ri), 0) + c(0, dp * ri)
+  sum(dp[(k + 1):length(dp)])
+}
+
 # closed-form reliability of the two-level structure (independent components);
 # unlike the enumeration this scales to any component count
-riskTwoLevelReliability <- function(r, groupSizes, inner, outer) {
+riskTwoLevelReliability <- function(r, groupSizes, inner, outer, k = NULL) {
   ends <- cumsum(groupSizes)
   starts <- c(1, head(ends, -1) + 1)
   gRel <- vapply(seq_along(groupSizes), function(j) {
     rs <- r[starts[j]:ends[j]]
-    if (inner == "series") prod(rs) else 1 - prod(1 - rs)
+    if (inner == "series") prod(rs)
+    else if (inner == "koutofn") riskKofNReliability(rs, k)
+    else 1 - prod(1 - rs)
   }, 0)
   if (outer == "series") prod(gRel) else 1 - prod(1 - gRel)
 }
+
+# common cause as one extra element in series with the whole system:
+# the system works only if the shared cause (probability q) does not occur;
+# the extra element is the last component, x[n + 1]
+riskPhiWithCommonCause <- function(phi, n)
+  function(x) as.integer(x[n + 1] == 1 && phi(x[seq_len(n)]) == 1)
 
 # 5-component bridge: e1: S-A, e2: A-T, e4: S-B, e5: B-T, e3: A-B (crossover);
 # minimal paths {1,2}, {4,5}, {1,3,5}, {4,3,2}
@@ -525,6 +567,39 @@ riskBirnbaum <- function(relFun, r) {
     r0 <- r; r0[j] <- 0
     relFun(r1) - relFun(r0)
   }, 0)
+}
+
+# upper one-sided Clopper-Pearson bound for p after k successes in n trials;
+# for k = 0 it reduces to 1 - alpha^(1/n) (zero-failure demonstration)
+riskUpperBound <- function(k, n, conf = 0.95) {
+  if (k >= n) return(1)
+  stats::qbeta(conf, k + 1, n - k)
+}
+
+# per-row case weights for the frequency analyses: an explicit count
+# variable first, then jamovi data weights (Data > Weights), else 1 per row
+riskCaseWeights <- function(data, countVar) {
+  if (!is.null(countVar))
+    return(list(w = jmvcore::toNumeric(data[[countVar]]),
+                source = "counts", name = countVar))
+  w <- attr(data, "jmv-weights", exact = TRUE)
+  if (!is.null(w))
+    return(list(w = as.numeric(w), source = "weights",
+                name = attr(data, "jmv-weights-name", exact = TRUE)))
+  list(w = rep(1, nrow(data)), source = "rows", name = NULL)
+}
+
+# append one series element (e.g. the common cause) at the system exit of a
+# block-diagram layout; every layout leaves the system at y = 0 on the right
+riskDiagramAppendSeries <- function(layout, label) {
+  w <- layout$boxW
+  xExit <- max(layout$edges$xend, layout$edges$x)
+  xC <- xExit + w / 2 + 0.3
+  layout$boxes <- rbind(layout$boxes, data.frame(x = xC, y = 0, label = label))
+  layout$edges <- rbind(layout$edges,
+    data.frame(x = xExit, y = 0, xend = xC - w / 2, yend = 0),
+    data.frame(x = xC + w / 2, y = 0, xend = xC + w / 2 + 0.6, yend = 0))
+  layout
 }
 
 # coherence: phi monotone in every argument and every component relevant

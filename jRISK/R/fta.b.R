@@ -32,14 +32,34 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         topTable$setError("Prawdopodobieństwa zdarzeń muszą być w przedziale [0, 1].")
         return()
       }
+      shared <- FALSE
       if (anyDuplicated(labels)) {
         dup <- unique(labels[duplicated(labels)])
-        topTable$setError(paste(
-          "Powtórzona etykieta zdarzenia (", paste(dup, collapse = ", "),
-          ") — możliwa wspólna przyczyna lub podwójne liczenie; ",
-          "naiwny rachunek przy założeniu niezależności byłby błędny.",
-          sep = ""))
-        return()
+        if (!self$options$sharedEvents) {
+          topTable$setError(paste(
+            "Powtórzona etykieta zdarzenia (", paste(dup, collapse = ", "),
+            ") — możliwa wspólna przyczyna lub podwójne liczenie; ",
+            "naiwny rachunek przy założeniu niezależności byłby błędny. ",
+            "Jeśli to to samo zdarzenie, zaznacz „Powtórzona etykieta = to samo zdarzenie”.",
+            sep = ""))
+          return()
+        }
+        # a shared event must carry one probability wherever it appears
+        uLab <- unique(labels)
+        ev <- match(labels, uLab)
+        pEv <- probs[!duplicated(labels)]
+        if (any(abs(probs - pEv[ev]) > 1e-12)) {
+          topTable$setError(paste(
+            "Powtórzone zdarzenie ma różne prawdopodobieństwa w różnych wierszach: ",
+            paste(uLab[tapply(probs, ev, function(p) diff(range(p)) > 1e-12)], collapse = ", "),
+            ".", sep = ""))
+          return()
+        }
+        if (length(pEv) > 16) {
+          topTable$setError("Rachunek dokładny z powtórzonymi zdarzeniami obsługuje maksymalnie 16 różnych zdarzeń.")
+          return()
+        }
+        shared <- TRUE
       }
 
       innerGate <- self$options$innerGate
@@ -48,14 +68,22 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       # keep the branch order as it appears in the data
       branch <- factor(branch, levels = unique(branch))
-      pTop <- riskFtaTopProb(probs, branch, innerGate, topGate)
+      pTop <- if (shared) riskFtaTopProbShared(pEv, ev, as.integer(branch), innerGate, topGate)
+              else riskFtaTopProb(probs, branch, innerGate, topGate)
 
       topTable$setRow(rowNo = 1, values = list(
         structure = paste("gałęzie: ", gateLabel[[innerGate]],
                           ", top: ", gateLabel[[topGate]], sep = ""),
         ptop = pTop))
-      topTable$setNote("assumptions",
-        "Założenia: zdarzenia bazowe są niezależne i różne; wszystkie odnoszą się do tego samego horyzontu.")
+      if (shared)
+        topTable$setNote("assumptions", paste(
+          "Założenia: różne zdarzenia bazowe są niezależne; powtórzone (",
+          paste(dup, collapse = ", "),
+          ") to jedno zdarzenie w kilku gałęziach, P(TOP) dokładnie przez wyliczenie stanów; ",
+          "wszystkie odnoszą się do tego samego horyzontu.", sep = ""))
+      else
+        topTable$setNote("assumptions",
+          "Założenia: zdarzenia bazowe są niezależne i różne; wszystkie odnoszą się do tego samego horyzontu.")
 
       branchTable <- self$results$branchTable
       byBranch <- split(seq_along(probs), branch)
@@ -65,34 +93,45 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           branch = b,
           gate = gateLabel[[innerGate]],
           events = paste(labels[i], collapse = ", "),
-          prob = riskFtaBranchProb(probs[i], innerGate)))
+          prob = if (shared) riskFtaBranchProb(pEv[unique(ev[i])], innerGate)
+                 else riskFtaBranchProb(probs[i], innerGate)))
       }
+
+      # from here on work on distinct events: with shared events the leaves
+      # map onto them through ev, otherwise every leaf is its own event
+      if (!shared) {
+        ev <- seq_along(probs)
+        pEv <- probs
+      }
+      evLabels <- labels[!duplicated(ev)]
+      occLeaves <- riskFtaOccurrence(as.integer(branch), innerGate, topGate)
+      occ <- function(x) occLeaves(x[ev])
 
       if (self$options$showCuts) {
         cutsTable <- self$results$cutsTable
-        nEv <- length(probs)
+        nEv <- length(pEv)
         if (nEv > 12) {
           cutsTable$setNote("limit",
             "Minimalne przekroje wyznaczane są dla maksymalnie 12 zdarzeń bazowych.")
         } else {
-          occ <- riskFtaOccurrence(as.integer(branch), innerGate, topGate)
           cuts <- riskMinimalPaths(occ, nEv)
           for (ci in seq_along(cuts)) {
             s <- cuts[[ci]]
             cutsTable$addRow(rowKey = ci, values = list(
-              cut = paste("{", paste(labels[s], collapse = ", "), "}", sep = ""),
-              prob = prod(probs[s])))
+              cut = paste("{", paste(evLabels[s], collapse = ", "), "}", sep = ""),
+              prob = prod(pEv[s])))
           }
         }
       }
 
       if (self$options$showImportance) {
         importanceTable <- self$results$importanceTable
-        imp <- riskFtaImportance(probs, branch, innerGate, topGate)
+        imp <- if (shared) riskFtaImportanceShared(pEv, ev, as.integer(branch), innerGate, topGate)
+               else riskFtaImportance(probs, branch, innerGate, topGate)
         ord <- order(imp, decreasing = TRUE)
         for (i in ord)
           importanceTable$addRow(rowKey = i, values = list(
-            event = labels[i], prob = probs[i], drop = imp[i]))
+            event = evLabels[i], prob = pEv[i], drop = imp[i]))
       }
 
       self$results$diagram$setState(list(
@@ -125,7 +164,7 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       top <- data.frame(
         x = topX, y = 2.4,
         label = paste("TOP [", s$topGate, "]\nP = ",
-                      format(round(s$pTop, 5), nsmall = 5), sep = ""))
+                      format(signif(s$pTop, 3), scientific = FALSE), sep = ""))
 
       edges <- rbind(
         data.frame(x = leafX, y = 0.25,

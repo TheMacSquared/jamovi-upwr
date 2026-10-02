@@ -25,33 +25,48 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       if (!is.null(self$options$levelB) && !(levB %in% levels(fb)))
         stop(sprintf("Nie można wykonać obliczenia: poziom «%s» zmiennej «%s» nie istnieje.", levB, varB), call. = FALSE)
 
-      keep <- !is.na(fa) & !is.na(fb)
+      # each row counts once, or as many times as the count variable / the
+      # jamovi data weights say (aggregated table: one row per cell)
+      cw <- riskCaseWeights(self$data, self$options$countVar)
+      if (any(cw$w < 0, na.rm = TRUE)) {
+        countsTable$setError(sprintf("Nie można wykonać obliczenia: liczności w «%s» nie mogą być ujemne.", cw$name))
+        return()
+      }
+      keep <- !is.na(fa) & !is.na(fb) & !is.na(cw$w)
       A <- as.character(fa[keep]) == levA
       B <- as.character(fb[keep]) == levB
-      n <- sum(keep)
+      w <- cw$w[keep]
+      n <- sum(w)
       if (n == 0) {
         countsTable$setError("Brak kompletnych obserwacji dla obu zmiennych.")
         return()
       }
+      if (cw$source == "counts")
+        countsTable$setNote("counts", sprintf("Liczności z kolumny «%s».", cw$name))
+      else if (cw$source == "weights")
+        countsTable$setNote("counts", sprintf("Dane ważone zmienną «%s».", cw$name))
+      if (any(w != round(w)))
+        countsTable$setNote("round",
+          "Liczności niecałkowite: tabela pokazuje wartości zaokrąglone, prawdopodobieństwa liczone są dokładnie.")
 
       labA <- paste("A: ", varA, " = ", levA, sep = "")
       labNotA <- "nie-A"
-      nAB <- sum(A & B)
-      nAnB <- sum(A & !B)
-      nnAB <- sum(!A & B)
-      nnAnB <- sum(!A & !B)
+      nAB <- sum(w[A & B])
+      nAnB <- sum(w[A & !B])
+      nnAB <- sum(w[!A & B])
+      nnAnB <- sum(w[!A & !B])
 
       countsTable$getColumn("b")$setTitle(paste("B: ", varB, " = ", levB, sep = ""))
       countsTable$getColumn("notb")$setTitle("nie-B")
       countsTable$setRow(rowNo = 1, values = list(
-        rowLabel = labA, b = nAB, notb = nAnB, total = nAB + nAnB))
+        rowLabel = labA, b = round(nAB), notb = round(nAnB), total = round(nAB + nAnB)))
       countsTable$setRow(rowNo = 2, values = list(
-        rowLabel = labNotA, b = nnAB, notb = nnAnB, total = nnAB + nnAnB))
+        rowLabel = labNotA, b = round(nnAB), notb = round(nnAnB), total = round(nnAB + nnAnB)))
       countsTable$setRow(rowNo = 3, values = list(
-        rowLabel = "Suma", b = nAB + nnAB, notb = nAnB + nnAnB, total = n))
+        rowLabel = "Suma", b = round(nAB + nnAB), notb = round(nAnB + nnAnB), total = round(n)))
 
-      pA <- mean(A)
-      pB <- mean(B)
+      pA <- (nAB + nAnB) / n
+      pB <- (nAB + nnAB) / n
       pAB <- nAB / n
 
       probTable <- self$results$probTable
@@ -123,6 +138,9 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       s <- image$state
       if (is.null(s))
         return(FALSE)
+      fmt <- function(v) format(round(v, 2), big.mark = " ")
+      s[c("n", "nA", "nnA", "nAB", "nAnB", "nnAB", "nnAnB")] <-
+        lapply(s[c("n", "nA", "nnA", "nAB", "nAnB", "nnAB", "nnAnB")], fmt)
       nodes <- data.frame(
         x = c(0, 1, 1, 2, 2, 2, 2),
         y = c(0, 1, -1, 1.5, 0.5, -0.5, -1.5),

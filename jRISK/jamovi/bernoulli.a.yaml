@@ -2,8 +2,9 @@
 name: bernoulli
 title: Schemat Bernoulliego (seria binarna)
 menuGroup: Ryzyko
-version: '0.3.0'
+version: '0.4.0'
 jas: '1.2'
+weightsSupport: 'full'
 
 options:
     - name: data
@@ -36,4 +37,18 @@ options:
       title: Wykres częstości skumulowanej
       type: Bool
       default: true
+
+    - name: countVar
+      title: Liczność (opcjonalnie)
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+      default: null
+
+    - name: showUpperBound
+      title: Jednostronna górna granica p (95%)
+      type: Bool
+      default: false
 ...

@@ -2,7 +2,7 @@
 name: fta
 title: Drzewo błędów (FTA)
 menuGroup: Ryzyko
-version: '0.2.0'
+version: '0.3.0'
 jas: '1.2'
 
 options:
@@ -66,4 +66,9 @@ options:
       title: Diagram drzewa
       type: Bool
       default: true
+
+    - name: sharedEvents
+      title: Powtórzona etykieta = to samo zdarzenie
+      type: Bool
+      default: false
 ...

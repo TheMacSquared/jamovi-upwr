@@ -5,6 +5,26 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+- Opcjonalny jRISK 0.4.0 (luki z audytu pokrycia ćwiczeń „Analiza ryzyka”):
+  „Zdarzenia i warunkowanie” i „Schemat Bernoulliego” przyjmują kolumnę liczności
+  (tabela zagregowana, np. Bayes z 4 wierszy) i respektują wagi danych jamovi;
+  w schemacie Bernoulliego jednostronna górna granica p (Clopper–Pearson,
+  przy zerze sukcesów 1 − 0,05^(1/n)). „Niezawodność systemów”: bramka k-z-n
+  w podsystemach w trybie danych, wspólna przyczyna jako element szeregowy
+  (oba tryby, z ścieżkami, przekrojami, Birnbaumem i schematem) oraz tabela
+  koherentności. „Drzewo błędów”: opcja „Powtórzona etykieta = to samo
+  zdarzenie” liczy P(TOP), przekroje i ważność dokładnie (domyślnie powtórzenie
+  nadal zatrzymuje analizę); małe P(TOP) na diagramie bez notacji wykładniczej.
+  „Modele czasu życia”: opcjonalna „Grupa” w trybie danych (osobne dopasowanie
+  i R(t) dla każdego typu urządzenia). Dane Bananpol jako jeden wątek kursu:
+  typy urządzeń w `bananpol.csv` mają różne rozkłady Weibulla, `bananpol_system.csv`
+  bierze niezawodności z ich dopasowań (R(6 mies.)), nowy surowy dziennik
+  `bananpol_alarmy.csv` (6000 zmian, czujniki stary/nowy, sekcje) zastępuje gotowe
+  tabele liczności. Dwa małe przykłady ćwiczeniowe (układ hamowania, drzewo
+  z powtórzonym zdarzeniem; `jRISK/data-raw/cwiczenia.R`). Klucze zadań kursu
+  „Analiza ryzyka” sprawdzane testami integracyjnymi.
+  Domyślne zachowanie istniejących analiz bez zmian.
+
 - jWody: biblioteka danych z trzema wbudowanymi CSV, instrukcjami ćwiczeń,
   słownikiem zmiennych, jednostkami i pochodzeniem według wzorca jSpace.
 

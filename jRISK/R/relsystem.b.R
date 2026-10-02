@@ -71,52 +71,24 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         parallelSeries = paste("Równoległo-szeregowa (", m, " gałęzie po ", npb, ")", sep = ""),
         bridge         = "Mostek (5 elementów)")
 
+      cc <- private$.commonCause(phi, r, as.character(seq_len(n)),
+                                 function(rr) riskSystemReliability(phi, rr))
+      if (is.null(cc))
+        return()
+
       inputsTable$setRow(rowNo = 1, values = list(
-        structureCol = structureLabel,
+        structureCol = paste(structureLabel, cc$structureSuffix, sep = ""),
         nCol = paste("n = ", n, sep = ""),
         relCol = paste("r = (", paste(format(r, digits = 3), collapse = ", "), ")", sep = "")))
 
+      Rsys <- Rsys * cc$factor
       resultTable$setRow(rowNo = 1, values = list(rel = Rsys, fail = 1 - Rsys))
-      resultTable$setNote("assumptions",
-        "Założenia: awarie elementów są niezależne, a wszystkie niezawodności odnoszą się do tego samego czasu misji.")
+      resultTable$setNote("assumptions", cc$note)
 
-      if (self$options$showPathsCuts) {
-        pathsTable <- self$results$pathsTable
-        paths <- riskMinimalPaths(phi, n)
-        cuts <- riskMinimalCuts(phi, n)
-        rowNo <- 0
-        for (s in paths) {
-          rowNo <- rowNo + 1
-          pathsTable$addRow(rowKey = rowNo, values = list(
-            type = "ścieżka minimalna",
-            set = paste("{", paste(s, collapse = ", "), "}", sep = "")))
-        }
-        for (s in cuts) {
-          rowNo <- rowNo + 1
-          pathsTable$addRow(rowKey = rowNo, values = list(
-            type = "przekrój minimalny",
-            set = paste("{", paste(s, collapse = ", "), "}", sep = "")))
-        }
-      }
-
-      if (self$options$showImportance) {
-        importanceTable <- self$results$importanceTable
-        B <- riskBirnbaum(function(rr) riskSystemReliability(phi, rr), r)
-        for (j in order(B, decreasing = TRUE))
-          importanceTable$addRow(rowKey = j, values = list(
-            component = as.character(j), rj = r[j], birnbaum = B[j]))
-      }
-
-      if (self$options$showStateTable) {
-        stateTable <- self$results$stateTable
-        st <- riskStateTable(phi, r)
-        for (i in seq_len(nrow(st)))
-          stateTable$addRow(rowKey = i, values = list(
-            state = st$state[i], phi = st$phi[i], prob = st$prob[i]))
-      }
+      private$.extras(cc$phi, cc$r, cc$labels, cc$relFun)
 
       layout <- riskDiagramLayout(structure, n, m = m, npb = npb, r = r)
-      self$results$diagram$setState(layout)
+      self$results$diagram$setState(private$.diagramCommonCause(layout))
     },
 
     .runData = function() {
@@ -162,11 +134,36 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       groupSizes <- as.integer(table(group))
       n <- length(r)
 
-      Rsys <- riskTwoLevelReliability(r, groupSizes, innerGate, outerGate)
+      k <- NULL
+      if (innerGate == "koutofn") {
+        k <- self$options$kValue
+        if (k != round(k)) {
+          inputsTable$setError("k musi być liczbą całkowitą.")
+          return()
+        }
+        if (any(groupSizes < k)) {
+          inputsTable$setError(paste(
+            "Bramka k-z-n wymaga co najmniej k = ", k,
+            " elementów w każdym podsystemie; za małe: ",
+            paste(levels(group)[groupSizes < k], collapse = ", "), ".", sep = ""))
+          return()
+        }
+        gateLabel <- c(gateLabel, koutofn = paste("co najmniej", k, "sprawne"))
+      }
+
+      relFun <- function(rr)
+        riskTwoLevelReliability(rr, groupSizes, innerGate, outerGate, k)
+      Rsys <- relFun(r)
+
+      # enumeration-based extras only for small systems
+      phi <- if (n <= 8) riskPhiTwoLevel(groupSizes, innerGate, outerGate, k) else NULL
+      cc <- private$.commonCause(phi, r, labels, relFun)
+      if (is.null(cc))
+        return()
 
       structureLabel <- paste(
         "Dwupoziomowa: w podsystemie ", gateLabel[[innerGate]],
-        ", podsystemy ", gateLabel[[outerGate]], sep = "")
+        ", podsystemy ", gateLabel[[outerGate]], cc$structureSuffix, sep = "")
       inputsTable$setRow(rowNo = 1, values = list(
         structureCol = structureLabel,
         nCol = paste("n = ", n, " (grupy: ",
@@ -174,27 +171,82 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
                            sep = "", collapse = ", "), ")", sep = ""),
         relCol = paste("r = (", paste(format(r, digits = 3), collapse = ", "), ")", sep = "")))
 
+      Rsys <- Rsys * cc$factor
       resultTable$setRow(rowNo = 1, values = list(rel = Rsys, fail = 1 - Rsys))
-      resultTable$setNote("assumptions",
-        "Założenia: awarie elementów są niezależne, a wszystkie niezawodności odnoszą się do tego samego czasu misji.")
+      resultTable$setNote("assumptions", cc$note)
 
-      # enumeration-based extras only for small systems
-      if (n <= 8) {
-        phi <- riskPhiTwoLevel(groupSizes, innerGate, outerGate)
+      if (n > 8 && (self$options$showPathsCuts || self$options$showStateTable ||
+                    self$options$showCoherence))
+        resultTable$setNote("enumLimit",
+          "Ścieżki/przekroje, tabela stanów i koherentność są wyznaczane dla systemów o maksymalnie 8 komponentach.")
+
+      private$.extras(cc$phi, cc$r, cc$labels, cc$relFun)
+
+      # a k-out-of-n group is drawn as a parallel block; with groups in
+      # parallel that picture would hide the k requirement, so it is skipped
+      if (innerGate == "koutofn" && outerGate == "parallel" && length(groupSizes) > 1) {
+        self$results$diagram$setVisible(FALSE)
+        return()
+      }
+      drawInner <- if (innerGate == "koutofn") "parallel" else innerGate
+      layout <- riskDiagramLayoutTwoLevel(groupSizes, drawInner, outerGate,
+                                          r = r,
+                                          labels = jmvcore::wrapLabels(labels, width = 14))
+      self$results$diagram$setState(private$.diagramCommonCause(layout))
+    },
+
+    # optional common cause: one extra element in series with the system,
+    # reliability 1 - q; returns the structure, reliabilities and labels
+    # extended by that element (phi NULL when enumeration is too large)
+    .commonCause = function(phi, r, labels, relFun) {
+      n <- length(r)
+      base <- "Założenia: awarie elementów są niezależne, a wszystkie niezawodności odnoszą się do tego samego czasu misji."
+      if (!self$options$commonCause)
+        return(list(phi = phi, r = r, labels = labels, relFun = relFun,
+                    factor = 1, structureSuffix = "", note = base))
+      q <- self$options$ccfProb
+      if (is.na(q) || q < 0 || q > 1) {
+        self$results$inputsTable$setError("Prawdopodobieństwo wspólnej przyczyny q musi być w przedziale [0, 1].")
+        return(NULL)
+      }
+      list(
+        phi = if (is.null(phi)) NULL else riskPhiWithCommonCause(phi, n),
+        r = c(r, 1 - q),
+        labels = c(labels, "CCF"),
+        relFun = function(rr) relFun(rr[seq_len(n)]) * rr[n + 1],
+        factor = 1 - q,
+        structureSuffix = paste(", + wspólna przyczyna CCF (q = ", format(q), ")", sep = ""),
+        note = paste("Założenia: wspólna przyczyna CCF (q = ", format(q),
+                     ") wyłącza cały system; poza nią awarie elementów są niezależne, ",
+                     "a wszystkie niezawodności odnoszą się do tego samego czasu misji.", sep = ""))
+    },
+
+    .diagramCommonCause = function(layout) {
+      if (!self$options$commonCause)
+        return(layout)
+      riskDiagramAppendSeries(layout,
+        paste("CCF\n", format(1 - self$options$ccfProb, digits = 3), sep = ""))
+    },
+
+    # paths/cuts, state table, coherence (enumeration, phi non-NULL) and
+    # Birnbaum importance (closed form via relFun, any size)
+    .extras = function(phi, r, labels, relFun) {
+      n <- length(r)
+      fmtSet <- function(s) paste("{", paste(labels[s], collapse = ", "), "}", sep = "")
+
+      if (!is.null(phi)) {
         if (self$options$showPathsCuts) {
           pathsTable <- self$results$pathsTable
           rowNo <- 0
           for (s in riskMinimalPaths(phi, n)) {
             rowNo <- rowNo + 1
             pathsTable$addRow(rowKey = rowNo, values = list(
-              type = "ścieżka minimalna",
-              set = paste("{", paste(labels[s], collapse = ", "), "}", sep = "")))
+              type = "ścieżka minimalna", set = fmtSet(s)))
           }
           for (s in riskMinimalCuts(phi, n)) {
             rowNo <- rowNo + 1
             pathsTable$addRow(rowKey = rowNo, values = list(
-              type = "przekrój minimalny",
-              set = paste("{", paste(labels[s], collapse = ", "), "}", sep = "")))
+              type = "przekrój minimalny", set = fmtSet(s)))
           }
         }
         if (self$options$showStateTable) {
@@ -204,25 +256,30 @@ relsystemClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             stateTable$addRow(rowKey = i, values = list(
               state = st$state[i], phi = st$phi[i], prob = st$prob[i]))
         }
-      } else if (self$options$showPathsCuts || self$options$showStateTable) {
-        resultTable$setNote("enumLimit",
-          "Ścieżki/przekroje i tabela stanów są wyznaczane dla systemów o maksymalnie 8 komponentach.")
+        if (self$options$showCoherence) {
+          coh <- riskCoherence(phi, n)
+          yesNo <- function(b) if (b) "tak" else "nie"
+          irrelevant <- labels[!coh$relevant]
+          coherenceTable <- self$results$coherenceTable
+          coherenceTable$addRow(rowKey = "mono", values = list(
+            property = "φ niemalejąca względem każdego elementu",
+            value = yesNo(coh$monotone)))
+          coherenceTable$addRow(rowKey = "rel", values = list(
+            property = "Każdy element istotny",
+            value = if (length(irrelevant) == 0) "tak"
+                    else paste("nie (nieistotne: ", paste(irrelevant, collapse = ", "), ")", sep = "")))
+          coherenceTable$addRow(rowKey = "coh", values = list(
+            property = "System koherentny", value = yesNo(coh$coherent)))
+        }
       }
 
-      # closed form scales to any component count, so importance has no limit
       if (self$options$showImportance) {
         importanceTable <- self$results$importanceTable
-        B <- riskBirnbaum(function(rr)
-          riskTwoLevelReliability(rr, groupSizes, innerGate, outerGate), r)
+        B <- riskBirnbaum(relFun, r)
         for (j in order(B, decreasing = TRUE))
           importanceTable$addRow(rowKey = j, values = list(
             component = labels[j], rj = r[j], birnbaum = B[j]))
       }
-
-      layout <- riskDiagramLayoutTwoLevel(groupSizes, innerGate, outerGate,
-                                          r = r,
-                                          labels = jmvcore::wrapLabels(labels, width = 14))
-      self$results$diagram$setState(layout)
     },
 
     .plotDiagram = function(image, ggtheme, theme, ...) {

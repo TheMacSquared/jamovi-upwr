@@ -60,6 +60,19 @@ items:
           title: B = R(sprawny) − R(uszkodzony)
           type: number
 
+    - name: coherenceTable
+      title: Koherentność systemu
+      type: Table
+      rows: 0
+      visible: (showCoherence)
+      columns:
+        - name: property
+          title: Własność
+          type: text
+        - name: value
+          title: Wynik
+          type: text
+
     - name: stateTable
       title: Tabela stanów systemu
       type: Table

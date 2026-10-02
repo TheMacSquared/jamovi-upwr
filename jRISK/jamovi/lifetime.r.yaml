@@ -45,9 +45,14 @@ items:
     - name: dataCounts
       title: Dane czasu życia
       type: Table
-      rows: 1
+      rows: 0
       visible: (mode:data)
       columns:
+        - name: group
+          title: Grupa
+          type: text
+          visible: (groupVar)
+          combineBelow: true
         - name: n
           title: n
           type: integer
@@ -67,6 +72,11 @@ items:
       rows: 0
       visible: (mode:data)
       columns:
+        - name: group
+          title: Grupa
+          type: text
+          visible: (groupVar)
+          combineBelow: true
         - name: model
           title: Model
           type: text
@@ -86,6 +96,11 @@ items:
       rows: 0
       visible: (mode:data)
       columns:
+        - name: group
+          title: Grupa
+          type: text
+          visible: (groupVar)
+          combineBelow: true
         - name: model
           title: Model
           type: text
@@ -108,6 +123,11 @@ items:
       rows: 0
       visible: (mode:data)
       columns:
+        - name: group
+          title: Grupa
+          type: text
+          visible: (groupVar)
+          combineBelow: true
         - name: model
           title: Model
           type: text

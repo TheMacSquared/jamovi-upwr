@@ -35,6 +35,14 @@ children:
             maxItemCount: 1
             isTarget: true
             enable: (mode_data)
+      - type: TargetLayoutBox
+        label: Grupa (opcjonalnie)
+        children:
+          - type: VariablesListBox
+            name: groupVar
+            maxItemCount: 1
+            isTarget: true
+            enable: (mode_data)
   - type: LevelSelector
     name: failureLevel
     defaultLevelIndex: 1

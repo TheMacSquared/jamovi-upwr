@@ -1,0 +1,6 @@
+"zdarzenie","p","galaz"
+"I",0.005,"przekroj_IC"
+"C",0.01,"przekroj_IC"
+"I",0.005,"przekroj_IB"
+"B1",0.05,"przekroj_IB"
+"B2",0.08,"przekroj_IB"

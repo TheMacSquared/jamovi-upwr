@@ -63,10 +63,6 @@ children:
         format: number
         enable: (mode_manual && (structure:series || structure:parallel || structure:koutofn))
       - type: TextBox
-        name: kValue
-        format: number
-        enable: (mode_manual && structure:koutofn)
-      - type: TextBox
         name: nBlocks
         format: number
         enable: (mode_manual && (structure:seriesParallel || structure:parallelSeries))
@@ -74,6 +70,13 @@ children:
         name: componentsPerBlock
         format: number
         enable: (mode_manual && (structure:seriesParallel || structure:parallelSeries))
+  - type: Label
+    label: k-z-n (struktura ręczna lub bramka w podsystemie)
+    children:
+      - type: TextBox
+        name: kValue
+        format: number
+        enable: ((mode_manual && structure:koutofn) || (mode_data && innerGate:koutofn))
   - type: Label
     label: Niezawodności elementów
     children:
@@ -140,3 +143,14 @@ children:
         name: showStateTable
       - type: CheckBox
         name: showDiagram
+      - type: CheckBox
+        name: showCoherence
+  - type: Label
+    label: Wspólna przyczyna
+    children:
+      - type: CheckBox
+        name: commonCause
+      - type: TextBox
+        name: ccfProb
+        format: number
+        enable: (commonCause)

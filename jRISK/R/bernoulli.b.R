@@ -20,25 +20,47 @@ bernoulliClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       if (!is.null(self$options$successLevel) && !(lev %in% levels(fo)))
         stop(sprintf("Nie można wykonać obliczenia: poziom «%s» zmiennej «%s» nie istnieje.", lev, outcomeVar), call. = FALSE)
 
-      orderVar <- self$options$orderVar
-      if (is.null(orderVar)) {
-        ord <- seq_along(fo)
-        summaryTable$setNote("order",
-          "Nie wskazano porządku prób — przyjęto kolejność wierszy arkusza.")
+      # aggregated data (count variable or jamovi weights): totals only,
+      # the order of individual trials is unknown
+      cw <- riskCaseWeights(self$data, self$options$countVar)
+      if (cw$source != "rows") {
+        if (any(cw$w < 0, na.rm = TRUE)) {
+          summaryTable$setError(sprintf("Nie można wykonać obliczenia: liczności w «%s» nie mogą być ujemne.", cw$name))
+          return()
+        }
+        keep <- !is.na(fo) & !is.na(cw$w)
+        w <- cw$w[keep]
+        n <- sum(w)
+        if (n == 0) {
+          summaryTable$setError("Brak kompletnych obserwacji.")
+          return()
+        }
+        k <- sum(w[as.character(fo[keep]) == lev])
+        summaryTable$setNote("order", sprintf(
+          "%s «%s»; kolejność prób nieznana, więc wykres częstości skumulowanej pominięto.",
+          if (cw$source == "counts") "Liczności z kolumny" else "Dane ważone zmienną", cw$name))
+        x <- NULL
       } else {
-        ord <- jmvcore::toNumeric(self$data[[orderVar]])
+        orderVar <- self$options$orderVar
+        if (is.null(orderVar)) {
+          ord <- seq_along(fo)
+          summaryTable$setNote("order",
+            "Nie wskazano porządku prób — przyjęto kolejność wierszy arkusza.")
+        } else {
+          ord <- jmvcore::toNumeric(self$data[[orderVar]])
+        }
+
+        keep <- !is.na(fo) & !is.na(ord)
+        x <- as.integer(as.character(fo[keep]) == lev)
+        x <- x[order(ord[keep])]
+        n <- length(x)
+        if (n == 0) {
+          summaryTable$setError("Brak kompletnych obserwacji.")
+          return()
+        }
+        k <- sum(x)
       }
 
-      keep <- !is.na(fo) & !is.na(ord)
-      x <- as.integer(as.character(fo[keep]) == lev)
-      x <- x[order(ord[keep])]
-      n <- length(x)
-      if (n == 0) {
-        summaryTable$setError("Brak kompletnych obserwacji.")
-        return()
-      }
-
-      k <- sum(x)
       phat <- k / n
       # Wilson 95% interval
       z <- qnorm(0.975)
@@ -47,7 +69,17 @@ bernoulliClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       summaryTable$setRow(rowNo = 1, values = list(
         n = n, successes = k, phat = phat,
-        lower = max(0, centre - half), upper = min(1, centre + half)))
+        lower = max(0, centre - half), upper = min(1, centre + half),
+        upperOne = riskUpperBound(k, n)))
+      if (self$options$showUpperBound)
+        summaryTable$setNote("upperOne", if (k == 0)
+          "Górna granica jednostronna (Clopper–Pearson); przy zerze sukcesów równa 1 − 0,05^(1/n)."
+          else "Górna granica jednostronna (Clopper–Pearson).")
+
+      if (is.null(x)) {
+        self$results$runPlot$setVisible(FALSE)
+        return()
+      }
       summaryTable$setNote("diag",
         "Wykres częstości skumulowanej ilustruje stabilizację p̂; nie dowodzi niezależności prób ani stałości p.")
 

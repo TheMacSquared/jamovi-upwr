@@ -126,9 +126,19 @@ lifetimeClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         status[is.na(sv)] <- NA_integer_
       }
 
-      keep <- !is.na(tRaw) & !is.na(status)
+      # optional grouping: every group (e.g. device type) gets its own
+      # Kaplan-Meier estimate and model fits
+      groupVarName <- self$options$groupVar
+      if (is.null(groupVarName)) {
+        gRaw <- factor(rep("", length(tRaw)))
+      } else {
+        gRaw <- as.factor(self$data[[groupVarName]])
+      }
+
+      keep <- !is.na(tRaw) & !is.na(status) & !is.na(gRaw)
       t <- tRaw[keep]
       status <- status[keep]
+      g <- droplevels(gRaw[keep])
 
       if (length(t) == 0) {
         dataCounts$setError("Brak kompletnych obserwacji (czas i status).")
@@ -147,6 +157,7 @@ lifetimeClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       if (any(zeroCens)) {
         t <- t[!zeroCens]
         status <- status[!zeroCens]
+        g <- droplevels(g[!zeroCens])
         dataCounts$setNote("zeroCens",
           paste("Usunięto", sum(zeroCens), "obserwacji cenzurowanych w t = 0 (brak informacji)."))
       }
@@ -155,93 +166,127 @@ lifetimeClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         return()
       }
 
-      km <- riskKaplanMeier(t, status)
-      dataCounts$setRow(rowNo = 1, values = list(
-        n = length(t), events = sum(status), censored = sum(1L - status),
-        kmMedian = if (is.finite(km$median)) km$median else NA))
-
       fitTable <- self$results$fitTable
       paramTable <- self$results$paramTable
       dataAtTable <- self$results$dataAtTable
       tUser <- self$options$t
+      grouped <- !is.null(groupVarName)
 
       paramLabels <- list(
         exponential = c(rate = "Intensywność (λ)"),
         gamma = c(shape = "Kształt (α)", rate = "Intensywność (λ)"),
         weibull = c(shape = "Kształt (β)", scale = "Skala (η)"))
 
-      fits <- list()
+      grid <- seq(max(t) / 400, max(max(t), tUser) * 1.02, length.out = 400)
+      kmSteps <- NULL
+      curves <- NULL
+      hazCurves <- NULL
+      bestNotes <- character(0)
+      allCensored <- character(0)
       anySingular <- FALSE
-      for (dist in c("exponential", "gamma", "weibull")) {
-        fit <- riskLtFit(t, status, dist)
-        fits[[dist]] <- fit
-        label <- private$.modelLabels[[dist]]
-        if (!fit$ok) {
-          fitTable$addRow(rowKey = dist, values = list(
-            model = paste(label, "— brak zbieżności"),
-            logLik = NA, aic = NA, bic = NA))
+
+      for (gr in levels(g)) {
+        sel <- g == gr
+        tg <- t[sel]
+        sg <- status[sel]
+        key <- function(x) paste(gr, x, sep = "|")
+
+        km <- riskKaplanMeier(tg, sg)
+        dataCounts$addRow(rowKey = gr, values = list(
+          group = gr, n = length(tg), events = sum(sg), censored = sum(1L - sg),
+          kmMedian = if (is.finite(km$median)) km$median else NA))
+        if (sum(sg) == 0) {
+          allCensored <- c(allCensored, gr)
           next
         }
-        fitTable$addRow(rowKey = dist, values = list(
-          model = label, logLik = fit$logLik, aic = fit$AIC, bic = fit$BIC))
-        for (pn in names(fit$par)) {
-          paramTable$addRow(rowKey = paste(dist, pn), values = list(
-            model = label,
-            param = paramLabels[[dist]][[pn]],
-            est = fit$par[[pn]],
-            lower = if (fit$singular) NA else fit$lower[[pn]],
-            upper = if (fit$singular) NA else fit$upper[[pn]]))
+
+        fits <- list()
+        for (dist in c("exponential", "gamma", "weibull")) {
+          fit <- riskLtFit(tg, sg, dist)
+          fits[[dist]] <- fit
+          label <- private$.modelLabels[[dist]]
+          if (!fit$ok) {
+            fitTable$addRow(rowKey = key(dist), values = list(
+              group = gr, model = paste(label, "— brak zbieżności"),
+              logLik = NA, aic = NA, bic = NA))
+            next
+          }
+          fitTable$addRow(rowKey = key(dist), values = list(
+            group = gr, model = label,
+            logLik = fit$logLik, aic = fit$AIC, bic = fit$BIC))
+          for (pn in names(fit$par)) {
+            paramTable$addRow(rowKey = key(paste(dist, pn)), values = list(
+              group = gr,
+              model = label,
+              param = paramLabels[[dist]][[pn]],
+              est = fit$par[[pn]],
+              lower = if (fit$singular) NA else fit$lower[[pn]],
+              upper = if (fit$singular) NA else fit$upper[[pn]]))
+          }
+          if (fit$singular)
+            anySingular <- TRUE
         }
-        if (fit$singular)
-          anySingular <- TRUE
+
+        okFits <- Filter(function(f) f$ok, fits)
+        bestDist <- NULL
+        if (length(okFits) > 0) {
+          aics <- vapply(okFits, function(f) f$AIC, 0)
+          bestDist <- names(okFits)[which.min(aics)]
+          bestNotes <- c(bestNotes, if (grouped)
+            paste(gr, ": ", private$.modelLabels[[bestDist]], sep = "")
+            else private$.modelLabels[[bestDist]])
+        }
+
+        # KM estimate of R(t*): the step value at the largest event time <= t*
+        kmAt <- 1
+        if (any(km$time <= tUser))
+          kmAt <- km$surv[max(which(km$time <= tUser))]
+        dataAtTable$addRow(rowKey = key("km"), values = list(
+          group = gr, model = "Kaplan–Meier", rt = kmAt, mttf = NA,
+          median = if (is.finite(km$median)) km$median else NA))
+        for (dist in names(okFits)) {
+          par <- okFits[[dist]]$par
+          dataAtTable$addRow(rowKey = key(dist), values = list(
+            group = gr,
+            model = private$.modelLabels[[dist]],
+            rt = riskLtReliability(tUser, dist, par),
+            mttf = riskLtMTTF(dist, par),
+            median = riskLtMedian(dist, par)))
+        }
+
+        # plot states: without groups all models are drawn; with groups only
+        # the lowest-AIC model of each group, so the picture stays readable
+        kmSteps <- rbind(kmSteps, data.frame(
+          group = gr, time = c(0, km$time), surv = c(1, km$surv)))
+        drawn <- if (grouped) bestDist else names(okFits)
+        for (dist in drawn) {
+          par <- okFits[[dist]]$par
+          R <- riskLtReliability(grid, dist, par)
+          h <- riskLtHazard(grid, dist, par)
+          h[!is.finite(h) | R < 1e-9] <- NA
+          lab <- if (grouped) gr else private$.modelLabels[[dist]]
+          curves <- rbind(curves, data.frame(model = lab, x = grid, y = R))
+          hazCurves <- rbind(hazCurves, data.frame(model = lab, x = grid, y = h))
+        }
       }
 
-      okFits <- Filter(function(f) f$ok, fits)
-      if (length(okFits) > 0) {
-        aics <- vapply(okFits, function(f) f$AIC, 0)
-        best <- private$.modelLabels[[names(okFits)[which.min(aics)]]]
+      if (length(bestNotes) > 0)
         fitTable$setNote("aic", paste(
-          "Najniższe AIC: model ", best,
+          if (grouped) "Najniższe AIC w grupach — " else "Najniższe AIC: model ",
+          paste(bestNotes, collapse = "; "),
           ". Porównanie ma charakter opisowy — nie wskazuje modelu „prawdziwego”.",
           sep = ""))
-      }
+      if (length(allCensored) > 0)
+        fitTable$setNote("censored", paste(
+          "Bez dopasowania (wszystkie obserwacje cenzurowane): ",
+          paste(allCensored, collapse = ", "), ".", sep = ""))
       if (anySingular)
         paramTable$setNote("singular",
           "Osobliwa macierz Hessego — przedziały ufności niedostępne dla części parametrów.")
-
-      # KM estimate of R(t*): the step value at the largest event time <= t*
-      kmAt <- 1
-      if (any(km$time <= tUser))
-        kmAt <- km$surv[max(which(km$time <= tUser))]
-      dataAtTable$addRow(rowKey = "km", values = list(
-        model = "Kaplan–Meier", rt = kmAt, mttf = NA,
-        median = if (is.finite(km$median)) km$median else NA))
-      for (dist in names(okFits)) {
-        par <- okFits[[dist]]$par
-        dataAtTable$addRow(rowKey = dist, values = list(
-          model = private$.modelLabels[[dist]],
-          rt = riskLtReliability(tUser, dist, par),
-          mttf = riskLtMTTF(dist, par),
-          median = riskLtMedian(dist, par)))
-      }
-
-      # states for the data-mode plots
-      grid <- seq(max(t) / 400, max(max(t), tUser) * 1.02, length.out = 400)
-      curves <- NULL
-      hazCurves <- NULL
-      for (dist in names(okFits)) {
-        par <- okFits[[dist]]$par
-        R <- riskLtReliability(grid, dist, par)
-        h <- riskLtHazard(grid, dist, par)
-        h[!is.finite(h) | R < 1e-9] <- NA
-        curves <- rbind(curves, data.frame(
-          model = private$.modelLabels[[dist]], x = grid, y = R))
-        hazCurves <- rbind(hazCurves, data.frame(
-          model = private$.modelLabels[[dist]], x = grid, y = h))
-      }
-      kmSteps <- data.frame(time = c(0, km$time), surv = c(1, km$surv))
-      self$results$kmPlot$setState(list(km = kmSteps, curves = curves, tUser = tUser))
-      self$results$hazPlot$setState(list(curves = hazCurves, tUser = tUser))
+      self$results$kmPlot$setState(list(km = kmSteps, curves = curves,
+                                        tUser = tUser, grouped = grouped))
+      self$results$hazPlot$setState(list(curves = hazCurves, tUser = tUser,
+                                         grouped = grouped))
     },
 
     .plotCurve = function(image, ggtheme, theme, ylab) {
@@ -274,17 +319,32 @@ lifetimeClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       state <- image$state
       if (is.null(state))
         return(FALSE)
-      Plot <- ggplot() +
-        geom_step(data = state$km, aes(x = time, y = surv),
-                  colour = theme$color[1], linewidth = 0.9) +
-        geom_vline(xintercept = state$tUser, colour = "grey60", linetype = "dotted") +
-        ggplot2::xlab("t") + ggplot2::ylab("R(t)") +
-        ggtheme +
-        theme(text = element_text(size = 14), legend.title = element_blank())
-      if (!is.null(state$curves))
-        Plot <- Plot +
-          geom_line(data = state$curves, aes(x = x, y = y, colour = model),
-                    linewidth = 0.8)
+      if (isTRUE(state$grouped)) {
+        # one colour per group: KM steps solid, lowest-AIC model dashed
+        Plot <- ggplot() +
+          geom_step(data = state$km, aes(x = time, y = surv, colour = group),
+                    linewidth = 0.9) +
+          geom_vline(xintercept = state$tUser, colour = "grey60", linetype = "dotted") +
+          ggplot2::xlab("t") + ggplot2::ylab("R(t)") +
+          ggtheme +
+          theme(text = element_text(size = 14), legend.title = element_blank())
+        if (!is.null(state$curves))
+          Plot <- Plot +
+            geom_line(data = state$curves, aes(x = x, y = y, colour = model),
+                      linewidth = 0.8, linetype = "dashed")
+      } else {
+        Plot <- ggplot() +
+          geom_step(data = state$km, aes(x = time, y = surv),
+                    colour = theme$color[1], linewidth = 0.9) +
+          geom_vline(xintercept = state$tUser, colour = "grey60", linetype = "dotted") +
+          ggplot2::xlab("t") + ggplot2::ylab("R(t)") +
+          ggtheme +
+          theme(text = element_text(size = 14), legend.title = element_blank())
+        if (!is.null(state$curves))
+          Plot <- Plot +
+            geom_line(data = state$curves, aes(x = x, y = y, colour = model),
+                      linewidth = 0.8)
+      }
       # discrete colour scale for fitted models comes from ggtheme (palette)
 
       print(Plot)

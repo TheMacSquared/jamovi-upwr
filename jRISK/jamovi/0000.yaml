@@ -1,7 +1,7 @@
 ---
 title: Ryzyko i niezawodnosc
 name: jRISK
-version: 0.3.4
+version: 0.4.0
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -56,8 +56,13 @@ datasets:
         i wydajność — modele czasu życia i rozkłady dyskretne.
       details: >-
         Dane syntetyczne (ustalone ziarno). Czas pracy w miesiącach wylosowano
-        z rozkładu Weibulla (kształt 1,5, skala 24) i ucięto przy 36 miesiącach:
-        urządzenia pracujące dłużej mają awaria = 0 (obserwacja cenzurowana).
+        z rozkładu Weibulla zależnego od typu urządzenia (agregat: zużycie,
+        kształt 2,2, skala 30; wentylator: awarie prawie losowe i krótkie życie,
+        kształt 1,2, skala 18; nawilżacz: kształt 1,6, skala 26) i ucięto przy 36
+        miesiącach: urządzenia pracujące dłużej mają awaria = 0 (obserwacja
+        cenzurowana). Dopasowania dla typów (Modele czasu życia z grupą =
+        urzadzenie) dają niezawodności komponentów w zbiorze „Bananpol — linia
+        dojrzewania”.
         Liczba niezaliczonych kontroli to wynik 12 kontroli rocznie z szansą
         niezaliczenia 0,15 (rozkład dwumianowy), usterki rocznie mają rozkład
         Poissona (λ = 2), wydajność rozkład normalny (100, 8). Trzy sekcje i trzy
@@ -140,6 +145,49 @@ datasets:
       - ryzyko
       - prawdopodobieństwo
       - tabele kontyngencji
+  - name: Bananpol — alarmy przegrzania (dziennik zmian)
+    path: bananpol_alarmy.csv
+    description: "6000 zmian w 6 komorach: przegrzanie, alarm, typ czujnika, sekcja — Bayes z surowych danych"
+    documentation:
+      summary: >-
+        Dziennik zmian w sześciu komorach dojrzewania Bananpol: czy doszło do
+        przegrzania komory i czy czujnik dał alarm — czułość, swoistość
+        i P(przegrzanie | alarm) liczone z surowych wierszy.
+      details: >-
+        Dane syntetyczne (ustalone ziarno). Jeden wiersz to jedna zmiana w jednej
+        komorze (1000 zmian na komorę). Częstość przegrzań zależy od sekcji
+        (A rzadko, C — przy rampie załadunkowej — najczęściej), więc ten sam
+        czujnik ma różne P(przegrzanie | alarm) w różnych sekcjach. Komory K2, K4
+        i K6 mają nowy model czujnika z mniejszą liczbą fałszywych alarmów. Przy
+        znanym stanie komory alarm zależy tylko od modelu czujnika. Analiza: Ryzyko
+        → Zdarzenia i warunkowanie (A = przegrzanie, B = alarm, metryki detektora),
+        porównania przez filtr czujnik lub sekcja; Ryzyko → Schemat Bernoulliego
+        dla przeoczeń przegrzań.
+      variables:
+        - name: data
+          description: Data zmiany.
+        - name: zmiana
+          description: "Zmiana: I, II, III."
+        - name: sekcja
+          description: "Sekcja dojrzewalni: A, B, C (C przy rampie załadunkowej)."
+        - name: komora
+          description: "Komora dojrzewania: K1-K6 (po dwie w sekcji)."
+        - name: czujnik
+          description: "Model czujnika w komorze: stary albo nowy."
+        - name: przegrzanie
+          description: "Czy w czasie zmiany doszło do przegrzania komory: tak / nie."
+        - name: alarm
+          description: "Czy czujnik dał alarm w czasie zmiany: tak / nie."
+      source: Dane syntetyczne jUPWR (skrypt data-raw/bananpol-alarmy.R, ziarno 303).
+      provenance:
+        package: jRISK
+        dataset: data-raw/bananpol-alarmy.R
+      changes:
+        - Zbiór utworzony w jUPWR na potrzeby kursu analizy ryzyka; firma Bananpol jest fikcyjna.
+    tags:
+      - ryzyko
+      - twierdzenie Bayesa
+      - prawdopodobieństwo
   - name: Bananpol — linia dojrzewania (komponenty)
     path: bananpol_system.csv
     description: "8 komponentów linii z niezawodnościami i p awarii — systemy i drzewo błędów"
@@ -149,10 +197,15 @@ datasets:
         z niezawodnością misji i prawdopodobieństwem awarii — niezawodność systemów
         szeregowo-równoległych i drzewo błędów (FTA).
       details: >-
-        Wartości ustalone ręcznie (bez losowania). Podsystemy: chłodzenie (AGR1,
-        AGR2), wentylacja (WEN1-WEN3), nawilżanie (NAW1, NAW2) i sterowanie (STER)
-        — komponenty w podsystemie pracują równolegle (redundancja), podsystemy
-        szeregowo, a STER jest celowo pojedynczym punktem awarii. Kolumna p_awarii
+        Niezawodności agregatów, wentylatorów i nawilżaczy to R(6 miesięcy) — czas
+        do przeglądu półrocznego — z dopasowania rozkładu Weibulla do zbioru
+        „Bananpol — urządzenia dojrzewalni” osobno dla każdego typu (Modele czasu
+        życia, tryb danych, grupa = urzadzenie, t = 6). Sterownik STER nie ma
+        danych eksploatacyjnych i ma wartość producenta 0,98. Podsystemy:
+        chłodzenie (AGR1, AGR2), wentylacja (WEN1-WEN3), nawilżanie (NAW1, NAW2)
+        i sterowanie (STER) — komponenty w podsystemie pracują równolegle
+        (redundancja), podsystemy szeregowo, a STER jest celowo pojedynczym
+        punktem awarii. Kolumna p_awarii
         = 1 - niezawodnosc, więc ten sam plik zasila drzewo błędów z bramkami AND
         (w podsystemie) i OR (między podsystemami): P(zdarzenie szczytowe)
         = 1 - R systemu. Analiza: Ryzyko → Niezawodność systemów (niezawodność =
@@ -164,8 +217,10 @@ datasets:
           description: Etykieta komponentu (AGR1, AGR2, WEN1-WEN3, NAW1, NAW2, STER).
         - name: podsystem
           description: "Podsystem: chlodzenie, wentylacja, nawilzanie, sterowanie."
+        - name: typ
+          description: "Typ urządzenia (agregat, wentylator, nawilzacz, sterownik) — łączy komponent z danymi czasu życia."
         - name: niezawodnosc
-          description: Niezawodność komponentu w czasie misji (prawdopodobieństwo poprawnej pracy).
+          description: Niezawodność komponentu w czasie misji 6 miesięcy (prawdopodobieństwo poprawnej pracy).
         - name: p_awarii
           description: Prawdopodobieństwo awarii = 1 - niezawodnosc.
       source: Dane syntetyczne jUPWR (skrypt data-raw/bananpol-system.R).
@@ -177,6 +232,54 @@ datasets:
     tags:
       - ryzyko
       - niezawodność
+      - drzewo błędów
+  - name: Ćwiczenia — układ hamowania
+    path: uklad_hamowania.csv
+    description: "Element wspólny C szeregowo z dwoma równoległymi przewodami A, B"
+    documentation:
+      summary: >-
+        Układ hamowania: wspólny element C (0,95) połączony szeregowo z dwoma równoległymi przewodami A i B (po 0,9).
+      details: >-
+        Analiza: Ryzyko → Niezawodność systemów, tryb danych (niezawodność = niezawodnosc, etykieta = element, podsystem = podsystem; w podsystemie równolegle, podsystemy szeregowo). Wspólne zasilanie: opcja „Wspólna przyczyna”.
+      variables:
+        - name: element
+          description: "Etykieta elementu (C, A, B)."
+        - name: podsystem
+          description: "Podsystem: C (element wspólny) lub AB (przewody równoległe)."
+        - name: niezawodnosc
+          description: "Niezawodność elementu w czasie misji."
+      source: Dane ćwiczeniowe jUPWR (skrypt data-raw/cwiczenia.R).
+      provenance:
+        package: jRISK
+        dataset: data-raw/cwiczenia.R
+      changes:
+        - Zbiór utworzony w jUPWR do ćwiczeń z analizy ryzyka; wartości ustalone ręcznie.
+    tags:
+      - ryzyko
+      - niezawodność
+  - name: Ćwiczenia — dwie bariery ze wspólną przyczyną
+    path: dwie_bariery.csv
+    description: "TOP = I i (C lub (B1 i B2)) zapisane przez przekroje; I powtórzone"
+    documentation:
+      summary: >-
+        Zdarzenie inicjujące I i dwie samodzielne bariery B1 (0,05), B2 (0,08) ze wspólną przyczyną C (0,01), zapisane przez przekroje minimalne {I, C} i {I, B1, B2}.
+      details: >-
+        Zdarzenie I występuje w obu przekrojach. Analiza: Ryzyko → Drzewo błędów (gałąź = galaz; wewnątrz gałęzi AND, na górze OR) z zaznaczoną opcją „Powtórzona etykieta = to samo zdarzenie”.
+      variables:
+        - name: zdarzenie
+          description: "Etykieta zdarzenia bazowego (I, C, B1, B2; I dwukrotnie)."
+        - name: p
+          description: "Prawdopodobieństwo zdarzenia bazowego."
+        - name: galaz
+          description: "Przekrój minimalny: przekroj_IC albo przekroj_IB."
+      source: Dane ćwiczeniowe jUPWR (skrypt data-raw/cwiczenia.R).
+      provenance:
+        package: jRISK
+        dataset: data-raw/cwiczenia.R
+      changes:
+        - Zbiór utworzony w jUPWR do ćwiczeń z analizy ryzyka; wartości ustalone ręcznie.
+    tags:
+      - ryzyko
       - drzewo błędów
 usesNative: true
 minApp: 1.0.8

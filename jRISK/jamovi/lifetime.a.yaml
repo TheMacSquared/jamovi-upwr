@@ -2,7 +2,7 @@
 name: lifetime
 title: Modele czasu zycia
 menuGroup: Ryzyko
-version: '0.3.0'
+version: '0.4.0'
 jas: '1.2'
 
 options:
@@ -112,4 +112,13 @@ options:
       title: Wykres gęstości f(t)
       type: Bool
       default: false
+
+    - name: groupVar
+      title: Grupa (opcjonalnie)
+      type: Variable
+      suggested:
+        - nominal
+      permitted:
+        - factor
+      default: null
 ...

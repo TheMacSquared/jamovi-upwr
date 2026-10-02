@@ -2,7 +2,7 @@
 name: relsystem
 title: Niezawodnosc systemow
 menuGroup: Ryzyko
-version: '0.3.0'
+version: '0.4.0'
 jas: '1.2'
 
 options:
@@ -50,6 +50,8 @@ options:
           name: parallel
         - title: Szeregowe
           name: series
+        - title: k-z-n (co najmniej k sprawnych)
+          name: koutofn
       default: parallel
 
     - name: outerGate
@@ -195,4 +197,21 @@ options:
       title: Schemat blokowy systemu
       type: Bool
       default: true
+
+    - name: showCoherence
+      title: Koherentność systemu
+      type: Bool
+      default: false
+
+    - name: commonCause
+      title: Wspólna przyczyna (element szeregowy)
+      type: Bool
+      default: false
+
+    - name: ccfProb
+      title: Prawdopodobieństwo wspólnej przyczyny q =
+      type: Number
+      default: 0.01
+      min: 0
+      max: 1
 ...
