@@ -20,15 +20,64 @@ test_that("effect sizes agree with textbook formulas", {
     expect_equal(a$omega[1], (a$ss[1] - 2 * r$mse) / (ssTot + r$mse))
 })
 
-test_that("Tukey, LSD, Dunnett p-values on emmeans match references", {
+test_that("effective post-hoc method follows the Welch switch", {
+    expect_equal(phEffectiveMethod("tukey", TRUE), "gamesHowell")
+    expect_equal(phEffectiveMethod("gamesHowell", FALSE), "tukey")
+    expect_equal(phEffectiveMethod("dunnett", TRUE), "dunnettWelch")
+    expect_equal(phEffectiveMethod("dunnett", FALSE), "dunnett")
+    expect_equal(phEffectiveMethod("none", TRUE), "none")
+})
+
+test_that("Games-Howell matches rstatix::games_howell_test", {
+    skip_if_not_installed("rstatix")
+    # unequal n and variances
+    set.seed(11)
+    d <- data.frame(g = factor(rep(c("A", "B", "C", "D"), c(8, 12, 15, 10))))
+    d$y <- rnorm(nrow(d), mean = c(A = 10, B = 11, C = 13, D = 10.5)[as.character(d$g)],
+                 sd = c(A = 1, B = 3, C = 0.5, D = 2)[as.character(d$g)])
+    gh <- compareWelch(d$y, d$g, "gamesHowell", 0.05)
+    ref <- rstatix::games_howell_test(d, y ~ g)
+    # rstatix reports group2 − group1; ours is g1 − g2 in combn order
+    expect_equal(gh$pairs$g1, ref$group1)
+    expect_equal(gh$pairs$diff, -ref$estimate, tolerance = 1e-8)
+    expect_equal(gh$pairs$diff - gh$pairs$crit, -ref$conf.high, tolerance = 1e-6)
+    expect_equal(gh$pairs$p, ref$p.adj, tolerance = 1e-3)
+    # group SE and CI from each group's own variance
+    sdC <- sd(d$y[d$g == "C"])
+    expect_equal(gh$means$se[3], sdC / sqrt(15))
+    expect_equal(gh$means$upper[3], mean(d$y[d$g == "C"]) + qt(0.975, 14) * sdC / sqrt(15))
+    expect_true(all(nchar(gh$means$letters) >= 1))
+})
+
+test_that("Dunnett with separate variances matches multcomp on diag(s²/n)", {
+    skip_if_not_installed("multcomp")
+    set.seed(5)
+    d <- data.frame(g = factor(rep(c("K", "T1", "T2", "T3"), c(10, 7, 12, 9))))
+    d$y <- rnorm(nrow(d), mean = c(K = 5, T1 = 6.5, T2 = 5.2, T3 = 7)[as.character(d$g)],
+                 sd = c(K = 0.6, T1 = 2, T2 = 1, T3 = 1.5)[as.character(d$g)])
+    dw <- compareWelch(d$y, d$g, "dunnettWelch", 0.05, control = "K")
+    expect_equal(dw$pairs$g2, rep("K", 3))
+    expect_equal(dw$means$letters[1], "(kontrola)")
+    w <- dw$means$var / dw$means$n
+    est <- setNames(dw$means$mean, dw$means$level)
+    K <- rbind(c(-1, 1, 0, 0), c(-1, 0, 1, 0), c(-1, 0, 0, 1))
+    for (i in 1:3) {
+        dfi <- floor(dw$pairs$df[i])
+        ref <- summary(multcomp::glht(multcomp::parm(est, diag(w), df = dfi), linfct = K))
+        # both sides integrate the multivariate t by quasi-Monte Carlo (abseps 1e-3)
+        expect_lt(abs(dw$pairs$p[i] - unname(ref$test$pvalues[i])), 2e-3)
+    }
+    # Welch–Satterthwaite df per comparison
+    wa <- w[2]; wb <- w[1]
+    expect_equal(dw$pairs$df[1], unname((wa + wb)^2 / (wa^2 / 6 + wb^2 / 9)))
+})
+
+test_that("Tukey and Dunnett p-values on emmeans match references", {
     r <- fitAnova(PlantGrowth, "weight", "group", ssType = "3")
     tk <- compareTerm(r$fit, "group", "tukey", 0.05, mse = r$mse)
     ref <- TukeyHSD(aov(weight ~ group, PlantGrowth))$group
     expect_equal(tk$pairs$p, unname(ref[, "p adj"]), tolerance = 1e-6)
     expect_equal(tk$means$letters, c("ab", "a", "b"))
-    lsd <- compareTerm(r$fit, "group", "lsd", 0.05, mse = r$mse)
-    tt <- pairwise.t.test(PlantGrowth$weight, PlantGrowth$group, p.adjust.method = "none")$p.value
-    expect_equal(lsd$pairs$p[1], tt["trt1", "ctrl"])
     dn <- compareTerm(r$fit, "group", "dunnett", 0.05, control = "ctrl", mse = r$mse)
     skip_if_not_installed("multcomp")
     refD <- summary(multcomp::glht(aov(weight ~ group, PlantGrowth),

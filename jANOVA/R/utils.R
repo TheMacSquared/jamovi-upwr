@@ -18,22 +18,33 @@ termLabel <- function(term) gsub(":", " × ", term, fixed = TRUE)
 
 phMethodLabel <- function(method) {
     switch(method,
-        tukey   = "test Tukeya (HSD)",
-        lsd     = "NIR (test t Fishera, LSD)",
-        scheffe = "test Scheffégo",
-        dunnett = "test Dunnetta (vs kontrola)",
-        holm    = "test t z poprawką Holma",
-        none    = "",
+        tukey        = "test Tukeya (HSD)",
+        gamesHowell  = "test Gamesa-Howella",
+        dunnett      = "test Dunnetta (vs kontrola)",
+        dunnettWelch = "test Dunnetta z osobnymi wariancjami grup (vs kontrola)",
+        none         = "",
         method)
 }
 
 phCritLabel <- function(method) {
     switch(method,
-        tukey   = "HSD",
-        lsd     = "NIR",
-        scheffe = "różnica graniczna Scheffégo",
-        dunnett = "różnica graniczna Dunnetta",
+        tukey        = "HSD",
+        gamesHowell  = "różnica graniczna Gamesa-Howella",
+        dunnett      = ,
+        dunnettWelch = "różnica graniczna Dunnetta",
         "")
+}
+
+# The panel offers one list per variance assumption (anova.js swaps it with
+# the Welch switch); the engine decides from `welchOneFactor` alone, so a
+# stale list value can never pair Tukey with Welch or Games-Howell without it.
+phEffectiveMethod <- function(method, welchOneFactor) {
+    allPairs <- method %in% c("tukey", "gamesHowell")
+    if (welchOneFactor) {
+        if (allPairs) "gamesHowell" else if (method == "dunnett") "dunnettWelch" else method
+    } else {
+        if (allPairs) "tukey" else method
+    }
 }
 
 # ---------------------------------------------------------------------------
@@ -140,17 +151,9 @@ pairwiseFromEmm <- function(means, V, method, alpha, control = NULL, mse = NULL)
     out$stat <- out$diff / out$se
     t <- out$stat; dfp <- out$df; se <- out$se
     out$p <- NA_real_; out$crit <- NA_real_
-    if (method == "lsd") {
-        out$p <- 2 * stats::pt(-abs(t), dfp)
-        out$crit <- stats::qt(1 - alpha / 2, dfp) * se
-    } else if (method == "tukey") {
+    if (method == "tukey") {
         out$p <- stats::ptukey(abs(t) * sqrt(2), k, dfp, lower.tail = FALSE)
         out$crit <- stats::qtukey(1 - alpha, k, dfp) / sqrt(2) * se
-    } else if (method == "scheffe") {
-        out$p <- stats::pf(t^2 / (k - 1), k - 1, dfp, lower.tail = FALSE)
-        out$crit <- sqrt((k - 1) * stats::qf(1 - alpha, k - 1, dfp)) * se
-    } else if (method == "holm") {
-        out$p <- stats::p.adjust(2 * stats::pt(-abs(t), dfp), method = "holm")
     } else if (method == "dunnett") {
         R <- dunnettCorrFromV(V, match(out$g1, levs), match(control, levs))
         dfi <- max(1L, as.integer(round(dfp[1])))
@@ -209,7 +212,81 @@ compareTerm <- function(fit, term, method, alpha, control = NULL, mse = NULL) {
         return(list(means = means, pairs = NULL, critNote = NULL))
     }
     pairs <- pairwiseFromEmm(means, tm$vcov, method, alpha, control, mse)
-    if (method == "dunnett") {
+    finishComparison(means, pairs, method, alpha, control)
+}
+
+# ---------------------------------------------------------------------------
+# Comparisons with separate group variances (one factor, Welch switch on)
+# ---------------------------------------------------------------------------
+
+# Group means with SE and CI from each group's own variance (t, n − 1 df).
+welchMeans <- function(y, g, alpha = 0.05) {
+    g <- droplevels(factor(g)); levs <- levels(g)
+    n <- as.numeric(table(g)); m <- as.numeric(tapply(y, g, mean))
+    v <- as.numeric(tapply(y, g, stats::var))
+    se <- sqrt(v / n); tq <- stats::qt(1 - alpha / 2, n - 1)
+    data.frame(level = levs, mean = m, se = se, df = n - 1, lower = m - tq * se,
+        upper = m + tq * se, n = n, var = v, stringsAsFactors = FALSE)
+}
+
+# Games-Howell (all pairs): studentized range with a Welch df per pair.
+# Dunnett with separate variances (vs control): multivariate t with the
+# correlation implied by diag(s²/n) and a Welch df per comparison, floored
+# to an integer as mvtnorm requires (Hasler & Hothorn, 2008).
+welchPairs <- function(means, method, alpha, control = NULL, mse = NULL) {
+    levs <- means$level; k <- length(levs)
+    m <- stats::setNames(means$mean, levs)
+    w <- stats::setNames(means$var / means$n, levs)
+    nn <- stats::setNames(means$n, levs)
+    if (method == "dunnettWelch") {
+        if (is.null(control) || !(control %in% levs)) control <- levs[1]
+        pairs <- cbind(setdiff(levs, control), control)
+    } else {
+        pairs <- t(utils::combn(levs, 2))
+    }
+    out <- data.frame(g1 = pairs[, 1], g2 = pairs[, 2], stringsAsFactors = FALSE)
+    a <- w[out$g1]; b <- w[out$g2]
+    out$diff <- unname(m[out$g1] - m[out$g2])
+    out$se <- unname(sqrt(a + b))
+    out$df <- unname((a + b)^2 / (a^2 / (nn[out$g1] - 1) + b^2 / (nn[out$g2] - 1)))
+    out$stat <- out$diff / out$se
+    t <- out$stat; dfp <- out$df; se <- out$se
+    out$p <- NA_real_; out$crit <- NA_real_
+    if (method == "gamesHowell") {
+        out$p <- stats::ptukey(abs(t) * sqrt(2), k, dfp, lower.tail = FALSE)
+        out$crit <- stats::qtukey(1 - alpha, k, dfp) / sqrt(2) * se
+    } else if (method == "dunnettWelch") {
+        V <- diag(unname(w), k); dimnames(V) <- list(levs, levs)
+        R <- dunnettCorrFromV(V, match(out$g1, levs), match(control, levs))
+        q <- nrow(out)
+        for (i in seq_len(q)) {
+            dfi <- max(1L, as.integer(floor(dfp[i])))
+            out$p[i] <- 1 - mvtnorm::pmvt(lower = rep(-abs(t[i]), q), upper = rep(abs(t[i]), q),
+                df = dfi, corr = R)[1]
+            out$crit[i] <- mvtnorm::qmvt(1 - alpha, tail = "both.tails", df = dfi, corr = R)$quantile * se[i]
+        }
+    }
+    out$lower <- out$diff - out$crit
+    out$upper <- out$diff + out$crit
+    out$d <- if (!is.null(mse) && is.finite(mse) && mse > 0) out$diff / sqrt(mse) else NA_real_
+    out$sig <- !is.na(out$p) & out$p < alpha
+    rownames(out) <- NULL
+    out
+}
+
+compareWelch <- function(y, g, method, alpha, control = NULL, mse = NULL) {
+    means <- welchMeans(y, g, alpha)
+    if (method == "none") {
+        means$letters <- ""
+        return(list(means = means, pairs = NULL, critNote = NULL))
+    }
+    pairs <- welchPairs(means, method, alpha, control, mse)
+    finishComparison(means, pairs, method, alpha, control)
+}
+
+# Letters (or control marks) and the critical-difference note.
+finishComparison <- function(means, pairs, method, alpha, control = NULL) {
+    if (method %in% c("dunnett", "dunnettWelch")) {
         if (is.null(control) || !(control %in% means$level)) control <- means$level[1]
         mark <- rep("", nrow(means)); names(mark) <- means$level
         mark[control] <- "(kontrola)"
@@ -219,16 +296,11 @@ compareTerm <- function(fit, term, method, alpha, control = NULL, mse = NULL) {
         ord <- means$level[order(means$mean)]
         means$letters <- unname(cldLetters(ord, pairs)[means$level])
     }
-    critNote <- NULL
-    if (method %in% c("tukey", "lsd", "scheffe", "dunnett")) {
-        if (length(unique(round(pairs$crit, 10))) == 1)
-            critNote <- sprintf("%s = %.4g (α = %g)", phCritLabel(method), pairs$crit[1], alpha)
-        else
-            critNote <- sprintf("%s różni się między parami (nierówne liczebności lub różne błędy); wartości w tabeli par (α = %g)",
-                phCritLabel(method), alpha)
-    } else if (method == "holm") {
-        critNote <- sprintf("p skorygowane metodą Holma; α = %g", alpha)
-    }
+    if (length(unique(round(pairs$crit, 10))) == 1)
+        critNote <- sprintf("%s = %.4g (α = %g)", phCritLabel(method), pairs$crit[1], alpha)
+    else
+        critNote <- sprintf("%s różni się między parami (nierówne liczebności lub różne błędy); wartości w tabeli par (α = %g)",
+            phCritLabel(method), alpha)
     list(means = means, pairs = pairs, critNote = critNote)
 }
 
@@ -308,19 +380,31 @@ homogeneityTable <- function(y, cells) {
 # Parametric post-hoc, contrasts, descriptives, assumptions and plots are
 # configured the same way in both analyses; `factorsAll` = factors whose
 # main effects get letters, `resid` = whether residual diagnostics exist.
-metodyAnovaWspolne <- function(m, o, factorsAll, residPlot = FALSE) {
-    method <- o$postHoc; alpha <- o$alpha
-    if (method == "none") {
+# `method` = effective method (phEffectiveMethod) or "welchFactorial" when
+# the Welch switch is on with several factors; `parametric = FALSE` when the
+# nonparametric switch replaced the parametric comparisons altogether.
+metodyAnovaWspolne <- function(m, o, factorsAll, residPlot = FALSE, method = o$postHoc, parametric = TRUE) {
+    alpha <- o$alpha
+    separate <- method %in% c("gamesHowell", "dunnettWelch")
+    if (!parametric) {
+        # nonparametric post-hoc is described with its test
+    } else if (method == "welchFactorial") {
+        m$add("Post-hoc", paste("Bez porównań parami: porównania przy nierównych wariancjach (Welch) są dostępne tylko dla",
+            "jednego czynnika; tabela pokazuje średnie brzegowe z modelu (emmeans) z przedziałami ufności %g%%."), 100 * (1 - alpha))
+    } else if (method == "none") {
         m$add("Post-hoc", "Bez porównań: tylko średnie brzegowe z modelu (emmeans) z przedziałami ufności %g%%.", 100 * (1 - alpha))
     } else {
         m$add("Post-hoc", paste(
-            "Porównania na średnich brzegowych z modelu (emmeans): %s, α = %g; litery grup jednorodnych",
+            "Porównania %s: %s, α = %g; litery grup jednorodnych",
             "metodą insert-absorb, „a” = najniższa średnia, ta sama litera = brak istotnej różnicy%s."),
+            if (separate) "na średnich grup z osobnymi wariancjami (SE i przedział ufności średniej z wariancji grupy, t z n − 1 df)"
+            else "na średnich brzegowych z modelu (emmeans)",
             phMethodLabel(method), alpha,
-            if (method == "dunnett") "; kontrola = pierwszy poziom czynnika" else "")
-        if (method != "holm")
-            m$add("Post-hoc", "Różnica graniczna (%s) w tabeli średnich; przedział ufności pary = różnica ± wartość graniczna (poziom %g%%).",
-                  phCritLabel(method), 100 * (1 - alpha))
+            if (method %in% c("dunnett", "dunnettWelch")) "; kontrola = pierwszy poziom czynnika" else "")
+        m$addIf(separate, "Post-hoc", "Stopnie swobody Welcha-Satterthwaite’a osobno dla każdej pary%s.",
+                if (method == "dunnettWelch") " (zaokrąglone w dół do liczby całkowitej)" else "")
+        m$add("Post-hoc", "Różnica graniczna (%s) w tabeli średnich; przedział ufności pary = różnica ± wartość graniczna (poziom %g%%).",
+              phCritLabel(method), 100 * (1 - alpha))
         m$addIf(o$phInter, "Post-hoc", "Porównywane także komórki interakcji dwóch czynników.")
         m$addIf(o$showPairs && isTRUE(o$phES), "Post-hoc", "d Cohena w tabeli par = różnica średnich / √MS błędu.")
     }
@@ -334,7 +418,7 @@ metodyAnovaWspolne <- function(m, o, factorsAll, residPlot = FALSE) {
     m$addIf(o$norm, "Założenia", "Normalność: test Shapiro-Wilka na resztach modelu (od 3 do 5000 reszt).")
     m$addIf(o$qq, "Założenia", "Wykres Q-Q reszt modelu wobec rozkładu normalnego.")
     m$addIf(residPlot, "Założenia", "Wykres reszt wobec wartości dopasowanych.")
-    m$addIf(o$plotMeans, "Wykres", "Średnie brzegowe z literami; słupki błędów = %s.",
+    m$addIf(o$plotMeans && parametric, "Wykres", "Średnie brzegowe z literami; słupki błędów = %s.",
             switch(o$errorBars, se = "błąd standardowy (SE)", ci = sprintf("przedział ufności %g%%", 100 * (1 - alpha)), "brak"))
     m$addIf(o$plotInteraction && length(factorsAll) >= 2, "Wykres",
             "Wykres interakcji: średnie komórek dla „%s” × „%s” (pierwsze dwa czynniki).", factorsAll[1], factorsAll[2])

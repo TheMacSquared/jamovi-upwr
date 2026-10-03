@@ -256,6 +256,8 @@ items:
         - alpha
         - postHoc
         - phInter
+        - welch
+        - nonpar
       template:
         title: ''
         type: Table
@@ -445,6 +447,8 @@ items:
         - alpha
         - postHoc
         - phInter
+        - welch
+        - nonpar
         - errorBars
       template:
         title: ''

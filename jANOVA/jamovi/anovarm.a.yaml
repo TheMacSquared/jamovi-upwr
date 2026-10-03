@@ -113,14 +113,8 @@ options:
       options:
         - title: Tukeya (HSD)
           name: tukey
-        - title: NIR (LSD Fishera)
-          name: lsd
-        - title: Holma
-          name: holm
-        - title: Dunnetta (vs pierwszy poziom)
+        - title: Dunnetta (vs kontrola)
           name: dunnett
-        - title: Scheffégo
-          name: scheffe
         - title: Brak (tylko średnie)
           name: none
       default: tukey

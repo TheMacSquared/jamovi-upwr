@@ -40,7 +40,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (method == "none") {
                 mt$getColumn("letters")$setVisible(FALSE)
                 mt$setNote("emm", sprintf("Przedziały ufności %g%%.", 100 * (1 - alpha)))
-            } else if (method == "dunnett") {
+            } else if (method %in% c("dunnett", "dunnettWelch")) {
                 mt$getColumn("letters")$setTitle("vs kontrola")
                 mt$setNote("dun", "* = różni się istotnie od kontroli (pierwszy poziom).")
             } else {
@@ -55,15 +55,9 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     if (what == "means") { vals$crit <- r$crit; vals$lower <- r$lower; vals$upper <- r$upper; vals$d <- r$d }
                     pt$addRow(rowKey = i, values = vals)
                 }
-                if (what == "means") {
-                    if (method == "holm") {
-                        for (cn in c("crit", "lower", "upper")) pt$getColumn(cn)$setVisible(FALSE)
-                        pt$setNote("holm", "p skorygowane metodą Holma.")
-                    } else {
-                        pt$setNote("crit", sprintf("Przedział ufności %g%% = różnica ± %s.",
-                            100 * (1 - alpha), phCritLabel(method)))
-                    }
-                }
+                if (what == "means")
+                    pt$setNote("crit", sprintf("Przedział ufności %g%% = różnica ± %s.",
+                        100 * (1 - alpha), phCritLabel(method)))
             }
         },
         .run = function() {
@@ -96,9 +90,20 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 self$results$anova$setNote("err", "Brak stopni swobody dla błędu (za mało obserwacji na komórkę).")
                 return()
             }
-            method <- opts$postHoc; alpha <- opts$alpha
+            alpha <- opts$alpha
             oneFactor <- length(factors) == 1 && length(blocks) == 0 && length(covs) == 0
             factorsOnly <- length(blocks) == 0 && length(covs) == 0
+            # Welch switch: one factor -> Games-Howell / Dunnett with separate
+            # variances; several factors -> no parametric pairwise comparisons
+            welchOneFactor <- isTRUE(opts$welch) && oneFactor
+            welchFactorial <- isTRUE(opts$welch) && factorsOnly && length(factors) >= 2
+            method <- if (welchFactorial) "none" else phEffectiveMethod(opts$postHoc, welchOneFactor)
+            artMethod <- phEffectiveMethod(opts$postHoc, FALSE)   # ART: comparisons on ranks
+            # nonparametric with one factor: Dunn's letters replace the parametric ones
+            hideParam <- isTRUE(opts$nonpar) && oneFactor
+            self$results$means$setVisible(!hideParam)
+            self$results$pairs$setVisible(isTRUE(opts$showPairs) && !hideParam)
+            self$results$plotMeans$setVisible(isTRUE(opts$plotMeans) && !hideParam)
             cells <- cellsFactor(d, factors)
             balanced <- length(unique(table(cells))) == 1
 
@@ -157,8 +162,8 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             self$results$npMeans$setVisible(useKW)
             self$results$npPairs$setVisible(useKW && isTRUE(opts$showPairs))
             self$results$art$setVisible(useART)
-            self$results$artMeans$setVisible(useART && method != "none")
-            self$results$artPairs$setVisible(useART && method != "none" && isTRUE(opts$showPairs))
+            self$results$artMeans$setVisible(useART && artMethod != "none")
+            self$results$artPairs$setVisible(useART && artMethod != "none" && isTRUE(opts$showPairs))
             if (isTRUE(opts$nonpar) && !factorsOnly) {
                 self$results$npTests$setNote("na", "Analiza nieparametryczna jest dostępna tylko dla modelu z samymi czynnikami (bez bloków i kowariant).")
             }
@@ -194,36 +199,41 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     md$add("Testy", paste(
                         "Nieparametrycznie (kilka czynników): Aligned Rank Transform (Wobbrock i in., 2011) — dla każdego efektu",
                         "odpowiedź wyrównana względem pozostałych efektów, zrangowana i poddana ANOVIE typu III; raportowany F tego efektu."))
-                    md$addIf(method != "none", "Testy", "Porównania efektów głównych ART na wyrównanych rangach: %s, α = %g.", phMethodLabel(method), alpha)
-                    if (method != "none") for (f in factors) {
+                    md$addIf(artMethod != "none", "Testy", "Porównania efektów głównych ART na wyrównanych rangach: %s, α = %g.", phMethodLabel(artMethod), alpha)
+                    if (artMethod != "none") for (f in factors) {
                         mt <- self$results$artMeans$get(key = f)
                         pt <- self$results$artPairs$get(key = f)
-                        cmp <- tryCatch(artMainEffectComparisons(d, dep, factors, f, method, alpha), error = function(e) e)
+                        cmp <- tryCatch(artMainEffectComparisons(d, dep, factors, f, artMethod, alpha), error = function(e) e)
                         if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
-                        private$.fillComparison(mt, pt, cmp, method, alpha, "art")
+                        private$.fillComparison(mt, pt, cmp, artMethod, alpha, "art")
                         mt$setNote("cld", "Ta sama litera = brak istotnej różnicy (a = najniższa średnia ranga).")
                     }
                 }
             }
 
             # --- parametric comparisons
-            metodyAnovaWspolne(md, opts, factors, residPlot = isTRUE(opts$residPlot))
+            metodyAnovaWspolne(md, opts, factors, residPlot = isTRUE(opts$residPlot),
+                method = if (welchFactorial) "welchFactorial" else method, parametric = !hideParam)
             md$addIf(opts$homog, "Założenia", "Jednorodność wariancji między komórkami czynników: test Levene’a (odchylenia od mediany) i test Bartletta.")
             md$addIf(opts$residsOV, "Dodatkowe", "Reszty modelu zapisane do arkusza (NA dla wierszy pominiętych).")
             md$render(self$results$metody)
-            keys <- private$.termKeys()
+            keys <- if (hideParam) list() else private$.termKeys()
             for (k in names(keys)) {
                 term <- keys[[k]]
                 mt <- self$results$means$get(key = k)
                 pt <- self$results$pairs$get(key = k)
                 img <- self$results$plotMeans$get(key = k)
-                cmp <- tryCatch(compareTerm(res$fit, term, method, alpha, control = NULL, mse = res$mse),
+                cmp <- tryCatch(
+                    if (welchOneFactor) compareWelch(d[[dep]], d[[term]], method, alpha, control = NULL, mse = res$mse)
+                    else compareTerm(res$fit, term, method, alpha, control = NULL, mse = res$mse),
                     error = function(e) e)
                 if (inherits(cmp, "error")) {
                     mt$setNote("err", paste("Nie można policzyć średnich:", conditionMessage(cmp)))
                     next
                 }
                 private$.fillComparison(mt, pt, cmp, method, alpha, "means")
+                if (welchFactorial)
+                    mt$setNote("welch", "Porównania przy nierównych wariancjach (Welch) są dostępne tylko dla jednego czynnika.")
                 m <- cmp$means
                 if (length(term) == 2) {
                     st <- list(means = data.frame(xf = m[[term[1]]], gf = m[[term[2]]], mean = m$mean, se = m$se,

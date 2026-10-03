@@ -79,14 +79,19 @@ test_that("opis metod: anova i anovarm", {
     expect_true(res$metody$visible)
     expect_true(grepl("„supp”, „dose”", h) && grepl("typu III", h) && grepl("zrównoważony", h))
     expect_true(grepl("Welcha-Jamesa", h) && grepl("Aligned Rank Transform", h))
-    expect_true(grepl("test Tukeya", h) && grepl("HSD", h) && grepl("√MS błędu", h))
+    # Welch with two factors: no parametric pairs; ART still uses Tukey
+    expect_true(grepl("tylko dla jednego czynnika", h) && grepl("ART na wyrównanych rangach: test Tukeya", h))
+    r2 <- jANOVA:::anova(data = tg, dep = "len", factors = c("supp", "dose"), showPairs = TRUE,
+                         phES = TRUE, metody = TRUE)
+    h2 <- r2$metody$content
+    expect_true(grepl("test Tukeya", h2) && grepl("HSD", h2) && grepl("√MS błędu", h2))
     expect_true(grepl("wielomianowe", h) && grepl("Bartletta", h) && grepl("Wykres interakcji", h))
     expect_lt(regexpr("<b>Dane</b>", h), regexpr("<b>Model</b>", h))
     expect_lt(regexpr("<b>Model</b>", h), regexpr("<b>Testy</b>", h))
     expect_lt(regexpr("<b>Założenia</b>", h), regexpr("<b>Wykres</b>", h))
     expect_false(grepl(sprintf("%.3f", res$anova$asDF$F[1]), h))
     # noty pod tabelami sa jednozdaniowe
-    txt <- paste(capture.output(print(res$means$get(key = "supp"))), collapse = "\n")
+    txt <- paste(capture.output(print(r2$means$get(key = "supp"))), collapse = "\n")
     expect_true(grepl("Ta sama litera", txt))
     expect_false(grepl("emmeans", txt))
 
@@ -95,4 +100,41 @@ test_that("opis metod: anova i anovarm", {
     rm <- jANOVA:::anovarm(data = oats, dep = "Y", subject = "plot", within = "N", between = "V",
                            spherCorr = "GG", pes = TRUE, homog = TRUE, metody = TRUE)$metody$content
     expect_true(grepl("aov_ez", rm) && grepl("Greenhouse", rm) && grepl("Mauchly", rm) && grepl("η²p", rm))
+})
+
+test_that("Welch with one factor switches post-hoc to separate variances", {
+    res <- jANOVA:::anova(data = PlantGrowth, dep = "weight", factors = "group",
+                          welch = TRUE, postHoc = "tukey", showPairs = TRUE, metody = TRUE)
+    p <- res$pairs$get(key = "group")$asDF
+    expect_false(all(p$df == round(p$df)))          # Welch df per pair
+    ref <- compareWelch(PlantGrowth$weight, PlantGrowth$group, "gamesHowell", 0.05)
+    expect_equal(p$p, ref$pairs$p)
+    expect_true(grepl("Gamesa-Howella", res$metody$content))
+    m <- res$means$get(key = "group")$asDF
+    expect_equal(m$se[1], sd(PlantGrowth$weight[PlantGrowth$group == "ctrl"]) / sqrt(10))
+    dw <- jANOVA:::anova(data = PlantGrowth, dep = "weight", factors = "group",
+                         welch = TRUE, postHoc = "dunnett", metody = TRUE)
+    expect_true(grepl("osobnymi wariancjami grup", dw$metody$content))
+    expect_equal(dw$means$get(key = "group")$asDF$letters[1], "(kontrola)")
+})
+
+test_that("Welch with several factors: means without letters and a note", {
+    tg <- ToothGrowth; tg$dose <- factor(tg$dose)
+    res <- jANOVA:::anova(data = tg, dep = "len", factors = c("supp", "dose"), welch = TRUE)
+    mt <- res$means$get(key = "dose")
+    expect_false(mt$getColumn("letters")$visible)
+    txt <- paste(capture.output(print(mt)), collapse = "\n")
+    expect_true(grepl("tylko dla jednego czynnika", txt))
+})
+
+test_that("nonparametric with one factor hides the parametric comparisons", {
+    res <- jANOVA:::anova(data = PlantGrowth, dep = "weight", factors = "group", nonpar = TRUE,
+                          showPairs = TRUE, metody = TRUE)
+    expect_false(res$means$visible)
+    expect_false(res$pairs$visible)
+    expect_false(res$plotMeans$visible)
+    expect_true(res$npMeans$visible)
+    expect_false(grepl("Średnie brzegowe z literami", res$metody$content))
+    r2 <- jANOVA:::anova(data = PlantGrowth, dep = "weight", factors = "group")
+    expect_true(r2$means$visible && r2$plotMeans$visible)
 })

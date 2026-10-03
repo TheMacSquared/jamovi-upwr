@@ -56,15 +56,9 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     if (what == "means") { vals$crit <- r$crit; vals$lower <- r$lower; vals$upper <- r$upper; vals$d <- r$d }
                     pt$addRow(rowKey = i, values = vals)
                 }
-                if (what == "means") {
-                    if (method == "holm") {
-                        for (cn in c("crit", "lower", "upper")) pt$getColumn(cn)$setVisible(FALSE)
-                        pt$setNote("holm", "p skorygowane metodą Holma.")
-                    } else {
-                        pt$setNote("crit", sprintf("Przedział ufności %g%% = różnica ± %s.",
-                            100 * (1 - alpha), phCritLabel(method)))
-                    }
-                }
+                if (what == "means")
+                    pt$setNote("crit", sprintf("Przedział ufności %g%% = różnica ± %s.",
+                        100 * (1 - alpha), phCritLabel(method)))
             }
         },
         .run = function() {
@@ -106,7 +100,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (inherits(res, "error")) {
                 at$setNote("err", paste("Nie udało się dopasować modelu. Szczegóły:", conditionMessage(res))); return()
             }
-            method <- o$postHoc; alpha <- o$alpha
+            method <- phEffectiveMethod(o$postHoc, FALSE); alpha <- o$alpha
             md <- jmvcore::metodyNew()   # `m` is reused below for matrices/means
             md$add("Dane", "Zmienna zależna „%s” w formacie długim; jednostka „%s” (liczba jednostek: %d, obserwacje kompletne: %d); czynniki wewnątrzobiektowe: %s%s%s.",
                   dep, subject, nlevels(d[[subject]]), nrow(d), jmvcore::metodyCyt(within),
@@ -148,6 +142,11 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             factorsOnly <- length(covs) == 0
             useFr <- isTRUE(o$nonpar) && oneWithin
             useART <- isTRUE(o$nonpar) && !oneWithin && factorsOnly
+            # nonparametric with one within factor: Nemenyi's letters replace the parametric ones
+            hideParam <- useFr
+            self$results$means$setVisible(!hideParam)
+            self$results$pairs$setVisible(isTRUE(o$showPairs) && !hideParam)
+            self$results$plotMeans$setVisible(isTRUE(o$plotMeans) && !hideParam)
             self$results$npTests$setVisible(useFr || (isTRUE(o$nonpar) && !factorsOnly))
             self$results$npMeans$setVisible(useFr)
             self$results$npPairs$setVisible(useFr && isTRUE(o$showPairs))
@@ -203,10 +202,10 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             }
 
             # --- parametric comparisons
-            metodyAnovaWspolne(md, o, c(within, between))
+            metodyAnovaWspolne(md, o, c(within, between), method = method, parametric = !hideParam)
             md$addIf(o$homog, "Założenia", "Jednorodność wariancji: test Levene’a (odchylenia od mediany) i test Bartletta na średnich jednostek (uśrednionych po czynnikach wewnątrzobiektowych) między grupami międzyobiektowymi.")
             md$render(self$results$metody)
-            keys <- private$.termKeys()
+            keys <- if (hideParam) list() else private$.termKeys()
             for (k in names(keys)) {
                 term <- keys[[k]]
                 mt <- self$results$means$get(key = k)

@@ -401,8 +401,12 @@ Katalog `jANOVA/` (wbudowany), menuGroup ANOVA (pozycje lądują w menu ANOVA ob
 testów nieparametrycznych jmv). Analizy: `anova` (zależna, czynniki, czynniki
 blokujące addytywne, kowarianty; SS typu I/II/III przez car::Anova z contr.sum;
 Welch dla jednego czynnika; η², η²p, ω²; post-hoc na średnich brzegowych emmeans:
-Tukey/NIR/Scheffé/Dunnett vs pierwszy poziom/Holm/Bonferroni z literami CLD
-i różnicą graniczną; kontrasty przez emmeans::contrast; Levene/Bartlett/Shapiro,
+Tukey/Dunnett vs pierwszy poziom/Brak z literami CLD i różnicą graniczną
+(od 0.5.0; przy Welchu i jednym czynniku Games-Howell i Dunnett z osobnymi
+wariancjami, lista podmieniana w `js/anova.js`, a R decyduje sam przez
+`phEffectiveMethod`; przy Welchu i ≥ 2 czynnikach średnie bez liter z notą;
+`nonpar` przy jednym czynniku ukrywa porównania parametryczne i wykres
+średnich); kontrasty przez emmeans::contrast; Levene/Bartlett/Shapiro,
 Q-Q, reszty do arkusza) i `anovarm` (format DŁUGI: zależna, jednostka, czynniki
 wewnątrz- i międzyobiektowe, kowarianty; afex::aov_ez z include_aov; Mauchly,
 poprawki GG/HF; emmeans model="univariate", poziomy wewnątrzobiektowe mapowane
@@ -419,7 +423,8 @@ wyrównanych rangach; w RM 1 czynnik wewnątrz → Friedman z W Kendalla i Nemen
 `welch` = Welch (1 czynnik, = oneway.test) lub Welch-James (Johansen 1980:
 kontrasty Kroneckera, Σ = diag(s²/n), F = T/(q+2A−6A/(q+2)), df2 = q(q+2)/(3A);
 walidacja z welchADF, na CRAN brak wydania dla R 4.6 — instalować z archiwum).
-Usunięte świadomie: test mediany, Jonckheere, Page, Bonferroni, Conover, HC3.
+Usunięte świadomie: test mediany, Jonckheere, Page, Bonferroni, Conover, HC3;
+w 0.5.0 NIR, Holm i Scheffé z post-hoc (NIR zostaje w jRol).
 UI warunkowe: `jamovi/js/anova.js`, `anovarm.js` (jus 3.0: handlery
 `<kontrolka>_changed`, `view_updated`, `ui.x.setPropertyValue('enable', …)`).
 PUŁAPKA: wrapper analizy `anova()` zasłania `stats::anova` — w kodzie modułu
