@@ -5,6 +5,24 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+## 1.0.6 — 2026-10-03
+Porównania post-hoc w jANOVA zgodne z rekomendacją przy nierównych wariancjach
+(Games-Howell przy Welchu); moduł opcjonalny jWody wchodzi do macierzy wydania.
+Wbudowana jANOVA wymaga nowej wersji aplikacji — sideload nie nadpisuje modułu
+systemowego.
+
+- jANOVA 0.5.0 (moduł wbudowany): porównania post-hoc przycięte do Tukeya,
+  Dunnetta (vs kontrola) i „Brak”; usunięte NIR (LSD), Holm i Scheffé (dla par
+  zdominowane przez Tukeya, NIR bez kontroli błędu rodziny porównań — zostaje
+  w jRol). Przełącznik „Nierówne wariancje (Welch)” przy jednym czynniku zmienia
+  też porównania: lista pokazuje Gamesa-Howella zamiast Tukeya, a Dunnett liczy
+  osobne wariancje grup z df Welcha (Hasler i Hothorn 2008); średnie z SE
+  i przedziałem z wariancji grupy. Przy Welchu i kilku czynnikach — średnie bez
+  liter z notą. „Nieparametrycznie” przy jednym czynniku (Kruskal-Wallis /
+  Friedman) ukrywa porównania parametryczne i wykres średnich, zostają litery
+  Dunna / Nemenyiego. ANOVA powtórzonych pomiarów: lista Tukey / Dunnett / Brak.
+  Stare pliki .omv z metodami lsd/holm/scheffe nie są obsługiwane (przed pilotażem).
+
 - jWody: biblioteka danych z trzema wbudowanymi CSV, instrukcjami ćwiczeń,
   słownikiem zmiennych, jednostkami i pochodzeniem według wzorca jSpace.
 
