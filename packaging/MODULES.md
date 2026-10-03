@@ -74,7 +74,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.6 | 28.2 | 0.4.0 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.6 | 28.2 | 0.4.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.4.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.0.5 | 28.2 | 0.3.4 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.3.4 | ✅ 2026-09-09 | ✅ 2026-09-09 |
@@ -103,7 +103,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.6 | 28.2 | 0.3.2 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.6 | 28.2 | 0.3.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.3.2 | ✅ 2026-09-09 | ✅ 2026-09-09 |
 | 1.0.3 | 28.2 | 0.3.1 | ✅ 2026-09-08 | ✅ 2026-09-08 |
@@ -129,7 +129,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.6 | 28.2 | 0.1.2 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.6 | 28.2 | 0.1.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.1.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.1.2 | ✅ 2026-09-09 | ✅ 2026-09-09 |
 | 1.0.3 | 28.2 | 0.1.1 | ✅ 2026-09-08 | ✅ 2026-09-08 |
@@ -146,7 +146,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jPomiar | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.6 | 28.2 | 0.3.0 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.6 | 28.2 | 0.3.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.0 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 
 Pierwsze wydanie z modułem: jUPWR 1.0.5. Testy obliczeń, kompilacja jmc i testy
@@ -160,7 +160,7 @@ referencyjnego.
 
 | jUPWR | jamovi | jWody | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.6 | 28.2 | 0.1.1 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.6 | 28.2 | 0.1.1 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.1.1 | ✅ 2026-09-28, arm64; testy artefaktu | ⬜ do zbudowania na Windows |
 
 Nowy moduł opcjonalny; status walidacji i metody: [`jWody/README.md`](../jWody/README.md).
