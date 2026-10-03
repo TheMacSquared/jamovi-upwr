@@ -75,7 +75,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
 | 1.0.6 | 28.2 | 0.4.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
-| 1.0.5 | 28.2 | 0.4.0 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.5 | 28.2 | 0.4.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.4 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.3.4 | ✅ 2026-09-09 | ✅ 2026-09-09 |
 | 1.0.3 | 28.2 | 0.3.4 | ✅ 2026-09-08 | ✅ 2026-09-08 |
@@ -151,9 +151,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 Pierwsze wydanie z modułem: jUPWR 1.0.5. Testy obliczeń, kompilacja jmc i testy
 integracyjne wykonane lokalnie na Linux x64 / R 4.6.0 (`packaging/scripts/test-jpomiar.sh`).
-Target Dockera `jpomiar-artifact` oraz sideload w aplikacji pozostają do sprawdzenia
-(brak demona Docker w środowisku implementacji). Lokalny `.jmo` nie zastępuje artefaktu
-referencyjnego.
+Docker sprawdzony przy wydaniu 1.0.6 (2026-10-03).
 Ćwiczenia i założenia: [`jPomiar/README.md`](../jPomiar/README.md).
 
 ### jWody
@@ -161,7 +159,7 @@ referencyjnego.
 | jUPWR | jamovi | jWody | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
 | 1.0.6 | 28.2 | 0.1.1 | ✅ 2026-10-03 | ✅ 2026-10-03 |
-| 1.0.5 | 28.2 | 0.1.1 | ✅ 2026-09-28, arm64; testy artefaktu | ⬜ do zbudowania na Windows |
+| 1.0.5 | 28.2 | 0.1.1 | ✅ 2026-09-28, arm64; testy artefaktu | ✅ 2026-10-03 |
 
 Nowy moduł opcjonalny; status walidacji i metody: [`jWody/README.md`](../jWody/README.md).
 Testy: `packaging/scripts/test-jwody.sh`; referencyjny target Dockera: `jwody-artifact`.
