@@ -7,7 +7,7 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## 1.0.7 — 2026-10-11
 Licencje zbiorów danych w dokumentacji biblioteki, uporządkowany zestaw zbiorów
-w jDane, drobne poprawki w jEksplor.
+w jDane, drobne poprawki w jEksplor i uproszczone wykresy pomocnicze.
 
 - jDane 0.8.0 (moduł wbudowany): każdy zbiór ma w panelu „O zbiorze” sekcję
   „Licencja” (nazwa, nota, odnośnik do oficjalnego tekstu i kopia w programie),
@@ -19,10 +19,16 @@ w jDane, drobne poprawki w jEksplor.
   Zbiory syntetyczne (autobusy, szkolenie) na CC0 1.0.
   `packaging/scripts/check-dataset-licenses.mjs` (w `release-check.sh`) wymaga
   pola licencji dla każdego zbioru.
-- jEksplor 0.1.3 (moduł wbudowany): „Zmienne ilościowe” — domyślnie zaznaczone
+- jEksplor 0.1.4 (moduł wbudowany): „Zmienne ilościowe” — domyślnie zaznaczone
   tylko N, średnia, mediana, odchylenie standardowe i kwartyle (braki, minimum,
   maksimum i V odznaczone). „Zmienne jakościowe” — w tabeli krzyżowej nagłówek
   grupy dla każdego poziomu zmiennej „Podziel według” z podkolumnami n i %.
+- Wykresy pomocnicze w analizach (jEksplor 0.1.4, jTestyT 0.4.3, jANOVA 0.5.1,
+  jCzest 0.2.3, jRegr 0.1.4, jCI 0.3.4, jperm 0.2.4, jRol 0.1.3): bez tytułu
+  z nazwą zmiennej nad wykresem i bez podtytułów/podpisów (opisy symboli, liczby
+  typu r, AUC, różnica z CI) — wykresy mają być szybkie i poglądowe, a liczby są
+  w tabelach. W Q-Q (jTestyT) i wykresach permutacyjnych (jperm) nazwa zmiennej
+  przeniesiona na oś. Stałe tytuły sekcji i legendy bez zmian.
 
 ## 1.0.6 — 2026-10-03
 Porównania post-hoc w jANOVA zgodne z rekomendacją przy nierównych wariancjach
