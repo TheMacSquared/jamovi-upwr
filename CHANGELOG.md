@@ -5,6 +5,25 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+## 1.0.7 — 2026-10-11
+Licencje zbiorów danych w dokumentacji biblioteki, uporządkowany zestaw zbiorów
+w jDane, drobne poprawki w jEksplor.
+
+- jDane 0.8.0 (moduł wbudowany): każdy zbiór ma w panelu „O zbiorze” sekcję
+  „Licencja” (nazwa, nota, odnośnik do oficjalnego tekstu i kopia w programie),
+  wersję źródła w „Pochodzeniu” i datę zmian względem źródła. Pełne teksty
+  GPL-2, GPL-3 i CC0 1.0 w `client/public/assets/licenses/`. Nowe zbiory: ankieta TIPI
+  (heplots 1.8.6, GPL ≥ 2) i Music & Mental Health (Kaggle, CC0 1.0).
+  Usunięte: PlantGrowth, npk, Irysy, Big5, bugs, Filmy (IMDb). Poprawione
+  źródła ToothGrowth, Affairs, Titanic i fastfood (pełny łańcuch pochodzenia).
+  Zbiory syntetyczne (autobusy, szkolenie) na CC0 1.0.
+  `packaging/scripts/check-dataset-licenses.mjs` (w `release-check.sh`) wymaga
+  pola licencji dla każdego zbioru.
+- jEksplor 0.1.3 (moduł wbudowany): „Zmienne ilościowe” — domyślnie zaznaczone
+  tylko N, średnia, mediana, odchylenie standardowe i kwartyle (braki, minimum,
+  maksimum i V odznaczone). „Zmienne jakościowe” — w tabeli krzyżowej nagłówek
+  grupy dla każdego poziomu zmiennej „Podziel według” z podkolumnami n i %.
+
 ## 1.0.6 — 2026-10-03
 Porównania post-hoc w jANOVA zgodne z rekomendacją przy nierównych wariancjach
 (Games-Howell przy Welchu); moduł opcjonalny jWody wchodzi do macierzy wydania.
