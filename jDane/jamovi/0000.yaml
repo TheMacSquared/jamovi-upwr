@@ -1,7 +1,7 @@
 ---
 title: Zbiory danych do zajęć (UPWr)
 name: jDane
-version: 0.7.1
+version: 0.8.0
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -11,83 +11,6 @@ description: >
   Przyrodniczym we Wrocławiu. Moduł nie zawiera analiz.
 analyses: []
 datasets:
-  - name: Wzrost roślin (PlantGrowth)
-    path: PlantGrowth.csv
-    description: "Sucha masa roślin: kontrola i 2 warunki uprawy — jednoczynnikowa ANOVA"
-    documentation:
-      summary: >-
-        Sucha masa roślin w grupie kontrolnej i dwóch warunkach uprawy —
-        najprostszy przykład jednoczynnikowej analizy wariancji.
-      details: >-
-        30 roślin przydzielono losowo po 10 do trzech grup: kontrolnej oraz dwóch
-        wariantów uprawy (trt1, trt2). Zmierzono suchą masę roślin. Zbiór ilustruje
-        porównanie trzech średnich (ANOVA, testy post-hoc, grupy jednorodne) oraz
-        założenia jednorodności wariancji i normalności reszt. Analiza:
-        Doświadczalnictwo → Układ całkowicie losowy (zależna = weight, czynnik A =
-        group) lub ANOVA → ANOVA (czynnik = group).
-      variables:
-        - name: weight
-          description: Sucha masa rośliny.
-        - name: group
-          description: "Warunki uprawy: ctrl (kontrola), trt1, trt2."
-      source: Dobson (1983), przykład 2.5, za dokumentacją pakietu datasets w R.
-      references:
-        - >-
-          Dobson, A. J. (1983). An Introduction to Statistical Modelling. London:
-          Chapman and Hall.
-      provenance:
-        package: datasets
-        dataset: PlantGrowth
-        url: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/PlantGrowth.html
-      changes:
-        - Dane wyeksportowane bez zmian.
-    tags:
-      - rolnictwo
-      - ANOVA
-      - doświadczalnictwo
-  - name: Nawożenie NPK (npk)
-    path: npk.csv
-    description: "Plon grochu przy nawożeniu N, P, K w 6 blokach (Fisher)"
-    documentation:
-      summary: >-
-        Klasyczne doświadczenie polowe z grochem: nawożenie azotem (N), fosforem
-        (P) i potasem (K) w układzie czynnikowym 2×2×2 w sześciu blokach.
-      details: >-
-        24 poletka w 6 blokach po 4 poletka. Każdy z trzech składników nawozu
-        zastosowano albo nie (0/1), co daje 8 kombinacji; w każdym bloku wystąpiła
-        połowa kombinacji (ułamkowy układ czynnikowy z uwikłaną interakcją N×P×K).
-        Zbiór ilustruje układ losowanych bloków z kilkoma czynnikami, efekty główne
-        i interakcje oraz porównania średnich. Analiza: Doświadczalnictwo → Układ
-        losowanych bloków (zależna = yield, czynnik A = N, czynnik B = P lub K,
-        blok = block). Zmienne N, P, K trzeba ustawić jako nominalne.
-      variables:
-        - name: block
-          description: Blok (1–6).
-        - name: "N"
-          description: "Nawożenie azotem: 0 = brak, 1 = zastosowano."
-        - name: P
-          description: "Nawożenie fosforem: 0 = brak, 1 = zastosowano."
-        - name: K
-          description: "Nawożenie potasem: 0 = brak, 1 = zastosowano."
-        - name: yield
-          description: Plon grochu w funtach z poletka (poletka po 1/70 akra).
-      source: >-
-        Imperial College London, ćwiczenia z analizy doświadczeń; za dokumentacją
-        pakietu datasets w R.
-      references:
-        - >-
-          Venables, W. N. i Ripley, B. D. (2002). Modern Applied Statistics with S,
-          wyd. 4. New York: Springer.
-      provenance:
-        package: datasets
-        dataset: npk
-        url: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/npk.html
-      changes:
-        - Dane wyeksportowane bez zmian.
-    tags:
-      - rolnictwo
-      - ANOVA
-      - doświadczalnictwo
   - name: Uprawy ryżu (RiceFarms)
     path: RiceFarms.csv
     description: "171 gospodarstw ryżowych (Indonezja), 6 sezonów — nakłady, plony, ceny"
@@ -143,6 +66,12 @@ datasets:
         - name: region
           description: "Wieś: wargabinangun, langan, gunungwangi, malausma, sukaambit, ciwangi."
       source: Feng i Horrace (2012), za dokumentacją pakietu plm.
+      license:
+        name: "GPL (≥ 2)"
+        notice: "GPL (≥ 2), za pakietem plm 2.6-7 (Yves Croissant, Giovanni Millo, Kevin Tappe). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+        texts:
+          - GPL-2.0
       references:
         - >-
           Feng, Q. i Horrace, W. C. (2012). Alternative technical efficiency
@@ -150,6 +79,7 @@ datasets:
           253–268.
       provenance:
         package: plm
+        version: "2.6-7"
         dataset: RiceFarms
         url: https://search.r-project.org/CRAN/refmans/plm/html/RiceFarms.html
       changes:
@@ -157,47 +87,6 @@ datasets:
     tags:
       - rolnictwo
       - regresja
-  - name: Zbiór danych Andersona (Irysy)
-    path: iris.csv
-    description: Zbiór danych "Iris" z R
-    documentation:
-      summary: >-
-        Pomiary kielicha i płatka 150 kwiatów irysa trzech gatunków — najbardziej
-        znany zbiór danych w statystyce.
-      details: >-
-        Po 50 kwiatów z gatunków Iris setosa, versicolor i virginica; dla każdego
-        zmierzono długość i szerokość działki kielicha oraz płatka (w cm). Zbiór
-        zebrał Edgar Anderson, a Fisher użył go do wprowadzenia liniowej analizy
-        dyskryminacyjnej. Ilustruje statystyki opisowe w grupach, wykresy
-        rozrzutu, korelacje, ANOVA, PCA oraz klasyfikację i grupowanie.
-      variables:
-        - name: Sepal.Length
-          description: Długość działki kielicha w cm.
-        - name: Sepal.Width
-          description: Szerokość działki kielicha w cm.
-        - name: Petal.Length
-          description: Długość płatka w cm.
-        - name: Petal.Width
-          description: Szerokość płatka w cm.
-        - name: Species
-          description: "Gatunek: setosa, versicolor, virginica."
-      source: Anderson (1935); Fisher (1936).
-      references:
-        - >-
-          Anderson, E. (1935). The irises of the Gaspé Peninsula. Bulletin of the
-          American Iris Society, 59, 2–5.
-        - >-
-          Fisher, R. A. (1936). The use of multiple measurements in taxonomic
-          problems. Annals of Eugenics, 7, 179–188.
-      provenance:
-        package: datasets
-        dataset: iris
-        url: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/iris.html
-      changes:
-        - Kopia zbioru przykładowego z jamovi (jmv); separator średnik.
-    tags:
-      - przyroda
-      - statystyki opisowe
   - name: Pingwiny (Palmer)
     path: penguins.csv
     description: >-
@@ -231,6 +120,12 @@ datasets:
         - name: year
           description: Rok obserwacji (2007–2009).
       source: Gorman, Williams i Fraser (2014); pakiet palmerpenguins.
+      license:
+        name: "CC0 1.0"
+        notice: "CC0 1.0, domena publiczna."
+        url: https://creativecommons.org/publicdomain/zero/1.0/
+        texts:
+          - CC0-1.0
       references:
         - >-
           Gorman, K. B., Williams, T. D. i Fraser, W. R. (2014). Ecological sexual
@@ -241,6 +136,7 @@ datasets:
           Archipelago (Antarctica) penguin data. R package.
       provenance:
         package: palmerpenguins
+        version: "0.1.1"
         dataset: penguins
         url: https://allisonhorst.github.io/palmerpenguins/
       changes:
@@ -269,20 +165,36 @@ datasets:
           description: "Sposób podania: OJ (sok pomarańczowy), VC (kwas askorbinowy)."
         - name: dose
           description: Dawka witaminy C w mikrogramach dziennie (500, 1000, 2000).
-      source: Crampton (1947), za dokumentacją pakietu datasets w R.
+      source: Bliss (1952), za dokumentacją pakietu datasets w R; Crampton (1947) jako odniesienie.
+      license:
+        name: "GPL (≥ 2)"
+        notice: "GPL (≥ 2), za pakietem jmv 2.8.0 (Ravi Selker, Jonathon Love, Damian Dropmann). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+        texts:
+          - GPL-2.0
       references:
+        - >-
+          Bliss, C. I. (1952). The Statistics of Bioassay. New York: Academic
+          Press.
         - >-
           Crampton, E. W. (1947). The growth of the odontoblast of the incisor
           teeth as a criterion of vitamin C intake of the guinea pig. The Journal
           of Nutrition, 33(5), 491–504.
       provenance:
-        package: datasets
+        package: jmv
+        version: "2.8.0"
         dataset: ToothGrowth
-        url: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html
+        url: https://github.com/jamovi/jmv/tree/master/data
+        note: >-
+          Zbiór pierwotnie pochodzi z pakietu datasets, będącego częścią R
+          (GPL-2 | GPL-3).
+        extraUrl: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html
+        extraUrlLabel: Dokumentacja zbioru w R
       changes:
         - >-
           Kopia zbioru przykładowego z jamovi (jmv): dawka wyrażona w mikrogramach
           (500/1000/2000) zamiast miligramów; separator średnik.
+      changesDate: '2026-08-26'
     tags:
       - medycyna
       - ANOVA
@@ -324,107 +236,30 @@ datasets:
         - name: bwt
           description: Masa urodzeniowa w gramach.
       source: Hosmer i Lemeshow (1989), za dokumentacją pakietu MASS.
+      license:
+        name: "GPL-2 | GPL-3"
+        notice: "GPL-2 | GPL-3, za pakietem MASS 7.3-66 (Brian Ripley, Bill Venables). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/gpl-3.0.html
+        texts:
+          - GPL-2.0
+          - GPL-3.0
       references:
         - >-
           Hosmer, D. W. i Lemeshow, S. (1989). Applied Logistic Regression. New
           York: Wiley.
       provenance:
         package: MASS
+        version: "7.3-66"
         dataset: birthwt
         url: https://search.r-project.org/CRAN/refmans/MASS/html/birthwt.html
       changes:
         - >-
           Kody 0/1 i 1/2/3 zamienione na etykiety (no/yes, white/black/other) tak
           jak w dokumentacji MASS, aby jamovi rozpoznał zmienne jako nominalne.
+      changesDate: '2026-08-26'
     tags:
       - medycyna
       - regresja logistyczna
-  - name: Wielka Piątka (Dolan, Oort, Stoel & Wicherts, 2009)
-    path: Big5.csv
-    description: Ciekawy zbiór danych do obliczania korelacji
-    documentation:
-      summary: >-
-        Wyniki 500 osób w pięciu wymiarach osobowości (Wielka Piątka) — zbiór do
-        korelacji i macierzy korelacji.
-      details: >-
-        Każda zmienna to średni wynik skali kwestionariusza NEO (od 1 do 5) dla
-        jednego z pięciu czynników osobowości. Zbiór ilustruje korelacje Pearsona
-        i Spearmana, macierz korelacji z wykresem, regresję wielokrotną oraz
-        analizę czynnikową. Analiza: Regresja → Korelacja (kilka zmiennych =
-        macierz); Czynnik → PCA.
-      variables:
-        - name: Neuroticism
-          description: Neurotyczność (średnia skali, 1–5).
-        - name: Extraversion
-          description: Ekstrawersja (średnia skali, 1–5).
-        - name: Openness
-          description: Otwartość na doświadczenie (średnia skali, 1–5).
-        - name: Agreeableness
-          description: Ugodowość (średnia skali, 1–5).
-        - name: Conscientiousness
-          description: Sumienność (średnia skali, 1–5).
-      source: Dolan, Oort, Stoel i Wicherts (2009); zbiór przykładowy jamovi.
-      references:
-        - >-
-          Dolan, C. V., Oort, F. J., Stoel, R. D. i Wicherts, J. M. (2009).
-          Testing measurement invariance in the target rotated multigroup
-          exploratory factor model. Structural Equation Modeling, 16(2), 295–314.
-      provenance:
-        package: jmv
-        dataset: Big5
-        url: https://github.com/jamovi/jmv/tree/master/data
-      changes:
-        - Kopia zbioru przykładowego z jamovi (jmv); separator średnik.
-    tags:
-      - psychologia
-      - korelacja
-  - name: Błędy (Ryan, Wilde i Crist, 2013)
-    path: bugs.csv
-    description: Zbiór danych do obliczania testu ANOVA dla powtórzonych pomiarów
-    documentation:
-      summary: >-
-        Chęć zabicia owadów różniących się poziomem obrzydzenia i strachu —
-        dane z powtórzonymi pomiarami (układ 2×2 wewnątrzobiektowy).
-      details: >-
-        93 uczestników oceniało na skali 0–10, w jakim stopniu chcieliby zabić
-        owada pokazanego na zdjęciu. Każdy widział cztery owady stanowiące
-        kombinacje niskiego/wysokiego obrzydzenia (LD/HD) i niskiego/wysokiego
-        strachu (LF/HF). Zbiór ilustruje ANOVA dla powtórzonych pomiarów z dwoma
-        czynnikami wewnątrzobiektowymi, ewentualnie z płcią jako czynnikiem
-        międzyobiektowym. Analiza: ANOVA → ANOVA powtórzonych pomiarów.
-      variables:
-        - name: Subject
-          description: Identyfikator uczestnika.
-        - name: Gender
-          description: "Płeć: Female, Male."
-        - name: Region
-          description: Region pochodzenia uczestnika.
-        - name: Education
-          description: Poziom wykształcenia.
-        - name: LDLF
-          description: Ocena owada o niskim obrzydzeniu i niskim strachu (0–10).
-        - name: LDHF
-          description: Ocena owada o niskim obrzydzeniu i wysokim strachu (0–10).
-        - name: HDLF
-          description: Ocena owada o wysokim obrzydzeniu i niskim strachu (0–10).
-        - name: HDHF
-          description: Ocena owada o wysokim obrzydzeniu i wysokim strachu (0–10).
-      source: Ryan, Wilde i Crist (2013); zbiór przykładowy jamovi.
-      references:
-        - >-
-          Ryan, R. S., Wilde, M. i Crist, S. (2013). Compared to a small,
-          supervised lab experiment, a large, unsupervised web-based experiment on
-          a previously known effect produces a worse result. Computers in Human
-          Behavior, 29(4), 1295–1300.
-      provenance:
-        package: jmv
-        dataset: bugs
-        url: https://github.com/jamovi/jmv/tree/master/data
-      changes:
-        - Kopia zbioru przykładowego z jamovi (jmv); separator średnik.
-    tags:
-      - psychologia
-      - ANOVA
   - name: Kalifornijskie szkoły (CASchools)
     path: CASchools.csv
     description: >-
@@ -473,18 +308,27 @@ datasets:
         - name: math
           description: Średni wynik testu z matematyki.
       source: Materiały internetowe do Stocka i Watsona (2007).
+      license:
+        name: "GPL-2 | GPL-3"
+        notice: "GPL-2 | GPL-3, za pakietem AER 1.2-17 (Christian Kleiber, Achim Zeileis). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/gpl-3.0.html
+        texts:
+          - GPL-2.0
+          - GPL-3.0
       references:
         - >-
           Stock, J. H. i Watson, M. W. (2007). Introduction to Econometrics,
           wyd. 2. Boston: Addison Wesley.
       provenance:
         package: AER
+        version: "1.2-17"
         dataset: CASchools
         url: https://search.r-project.org/CRAN/refmans/AER/html/CASchools.html
       changes:
         - >-
           Wartości liczbowe zaokrąglono do czterech miejsc po przecinku, aby
           usunąć szum precyzji odziedziczony z pliku źródłowego Stata.
+      changesDate: '2026-08-26'
     tags:
       - społeczne
       - regresja
@@ -522,13 +366,24 @@ datasets:
           description: Zawód wg klasyfikacji Hollingsheada (1–7, odwrócona).
         - name: rating
           description: Ocena małżeństwa na skali 1 (bardzo nieszczęśliwe) – 5 (bardzo szczęśliwe).
-      source: Fair (1978), za dokumentacją pakietu AER.
+      source: Greene (2003), tabela F22.2, za dokumentacją pakietu AER; Fair (1978) jako publikacja pierwotna.
+      license:
+        name: "GPL-2 | GPL-3"
+        notice: "GPL-2 | GPL-3, za pakietem AER 1.2-17 (Christian Kleiber, Achim Zeileis). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/gpl-3.0.html
+        texts:
+          - GPL-2.0
+          - GPL-3.0
       references:
         - >-
           Fair, R. C. (1978). A theory of extramarital affairs. Journal of
           Political Economy, 86(1), 45–61.
+        - >-
+          Greene, W. H. (2003). Econometric Analysis, wyd. 5. Upper Saddle River:
+          Prentice Hall.
       provenance:
         package: AER
+        version: "1.2-17"
         dataset: Affairs
         url: https://search.r-project.org/CRAN/refmans/AER/html/Affairs.html
       changes:
@@ -546,8 +401,8 @@ datasets:
         Losy 1309 pasażerów Titanica: przeżycie, płeć, wiek i klasa — zbiór do
         tabel wielodzielczych i regresji logistycznej.
       details: >-
-        Dane o pasażerach (bez załogi) z Encyclopedia Titanica, w wersji z pakietu
-        carData. Wiek brakuje u części osób. Zbiór ilustruje tabele niezależności
+        Dane o pasażerach (bez załogi) ze zbioru titanic3 (Thomas Cason), w wersji z
+        pakietu carData. Wiek brakuje u części osób. Zbiór ilustruje tabele niezależności
         (przeżycie × płeć × klasa), iloraz szans i ryzyko względne oraz regresję
         logistyczną. Analiza: Częstości → Tabela kontyngencji; Regresja →
         Regresja logistyczna (zależna = survived).
@@ -562,17 +417,25 @@ datasets:
           description: Wiek w latach (u części pasażerów brak).
         - name: passengerClass
           description: "Klasa: 1st, 2nd, 3rd."
-      source: Encyclopedia Titanica, za dokumentacją pakietu carData.
+      source: Zbiór titanic3 zestawiony przez Thomasa Casona, za dokumentacją pakietu carData; Encyclopedia Titanica jako odniesienie.
+      license:
+        name: "GPL (≥ 2)"
+        notice: "GPL (≥ 2), za pakietem carData 3.0-6 (John Fox, Sanford Weisberg, Brad Price). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+        texts:
+          - GPL-2.0
       references:
         - >-
           Fox, J. i Weisberg, S. (2019). An R Companion to Applied Regression,
           wyd. 3. Thousand Oaks: Sage.
       provenance:
         package: carData
+        version: "3.0-6"
         dataset: TitanicSurvival
         url: https://search.r-project.org/CRAN/refmans/carData/html/TitanicSurvival.html
       changes:
         - Nazwiska pasażerów przeniesione z nazw wierszy do zwykłej kolumny name.
+      changesDate: '2026-08-26'
     tags:
       - społeczne
       - regresja logistyczna
@@ -626,6 +489,13 @@ datasets:
         - name: prof
           description: Identyfikator wykładowcy (1–94); ten sam prowadzi kilka kursów.
       source: Hamermesh i Parker (2005), za dokumentacją pakietu AER.
+      license:
+        name: "GPL-2 | GPL-3"
+        notice: "GPL-2 | GPL-3, za pakietem AER 1.2-17 (Christian Kleiber, Achim Zeileis). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/gpl-3.0.html
+        texts:
+          - GPL-2.0
+          - GPL-3.0
       references:
         - >-
           Hamermesh, D. S. i Parker, A. M. (2005). Beauty in the classroom:
@@ -636,6 +506,7 @@ datasets:
           wyd. 2. Boston: Addison Wesley.
       provenance:
         package: AER
+        version: "1.2-17"
         dataset: TeachingRatings
         url: https://search.r-project.org/CRAN/refmans/AER/html/TeachingRatings.html
       changes:
@@ -678,6 +549,12 @@ datasets:
         - name: dlugosc_trasy_km
           description: Długość trasy w kilometrach.
       source: Zbiór syntetyczny, wygenerowany na potrzeby zajęć w jUPWR.
+      license:
+        name: "CC0 1.0"
+        notice: "CC0 1.0, domena publiczna."
+        url: https://creativecommons.org/publicdomain/zero/1.0/
+        texts:
+          - CC0-1.0
       provenance:
         package: jDane
         dataset: autobusy
@@ -685,6 +562,7 @@ datasets:
         - >-
           Ujemne zera powstałe przy zaokrąglaniu zamienione na 0; numery linii
           zapisane jako liczby całkowite.
+      changesDate: '2026-09-03'
     tags:
       - społeczne
       - ANOVA
@@ -697,8 +575,10 @@ datasets:
         Wartości odżywcze 515 pozycji menu ośmiu amerykańskich sieci fast food
         — kalorie, tłuszcze, sód, węglowodany i białko.
       details: >-
-        Dane zebrane ze stron restauracji (McDonald's, Burger King, Subway,
-        Taco Bell, Chick-fil-A, Sonic, Arby's, Dairy Queen). Rozkłady są
+        Menu amerykańskich sieci restauracji ze stanu na 2018 r., tylko dania
+        główne. Osiem sieci: Taco Bell (115 pozycji), Subway (96), Burger King
+        (70), McDonald's (57), Arby's (55), Sonic (53), Dairy Queen (42),
+        Chick Fil-A (27). Rozkłady są
         prawoskośne z wyraźnymi obserwacjami odstającymi — pojedyncze pozycje
         pokrywają dzienne zapotrzebowanie na sód albo kalorie. Zbiór ilustruje
         statystyki opisowe w grupach, wykresy pudełkowe i rozrzutu, ANOVA
@@ -740,84 +620,207 @@ datasets:
           description: Wapń jako odsetek dziennego zapotrzebowania.
         - name: salad
           description: Czy pozycja jest sałatką (w tym zbiorze zawsze Other).
-      source: Strony internetowe sieci restauracji; pakiet openintro.
+      source: Wartości odżywcze z serwisu fastfoodnutrition.org, zebrane w 2018 r. w ramach projektu TidyTuesday; zbiór przejęty bez zmian z pakietu openintro.
+      license:
+        name: "GPL-3"
+        notice: "GPL-3, za pakietem openintro 2.5.1 (Çetinkaya-Rundel, Diez, Bray, Kim, Baumer, Ismay, Paterno, Barr). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/gpl-3.0.html
+        texts:
+          - GPL-3.0
       references:
+        - >-
+          Data Science Learning Community (2024). Tidy Tuesday: A weekly social
+          data project. https://tidytues.day (zbiór z tygodnia 2018-09-04:
+          https://github.com/rfordatascience/tidytuesday/tree/main/data/2018/2018-09-04)
+        - >-
+          Çetinkaya-Rundel, M., Diez, D., Bray, A., Kim, A. Y., Baumer, B.,
+          Ismay, C., Paterno, N. i Barr, C. (2026). openintro: Datasets and
+          Supplemental Functions from 'OpenIntro' Textbooks and Labs. Pakiet R,
+          wersja 2.5.1.
         - >-
           Çetinkaya-Rundel, M. i Hardin, J. (2021). Introduction to Modern
           Statistics. OpenIntro.
       provenance:
         package: openintro
+        version: "2.5.1"
         dataset: fastfood
         url: https://www.openintro.org/data/index.php?data=fastfood
+        extraUrl: https://github.com/rfordatascience/tidytuesday/tree/main/data/2018/2018-09-04
+        extraUrlLabel: Tydzień TidyTuesday 2018-09-04
       changes:
         - Dane wyeksportowane bez zmian; braki danych jako puste komórki.
     tags:
       - żywność
       - statystyki opisowe
       - ANOVA
-  - name: Filmy (IMDb)
-    path: movies.csv
+  - name: Ankieta TIPI — Wielka Piątka (heplots)
+    path: TIPI.csv
     description: >-
-      2000 filmów pełnometrażowych z lat 1970–2005 — budżet, długość, gatunek
-      i ocena widzów
+      1799 osób z internetowej ankiety: pięć wymiarów osobowości (skala TIPI) i
+      11 zmiennych demograficznych
     documentation:
       summary: >-
-        Losowa próbka 2000 filmów pełnometrażowych z serwisu IMDb: budżet,
-        czas trwania, gatunek, kategoria wiekowa i średnia ocena widzów.
+        Wyniki 1799 osób w pięciu wymiarach osobowości mierzonych krótkim
+        kwestionariuszem TIPI oraz dane demograficzne (wykształcenie, miejsce
+        zamieszkania, płeć, wiek i inne).
       details: >-
-        Podzbiór zbioru movies z pakietu ggplot2movies (stan bazy IMDb na
-        2005 r., pierwotnie 58 788 filmów). Zostawiono filmy od 1970 r., trwające
-        co najmniej 60 minut, z podanym budżetem i co najmniej setką głosów;
-        z tego wylosowano 2000 pozycji. Zbiór ilustruje korelację i regresję
-        (czy droższe filmy są lepiej oceniane — odpowiedź bywa zaskakująca),
-        porównania gatunków, trendy w czasie i pracę z rozkładem prawoskośnym
-        (budżet, liczba głosów — dobry moment na transformację logarytmiczną).
-        Analiza: Regresja → Regresja liniowa (rating od budget, length, year);
-        ANOVA → ANOVA (rating wg genre).
+        Ankieta internetowa z ochotniczym udziałem, więc próba nie jest
+        reprezentatywna. Każda skala (Extraversion, Neuroticism,
+        Conscientiousness, Agreeableness, Openness) to średnia z dwóch pozycji
+        (jednej kodowanej wprost i jednej odwrotnie), co ogranicza rzetelność
+        pomiaru; wynik przyjmuje wartości od 1 do 7. Zbiór zawiera 1675 wierszy
+        bez braków danych. Zmiany wprowadzone przez autorów pakietu przed
+        włączeniem do jUPWR: usunięto 100 osób z odpowiedzią „Other” w zmiennej
+        płci, a etykiety części poziomów (m.in. wykształcenia, języka
+        ojczystego i rasy) skrócono. W zmiennej age występuje jedna wartość
+        niemożliwa (5555). Zbiór ilustruje korelacje i macierz korelacji,
+        porównania grup (płeć, język ojczysty, głosowanie), ANOVA, regresję
+        wielokrotną i logistyczną oraz tabele częstości.
       variables:
-        - name: title
-          description: Tytuł filmu.
-        - name: year
-          description: Rok produkcji (1970–2005).
-        - name: length
-          description: Czas trwania w minutach.
-        - name: budget
-          description: Budżet produkcji w dolarach (bez korekty o inflację).
-        - name: rating
-          description: Średnia ocena użytkowników IMDb (1–10).
-        - name: votes
-          description: Liczba oddanych głosów.
-        - name: mpaa
-          description: >-
-            Kategoria wiekowa MPAA (G, PG, PG-13, R, NC-17); u wielu filmów brak.
-        - name: genre
-          description: >-
-            Gatunek główny: Documentary, Animation, Action, Romance, Comedy,
-            Drama, Short. Other oznacza film, któremu w bazie nie przypisano
-            żadnego z tych siedmiu gatunków (np. horror czy science fiction).
-        - name: n_genres
-          description: >-
-            Liczba przypisanych gatunków spośród siedmiu (film może mieć kilka;
-            genre podaje pierwszy wg ustalonego priorytetu).
-      source: Internet Movie Database (2005), za pakietem ggplot2movies.
+        - name: Extraversion
+          description: Ekstrawersja — średnia z dwóch pozycji, zakres 1–7.
+        - name: Neuroticism
+          description: Neurotyczność — średnia z dwóch pozycji, zakres 1–7.
+        - name: Conscientiousness
+          description: Sumienność — średnia z dwóch pozycji, zakres 1–7.
+        - name: Agreeableness
+          description: Ugodowość — średnia z dwóch pozycji, zakres 1–7.
+        - name: Openness
+          description: Otwartość na doświadczenia — średnia z dwóch pozycji, zakres 1–7.
+        - name: education
+          description: "Wykształcenie, od najniższego: <HS, HS, Univ, Grad."
+        - name: urban
+          description: "Miejsce zamieszkania, od wiejskiego: Rural, Suburban, Urban."
+        - name: gender
+          description: "Płeć: M, F."
+        - name: engnat
+          description: "Angielski jako język ojczysty: Native, Non-native."
+        - name: age
+          description: Wiek w latach.
+        - name: religion
+          description: Religia (12 kategorii, m.in. Agnostic, Atheist, Buddhist, Hindu, Jewish, Muslim, Sikh, Other).
+        - name: orientation
+          description: Orientacja (5 kategorii; Heterosexual, Bisexual, Homosexual, Asexual, Other).
+        - name: race
+          description: Rasa (5 kategorii; etykiety jak w źródle).
+        - name: voted
+          description: "Udział w głosowaniu: Yes, No."
+        - name: married
+          description: "Stan cywilny: Never married, Currently married, Previously married."
+        - name: familysize
+          description: Liczba (opis zmiennej nie jest podany w dokumentacji pakietu).
+      source: >-
+        Dane pierwotnie z Open Source Psychometrics Project
+        (https://openpsychometrics.org/), w wersji z pakietu heplots użytej przez
+        Jonesa i in. (2020).
+      license:
+        name: "GPL (≥ 2)"
+        notice: "GPL (≥ 2), za pakietem heplots 1.8.6 (Michael Friendly, John Fox, Georges Monette). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+        texts:
+          - GPL-2.0
       references:
         - >-
-          Wickham, H. (2015). ggplot2movies: Movies Data. R package.
+          Jones, P. J., Mair, P., Simon, T. i in. (2020). Network Trees: A Method
+          for Recursively Partitioning Covariance Structures. Psychometrika, 85,
+          926–945. https://doi.org/10.1007/s11336-020-09731-4
+        - >-
+          Gosling, S. D., Rentfrow, P. J. i Swann, W. B., Jr. (2003). A very brief
+          measure of the Big-Five personality domains. Journal of Research in
+          Personality, 37, 504–528.
       provenance:
-        package: ggplot2movies
-        dataset: movies
-        url: https://cran.r-project.org/package=ggplot2movies
+        package: heplots
+        version: "1.8.6"
+        dataset: TIPI
+        url: https://cran.r-project.org/package=heplots
+      changes:
+        - Dane wyeksportowane bez zmian; braki danych jako puste komórki.
+    tags:
+      - psychologia
+      - korelacja
+  - name: Muzyka a zdrowie psychiczne (ankieta)
+    path: mxmh.csv
+    description: >-
+      736 osób: nawyki słuchania muzyki, częstość słuchania 16 gatunków i
+      samoocena lęku, depresji, bezsenności i objawów obsesyjno-kompulsyjnych
+    documentation:
+      summary: >-
+        Ankieta o słuchaniu muzyki i samopoczuciu: 736 respondentów, czas i
+        okoliczności słuchania, częstość słuchania 16 gatunków oraz samoocena
+        czterech objawów w skali 0–10.
+      details: >-
+        Ankieta w formularzu internetowym, rozpowszechniana na forach,
+        serwerach dyskusyjnych i w mediach społecznościowych, bez ograniczeń
+        wieku i miejsca. Próba ochotnicza, niereprezentatywna. Lęk (anxiety),
+        depresja (depression), bezsenność (insomnia) i objawy obsesyjno-
+        kompulsyjne (ocd) to pojedyncze samooceny w skali 0–10, a nie wyniki
+        narzędzi diagnostycznych. Częstość słuchania gatunków (kolumny freq_*)
+        ma cztery poziomy, od najrzadszego: Never, Rarely, Sometimes, Very
+        frequently. Zbiór ilustruje porównania grup, korelacje, tabele
+        częstości i regresję. Przed włączeniem do jUPWR usunięto kolumny
+        Timestamp i Permissions, zmieniono nazwy kolumn (tabela starych i
+        nowych nazw: jDane/data-raw/mxmh_nazwy.csv) i zastąpiono brakiem
+        danych 7 wartości bpm spoza zakresu 20–300.
+      variables:
+        - name: age
+          description: Wiek w latach.
+        - name: streaming_service
+          description: Główny serwis streamingowy.
+        - name: hours_per_day
+          description: Średnia liczba godzin słuchania muzyki dziennie.
+        - name: while_working
+          description: Czy respondent słucha muzyki podczas pracy lub nauki (Yes, No).
+        - name: instrumentalist
+          description: Czy gra na instrumencie (Yes, No).
+        - name: composer
+          description: Czy komponuje (Yes, No).
+        - name: fav_genre
+          description: Ulubiony gatunek.
+        - name: exploratory
+          description: Czy aktywnie poszukuje nowych wykonawców i gatunków (Yes, No).
+        - name: foreign_languages
+          description: Czy regularnie słucha utworów w obcych językach (Yes, No).
+        - name: bpm
+          description: Tempo (uderzenia na minutę) ulubionego gatunku; wartości spoza zakresu 20–300 zastąpiono brakiem danych.
+        - name: freq_classical
+          description: "Częstość słuchania gatunku. Analogicznie: freq_country, freq_edm, freq_folk, freq_gospel, freq_hip_hop, freq_jazz, freq_k_pop, freq_latin, freq_lofi, freq_metal, freq_pop, freq_rnb, freq_rap, freq_rock, freq_video_game_music. Poziomy: Never, Rarely, Sometimes, Very frequently."
+        - name: anxiety
+          description: Samoocena lęku, skala 0–10.
+        - name: depression
+          description: Samoocena depresji, skala 0–10.
+        - name: insomnia
+          description: Samoocena bezsenności, skala 0–10.
+        - name: ocd
+          description: Samoocena objawów obsesyjno-kompulsyjnych, skala 0–10.
+        - name: music_effects
+          description: Ocena wpływu muzyki na zdrowie psychiczne (Improve, No effect, Worsen).
+      source: >-
+        Rasgaitis, C. (2022). Music & Mental Health Survey Results [zbiór
+        danych]. Kaggle.
+      license:
+        name: "CC0 1.0"
+        notice: "CC0 1.0, domena publiczna."
+        url: https://creativecommons.org/publicdomain/zero/1.0/
+        texts:
+          - CC0-1.0
+      references:
+        - >-
+          Rasgaitis, C. (2022). Music & Mental Health Survey Results [zbiór
+          danych]. Kaggle. https://www.kaggle.com/datasets/catherinerasgaitis/mxmh-survey-results
+      provenance:
+        package: Kaggle
+        version: "wersja 1 z 2022-11-21"
+        dataset: mxmh_survey_results.csv
+        url: https://www.kaggle.com/datasets/catherinerasgaitis/mxmh-survey-results
       changes:
         - >-
-          Filtr (rok ≥ 1970, długość ≥ 60 min, ≥ 100 głosów, znany budżet
-          większy od zera) i losowa próbka 2000 filmów (ziarno 2026).
-        - >-
-          Siedem kolumn wskaźnikowych gatunku zastąpiono zmienną nominalną genre
-          oraz licznikiem n_genres.
+          Usunięte kolumny Timestamp i Permissions; zmienione nazwy kolumn;
+          7 wartości bpm spoza zakresu 20–300 (0, 0, 0, 4, 8, 624, 999999999)
+          zastąpiono brakiem danych.
+      changesDate: '2026-10-11'
     tags:
-      - kultura
-      - regresja
-      - korelacja
+      - psychologia
+      - zdrowie
   - name: Szkolenie gospodarstw (przed-po)
     path: szkolenie.csv
     description: "Stosowanie praktyki przed szkoleniem, tuż po i po pół roku — McNemar i Q Cochrana"
@@ -849,6 +852,12 @@ datasets:
       source: >-
         Dane syntetyczne wygenerowane na potrzeby zajęć; kod generujący
         w jDane/data-raw/datasets.R (ziarno 2026).
+      license:
+        name: "CC0 1.0"
+        notice: "CC0 1.0, domena publiczna."
+        url: https://creativecommons.org/publicdomain/zero/1.0/
+        texts:
+          - CC0-1.0
       provenance:
         package: jDane
         dataset: szkolenie

@@ -11,18 +11,32 @@ interface VariableDocumentation {
     description: string;
 }
 
+interface DatasetLicense {
+    name: string;
+    notice: string;
+    url?: string;
+    // ids of the full license texts shipped with the program (client/public/assets/licenses/<id>.txt)
+    texts?: string[];
+}
+
 interface DatasetDocumentation {
     summary: string;
     details?: string;
     variables?: VariableDocumentation[];
     source?: string;
+    license?: DatasetLicense;
     references?: string[];
     provenance?: {
         package?: string;
+        version?: string;
         dataset?: string;
         url?: string;
+        note?: string;
+        extraUrl?: string;
+        extraUrlLabel?: string;
     };
     changes?: string[];
+    changesDate?: string;
 }
 
 interface DatasetDefinition {
@@ -148,6 +162,27 @@ class DatasetInfo extends HTMLElement {
         if (documentation.source)
             this.addSection('Źródło', h('p', {}, documentation.source));
 
+        if (documentation.license) {
+            const license = documentation.license;
+            const links = h('p', {});
+            if (license.url)
+                links.append(h('a', {
+                    href: url(license.url),
+                    target: '_blank',
+                    rel: 'noopener noreferrer'
+                }, 'Tekst licencji (' + license.name + ')'));
+            for (const id of license.texts ?? []) {
+                if (links.childNodes.length > 0)
+                    links.append(' \u00b7 ');
+                links.append(h('a', {
+                    href: url('../assets/licenses/' + encodeURIComponent(id) + '.txt'),
+                    target: '_blank',
+                    rel: 'noopener noreferrer'
+                }, 'Kopia w programie: ' + id));
+            }
+            this.addSection('Licencja', h('p', {}, license.notice), links);
+        }
+
         if (documentation.references?.length) {
             const list = h('ul');
             for (const reference of documentation.references)
@@ -159,12 +194,16 @@ class DatasetInfo extends HTMLElement {
             const list = h('ul');
             for (const change of documentation.changes)
                 list.append(h('li', {}, change));
-            this.addSection('Zmiany w jUPWR', list);
+            const nodes: Node[] = [list];
+            if (documentation.changesDate)
+                nodes.push(h('p', {}, 'Data zmian: ' + documentation.changesDate));
+            this.addSection('Zmiany w jUPWR', ...nodes);
         }
 
         if (documentation.provenance) {
             const provenance = documentation.provenance;
-            const label = [provenance.package, provenance.dataset].filter(Boolean).join(' \u2014 ');
+            const packageLabel = [provenance.package, provenance.version].filter(Boolean).join(' ');
+            const label = [packageLabel, provenance.dataset].filter(Boolean).join(' \u2014 ');
             const paragraph = h('p', {}, label);
             if (provenance.url) {
                 paragraph.append(' \u00b7 ', h('a', {
@@ -173,7 +212,17 @@ class DatasetInfo extends HTMLElement {
                     rel: 'noopener noreferrer'
                 }, 'Oryginalna dokumentacja'));
             }
-            this.addSection('Pochodzenie', paragraph);
+            if (provenance.extraUrl) {
+                paragraph.append(' \u00b7 ', h('a', {
+                    href: url(provenance.extraUrl),
+                    target: '_blank',
+                    rel: 'noopener noreferrer'
+                }, provenance.extraUrlLabel || 'Źródło'));
+            }
+            const nodes: Node[] = [paragraph];
+            if (provenance.note)
+                nodes.push(h('p', {}, provenance.note));
+            this.addSection('Pochodzenie', ...nodes);
         }
     }
 

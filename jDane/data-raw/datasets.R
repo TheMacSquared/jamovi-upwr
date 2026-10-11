@@ -1,10 +1,9 @@
 # Provenance of the jDane datasets.
 #
-# Big5.csv, ToothGrowth.csv, bugs.csv, iris.csv are copied verbatim from
-# the jmv module (jmv/data/), so the library entries stay identical to the
-# examples jamovi ships with.
+# ToothGrowth.csv is copied verbatim from the jmv module (jmv/data/), so the
+# library entry stays identical to the example jamovi ships with.
 #
-# The remaining four are exported from their R packages. CASchools carries
+# The others are exported from their R packages. CASchools carries
 # float32 noise from the original Stata file, hence the rounding.
 
 data("CASchools", package = "AER")
@@ -20,10 +19,6 @@ write.csv(RiceFarms, "data/RiceFarms.csv", row.names = FALSE, na = "")
 
 write.csv(palmerpenguins::penguins, "data/penguins.csv",
           row.names = FALSE, na = "")
-
-write.csv(PlantGrowth, "data/PlantGrowth.csv", row.names = FALSE, na = "")
-
-write.csv(npk, "data/npk.csv", row.names = FALSE, na = "")
 
 # birthwt ships with 0/1 and 1/2/3 codes; recoded to labels the same way
 # the MASS documentation does, so jamovi picks the columns up as nominal
@@ -57,27 +52,9 @@ write.csv(bus, "data/autobusy.csv", row.names = FALSE, na = "")
 data("fastfood", package = "openintro")
 write.csv(as.data.frame(fastfood), "data/fastfood.csv", row.names = FALSE, na = "")
 
-# filmy IMDb (stan na 2005). Pelny zbior ma 58 788 wierszy i 24 kolumny --
-# za duzo na zajecia, wiec: filmy pelnometrazowe (>= 60 min) od 1970 r.
-# z co najmniej 100 glosami i znanym budzetem, losowa probka 2000 sztuk;
-# 7 kolumn wskaznikowych gatunku scalone w jedna zmienna nominalna
-data("movies", package = "ggplot2movies")
-# gatunek glowny: pierwszy pasujacy wg priorytetu ponizej, bo w zbiorze
-# zrodlowym film moze miec kilka etykiet naraz (n_genres liczy ile)
-gen <- c("Documentary", "Animation", "Action", "Romance", "Comedy",
-         "Drama", "Short")
-mv <- subset(movies, year >= 1970 & length >= 60 & votes >= 100 &
-                     !is.na(budget) & budget > 0 & !is.na(rating))
-ind <- as.matrix(mv[, gen])
-mv$n_genres <- rowSums(ind)
-mv$genre <- ifelse(mv$n_genres == 0, "Other",
-                   gen[max.col(ind, ties.method = "first")])
-mv$mpaa[mv$mpaa == ""] <- NA
-mv <- mv[, c("title", "year", "length", "budget", "rating", "votes",
-             "mpaa", "genre", "n_genres")]
-set.seed(2026)
-mv <- mv[sort(sample(nrow(mv), 2000)), ]
-write.csv(mv, "data/movies.csv", row.names = FALSE, na = "")
+# TIPI: ankieta internetowa Ten Item Personality Inventory (heplots 1.8.6,
+# Jones i in. 2020); eksport bez zmian, braki jako puste komorki
+write.csv(heplots::TIPI, "data/TIPI.csv", row.names = FALSE, na = "")
 
 # szkolenie -- zbior SYNTETYCZNY przygotowany na zajecia z analizy czestosci.
 # Trzy powtorzone pomiary binarne na tych samych gospodarstwach, wiec musza byc

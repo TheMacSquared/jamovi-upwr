@@ -71,4 +71,7 @@ for d in */jamovi/0000.yaml; do
         || bad "MODULES.md: brak wiersza macierzy dla jUPWR $JUPWR z $m $v"
 done
 
+# licencje zbiorów jDane: każdy zbiór ma pole license, a teksty licencji są w kliencie
+node packaging/scripts/check-dataset-licenses.mjs && ok "licencje zbiorów jDane" || bad "licencje zbiorów jDane — patrz wyżej"
+
 echo; [ $warn -eq 0 ] && echo "Wydanie spójne." || { echo "Ostrzeżeń: $warn"; exit 1; }
