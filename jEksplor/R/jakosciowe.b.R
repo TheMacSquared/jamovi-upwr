@@ -25,15 +25,17 @@ jakoscioweClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 } else {
                     for (kind in c("pcCol", "pcRow", "pcTotal"))
                         t$addColumn(name = paste0("type_", kind), title = "", type = "text", visible = paste0("(", kind, ")"))
+                    # one group header per level of the splitting variable, with n and % beneath it
                     for (i in seq_along(gl)) {
-                        t$addColumn(name = paste0("n_", i), title = gl[i], superTitle = o$splitBy, type = "integer")
-                        t$addColumn(name = paste0("pcCol_", i), title = gl[i], superTitle = o$splitBy, type = "number", visible = "(pcCol)")
-                        t$addColumn(name = paste0("pcRow_", i), title = gl[i], superTitle = o$splitBy, type = "number", visible = "(pcRow)")
-                        t$addColumn(name = paste0("pcTotal_", i), title = gl[i], superTitle = o$splitBy, type = "number", visible = "(pcTotal)")
+                        st <- paste0(o$splitBy, ": ", gl[i])
+                        t$addColumn(name = paste0("n_", i), title = "n", superTitle = st, type = "integer")
+                        t$addColumn(name = paste0("pcCol_", i), title = "%", superTitle = st, type = "number", visible = "(pcCol)")
+                        t$addColumn(name = paste0("pcRow_", i), title = "%", superTitle = st, type = "number", visible = "(pcRow)")
+                        t$addColumn(name = paste0("pcTotal_", i), title = "%", superTitle = st, type = "number", visible = "(pcTotal)")
                     }
-                    t$addColumn(name = "n_tot", title = "Razem", type = "integer")
-                    t$addColumn(name = "pcCol_tot", title = "Razem", type = "number", visible = "(pcCol)")
-                    t$addColumn(name = "pcTotal_tot", title = "Razem", type = "number", visible = "(pcTotal)")
+                    t$addColumn(name = "n_tot", title = "n", superTitle = "Razem", type = "integer")
+                    t$addColumn(name = "pcCol_tot", title = "%", superTitle = "Razem", type = "number", visible = "(pcCol)")
+                    t$addColumn(name = "pcTotal_tot", title = "%", superTitle = "Razem", type = "number", visible = "(pcTotal)")
                 }
             }
             private$.built <- TRUE

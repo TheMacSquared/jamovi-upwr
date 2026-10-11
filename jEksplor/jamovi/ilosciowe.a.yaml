@@ -48,7 +48,7 @@ options:
     - name: missing
       title: Braki
       type: Bool
-      default: true
+      default: false
 
     - name: mean
       title: Średnia
@@ -73,17 +73,17 @@ options:
     - name: min
       title: Minimum
       type: Bool
-      default: true
+      default: false
 
     - name: max
       title: Maksimum
       type: Bool
-      default: true
+      default: false
 
     - name: v
       title: Współczynnik zmienności V (%)
       type: Bool
-      default: true
+      default: false
 
     # --- rdzeń: wykresy ---
     - name: hist
