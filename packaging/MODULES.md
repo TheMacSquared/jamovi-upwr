@@ -74,7 +74,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.7 | 28.2 | 0.4.0 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.7 | 28.2 | 0.4.0 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.4.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.4.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.4 | ✅ 2026-09-18 | ✅ 2026-09-18 |
@@ -104,7 +104,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.7 | 28.2 | 0.3.2 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.7 | 28.2 | 0.3.2 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.3.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.3.2 | ✅ 2026-09-09 | ✅ 2026-09-09 |
@@ -131,7 +131,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.7 | 28.2 | 0.1.3 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.7 | 28.2 | 0.1.3 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.1.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.1.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 | 1.0.4 | 28.2 | 0.1.2 | ✅ 2026-09-09 | ✅ 2026-09-09 |
@@ -149,20 +149,20 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jPomiar | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.7 | 28.2 | 0.3.0 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.7 | 28.2 | 0.3.0 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.3.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.0 | ✅ 2026-09-18 | ✅ 2026-09-18 |
 
 Pierwsze wydanie z modułem: jUPWR 1.0.5. Testy obliczeń, kompilacja jmc i testy
 integracyjne wykonane lokalnie na Linux x64 / R 4.6.0 (`packaging/scripts/test-jpomiar.sh`).
-Docker sprawdzony przy wydaniu 1.0.6 (2026-10-03).
+Docker sprawdzony przy wydaniu 1.0.7 (2026-10-11).
 Ćwiczenia i założenia: [`jPomiar/README.md`](../jPomiar/README.md).
 
 ### jWody
 
 | jUPWR | jamovi | jWody | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.0.7 | 28.2 | 0.1.1 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.7 | 28.2 | 0.1.1 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.1.1 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.1.1 | ✅ 2026-09-28, arm64; testy artefaktu | ✅ 2026-10-03 |
 
