@@ -714,11 +714,12 @@ datasets:
         (https://openpsychometrics.org/), w wersji z pakietu heplots użytej przez
         Jonesa i in. (2020).
       license:
-        name: "GPL (≥ 2)"
-        notice: "GPL (≥ 2), za pakietem heplots 1.8.6 (Michael Friendly, John Fox, Georges Monette). Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
-        url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+        name: "GPL-2 | GPL-3"
+        notice: "GPL-2 | GPL-3, za pakietami heplots 1.8.6 (GPL ≥ 2; Michael Friendly, John Fox, Georges Monette) i networktree 1.0.1 (GPL-2 | GPL-3; Payton Jones, Thorsten Simon, Achim Zeileis), z którego pochodzą surowe odpowiedzi na pozycje kwestionariusza. Wersja zbioru w jUPWR jest udostępniana na tej samej licencji."
+        url: https://www.gnu.org/licenses/gpl-3.0.html
         texts:
           - GPL-2.0
+          - GPL-3.0
       references:
         - >-
           Jones, P. J., Mair, P., Simon, T. i in. (2020). Network Trees: A Method
