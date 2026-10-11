@@ -1,7 +1,7 @@
 ---
 title: Zbiory danych do zajęć (UPWr)
 name: jDane
-version: 0.8.0
+version: 0.8.1
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -668,7 +668,7 @@ datasets:
         reprezentatywna. Każda skala (Extraversion, Neuroticism,
         Conscientiousness, Agreeableness, Openness) to średnia z dwóch pozycji
         (jednej kodowanej wprost i jednej odwrotnie), co ogranicza rzetelność
-        pomiaru; wynik przyjmuje wartości od 1 do 7. Zbiór zawiera 1675 wierszy
+        pomiaru; wynik przyjmuje wartości od 1 do 7. Zbiór zawiera 1657 wierszy
         bez braków danych. Zmiany wprowadzone przez autorów pakietu przed
         włączeniem do jUPWR: usunięto 100 osób z odpowiedzią „Other” w zmiennej
         płci, a etykiety części poziomów (m.in. wykształcenia, języka
@@ -733,8 +733,21 @@ datasets:
         version: "1.8.6"
         dataset: TIPI
         url: https://cran.r-project.org/package=heplots
+        note: >-
+          Surowe odpowiedzi na pozycje kwestionariusza: pakiet networktree 1.0.1
+          (zbiór tipi); w nich pominięte pytanie ma kod 0.
+        extraUrl: https://cran.r-project.org/package=networktree
+        extraUrlLabel: Pakiet networktree
       changes:
-        - Dane wyeksportowane bez zmian; braki danych jako puste komórki.
+        - >-
+          W pakiecie heplots pominięte pytanie (kod 0 w surowych danych) weszło
+          do średniej skali jako zero. Wyniki skal przeliczono z pozycji
+          (X + (8 − X_r)) / 2, co odtwarza wartości z heplots, a tam, gdzie
+          X lub X_r wynosiło 0, wstawiono brak danych. Zastąpiono 60 wartości
+          (Extraversion 12, Neuroticism 12, Conscientiousness 13, Agreeableness
+          11, Openness 12) u 20 osób. Pozostałe zmienne bez zmian; braki danych
+          jako puste komórki.
+      changesDate: '2026-10-11'
     tags:
       - psychologia
       - korelacja

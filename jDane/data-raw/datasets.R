@@ -53,8 +53,9 @@ data("fastfood", package = "openintro")
 write.csv(as.data.frame(fastfood), "data/fastfood.csv", row.names = FALSE, na = "")
 
 # TIPI: ankieta internetowa Ten Item Personality Inventory (heplots 1.8.6,
-# Jones i in. 2020); eksport bez zmian, braki jako puste komorki
-write.csv(heplots::TIPI, "data/TIPI.csv", row.names = FALSE, na = "")
+# Jones i in. 2020; pominiete pytania odtworzone z networktree 1.0.1) --
+# patrz data-raw/tipi.R
+source("data-raw/tipi.R")
 
 # szkolenie -- zbior SYNTETYCZNY przygotowany na zajecia z analizy czestosci.
 # Trzy powtorzone pomiary binarne na tych samych gospodarstwach, wiec musza byc

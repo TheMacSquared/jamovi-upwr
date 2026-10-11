@@ -19,6 +19,9 @@ w jDane, drobne poprawki w jEksplor i uproszczone wykresy pomocnicze.
   Zbiory syntetyczne (autobusy, szkolenie) na CC0 1.0.
   `packaging/scripts/check-dataset-licenses.mjs` (w `release-check.sh`) wymaga
   pola licencji dla każdego zbioru.
+  jDane 0.8.1: w TIPI pominięte pytania (kod 0 w surowych danych networktree)
+  nie wchodzą już do średnich skal jako zero — 60 wartości w 20 wierszach
+  zastąpiono brakiem danych; wyniki skal przeliczone z pozycji.
 - jEksplor 0.1.4 (moduł wbudowany): „Zmienne ilościowe” — domyślnie zaznaczone
   tylko N, średnia, mediana, odchylenie standardowe i kwartyle (braki, minimum,
   maksimum i V odznaczone). „Zmienne jakościowe” — w tabeli krzyżowej nagłówek

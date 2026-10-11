@@ -93,7 +93,7 @@
 2.5,7,5.5,4,5,"<HS","Rural","F","Native",15,"Atheist","Heterosexual","Indig-White","No","Never married",1
 7,4.5,4.5,6,6.5,"<HS","Urban","F","Native",57,"Christian (Other)","Heterosexual","Indig-White","Yes","Never married",3
 5,3,6,2.5,4.5,"HS","Suburban","F","Native",18,"Atheist","Bisexual","Indig-White","No","Never married",3
-3.5,5.5,7,3,4,"Univ","Suburban","F","Native",30,"Christian (Protestant)","Heterosexual","Indig-White","No","Currently married",1
+3.5,5.5,,3,4,"Univ","Suburban","F","Native",30,"Christian (Protestant)","Heterosexual","Indig-White","No","Currently married",1
 1.5,6.5,3,2,6.5,"HS","Urban","M","Native",29,"Atheist","Heterosexual","Indig-White","No","Never married",1
 2.5,3,4.5,3.5,4.5,"<HS","Suburban","M","Native",15,"Other","Heterosexual","Indig-White","No","Never married",2
 2,4.5,6.5,6.5,5.5,"Univ","Suburban","F","Native",23,"Agnostic","Heterosexual","Indig-White","Yes","Never married",2
@@ -144,7 +144,7 @@
 1.5,5,7,5,4.5,"Univ","Urban","M","Native",38,"Christian (Protestant)","Heterosexual","Indig-White","No","Currently married",2
 5,4.5,5,5,4.5,"Univ","Urban","F","Non-native",20,"Buddhist","Bisexual","Indig-White","No","Never married",1
 2,3.5,5.5,4,7,"Grad","Urban","M","Native",36,"Atheist","Heterosexual","Indig-White","Yes","Never married",2
-5,3.5,6,5,2.5,"HS","Rural","F","Native",25,"Christian (Other)","Heterosexual","Indig-White","No","Currently married",3
+5,3.5,6,5,,"HS","Rural","F","Native",25,"Christian (Other)","Heterosexual","Indig-White","No","Currently married",3
 7,2,3,4,4,"Univ","Urban","M","Native",21,"Christian (Protestant)","Heterosexual","Indig-White","No","Never married",2
 5,6,4,2,4,"Univ","Urban","M","Native",48,"Agnostic","Heterosexual","Indig-White","Yes","Currently married",2
 7,3.5,2,5,5,"HS","Suburban","M","Native",19,"Christian (Catholic)","Bisexual","Indig-White","Yes","Never married",1
@@ -271,7 +271,7 @@
 2.5,3,7,4,3.5,"HS","Rural","F","Native",17,"Christian (Protestant)","Heterosexual","Indig-White","No","Never married",2
 5,1.5,7,6.5,7,"HS","Rural","M","Native",18,"Agnostic","Heterosexual","Indig-White","No","Never married",2
 2,2.5,3.5,4,5,"HS","Suburban","M","Native",21,"Christian (Protestant)","Heterosexual","Indig-White","No","Never married",2
-5,1,7.5,6,7,"<HS","Suburban","M","Non-native",15,"Atheist","Heterosexual","Indig-White","No","Never married",2
+5,1,,6,7,"<HS","Suburban","M","Non-native",15,"Atheist","Heterosexual","Indig-White","No","Never married",2
 1,7,1.5,4.5,6,"<HS","Suburban","M","Native",15,"Agnostic","Other","Indig-White","No","Never married",2
 1,6.5,1.5,5,5,"HS","Suburban","F","Native",26,"Atheist","Homosexual","Indig-White","Yes","Never married",2
 1,3.5,6,2.5,5,"HS","Urban","M","Native",19,"Atheist","Heterosexual","Indig-White","No","Never married",2
@@ -343,7 +343,7 @@
 2,4,5,4,4.5,"HS","Urban","F","Non-native",15,"Atheist","Bisexual","Indig-White","No","Never married",3
 4.5,4,6.5,5,4,"Univ","Urban","F","Native",46,"Jewish","Heterosexual","Indig-White","No","Currently married",2
 2,4,5,1.5,7,"<HS","Urban","F","Native",14,"Agnostic","Heterosexual","Asian","No","Never married",2
-4,4,4,4,4,"Univ","Suburban","F","Native",50,"Other","Heterosexual","Indig-White","No","Currently married",4
+,,,,,"Univ","Suburban","F","Native",50,"Other","Heterosexual","Indig-White","No","Currently married",4
 1,4,5,3,5,"HS","Suburban","F","Native",18,"Agnostic","Asexual","Asian","No","Never married",1
 3,3,5.5,6,6.5,"HS",,"F","Native",42,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Never married",1
 4.5,4,5,5,6,"HS","Suburban","M","Non-native",20,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Never married",2
@@ -489,7 +489,7 @@
 5,3.5,5.5,5.5,5,"HS","Urban","M","Native",21,"Buddhist","Heterosexual","Asian","Yes","Never married",4
 1.5,5.5,6,2,5,"Grad","Urban","M","Non-native",32,"Agnostic","Homosexual","Indig-White","Yes","Never married",3
 3.5,1,6.5,6,7,"<HS","Urban","M","Native",18,"Hindu","Heterosexual","Other","No","Never married",0
-4,4,4,4,4,"HS","Urban","M","Non-native",16,"Agnostic","Heterosexual","Indig-White","No","Never married",1
+,,,,,"HS","Urban","M","Non-native",16,"Agnostic","Heterosexual","Indig-White","No","Never married",1
 1,5.5,4.5,3,1.5,"HS","Urban","M","Non-native",33,"Atheist","Heterosexual","Indig-White","Yes","Never married",2
 1.5,4.5,4,4,5.5,"Univ","Suburban","F","Native",24,"Other","Homosexual","Indig-White","Yes","Never married",3
 3.5,4,3,6,6.5,"<HS","Suburban","F","Native",17,"Agnostic","Heterosexual","Indig-White","No","Never married",3
@@ -509,7 +509,7 @@
 5.5,4.5,4,4,6.5,"Univ","Suburban","M","Native",26,"Atheist","Heterosexual","Indig-White","Yes","Never married",5
 1.5,6,5.5,6.5,4,"HS","Suburban","F","Native",18,"Atheist","Other","Indig-White","No","Never married",3
 2,2,6.5,4,3.5,"HS","Suburban","M",,60,"Agnostic","Heterosexual","Indig-White","No","Never married",1
-4,4,4,4,4,"Univ","Suburban","M","Native",25,"Agnostic","Homosexual","Indig-White","No","Never married",1
+,,,,,"Univ","Suburban","M","Native",25,"Agnostic","Homosexual","Indig-White","No","Never married",1
 3,2,5.5,4,5,"Univ","Urban","M","Native",39,"Atheist","Heterosexual","Indig-White","No","Currently married",4
 1,4,4,6,6,"Univ","Rural","F","Non-native",20,"Agnostic","Heterosexual","Indig-White","Yes","Never married",3
 6.5,1.5,5.5,6,7,"Univ","Urban","F","Native",21,"Christian (Protestant)","Heterosexual","Indig-White","No","Never married",2
@@ -594,7 +594,7 @@
 2,7,3.5,4.5,5.5,"HS","Urban","F","Non-native",17,"Agnostic","Bisexual","Asian","No","Never married",2
 5,4.5,6,4,6.5,"Grad","Rural","F","Native",68,"Jewish","Heterosexual","Indig-White","No","Currently married",3
 3.5,4,1.5,5.5,4.5,"Univ","Suburban","F","Native",53,"Other","Asexual","Indig-White","No","Currently married",5
-3,1,5,7.5,5,"Univ","Urban","M","Native",55,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Currently married",3
+3,1,5,,5,"Univ","Urban","M","Native",55,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Currently married",3
 2,5,3,4,7,"HS","Urban","F","Non-native",18,"Atheist","Bisexual","Indig-White","Yes","Never married",2
 4.5,1.5,6.5,6.5,6,"Grad","Urban","M","Non-native",44,"Christian (Catholic)","Heterosexual","Indig-White","Yes","Currently married",2
 3.5,4,7,7,6.5,"HS","Suburban","F","Native",73,"Atheist","Heterosexual","Indig-White","Yes","Currently married",3
@@ -791,13 +791,13 @@
 7,3,3,2.5,5,"HS","Suburban","M","Native",19,"Christian (Catholic)","Heterosexual","Indig-White","Yes","Never married",3
 4.5,1,7,6.5,7,"Univ","Urban","M","Native",44,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Currently married",1
 4,6.5,4,3.5,4.5,"Grad","Suburban","F","Native",25,"Other","Bisexual","Indig-White","No","Never married",3
-3,7,2,4.5,6,"Grad","Urban","F","Non-native",32,"Christian (Protestant)","Bisexual","Indig-White","No",,1
+3,7,,4.5,6,"Grad","Urban","F","Non-native",32,"Christian (Protestant)","Bisexual","Indig-White","No",,1
 1,4.5,4,2,5,"HS","Suburban","M","Native",17,"Other","Heterosexual","Indig-White","No","Never married",2
 3,6.5,2,3.5,6,"<HS","Suburban","M","Native",16,"Christian (Protestant)","Heterosexual","Indig-White","No","Never married",3
 3,2,5.5,4.5,5.5,"<HS","Urban","M","Native",14,"Atheist","Heterosexual","Indig-White","No","Never married",2
 4.5,4.5,4,3,5,"Univ","Suburban","M","Native",43,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Never married",3
 3,4,5.5,3,4,"HS","Urban","M","Native",45,"Christian (Other)","Heterosexual","Indig-White","Yes","Previously married",4
-5.5,5,5,5,5,"Univ","Suburban","M","Native",54,"Christian (Other)","Heterosexual","Indig-White","Yes","Currently married",3
+5.5,,5,5,5,"Univ","Suburban","M","Native",54,"Christian (Other)","Heterosexual","Indig-White","Yes","Currently married",3
 5.5,5,7,7,5.5,"HS","Rural","F","Native",34,"Atheist","Heterosexual","Indig-White","Yes","Never married",2
 1.5,2.5,4,4,5.5,"HS","Suburban","M","Native",18,"Agnostic","Heterosexual","Other","No","Never married",2
 2,3,6.5,7,4.5,"HS","Urban","F","Non-native",16,"Christian (Catholic)","Heterosexual","Asian","No","Never married",3
@@ -873,7 +873,7 @@
 1.5,4.5,4.5,3.5,6.5,"<HS","Rural","F","Native",15,"Christian (Catholic)","Bisexual","Indig-White","No","Never married",2
 3,3.5,4.5,3,6,"Univ","Urban","F","Native",26,"Agnostic","Heterosexual","Other","No","Never married",1
 2,1.5,7,5,6.5,"Grad","Urban","M","Non-native",67,"Atheist","Heterosexual","Indig-White","No","Currently married",3
-5,1,4,6.5,6,"Grad","Urban","M","Native",63,"Agnostic","Homosexual","Indig-White","No","Never married",2
+5,,4,6.5,6,"Grad","Urban","M","Native",63,"Agnostic","Homosexual","Indig-White","No","Never married",2
 5,2.5,3,5,4.5,"Grad","Urban","F","Native",69,"Agnostic","Bisexual","Indig-White","Yes","Previously married",3
 3,5.5,2.5,4,6,"HS","Rural","M","Native",18,"Atheist","Other","Indig-White","No","Never married",2
 2.5,4,3.5,4.5,4,"HS","Rural","M","Native",31,"Atheist","Heterosexual","Indig-White","Yes","Currently married",1
@@ -997,7 +997,7 @@
 2.5,3.5,6.5,5,5.5,"Univ","Urban","M","Native",22,"Jewish","Heterosexual","Indig-White","Yes","Never married",3
 1.5,6.5,3.5,4,5,"HS","Urban","F","Non-native",22,"Buddhist","Heterosexual","Asian","No","Never married",2
 6.5,3,1,3.5,7,"HS","Rural","F","Native",18,"Atheist","Heterosexual","Other","No","Never married",7
-4,0.5,4,4,7.5,"HS","Urban","F","Native",42,"Christian (Catholic)","Heterosexual","Indig-White","No","Never married",3
+,,,,,"HS","Urban","F","Native",42,"Christian (Catholic)","Heterosexual","Indig-White","No","Never married",3
 3.5,5,3,2,6,"<HS","Suburban","F","Native",16,"Jewish","Heterosexual","Indig-White","No","Never married",2
 4.5,3,7,4.5,6,"Grad","Suburban","F","Native",62,"Agnostic","Heterosexual","Indig-White","Yes","Previously married",3
 1.5,4,4,6.5,6,"Univ","Rural","F","Native",27,"Agnostic","Homosexual","Indig-White","No","Never married",3
@@ -1099,7 +1099,7 @@
 5.5,3.5,6.5,6,6,"Univ","Rural","F","Native",22,"Christian (Catholic)","Heterosexual","Indig-White","No","Never married",2
 2.5,6,3,4.5,6,,"Suburban","F","Native",18,"Atheist","Bisexual","Indig-White","No","Never married",2
 2.5,7,4,6,6,"<HS","Suburban","F","Native",16,"Other","Homosexual","Indig-White","No","Never married",1
-4,4,4,4,4,,"Suburban","F","Native",29,"Buddhist","Heterosexual","Indig-White","No","Never married",2
+,,,,,,"Suburban","F","Native",29,"Buddhist","Heterosexual","Indig-White","No","Never married",2
 5.5,5,5,5,3.5,"Grad","Suburban","F","Native",44,"Atheist","Heterosexual","Other","No","Never married",3
 1,5.5,2,4,7,"Grad","Suburban","F","Non-native",35,"Agnostic","Bisexual","Indig-White","No","Never married",2
 1,7,4,2,3.5,"Univ","Rural","M","Non-native",23,"Agnostic","Heterosexual","Other","No","Never married",3
@@ -1202,7 +1202,7 @@
 5,6.5,6.5,5.5,7,"HS","Suburban","F","Non-native",15,"Atheist","Heterosexual","Asian","No","Never married",2
 1.5,4,4.5,6,6.5,"Grad","Suburban","F","Native",55,"Other","Heterosexual","Other","Yes","Never married",3
 3.5,6,4,5.5,7,"HS","Urban","F","Non-native",18,"Buddhist","Heterosexual","Indig-White","No","Never married",2
-0.5,4,4,4,4,"Univ","Urban","M","Non-native",38,"Atheist","Heterosexual","Indig-White","Yes","Never married",2
+,,,,,"Univ","Urban","M","Non-native",38,"Atheist","Heterosexual","Indig-White","Yes","Never married",2
 3,2,6,3.5,6.5,"Grad","Urban","M","Non-native",31,"Atheist","Heterosexual","Indig-White","No","Currently married",1
 2.5,5.5,5,5.5,3,"HS","Urban","F","Native",16,"Christian (Other)","Heterosexual","Other","No","Never married",3
 2,5,3.5,3.5,4,"HS","Rural","M","Native",20,"Christian (Other)","Bisexual","Indig-White","No","Never married",3
@@ -1414,7 +1414,7 @@
 4.5,6,5,1.5,4,"HS","Urban","F","Native",18,"Atheist","Other","Indig-White","No","Never married",2
 4,2,5,4,6.5,"<HS","Suburban","F","Native",16,"Christian (Catholic)","Heterosexual","Indig-White","No","Never married",3
 1.5,4.5,5,5,5,"Univ","Suburban","F","Native",26,"Atheist","Heterosexual","Indig-White","Yes","Never married",1
-4,4,4,4,7,"HS","Suburban","F","Native",36,"Christian (Other)","Heterosexual","Indig-White","No","Previously married",5
+,,,,,"HS","Suburban","F","Native",36,"Christian (Other)","Heterosexual","Indig-White","No","Previously married",5
 2,6,4.5,1.5,4.5,"HS","Rural","M","Native",42,"Other","Heterosexual","Indig-White","No","Never married",3
 2.5,2.5,5.5,4.5,5,"Univ","Suburban","F","Native",40,"Atheist","Heterosexual","Indig-White","Yes","Never married",6
 3,4.5,3.5,4.5,6,"Grad","Suburban","F","Native",65,"Atheist","Bisexual","Indig-White","Yes","Never married",5
@@ -1445,7 +1445,7 @@
 2.5,6,4,4.5,7,"<HS","Urban","F","Native",17,"Atheist","Heterosexual","Indig-White","No","Never married",3
 1,4,3,2.5,6,"Univ","Suburban","M","Native",25,"Atheist","Asexual","Indig-White","Yes","Never married",2
 1,1,6,2.5,5.5,"HS","Rural","M","Native",29,"Other","Bisexual","Indig-White","No","Never married",2
-4,4,4,4,4,"HS","Suburban","F","Native",22,"Agnostic","Heterosexual","Indig-White","No","Never married",3
+,,,,,"HS","Suburban","F","Native",22,"Agnostic","Heterosexual","Indig-White","No","Never married",3
 2,3.5,4.5,5.5,2.5,"HS","Rural","M","Native",18,"Agnostic","Heterosexual","Indig-White","Yes","Never married",2
 3,4,2.5,4,4,"HS","Urban","F","Native",37,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Never married",2
 2.5,4,3.5,4.5,6.5,"Univ","Urban","M","Non-native",23,"Agnostic","Heterosexual","Indig-White","Yes","Never married",2
@@ -1642,7 +1642,7 @@
 4,4.5,6,5.5,6.5,"HS","Urban","M","Non-native",35,"Atheist","Heterosexual","Indig-White","Yes","Never married",2
 3.5,3,3.5,4.5,6.5,"Grad","Rural","M","Non-native",35,"Agnostic","Heterosexual","Indig-White","No","Never married",3
 5,1.5,4.5,5.5,6,"Grad","Suburban","M","Non-native",57,"Agnostic","Heterosexual","Indig-White","Yes","Currently married",2
-1.5,4,4,4,4,"Univ","Urban","M","Non-native",65,"Agnostic","Heterosexual","Indig-White","No","Never married",2
+,,,,,"Univ","Urban","M","Non-native",65,"Agnostic","Heterosexual","Indig-White","No","Never married",2
 1.5,3.5,3,3.5,4,"HS","Urban","M","Non-native",18,"Agnostic","Heterosexual","Indig-White","No","Never married",2
 1.5,1,3.5,4.5,3.5,"HS","Suburban","M","Native",18,"Christian (Catholic)","Heterosexual","Arab","No","Never married",3
 2,4,4.5,4,6,"HS","Urban","F","Native",19,"Agnostic","Asexual","Indig-White","No","Never married",2
@@ -1688,7 +1688,7 @@
 3,4,4,3,7,"Univ","Suburban","M","Native",35,"Atheist","Heterosexual","Indig-White","Yes","Never married",3
 2.5,2,2,4,7,,"Rural","F","Non-native",49,"Agnostic","Heterosexual","Indig-White","No","Never married",3
 2,4.5,3.5,5,5.5,"Univ","Suburban","F","Native",54,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Never married",2
-4.5,3.5,4,3.5,6,"HS","Suburban","F","Native",27,"Atheist","Heterosexual","Indig-White","No","Never married",1
+,3.5,4,3.5,6,"HS","Suburban","F","Native",27,"Atheist","Heterosexual","Indig-White","No","Never married",1
 1,1,4,4.5,7,"HS","Suburban","M","Native",22,"Agnostic","Homosexual","Other","No","Never married",2
 3,4,5.5,3,5.5,"<HS","Suburban","F","Native",17,"Agnostic","Bisexual","Other","No","Never married",3
 5.5,3,6.5,6.5,6,"HS","Suburban","M","Native",58,"Agnostic","Heterosexual","Other","Yes","Previously married",4
@@ -1702,7 +1702,7 @@
 4.5,2.5,7,6.5,6.5,"Univ","Suburban","M","Native",35,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Currently married",2
 2,6.5,4.5,4,7,"HS","Suburban","F","Native",20,"Other","Bisexual","Asian","Yes","Never married",2
 3.5,4,4,4.5,5,"Univ","Suburban","F","Non-native",23,"Atheist","Heterosexual","Indig-White","Yes","Never married",1
-4.5,4.5,6,6.5,6.5,"HS","Urban","M","Native",68,"Agnostic","Heterosexual","Indig-White","Yes","Currently married",2
+,4.5,6,6.5,6.5,"HS","Urban","M","Native",68,"Agnostic","Heterosexual","Indig-White","Yes","Currently married",2
 6,2,4.5,5.5,6.5,"HS","Suburban","M","Non-native",22,"Christian (Catholic)","Heterosexual","Black","No","Never married",4
 2,5,2.5,6,6,"HS","Rural","F","Non-native",24,,"Bisexual","Indig-White","No","Never married",2
 3,5,4.5,7,7,"HS","Suburban","F","Native",17,"Christian (Other)","Heterosexual","Indig-White","No","Never married",1
@@ -1766,7 +1766,7 @@
 1.5,7,2.5,4,3.5,"HS","Urban","M","Non-native",24,"Atheist","Bisexual","Indig-White","Yes","Never married",1
 6.5,5,5,3.5,6.5,"<HS","Rural","M","Native",16,"Agnostic","Heterosexual","Indig-White","No","Never married",3
 2.5,2.5,4.5,4,6,"HS","Urban","M","Native",23,"Agnostic","Heterosexual","Other","No","Never married",5
-4,4,4,4,4,"Grad","Suburban","M","Non-native",18,"Atheist","Bisexual","Indig-White","Yes","Never married",2
+,,,,,"Grad","Suburban","M","Non-native",18,"Atheist","Bisexual","Indig-White","Yes","Never married",2
 3.5,5.5,2,3.5,4,"Grad","Urban","M","Non-native",31,"Agnostic","Heterosexual","Other","No","Never married",2
 6,5,6.5,5,5.5,"HS","Urban","M","Native",21,"Agnostic",,"Indig-White","Yes","Never married",3
 3.5,2,4,6.5,7,"Univ","Rural","F","Native",47,"Christian (Protestant)","Heterosexual","Indig-White","Yes","Currently married",0
@@ -1783,7 +1783,7 @@
 4,3.5,6,7,5,"HS","Urban","F","Native",54,"Christian (Other)","Heterosexual","Indig-White","Yes","Never married",2
 5,4,6.5,4,6.5,"Univ","Urban","F","Native",35,"Atheist","Heterosexual","Indig-White","No","Never married",7
 2,5,4.5,4.5,6.5,"Univ","Suburban","F","Native",25,"Agnostic","Heterosexual","Indig-White","No","Never married",2
-2,6,3,1,6.5,"HS","Suburban","M","Native",17,"Atheist","Heterosexual","Indig-White","No","Previously married",2
+2,6,3,1,,"HS","Suburban","M","Native",17,"Atheist","Heterosexual","Indig-White","No","Previously married",2
 2.5,5,4,3,5.5,"Grad","Suburban","M","Native",53,"Other","Heterosexual","Indig-White","Yes","Previously married",1
 3.5,5.5,4,3,6,"<HS","Urban","M","Native",16,"Atheist","Homosexual","Indig-White","No","Never married",1
 2,5,2.5,4.5,7,"Univ","Suburban","F","Native",20,"Agnostic","Bisexual","Indig-White","Yes","Never married",2
