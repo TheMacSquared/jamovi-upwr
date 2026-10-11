@@ -176,9 +176,7 @@ buildGroupedMeanCIPlot <- function(label, groups, ciWidth, statLabel, ggtheme, t
     p + ggplot2::geom_errorbar(data = ci, ggplot2::aes(x = group, ymin = lower, ymax = upper), inherit.aes = FALSE,
                                width = 0.3, linewidth = 1.2, colour = acc) +
         ggplot2::geom_point(data = ci, ggplot2::aes(x = group, y = est), inherit.aes = FALSE, shape = 18, size = 6, colour = acc) +
-        ggplot2::labs(x = NULL, y = label, subtitle = if (length(gn) == 1)
-            sprintf("%s = %.3g; %g%% CI [%.3g; %.3g]", statLabel, ci$est[1], ciWidth, ci$lower[1], ci$upper[1])
-            else sprintf("%s z %g%% przedziałem ufności", statLabel, ciWidth)) +
+        ggplot2::labs(x = NULL, y = label) +
         ggtheme
 }
 
@@ -198,7 +196,7 @@ buildTwoMeansCIPlot <- function(x1, x2, group1, group2, estimate, lower, upper, 
         ggplot2::geom_point(data = diffDF, ggplot2::aes(x = group, y = y), inherit.aes = FALSE, shape = 18, size = 6, colour = acc) +
         ggplot2::scale_x_discrete(drop = FALSE) +
         ggplot2::scale_y_continuous(sec.axis = ggplot2::sec_axis(~ . - ref, name = sprintf("Różnica względem średniej „%s”", group2))) +
-        ggplot2::labs(x = NULL, y = ylab, subtitle = sprintf("Różnica = %.3g; %g%% CI [%.3g; %.3g]", estimate, ciWidth, lower, upper)) +
+        ggplot2::labs(x = NULL, y = ylab) +
         ggtheme
 }
 
@@ -215,8 +213,7 @@ buildProportionIconPlot <- function(label, estimate, lower, upper, ciWidth, ggth
         ggplot2::geom_tile(colour = "white", linewidth = 1.5) +
         ggplot2::scale_fill_manual(values = c("Sukces" = acc, "Przedział ufności" = "#E89090", "Porażka" = "#E0E0E0"), drop = FALSE) +
         ggplot2::coord_fixed() + ggplot2::scale_y_reverse() +
-        ggplot2::labs(x = NULL, y = NULL, fill = NULL,
-                      subtitle = sprintf("%s: %.1f%%; %g%% CI [%.1f%%; %.1f%%]", label, 100 * estimate, ciWidth, 100 * lower, 100 * upper)) +
+        ggplot2::labs(x = NULL, y = NULL, fill = NULL) +
         ggtheme +
         ggplot2::theme(axis.text = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(),
                        axis.line = ggplot2::element_blank(), panel.grid = ggplot2::element_blank(),
@@ -243,8 +240,7 @@ buildDiffPropPlot <- function(group1, group2, p1, p2, ci1, ci2, estimate, lower,
         ggplot2::scale_y_continuous(labels = function(v) paste0(round(100 * v), "%"),
                                     sec.axis = ggplot2::sec_axis(~ . - ref, name = sprintf("Różnica względem „%s”", group2),
                                                                  labels = function(v) paste0(round(100 * v), " p.p."))) +
-        ggplot2::labs(x = NULL, y = sprintf("Udział kategorii „%s”", level),
-                      subtitle = sprintf("Różnica = %.1f p.p.; %g%% CI [%.1f; %.1f] p.p.", 100 * estimate, ciWidth, 100 * lower, 100 * upper)) +
+        ggplot2::labs(x = NULL, y = sprintf("Udział kategorii „%s”", level)) +
         ggtheme
 }
 
@@ -254,8 +250,7 @@ buildCorrelationPlot <- function(x1, x2, var1, var2, estimate, lower, upper, ciW
     ggplot2::ggplot(df, ggplot2::aes(x = x, y = y)) +
         ggplot2::geom_point(alpha = 0.5, size = 2.5, colour = theme$color[1]) +
         ggplot2::geom_smooth(method = "lm", formula = y ~ x, se = FALSE, colour = accent(theme), linewidth = 0.9) +
-        ggplot2::labs(x = var1, y = var2, subtitle = sprintf("%s = %.3f; %g%% CI [%.3f; %.3f]",
-            if (method == "pearson") "r Pearsona" else "ρ Spearmana", estimate, ciWidth, lower, upper)) +
+        ggplot2::labs(x = var1, y = var2) +
         ggtheme
 }
 
@@ -267,7 +262,7 @@ buildRegressionPlot <- function(x, y, xlab, ylab, band, ciWidth, bandLabel, ggth
                              fill = accent(theme), alpha = 0.2) +
         ggplot2::geom_point(alpha = 0.5, size = 2.2, colour = theme$color[1]) +
         ggplot2::geom_line(data = band, ggplot2::aes(x = x, y = fit), inherit.aes = FALSE, colour = accent(theme), linewidth = 1) +
-        ggplot2::labs(x = xlab, y = ylab, subtitle = sprintf("Pasmo: %g%% przedział ufności dla wartości średniej (%s)", ciWidth, bandLabel)) +
+        ggplot2::labs(x = xlab, y = ylab) +
         ggtheme
 }
 
@@ -279,7 +274,7 @@ buildBootHist <- function(reps, est, lower, upper, xlab, ggtheme, theme) {
         ggplot2::annotate("rect", xmin = lower, xmax = upper, ymin = -Inf, ymax = Inf, fill = acc, alpha = 0.12) +
         ggplot2::geom_vline(xintercept = est, colour = acc, linewidth = 1) +
         ggplot2::geom_vline(xintercept = c(lower, upper), colour = acc, linetype = "dashed", linewidth = 0.8) +
-        ggplot2::labs(x = xlab, y = "Liczba replikacji", subtitle = "Linia ciągła = estymata z danych; przerywane = granice przedziału") +
+        ggplot2::labs(x = xlab, y = "Liczba replikacji") +
         ggtheme
 }
 

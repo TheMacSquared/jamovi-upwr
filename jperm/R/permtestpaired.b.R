@@ -10,7 +10,7 @@ permtestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cl
         },
         .init = function() {
             for (k in private$.pairKeys()) {
-                self$results$plots$addItem(key = k); self$results$plots$get(key = k)$setTitle(k)
+                self$results$plots$addItem(key = k)
             }
         },
         .run = function() {
@@ -33,7 +33,7 @@ permtestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cl
                 tt$addRow(rowKey = k, values = list(var = k, stat = observed,
                     p = permPValue(observed, permDist, o$hypothesis), nPerm = length(permDist)))
                 exactNote(tt, k, permDist, o$exact)
-                self$results$plots$get(key = k)$setState(list(permDist = permDist, observed = observed, hypothesis = o$hypothesis))
+                self$results$plots$get(key = k)$setState(list(permDist = permDist, observed = observed, hypothesis = o$hypothesis, label = k))
             }
             tt$setNote("h", "Różnica = pierwsza − druga zmienna.")
         },
@@ -41,7 +41,7 @@ permtestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cl
         .permPlot = function(image, ggtheme, theme, ...) {
             if (is.null(image$state)) return(FALSE)
             s <- image$state
-            buildPermPlot(s$permDist, s$observed, s$hypothesis, ggtheme, theme)
+            buildPermPlot(s$permDist, s$observed, s$hypothesis, ggtheme, theme, s$label)
         }
     )
 )

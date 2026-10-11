@@ -83,8 +83,7 @@ boxPlotTests <- function(image, ggtheme, theme) {
     p + ggplot2::geom_boxplot(width = 0.5, alpha = 0.25, outlier.shape = NA, fill = theme$color[1], colour = "grey30") +
         ggplot2::geom_jitter(width = 0.12, height = 0, alpha = 0.5, size = 2, colour = theme$color[1]) +
         ggplot2::geom_point(data = means, ggplot2::aes(x = group, y = mean), shape = 18, size = 5, colour = accent(theme)) +
-        ggplot2::labs(x = NULL, y = s$ylab, subtitle = paste0("Pudełko: mediana i kwartyle; romb: średnia",
-            if (!is.null(s$refLine)) sprintf("; linia przerywana: %s", s$refLabel %||% "H₀") else "")) + ggtheme
+        ggplot2::labs(x = NULL, y = s$ylab) + ggtheme
 }
 
 qqPlotResid <- function(image, ggtheme, theme) {
@@ -95,7 +94,7 @@ qqPlotResid <- function(image, ggtheme, theme) {
     ggplot2::ggplot(df, ggplot2::aes(x = theo, y = z)) +
         ggplot2::geom_abline(slope = 1, intercept = 0, colour = "grey50") +
         ggplot2::geom_point(alpha = 0.7, colour = theme$color[1]) +
-        ggplot2::labs(x = "Kwantyle teoretyczne", y = "Standaryzowane wartości", subtitle = s$label) + ggtheme
+        ggplot2::labs(x = "Kwantyle teoretyczne", y = paste("Standaryzowane:", s$label)) + ggtheme
 }
 
 # ---------------------------------------------------------------------------

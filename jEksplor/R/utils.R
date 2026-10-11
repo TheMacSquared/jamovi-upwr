@@ -144,8 +144,7 @@ boxPlot <- function(d, label, violin, dot, meanPt, ggtheme, theme) {
                                    colour = theme$color[1], outlier.shape = if (dot) NA else 19)
     if (dot) p <- p + ggplot2::geom_jitter(width = 0.12, height = 0, alpha = 0.45, size = 1.8, colour = theme$color[1])
     if (meanPt) p <- p + ggplot2::stat_summary(fun = mean, geom = "point", shape = 18, size = 4.5, colour = accent(theme))
-    p + ggplot2::labs(x = if (nlevels(d$group) > 1) NULL else "", y = label,
-                      subtitle = if (meanPt) "Pudełko: mediana i kwartyle; romb: średnia" else NULL) + ggtheme
+    p + ggplot2::labs(x = if (nlevels(d$group) > 1) NULL else "", y = label) + ggtheme
 }
 
 qqPlotDesc <- function(d, label, ggtheme, theme) {
@@ -178,8 +177,7 @@ lorenzPlot <- function(d, label, ggtheme, theme) {
     p + ggplot2::scale_x_continuous(labels = function(v) paste0(round(100 * v), "%")) +
         ggplot2::scale_y_continuous(labels = function(v) paste0(round(100 * v), "%")) +
         ggplot2::coord_fixed() +
-        ggplot2::labs(x = "Skumulowany udział jednostek", y = sprintf("Skumulowany udział sumy „%s”", label),
-                      subtitle = "Przekątna = równy rozkład; im dalej krzywa, tym większa koncentracja") + ggtheme
+        ggplot2::labs(x = "Skumulowany udział jednostek", y = sprintf("Skumulowany udział sumy „%s”", label)) + ggtheme
 }
 
 # ---------------------------------------------------------------------------
@@ -241,7 +239,7 @@ ogivePlot <- function(tab, label, ggtheme, theme) {
         ggplot2::geom_hline(yintercept = 50, linetype = "dashed", colour = "grey50") +
         ggplot2::scale_y_continuous(labels = function(v) paste0(v, "%"), limits = c(0, 100)) +
         ggplot2::scale_x_continuous(breaks = d$x, labels = function(v) format(signif(v, 4))) +
-        ggplot2::labs(x = label, y = "Częstość skumulowana", subtitle = "Linia przerywana: 50% — odczyt mediany") + ggtheme
+        ggplot2::labs(x = label, y = "Częstość skumulowana") + ggtheme
 }
 
 # ---------------------------------------------------------------------------

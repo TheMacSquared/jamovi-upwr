@@ -83,7 +83,7 @@ iloscioweClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             private$.buildTable()
             for (v in o$vars) {
                 for (arr in c("hist", "box", "qq", "ecdf", "lorenz")) {
-                    self$results[[arr]]$addItem(key = v); self$results[[arr]]$get(key = v)$setTitle(v)
+                    self$results[[arr]]$addItem(key = v)
                 }
                 self$results$extreme$addItem(key = v); self$results$extreme$get(key = v)$setTitle(paste("Wartości skrajne:", v))
             }

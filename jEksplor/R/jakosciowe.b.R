@@ -44,7 +44,7 @@ jakoscioweClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             o <- self$options
             if (length(o$vars) == 0) return()
             for (v in o$vars) {
-                for (arr in c("freqs", "bars", "mosaics")) { self$results[[arr]]$addItem(key = v); self$results[[arr]]$get(key = v)$setTitle(v) }
+                for (arr in c("freqs", "bars", "mosaics")) { self$results[[arr]]$addItem(key = v); if (arr == "freqs") self$results[[arr]]$get(key = v)$setTitle(v) }
             }
             private$.buildTables()   # items must exist before their columns are added
         },

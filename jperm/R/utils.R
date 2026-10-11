@@ -119,8 +119,9 @@ permDistPaired <- function(d, nPerm, seed, exact) {
 #' @param hypothesis character, one of "different", "greater", "less"
 #' @param ggtheme ggplot2 theme object from jamovi
 #' @param theme list with jamovi theme colors
+#' @param label optional variable label appended to the x axis title
 #' @return ggplot object
-buildPermPlot <- function(permDist, observed, hypothesis, ggtheme, theme) {
+buildPermPlot <- function(permDist, observed, hypothesis, ggtheme, theme, label = NULL) {
     df <- data.frame(stat = permDist)
 
     # Determine rejection region for shading
@@ -152,7 +153,7 @@ buildPermPlot <- function(permDist, observed, hypothesis, ggtheme, theme) {
             linewidth = 1.2
         ) +
         ggplot2::labs(
-            x = "Statystyka permutacyjna",
+            x = if (is.null(label)) "Statystyka permutacyjna" else paste0("Statystyka permutacyjna: ", label),
             y = "Liczebność"
         ) +
         ggtheme

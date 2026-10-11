@@ -6,7 +6,6 @@ ttestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         .init = function() {
             for (v in self$options$vars) {
                 self$results$plots$addItem(key = v); self$results$qq$addItem(key = v)
-                self$results$plots$get(key = v)$setTitle(v); self$results$qq$get(key = v)$setTitle(v)
             }
         },
         .run = function() {

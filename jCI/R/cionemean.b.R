@@ -55,7 +55,7 @@ cionemeanClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     fallback <- fallback || r$fallback
                     if (isTRUE(o$bootPlot)) {
                         self$results$bootPlots$addItem(key = key)
-                        img <- self$results$bootPlots$get(key = key); img$setTitle(key)
+                        img <- self$results$bootPlots$get(key = key)
                         img$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = statLab))
                     }
                 } else r <- ciMeanT(xg, level)

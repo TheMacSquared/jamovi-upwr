@@ -30,7 +30,7 @@ scatterPairPlot <- function(x, y, xlab, ylab, r, method, ggtheme, theme) {
     p <- ggplot2::ggplot(data.frame(x = x, y = y), ggplot2::aes(x = x, y = y)) +
         ggplot2::geom_point(alpha = 0.55, size = 2.2, colour = theme$color[1])
     if (method == "pearson") p <- p + ggplot2::geom_smooth(method = "lm", formula = y ~ x, se = FALSE, colour = accent(theme), linewidth = 0.9)
-    p + ggplot2::labs(x = xlab, y = ylab, subtitle = sprintf("%s = %.3f", corMethodLabel(method), r)) + ggtheme
+    p + ggplot2::labs(x = xlab, y = ylab) + ggtheme
 }
 
 # All pairs as facets (lower triangle), each panel titled with the coefficient
@@ -125,7 +125,7 @@ simpleRegressionPlot <- function(x, y, xlab, ylab, band, ggtheme, theme) {
         ggplot2::geom_ribbon(data = band, ggplot2::aes(x = x, ymin = lower, ymax = upper), inherit.aes = FALSE, fill = accent(theme), alpha = 0.18) +
         ggplot2::geom_point(alpha = 0.55, size = 2.2, colour = theme$color[1]) +
         ggplot2::geom_line(data = band, ggplot2::aes(x = x, y = fit), inherit.aes = FALSE, colour = accent(theme), linewidth = 1) +
-        ggplot2::labs(x = xlab, y = ylab, subtitle = "Prosta MNK z pasmem przedziału ufności dla wartości średniej") + ggtheme
+        ggplot2::labs(x = xlab, y = ylab) + ggtheme
 }
 
 residFittedPlot <- function(fitted, resid, ggtheme, theme) {
@@ -133,7 +133,7 @@ residFittedPlot <- function(fitted, resid, ggtheme, theme) {
         ggplot2::geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
         ggplot2::geom_point(alpha = 0.55, size = 2, colour = theme$color[1]) +
         ggplot2::geom_smooth(method = "loess", formula = y ~ x, se = FALSE, colour = accent(theme), linewidth = 0.8) +
-        ggplot2::labs(x = "Wartości dopasowane", y = "Reszty", subtitle = "Linia = wygładzenie loess; oczekiwany brak wzorca") + ggtheme
+        ggplot2::labs(x = "Wartości dopasowane", y = "Reszty") + ggtheme
 }
 
 qqResidPlot <- function(resid, ggtheme, theme) {
@@ -205,7 +205,7 @@ rocPlot <- function(roc, auc, ggtheme, theme) {
         ggplot2::geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "grey50") +
         ggplot2::geom_path(colour = accent(theme), linewidth = 1) +
         ggplot2::coord_fixed() +
-        ggplot2::labs(x = "1 − swoistość (odsetek fałszywie dodatnich)", y = "Czułość (odsetek prawdziwie dodatnich)", subtitle = sprintf("AUC = %.3f", auc)) + ggtheme
+        ggplot2::labs(x = "1 − swoistość (odsetek fałszywie dodatnich)", y = "Czułość (odsetek prawdziwie dodatnich)") + ggtheme
 }
 
 logisticSimplePlot <- function(x, y, xlab, eventLabel, fit, covName, ggtheme, theme) {
@@ -217,5 +217,5 @@ logisticSimplePlot <- function(x, y, xlab, eventLabel, fit, covName, ggtheme, th
         ggplot2::geom_jitter(width = 0, height = 0.03, alpha = 0.5, size = 2, colour = theme$color[1]) +
         ggplot2::geom_line(data = band, ggplot2::aes(x = x, y = fit), inherit.aes = FALSE, colour = accent(theme), linewidth = 1) +
         ggplot2::scale_y_continuous(labels = function(v) paste0(round(100 * v), "%")) +
-        ggplot2::labs(x = xlab, y = sprintf("P(%s)", eventLabel), subtitle = "Krzywa logistyczna z pasmem ±1.96 SE (skala logitu)") + ggtheme
+        ggplot2::labs(x = xlab, y = sprintf("P(%s)", eventLabel)) + ggtheme
 }

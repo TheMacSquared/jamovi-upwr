@@ -223,8 +223,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                                    vjust = -1.1, size = 3.6) +
                 ggplot2::scale_y_continuous(labels = function(x) paste0(100 * x, "%"),
                                             limits = c(0, min(1, max(df$udzial) * 1.25 + 0.05))) +
-                ggplot2::labs(x = NULL, y = lab,
-                              caption = sprintf("N = %d", st$n)) +
+                ggplot2::labs(x = NULL, y = lab) +
                 ggplot2::theme_minimal()
             print(p)
             TRUE

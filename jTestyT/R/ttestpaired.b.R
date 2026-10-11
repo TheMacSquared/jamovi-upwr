@@ -11,7 +11,6 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
         .init = function() {
             for (k in private$.pairKeys()) {
                 self$results$plots$addItem(key = k); self$results$qq$addItem(key = k)
-                self$results$plots$get(key = k)$setTitle(k); self$results$qq$get(key = k)$setTitle(paste("Różnice:", k))
             }
         },
         .run = function() {

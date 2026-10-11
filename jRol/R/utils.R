@@ -586,8 +586,7 @@ meansPlot <- function(image, ggtheme, theme) {
             ggplot2::geom_text(ggplot2::aes(y = labY, label = letters), size = 4.5) +
             ggplot2::labs(x = s$label, y = s$dep)
     }
-    sub <- if (is.null(ebLab)) NULL else paste("Słupki:", ebLab)
-    p <- p + ggplot2::labs(subtitle = sub) + ggtheme
+    p <- p + ggtheme
     p
 }
 
