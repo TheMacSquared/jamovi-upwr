@@ -601,3 +601,86 @@ nortest jako źródło przybliżeń p (jEksplor, bez zależności), ARTool/Wobbr
 Bonett-Wright 2000 (jCI). Cytować tylko wtedy, gdy dana tabela/wykres
 naprawdę z pakietu korzysta (refs na elemencie, nie na całej analizie).
 
+
+### Zadanie 21: nowe elementy wyników jamovi 28.4+ (Text, Svg, vector, File) — PLAN, DECYZJE OTWARTE
+Stan 2026-10-12: tylko plan, nic nie wdrożone; decyzje niepodjęte (wszystkie opcje
+poniżej). Dotyczy wyłącznie gałęzi `test/upstream-28.11` (jUPWR 1.1.x, baza jamovi
+28.11). Moduły używające tych elementów wymagają jamovi ≥ 28.4 — `.jmo` z nimi nie
+zainstaluje się w 1.0.x (odnotować w macierzy `packaging/MODULES.md`).
+Rekomendacja ogólna (do decyzji): 1.1.0 wydać jako SAM merge 28.11 (eksport
+.docx/.odt/LaTeX już działa), nowe elementy dopiero w 1.1.x/1.2.0 — wtedy regresja
+jest jednoznacznie przypisana do merge'a albo do nowej funkcji.
+
+Elementy (źródła: `jmvcore/R/text.R`, `svg.R`, `image.R`, `analysis.R`;
+`jamovi-compiler/schemas/*.yaml`; `client/resultsview/text.ts`, `svg.ts`):
+- `Text` (`.r.yaml`): markdown renderowany przez klienta, `setContent()` przyjmuje
+  tekst lub dowolny obiekt (capture.output); linki otwierane zewnętrznie; dobra
+  postać tekstowa w eksporcie/kopiowaniu.
+- `Svg` (`.r.yaml`): znaczniki SVG + skrypty/style modułu wykonywane w panelu
+  wyników; klient zapisuje narysowany SVG do .omv (path), silnik R nie umie go
+  zapisać (`saveAs` odrzuca).
+- `Image` z `mode: vector`: ggplot renderowany przez `grDevices::svg` (cairo)
+  zamiast PNG przez ragg; bez zmian w kodzie wykresu.
+- `File` (`.a.yaml`, `extensions`, `multiple`, `hidden`): plik wybrany w panelu,
+  zapisywany WEWNĄTRZ .omv; w R domyślnie NULL (gałąź w `header.template`).
+
+Skala (moduły wbudowane): 50 wykresów Image (jANOVA 7, jTestyT 6, jCI 15, jCzest 3,
+jEksplor 9, jRegr 7, jperm 3) + scatr 26; `metody` (Html) w 27 analizach
+wbudowanych + 4 w jPomiar.
+
+Etap 1 — wykresy wektorowe.
+1a. PUŁAPKA fontów: cairo szuka fontów przez fontconfig, a motywy jUPWR rejestrują
+    fonty tylko przez `systemfonts::add_fonts()` (`jmvcore/R/themes.R`, fonty w
+    `/usr/lib/jamovi/fonts/`) — widzi je ragg, nie cairo. Opcje:
+    A) instalacja fontów jUPWR systemowo (fontconfig) w Dockerze, macOS, Windows —
+       cairo zamienia glify na krzywe, SVG wygląda identycznie wszędzie (także
+       w Wordzie bez naszych fontów); zostajemy na ścieżce kodu upstreamu; wada:
+       trzy pipeline'y, niezweryfikowane jak cairo w R na Windows szuka fontów.
+       (rekomendowane; najpierw kilkunastominutowy test w Dockerze)
+    B) w forku jmvcore renderować SVG przez `svglite` (widzi systemfonts) — jedna
+       zmiana w `analysis.R`; wady: tekst w SVG jako tekst z nazwą fontu (inna
+       czcionka bez fontu u odbiorcy), nowy pakiet, rozjazd z upstreamem przy
+       każdym merge'u.
+    C) akceptować czcionkę zastępczą — zero pracy, wykresy różnią się od PNG
+       i motywów wykładowych.
+1b. Pilot na jEksplor (9 wykresów): wygląd w aplikacji, eksport .docx/.odt,
+    rozmiar .omv, wydajność przy N ~ 10 000 (ECDF, punkty na boxplocie).
+1c. Zakres:
+    A) wszystkie 50 + scatr z wyjątkami (hexbin, scat, bubble przy dużym N
+       rastrowe) — spójność, ryzyko ciężkich SVG.
+    B) tylko wykresy z małą liczbą elementów (średnie z CI, słupki, krzywe,
+       diagnostyczne) — bezpieczne, ocena per wykres. (rekomendowane na start,
+       potem rozszerzenie do A po pilocie)
+    C) globalny przełącznik „Wykresy wektorowe" w ustawieniach — wybór
+       użytkownika; upstream ma `mode` statycznie w `.r.yaml`, więc zmiany
+       w kliencie, serwerze i jmvcore. (nierekomendowane)
+
+Etap 2 — „Opis zastosowanych metod" jako Text:
+    A) zostawić Html — eksport .docx wygląda dobrze (sprawdzone 2026-10-12),
+       zero ryzyka dla zapisanych .omv. (rekomendowane)
+    B) `metodyNew()` generuje markdown, typ `Text` w 31 `.r.yaml` — prostszy kod
+       (bez ręcznego HTML/escapowania), kopiowanie jako markdown; wady: bump
+       wszystkich modułów, sprawdzić otwieranie starych .omv z elementem Html;
+       pilot na jednej analizie (np. jTestyT `ttestone`) + test starego .omv.
+
+Etap 3 — opcja File:
+    A) nie teraz, czekać na potrzebę z zajęć. (rekomendowane)
+    B) pilot jSpace: własny plik TLE / GeoJSON granic / raster.
+    C) pilot jPomiar: plik z danymi wzorcowania.
+    Przy pilocie sprawdzić: limit rozmiaru (upstream ma limit wielkości żądania),
+    zapis .omv z dużym plikiem, jak R dostaje ścieżkę.
+
+Etap 4 — interaktywne Svg:
+    A) odłożyć po 1.1.0, najwyżej jeden pilot. (rekomendowane)
+    B) pilot `jCI::cibootstrap` (animacja kolejnych prób bootstrapowych).
+    C) pilot jdistrACTION (zaznaczanie obszaru pod gęstością).
+    D) zrezygnować.
+    Koszt: stały kod JavaScript w module, tłumaczenia, testy w przeglądarce,
+    zapis/odtworzenie z .omv, eksport .docx.
+
+Kolejność (proponowana): 1.1.0 = sam merge → test fontów w Dockerze → pilot
+vector na jEksplor → rozszerzenie → ewentualnie File i Svg. Każdy etap osobnym
+commitem z bumpem zmienionych modułów. Testy per etap: analizy w obrazie Dockera
+porównane z poprzednią wersją (klasy `*Options`/`*Class`, w obrazie brak
+wrapperów; urządzenie `png(type = "cairo")`, bo domyślny pdf daje „invalid font
+type"), eksport .docx/.odt ręcznie, otwarcie starego .omv, `release-check.sh`.
