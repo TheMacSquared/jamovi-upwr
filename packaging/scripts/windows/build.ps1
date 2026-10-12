@@ -57,6 +57,18 @@ $Modules    = @('jmv','plots','jperm','jCI','jdistrACTION','jDane','jANOVA','jTe
 $ProgressPreference = 'SilentlyContinue'
 function Step($m){ Write-Host "`n==> $m" -ForegroundColor Cyan }
 function Info($m){ Write-Host "    $m" -ForegroundColor DarkGray }
+# npm install w biezacym katalogu, gdy brak node_modules ALBO package.json jest nowszy
+# niz ostatnia instalacja (npm zapisuje node_modules\.package-lock.json). Samo
+# Test-Path node_modules nie wylapuje pakietow dodanych przez merge upstreamu (marked w 28.11).
+function Ensure-NpmDeps {
+    $stamp = Join-Path "node_modules" ".package-lock.json"
+    if (-not (Test-Path $stamp) -or
+        (Get-Item "package.json").LastWriteTime -gt (Get-Item $stamp).LastWriteTime) {
+        Info "npm install ($(Split-Path -Leaf (Get-Location)))"
+        npm install | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "npm install nieudany w $(Get-Location)" }
+    }
+}
 
 # Uruchamia jmc i PRZERYWA build, gdy zwroci blad kodem wyjscia.
 # Bez tego `| Out-Null` polykal komunikat jmc, a jedynym straznikiem byl
@@ -150,7 +162,7 @@ Info "OK nanomsg"
 # ---------------------------------------------------------------------------
 Step "Klient (vite)"
 Push-Location (Join-Path $RepoRoot "client")
-if (-not (Test-Path node_modules)) { npm install | Out-Null }
+Ensure-NpmDeps
 npm run build:coms | Out-Null
 node .\node_modules\vite\bin\vite.js build --outDir "$Payload\client" --emptyOutDir | Out-Null
 Pop-Location
@@ -188,7 +200,7 @@ Info "OK jmvcore (RProtoBuf_serialize zapieczetowany)"
 
 # 4d. kompilacja modulow przez jmc (--rhome dziala dzieki patchowi index.js)
 Push-Location (Join-Path $RepoRoot "jamovi-compiler")
-if (-not (Test-Path node_modules)) { npm install | Out-Null }
+Ensure-NpmDeps
 Pop-Location
 $jmc = Join-Path $RepoRoot "jamovi-compiler\index.js"
 
@@ -301,7 +313,7 @@ finally {
 # ---------------------------------------------------------------------------
 Step "i18n"
 Push-Location (Join-Path $RepoRoot "i18n")
-if (-not (Test-Path node_modules)) { npm install | Out-Null }
+Ensure-NpmDeps
 New-Item -ItemType Directory -Force -Path "$Payload\i18n\json" | Out-Null
 node (Join-Path $RepoRoot "i18n\index.js") --build src --dest "$Payload\i18n\json" | Out-Null
 Pop-Location
