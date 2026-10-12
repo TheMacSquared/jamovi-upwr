@@ -8,6 +8,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 ## 1.1.0 — w przygotowaniu (gałąź `test/upstream-28.11`)
 Baza jamovi 28.2 → 28.11. Wersja testowa; 1.0.x (gałąź `main`) bez zmian.
 
+Stan buildów (2026-10-12): Docker (`jupwr/jupwr:1.1.0`) zbudowany i sprawdzony
+(analizy jUPWR przeliczone i porównane z 1.0.7, eksport .docx sprawdzony),
+Windows i macOS zbudowane, aplikacje uruchamiają się; w trakcie testów.
+
 - Upstream jamovi 28.11: eksport wyników do .docx, .odt i LaTeX, kopiowanie
   tabeli jako obrazu i jako markdown, element wyników `Text` (markdown) i `Svg`,
   opcja `File`, rozwijane opisy w bibliotece danych, autosave, refaktor serwera
