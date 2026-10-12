@@ -5,6 +5,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+- Zmienna przekształcona nominalna/porządkowa: etykiety tekstowe w kolejności
+  reguł niezależnie od (ukrytej) zmiennej źródłowej; wcześniej przy źródle
+  ciągłym sortowane po kodach znaków („średnia” za „wysoka”).
+
 ## 1.0.7 — 2026-10-11
 Licencje zbiorów danych w dokumentacji biblioteki, uporządkowany zestaw zbiorów
 w jDane, drobne poprawki w jEksplor i uproszczone wykresy pomocnicze.
