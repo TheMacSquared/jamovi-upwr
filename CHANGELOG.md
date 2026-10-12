@@ -28,6 +28,9 @@ Windows i macOS zbudowane, aplikacje uruchamiają się; w trakcie testów.
 - Poprawka regresji z upstreamu 28.11 w kliencie: tabela, która traci wszystkie
   kolumny (np. Zmienne ilościowe po usunięciu ostatniej zmiennej), czyści też
   wiersze zamiast pokazywać stare wyniki bez nagłówków.
+- Zmienna przekształcona nominalna/porządkowa: etykiety tekstowe w kolejności
+  reguł niezależnie od (ukrytej) zmiennej źródłowej; wcześniej przy źródle
+  ciągłym sortowane po kodach znaków („średnia” za „wysoka”).
 
 ## 1.0.7 — 2026-10-11
 Licencje zbiorów danych w dokumentacji biblioteki, uporządkowany zestaw zbiorów

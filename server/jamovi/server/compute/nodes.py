@@ -550,10 +550,31 @@ class Call(ast.Call, Node):
         source = self.args[0]
         if ((self.func.id == '_RECODE_ORD' or self.func.id == '_RECODE_NOM')
                 and source.measure_type == MeasureType.CONTINUOUS):
-            levels = self.fvalues(row_count, False)
-            levels = filter(lambda x: not is_missing(x), levels)
-            levels = sorted(levels)
-            levels = map(lambda x: convert(x, str), levels)
+            values = self.fvalues(row_count, False)
+            values = [ v for v in values if not is_missing(v) ]
+            texts = set(v for v in values if isinstance(v, str))
+            if len(texts) == 0:
+                levels = sorted(values)
+                levels = map(lambda x: convert(x, str), levels)
+                return enumerate(levels)
+            # jUPWR: text labels keep the order of the recode rules (as with
+            # the automatic measure type); sorting them by code point put
+            # 'średnia' after 'wysoka'. Values passed through from the
+            # source follow, sorted numerically.
+            levels = [ ]
+            for arg_i in arg_level_indices:
+                if arg_i == 0 or arg_i >= len(self.args):
+                    continue
+                arg = self.args[arg_i]
+                if not arg.has_levels:
+                    continue
+                for level in arg.get_levels(row_count, False):
+                    if level[1] in texts and level[1] not in levels:
+                        levels.append(level[1])
+            numbers = sorted(set(v for v in values if not isinstance(v, str)))
+            for value in sorted(texts) + [ convert(v, str) for v in numbers ]:
+                if value not in levels:
+                    levels.append(value)
             return enumerate(levels)
 
         level_use = OrderedDict()
