@@ -1,6 +1,6 @@
 'use strict';
 
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 
 import ActionHub from './actionhub';
 import { h, url } from '../common/htmlelementcreator';

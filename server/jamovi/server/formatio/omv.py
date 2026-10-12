@@ -9,15 +9,18 @@ import struct
 import os
 import os.path
 import re
+import shutil
 
 from .exceptions import FileCorruptError
 from .exceptions import FileFormatNotSupportedError
+from ..sessionfiles import SessionFiles
+from ..sessionfiles import STORED_EXTS
+from ..sessionfiles import is_file_id
 
 from jamovi.core import ColumnType
 from jamovi.core import DataType
 from jamovi.core import MeasureType
 from jamovi.server.appinfo import app_info
-from jamovi.server.instancemodel import InstanceModel
 
 from ..i18n import _
 
@@ -27,8 +30,14 @@ from logging import getLogger
 
 log = getLogger(__name__)
 
+is_analysis = re.compile(r'^[0-9][0-9]+ .+/analysis$')
+is_resource = re.compile(r'^[0-9][0-9]+ .+/resources/.+')
+is_file = re.compile(r'^[0-9][0-9]+ .+/files/([^/]+)$')
 
-def write(data: InstanceModel, path, prog_cb, html=None, is_template=False):
+
+def write(project, path, prog_cb, html=None, is_template=False):
+
+    data = project.get_dataset()
 
     with ZipFile(path, 'w', zipfile.ZIP_DEFLATED) as zip:
 
@@ -119,7 +128,7 @@ def write(data: InstanceModel, path, prog_cb, html=None, is_template=False):
         metadata = { }
 
         document = { }
-        document['resultsLanguage'] = data.results_language
+        document['resultsLanguage'] = project.results_language
         metadata['document'] = document
 
         meta_dataset = { }
@@ -215,16 +224,35 @@ def write(data: InstanceModel, path, prog_cb, html=None, is_template=False):
 
         resources = [ ]
 
-        for analysis in data.analyses:
+        # files the analyses' File options refer to. they're written under
+        # the first analysis that uses them, and an analysis is only allowed
+        # to keep the ids of files that made it in (a template keeps none:
+        # it's structure without data)
+        session_files = SessionFiles(project.session_temp)
+        files_written = set()
+
+        for analysis in project.analyses:
             if analysis.has_results is False:
                 continue
+            if not is_template:
+                for file_id in analysis.files:
+                    if file_id in files_written:
+                        continue
+                    if not session_files.exists(file_id):
+                        log.error(f"Unable to include file '{ file_id }'")
+                        continue
+                    entry = '{:02} {}/files/{}'.format(analysis.id, analysis.name, file_id)
+                    _unused, ext = os.path.splitext(file_id)
+                    compress = zipfile.ZIP_STORED if ext.lower() in STORED_EXTS else zipfile.ZIP_DEFLATED
+                    zip.write(session_files.path(file_id), entry, compress)
+                    files_written.add(file_id)
             analysis_dir = '{:02} {}/analysis'.format(analysis.id, analysis.name)
-            zip.writestr(analysis_dir, analysis.serialize(strip_content=is_template), zipfile.ZIP_DEFLATED)
+            zip.writestr(analysis_dir, analysis.serialize(strip_content=is_template, files=files_written), zipfile.ZIP_DEFLATED)
             resources += analysis.resources
 
         for rel_path in resources:
             try:
-                abs_path = os.path.join(data.instance_path, rel_path)
+                abs_path = os.path.join(project.instance_path, rel_path)
                 zip.write(abs_path, rel_path)
             except FileNotFoundError:
                 log.error(f"Unable to include resource '{ rel_path }'")
@@ -292,7 +320,7 @@ def replace_single_equals(formula):
     return formula
 
 
-def read(data, path, prog_cb, **kwargs):
+def read(project, path, prog_cb, **kwargs):
 
     with ZipFile(path, 'r') as zip:
 
@@ -316,10 +344,25 @@ def read(data, path, prog_cb, **kwargs):
         if jav[0] > 12:
             raise FileFormatNotSupportedError(_('A newer version of jamovi is required'))
 
+        # files the analyses' File options refer to (see OptionFile). they
+        # go into the session temp dir, which is capped, so before reading
+        # anything check they'll fit -- an open that would take the session
+        # over the cap is refused, as a data set with too many columns is
+        session_files = SessionFiles(project.session_temp)
+        file_entries = { }
+        for entry in zip.infolist():
+            match = is_file.match(entry.filename)
+            if match and is_file_id(match.group(1)):
+                file_entries.setdefault(match.group(1), entry)
+        extra = sum(entry.file_size for file_id, entry in file_entries.items() if not session_files.exists(file_id))
+        project.instance.check_file_storage(extra)
+
         meta_content = zip.read('metadata.json').decode('utf-8')
         metadata = json.loads(meta_content)
         meta_document = metadata.get('document', {'resultsLanguage': 'en'})
         meta_dataset = metadata['dataSet']
+
+        data = project.add_dataset()
 
         # if 'importPath' in meta_dataset:
         #     try:
@@ -420,7 +463,7 @@ def read(data, path, prog_cb, **kwargs):
         data.set_row_count(row_count)
         data.set_weights_by_name(meta_dataset.get('weights'))
 
-        data.results_language = meta_document.get('resultsLanguage', 'en')
+        project.results_language = meta_document.get('resultsLanguage', 'en')
 
         columns_w_bad_levels = [ ]  # do some repair work
 
@@ -544,13 +587,28 @@ def read(data, path, prog_cb, **kwargs):
         for column in data:
             column.determine_dps()
 
-        is_analysis = re.compile('^[0-9][0-9]+ .+/analysis$')
-        is_resource = re.compile('^[0-9][0-9]+ .+/resources/.+')
+        # the files first, so the analyses know which are available. a file
+        # is only adopted if its content really hashes to its id: session
+        # temp is shared by every instance in the session, so nothing an
+        # archive says can be allowed to replace another's file
+        files_available = set()
+        for file_id, entry in file_entries.items():
+            if session_files.exists(file_id):
+                files_available.add(file_id)
+                continue
+            _unused, ext = os.path.splitext(file_id)
+            with NamedTemporaryFile(suffix=ext, delete=False, dir=session_files.dir) as tmp:
+                with zip.open(entry) as source:
+                    shutil.copyfileobj(source, tmp)
+            if session_files.verify_and_adopt(tmp.name, file_id):
+                files_available.add(file_id)
+            else:
+                log.error(f"File '{ entry.filename }' does not match its id, ignoring")
 
         for entry in zip.infolist():
             if is_analysis.match(entry.filename):
-                zip.extract(entry, data.instance_path)
+                zip.extract(entry, project.instance_path)
                 serial = zip.read(entry.filename)
-                data.analyses.create_from_serial(serial)
+                project.analyses.create_from_serial(serial, files_available)
             elif is_resource.match(entry.filename):
-                zip.extract(entry, data.instance_path)
+                zip.extract(entry, project.instance_path)

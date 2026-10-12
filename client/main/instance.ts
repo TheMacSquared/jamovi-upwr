@@ -37,6 +37,48 @@ import { ISaveOptions } from './backstage/fsentry';
 import Coms, { QQ } from './coms';
 import { ResultsView } from './results';
 import MsgDialog from '../common/msgdialog';
+import { recentlyRelocated, Relocation } from './relocate';
+
+// a proxy in front of the server gave up waiting for a response (504, or
+// cloudflare's 524). if the browser was still sending the file at the time,
+// the upload itself took too long; otherwise the server did
+function isProxyTimeout(status: number): boolean {
+    return status === 504 || status === 524;
+}
+
+function timedOut(uploaded: boolean): string {
+    if (uploaded)
+        return _('The server took too long to respond. Please try again.');
+    return _('The upload took too long to complete. Please try again with a faster connection, or a smaller file.');
+}
+
+// reads a json lines response, passing on its 'in-progress' lines as
+// progress, and resolving with the last line
+async function readJsonLines(body: ReadableStream | null, setProgress: (progress: any) => void): Promise<any> {
+
+    if (body === null)
+        return undefined;
+
+    const stream = parseJsonLines(body.getReader());
+    for await (const message of stream as AsyncIterable<any>) {
+        if (message.status === 'in-progress') {
+            if ( ! message.title)
+                message.title = _('Opening');
+            setProgress(message);
+        }
+    }
+    return await stream;
+}
+
+// whether a response body says the session has gone
+function isNoSession(body: string): boolean {
+    try {
+        return JSON.parse(body).status === 'no-session';
+    }
+    catch (e) {
+        return false;
+    }
+}
 
 export interface IInstanceOpenOptions {
     path?: string,
@@ -49,9 +91,15 @@ export interface IInstanceOpenOptions {
     headers?: { [key: string]: string },
 }
 
-interface IInstanceOpenRequiresInteraction {
+// signing in (again) is needed to start a session
+interface IInstanceOpenRequiresAuth {
     status: 'requires-auth',
-    event?: 'full',
+}
+
+// no room to start a session just now
+interface IInstanceOpenFull {
+    status: 'full',
+    message?: string,
 }
 
 interface IInstanceOpenError {
@@ -62,10 +110,15 @@ interface IInstanceOpenError {
 
 interface IInstanceOpenSuccess {
     status: 'OK',
-    url?: string,
+    // the instance opened. absent when there was nothing to open (an
+    // instance being reconnected to that already has its data set)
+    instanceId?: string,
 }
 
-export type IInstanceOpenResult = IInstanceOpenSuccess | IInstanceOpenRequiresInteraction | IInstanceOpenError;
+// the page is to be loaded again; see relocate.ts
+type IInstanceOpenRelocation = Relocation;
+
+export type IInstanceOpenResult = IInstanceOpenSuccess | IInstanceOpenRequiresAuth | IInstanceOpenFull | IInstanceOpenError | IInstanceOpenRelocation;
 
 export interface IInstanceOpenProgress {
     title: string,
@@ -76,6 +129,13 @@ export interface IInstanceOpenProgress {
 }
 
 export type InstanceOpenStream = ProgressStream<IInstanceOpenProgress, IInstanceOpenResult>;
+
+// a file copied into the session (for a 'File' analysis option). id is its
+// name there, derived from its content; filename is the name the user chose
+export interface IFileEntry {
+    id: string,
+    filename: string,
+}
 
 export interface IModuleInteractions {
     installModule: (name: string) => QQ.Promise<void>,
@@ -123,6 +183,7 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
     _dataSetModel: DataSetViewModel;
     _instanceId: string;
     _onBC: (broadcast) => void;
+    _onResume: (event: Event) => void;
     transId: number = 0;
     seqNo: number = 0;
     command: string = '';
@@ -159,6 +220,17 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
         this._onBC = (bc => this._onReceive(bc));
         this.attributes.coms.on('broadcast', this._onBC);
 
+        // a page coming back from the background may have a dead connection
+        // that hasn't noticed (an iPad, in particular)
+        this._onResume = (event) => {
+            if (event.type === 'pageshow' && ! (event as PageTransitionEvent).persisted)
+                return;
+            if (document.visibilityState === 'visible')
+                this._verifyConnection();
+        };
+        document.addEventListener('visibilitychange', this._onResume);
+        window.addEventListener('pageshow', this._onResume);
+
         this._modules.on('moduleUninstalled', (meta) => {
             let moduleName = meta.name;
             this._modules.purgeCache(moduleName);
@@ -193,6 +265,8 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
         this._dataSetModel.off('columnsChanged', this._columnsChanged, this);
         this._analyses.off('analysisOptionsChanged', this._onOptionsChanged, this);
         this.attributes.coms.off('broadcast', this._onBC);
+        document.removeEventListener('visibilitychange', this._onResume);
+        window.removeEventListener('pageshow', this._onResume);
         this._settings.destroy();
     }
 
@@ -279,6 +353,93 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
         });
     }
 
+    // refuses an upload that can't succeed, before any of it is sent. once a
+    // browser starts sending a body the server has no way to stop it, so an
+    // upload refused by the server is an upload sent in full first
+    _checkUpload(files: Iterable<File | string>) {
+
+        if ( ! this.attributes.coms.connected)
+            throw new UserFacingError(_('Upload failed'), { cause: _('The connection to the session has been lost') });
+
+        if (host.maxUploadMB === undefined)
+            return;
+
+        let size = 0;
+        for (const file of files) {
+            if (typeof file !== 'string')  // a path (electron) is copied, not sent
+                size += file.size;
+        }
+        if (size > host.maxUploadMB * 1024 * 1024)
+            throw new UserFacingError(_('Upload failed'), { cause: _('File size exceeds session limits') });
+    }
+
+    // copies files into the session (for a 'File' analysis option), where
+    // the engine can read them. files are either File objects (a browser:
+    // the bytes are uploaded) or paths (electron: the server, which is on
+    // the same machine, does the copy). progress is reported the same way
+    // as open(), so it can be shown in the notification area
+    uploadFiles(files: FileList | File[] | string[], signal?: AbortSignal): ProgressStream<IInstanceOpenProgress, IFileEntry[]> {
+
+        return new ProgressStream(async (setProgress): Promise<IFileEntry[]> => {
+
+            this._checkUpload(files);
+
+            // fetch doesn't support upload progress, so we need to use xhr
+            let xhr = new XMLHttpRequest();
+            xhr.responseType = 'json';
+
+            const cancel = () => xhr.abort();
+            if (signal)
+                signal.addEventListener('abort', cancel, { once: true });
+
+            setProgress({ title: _('Uploading'), p: 0, n: 0, cancel });
+
+            xhr.upload.addEventListener('progress', (event) => {
+                if (event.lengthComputable)
+                    setProgress({ title: _('Uploading'), p: event.loaded, n: event.total, cancel });
+            });
+
+            let uploaded = false;  // the whole file was sent
+            xhr.upload.addEventListener('load', () => uploaded = true);
+
+            const data = new FormData();
+            for (const file of files) {
+                if (typeof file === 'string') {
+                    // the same shape an upload accelerator hands the server
+                    data.append('file.path', file);
+                    data.append('file.name', path.basename(file));
+                }
+                else {
+                    data.append('file', file, file.name);
+                }
+            }
+
+            xhr.open('POST', 'upload', true);
+            xhr.send(data);
+
+            await new Promise<void>((resolve) => {
+                xhr.addEventListener('loadend', () => resolve(), { once: true });
+            });
+
+            if (xhr.status === 0) // aborted
+                throw new CancelledError();
+
+            if (xhr.status === 413) {
+                // the session's file storage is capped; the server says by how much
+                let message = xhr.response?.message || _('File size exceeds session limits');
+                throw new UserFacingError(_('Upload failed'), { cause: message });
+            }
+
+            if (isProxyTimeout(xhr.status))
+                throw new UserFacingError(_('Upload failed'), { cause: timedOut(uploaded) });
+
+            if (xhr.status !== 200)
+                throw new UserFacingError(_('Upload failed'), { cause: xhr.statusText });
+
+            return xhr.response as IFileEntry[];
+        });
+    }
+
     open(options: IInstanceOpenOptions): InstanceOpenStream {
 
         if ('url' in options) {
@@ -289,13 +450,42 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
         return new ProgressStream(async (setProgress): Promise<IInstanceOpenResult> => {
 
             let response;
-            let welcomeUrl;
 
             let headers = new Headers();
             headers.append('Accept-Language', I18ns.get('app').language);
 
             if (options.authToken)
                 headers.append('Authorization', `Bearer ${ options.authToken }`);
+
+            // tells the server not to ask for a relocation again
+            if (recentlyRelocated())
+                headers.append('X-Jamovi-Relocated', '1');
+
+            if (options.file)
+                this._checkUpload([ options.file ]);
+
+            // 'no-session' means the cookies don't name a live session (and
+            // they've been cleared). with an auth token (i.e. at boot) one is
+            // started, and the open tried again. without one there's nothing
+            // to be done: a data set being reconnected to has gone, and
+            // in-app, the session has ended
+            let sessionStarted = false;
+            const noSession = async (): Promise<IInstanceOpenResult | undefined> => {
+                if (options.authToken && ! sessionStarted) {
+                    sessionStarted = true;
+                    return await this._startSession(headers, setProgress);
+                }
+                if ( ! options.path && ! options.file) {
+                    throw new UserFacingError(_('Sorry'), {
+                        cause: _('This data set is no longer available'),
+                        status: 'terminated',
+                    });
+                }
+                throw new UserFacingError(_('Unable to open'), {
+                    cause: _('Your session has ended. Please refresh the page to continue.'),
+                    status: 'disconnected',
+                });
+            };
 
             while (true) {
 
@@ -345,7 +535,10 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
                             setProgress({ title: _('Uploading'), p: event.loaded, n: event.total, cancel: () => xhr.abort() });
                     });
 
-                    let url = `${ host.baseUrl }open?p=`;
+                    let uploaded = false;  // the whole file was sent
+                    xhr.upload.addEventListener('load', () => uploaded = true);
+
+                    let url = `${ host.baseUrl }open`;
 
                     const data = new FormData();
                     data.append('options', JSON.stringify(options));
@@ -370,8 +563,18 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
                     if (xhr.status === 204)
                         return { 'status': 'OK' };
 
+                    if (xhr.status === 401 && isNoSession(xhr.responseText)) {
+                        const result = await noSession();
+                        if (result)
+                            return result;
+                        continue;
+                    }
+
                     if (xhr.status === 413)
-                        throw new UserFacingError(_('Upload failed'), { cause: 'File size exceeds session limits' });
+                        throw new UserFacingError(_('Upload failed'), { cause: _('File size exceeds session limits') });
+
+                    if (isProxyTimeout(xhr.status))
+                        throw new UserFacingError(_('Upload failed'), { cause: timedOut(uploaded) });
 
                     if (xhr.status !== 200)
                         throw new UserFacingError(_('Upload failed'), { cause: xhr.statusText });
@@ -387,17 +590,17 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
                         const data = new FormData();
                         data.append('options', JSON.stringify(options));
 
-                        response = await fetch('open?p=', {
+                        response = await fetch('open', {
                             method: 'POST',
                             headers: headers,
                             body: data,
                         });
                     }
                     else {
-                        let url = 'open?p=';
+                        let url = 'open';
 
                         if (options.accessKey)
-                            url += `&key=${ options.accessKey }`;
+                            url += `?key=${ options.accessKey }`;
 
                         response = await fetch(url, {
                             method: 'GET',
@@ -408,57 +611,21 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
                     if (response.status === 204)
                         return { 'status': 'OK' };
 
+                    if (response.status === 401 && isNoSession(await response.text())) {
+                        const result = await noSession();
+                        if (result)
+                            return result;
+                        continue;
+                    }
+
                     if (response.status === 413)
-                        throw new UserFacingError(_('Unable to open'), { cause: 'File size exceeds session limits' });
+                        throw new UserFacingError(_('Unable to open'), { cause: _('File size exceeds session limits') });
 
                     if (response.status !== 200)
                         throw new UserFacingError(_('Unable to open'), { cause: response.statusText });
                 }
 
-                const reader = response.body.getReader();
-                const utf8Decoder = new TextDecoder('utf-8');
-
-                let message;
-                for (;;) {
-                    let { done, value } = await reader.read();
-
-                    let pieces;
-                    if (typeof(value) === 'string')
-                        pieces = value.split('\n');
-                    else if ( ! value)
-                        pieces = [ ];
-                    else
-                        pieces = utf8Decoder.decode(value).split('\n');
-
-                    // if the last piece is empty (in jsonlines this will often be the case)
-                    // use the second last piece instead
-                    let lastPiece = pieces[pieces.length - 1] || pieces[pieces.length - 2];
-                    if (lastPiece) {
-                        try {
-                            message = JSON.parse(lastPiece);
-                        }
-                        catch(e) {
-                            message = null;
-                        }
-                    }
-
-                    if (message && message.status === 'in-progress') {
-                        if ( ! message.title)
-                            message.title = _('Opening');
-                        setProgress(message);
-                    }
-
-                    if (done)
-                        break;
-                }
-
-                if (message && message['set-cookies']) {
-                    for (let cookie of message['set-cookies']) {
-                        // if the cookie has a domain, we need to rewrite it to the current domain
-                        // this let's us run the client and server on different domains (i.e. when testing).
-                        document.cookie = cookie.replace(/Domain=[^;]+/, `Domain=${ window.location.hostname }`);
-                    }
-                }
+                const message = await readJsonLines(response.body, setProgress);
 
                 if ( ! message) {
                     throw new UserFacingError(_('Unable to open'), {
@@ -466,7 +633,7 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
                         status: 'error',
                     });
                 }
-                else if (message.status !== 'OK' && message.status !== 'requires-auth') {
+                else if (message.status !== 'OK') {
                     let title = message.title || _('Unable to open');
                     throw new UserFacingError(title, {
                         cause: message.message || _('Unexpected error'),
@@ -474,20 +641,71 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
                         messageSrc: message['message-src'],
                     });
                 }
-                else if (message.url === '/open') {
-                    // open is performed in two steps, so we store the welcome
-                    // message from the first step
-                    welcomeUrl = message['message-src'];
-                    continue;
-                }
-                else {
-                    // and apply the welcome message to the second
-                    if ( ! ('message-src' in message) && welcomeUrl !== undefined)
-                        message['message-src'] = welcomeUrl;
-                    return message;
-                }
+
+                return { status: 'OK', instanceId: message.instanceId };
             }
         });
+    }
+
+    // starts a session for the signed in user, and takes its cookies: when
+    // the session is ready, the server hands over a ticket, which is then
+    // exchanged for the cookies. resolves with undefined once the cookies are
+    // set, or otherwise with why there's no session
+    async _startSession(headers: Headers, setProgress: (progress: any) => void): Promise<IInstanceOpenResult | undefined> {
+
+        let response = await fetch(`${ host.baseUrl }session/start`, {
+            method: 'POST',
+            headers: headers,
+        });
+
+        if (response.status !== 200)
+            throw new UserFacingError(_('Unable to open'), { cause: response.statusText });
+
+        const message = await readJsonLines(response.body, setProgress);
+
+        if ( ! message)
+            throw new UserFacingError(_('Unable to open'), { cause: _('Unexpected error') });
+
+        switch (message.status) {
+            case 'ready':
+                break;
+            case 'requires-auth':
+                return { status: 'requires-auth' };
+            case 'full':
+                return { status: 'full', message: message.message };
+            case 'reload':
+            case 'redirect':
+                return message;
+            default:
+                throw new UserFacingError(message.title || _('Unable to open'), {
+                    cause: message.message || _('Unexpected error'),
+                    status: 'error',
+                    messageSrc: message['message-src'],
+                });
+        }
+
+        const claimHeaders = new Headers(headers);
+        claimHeaders.set('Content-Type', 'application/json');
+
+        response = await fetch(`${ host.baseUrl }session/claim`, {
+            method: 'POST',
+            headers: claimHeaders,
+            body: JSON.stringify({ ticket: message.ticket }),
+        });
+
+        if (response.status === 401)
+            return { status: 'requires-auth' };
+
+        if (response.status !== 204) {
+            let cause = response.statusText;
+            try {
+                cause = JSON.parse(await response.text()).message || cause;
+            }
+            catch (e) { }
+            throw new UserFacingError(_('Unable to open'), { cause });
+        }
+
+        return undefined;
     }
 
     async save(options: ISaveOptions) {
@@ -526,10 +744,15 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
                 filename = result.filename;
 
                 if ( ! options.export) {
-                    this.set('path', result.path);
+                    // a download is written to a temp file (result.path), but
+                    // the data set takes the name the user chose
+                    this.set('path', result.download ? options.path : result.path);
                     this.set('title', result.title);
                     this.set('saveFormat', result.saveFormat);
                     this._dataSetModel.set('edited', false);
+
+                    if (result.download)
+                        return result;
 
                     this._notify({ message: _('File Saved'), cause: _(`Saved to '{filename}'`, { filename }) });
                 }
@@ -579,6 +802,13 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
 
             // Generate content if necessary
             let content = null;
+            let svgs = null;
+
+            if (options.path.endsWith('.omv') && ! options.export) {
+                // an Svg element is stored as the svg it renders to, and only
+                // the results view can provide that
+                svgs = await this.attributes.resultsSupplier.getSvgs();
+            }
 
             if (options.content) {
                 content = options.content;
@@ -587,18 +817,31 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
             else if (options.partType === 'image') {
                 // images are handled specially below
             }
-            else if (options.path.endsWith('.omv') || options.format === 'abs-html') {
+            else if (options.path.endsWith('.omv')) {
                 content = await this.attributes.resultsSupplier.getAsHTML({images:'relative', generator:app});
+                // content = await this.attributes.resultsSupplier.getAsHtml2({images:'resources', generator:app, showRefs: false});
+                // to follow, once the html export has had more use: the
+                // stored results as the same document, with the figures
+                // referenced as the resources alongside the analyses
             }
             else if (options.path.endsWith('.html') || options.path.endsWith('.htm')) {
-                content = await this.attributes.resultsSupplier.getAsHTML({images:'inline', generator:app}, options.part);
+                // the complete document; the server writes it as-is
+                content = await this.attributes.resultsSupplier.getAsHtml2({images:'inline', generator:app}, options.part);
             }
             else if (options.path.endsWith('.zip')) {
                 content = await this.attributes.resultsSupplier.getAsLatex();
             }
+            else if (options.path.endsWith('.docx')) {
+                // the complete document; the server writes it as-is
+                content = await this.attributes.resultsSupplier.getAsDocx(options.part);
+            }
+            else if (options.path.endsWith('.odt')) {
+                // the complete document; the server writes it as-is
+                content = await this.attributes.resultsSupplier.getAsOdt(options.part);
+            }
             else if (options.path.endsWith('.pdf')) {
-                let images = host.isElectron ? 'absolute' : 'inline';
-                const html = await this.attributes.resultsSupplier.getAsHTML({images:images, generator:app}, options.part);
+                // the html document, printed
+                const html = await this.attributes.resultsSupplier.getAsHtml2({images:'inline', generator:app}, options.part);
                 content = await this._requestPDF(html);
             }
 
@@ -606,6 +849,10 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
             data.append('options', JSON.stringify(options));
             if (content)
                 data.append('content', new Blob([ content ]));
+            if (svgs) {
+                for (const [ part, svg ] of Object.entries(svgs))
+                    data.append(`svg:${ part }`, new Blob([ svg as string ]));
+            }
 
             const response = await fetch('save', {
                 method: 'POST',
@@ -758,6 +1005,24 @@ export class Instance extends EventMap<IInstanceModel> implements IBackstageSupp
             type: error.type ? error.type : 'info',
         });
         this.trigger('notification', notification);
+    }
+
+    _verifyConnection() {
+
+        // electron's server is local; there's no connection to lose, and a
+        // failure there closes jamovi
+        if (host.isElectron || ! this._instanceId)
+            return;
+
+        let coms = this.attributes.coms;
+
+        let instanceRequest = new coms.Messages.InstanceRequest();
+        let request = new coms.Messages.ComsMessage();
+        request.payload = instanceRequest.toArrayBuffer();
+        request.payloadType = 'InstanceRequest';
+        request.instanceId = this._instanceId;
+
+        coms.verify(request);
     }
 
     _beginInstance(instanceId: string) {

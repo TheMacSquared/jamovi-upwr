@@ -25,11 +25,23 @@ import { IReference } from './references';
 import { R } from './references';
 import { jmv } from './references';
 
-import { hydrate } from './formatio/hydrate';
-import { htmlify } from './formatio/htmlify';
+import { hydrate, IElement } from './formatio/hydrate';
+
+// how an exported document refers to its figures (see _fillImages())
+type ImageMode = 'inline' | 'resources';
+
+interface IHtmlDocOptions {
+    images?: ImageMode;   // default 'inline'
+    generator?: string;   // for the <meta name="generator">
+    showRefs?: boolean;
+}
+import { createDoc as createHtmlDoc } from './formatio/htmlify';
+import { clipboardData, clipboardDocData, IClipboardData, IRenderedImage } from './formatio/clipboard';
+import { imagify } from './formatio/imagify';
 import { latexify } from './formatio/latexify';
 import { createDoc } from './formatio/latexify';
 import { createBibTex } from './formatio/latexify';
+import type { IDocItem, IFigure } from './formatio/docxify';
 
 interface AnalysisResource {
     id: number,
@@ -803,36 +815,191 @@ class ResultsPanel extends EventDistributor {
         ContextMenu.showResultsMenu(entries, data.pos.left, data.pos.top);
     }
 
-    getAsLatex() {
-        const analyses = [ ...this.model.analyses() ];
-        const fragments: Array<string> = [];
-        let references: Array<IReference> = [ R, jmv ];
-        let first = true;
+    // hydrates every analysis (or just the part addressed), and gathers the
+    // references they cite. the first analysis of a whole document carries
+    // the document heading (see hydrateGroup()), everything else sits
+    // beneath it. verbatimHtml: see hydrate()'s IHydrateOptions of the same
+    // name -- passed by callers building html (getAsHtml2(), the clipboard),
+    // not docx/latex
+    private _hydrateAll(part?: string, verbatimHtml: boolean = false): { items: Array<IDocItem>, references: Array<IReference> } {
+        const items: Array<IDocItem> = [];
+        let references: Array<IReference> = [];
 
-        for (let analysis of analyses) {
-            const results = analysis.results;
-            const values = analysis.options.getValues();
-            const hydrated = hydrate(results, [], values, first, analysis.id);
-            first = false;
-            if (hydrated === null)
-                continue;
-            const latex = latexify(hydrated);
-            if (latex !== null && latex !== '')
-                fragments.push(latex);
-            // get references from results
+        if (part) {
+            const address = unflatten(part);
+            const analysisId = parseInt(address.shift());
+            const analysis = this.model.analyses().get(analysisId);
+            if (analysis === null)
+                throw new Error('Unable to access analysis');
+            const element = hydrate(analysis.results, { address, values: analysis.options.getValues(), analysisId: analysis.id, verbatimHtml });
+            if (element !== null)
+                items.push({ element, level: 1 });
             references.push(...analysis.references);
+        }
+        else {
+            references.push(R, jmv);
+            let first = true;
+            for (const analysis of this.model.analyses()) {
+                const element = hydrate(analysis.results, { values: analysis.options.getValues(), top: first, analysisId: analysis.id, verbatimHtml });
+                const level = first ? 1 : 2;
+                first = false;
+                if (element === null)
+                    continue;
+                items.push({ element, level });
+                references.push(...analysis.references);
+            }
         }
 
         // remove duplicate references
-        const nameRefPairs = references.map(ref => [ref.name, ref]);
-        const refsByName = Object.fromEntries(nameRefPairs);
-        references = Object.values(refsByName);
-        const refNames = Object.keys(refsByName);
+        references = Object.values(Object.fromEntries(references.map(ref => [ref.name, ref])));
+
+        return { items, references };
+    }
+
+    // hydration leaves an image's path empty (it doesn't have access to the
+    // rendered figure); this fills them in. 'inline' is the figure from the
+    // results view, as a png data url; 'resources' is the path of the
+    // rendered image relative to the instance, as the .omv stores it
+    private async _fillImages(element: IElement, images: ImageMode = 'inline'): Promise<void> {
+        if (element === null)
+            return;
+        if (element.type === 'group') {
+            for (const item of element.items)
+                await this._fillImages(item, images);
+        }
+        else if (element.type === 'image') {
+            if (images === 'resources') {
+                // a url: the paths have spaces in them ('3 anova/resources/…')
+                element.path = element.resource ? encodeURI(element.resource) : null;
+            }
+            else {
+                const content = await this._getContent(unflatten(element.address), { });
+                if (content && content.image)
+                    element.path = content.image;
+            }
+        }
+    }
+
+    getAsLatex() {
+        const { items, references } = this._hydrateAll();
+        const fragments = items
+            .map(({ element }) => latexify(element))
+            .filter(latex => latex !== null && latex !== '');
+        const refNames = references.map(ref => ref.name);
 
         const doc = createDoc(fragments, refNames);
         const bibtex = createBibTex(references);
 
         return `${ doc }[--BIBTEX_FROM_HERE--]\n${ bibtex }`;
+    }
+
+    // the whole document (like getAsLatex()), or a single analysis/element
+    // when a part is given. the document is built in its entirety here; the
+    // server just writes the bytes out
+    async getAsDocx(part?: string): Promise<ArrayBuffer> {
+        // the docx library is sizeable, so it's loaded when first needed
+        const { createDoc } = await import('./formatio/docxify');
+
+        const { items, references } = this._hydrateAll(part);
+
+        // figures come from the results view, as it renders them: a png, and
+        // the svg too for a vector plot
+        const figures = async (address: string): Promise<IFigure | null> => {
+            const content = await this._getContent(unflatten(address), { });
+            if ( ! content || ! content.image)
+                return null;
+            const png = await (await fetch(content.image)).arrayBuffer();
+            return { png, svg: content.vector ? content.svg : undefined };
+        };
+
+        const showRefs = this.model.settings().getSetting('refsMode', 'bottom') !== 'hidden';
+
+        return createDoc(items, { references, figures, showRefs });
+    }
+
+    // the OpenDocument Text counterpart to getAsDocx(), for LibreOffice/
+    // OpenOffice; built the same way, from the same hydrated items
+    async getAsOdt(part?: string): Promise<ArrayBuffer> {
+        // the odt-building code is sizeable, so it's loaded when first needed
+        const { createDoc } = await import('./formatio/odtify');
+
+        const { items, references } = this._hydrateAll(part);
+
+        const figures = async (address: string): Promise<IFigure | null> => {
+            const content = await this._getContent(unflatten(address), { });
+            if ( ! content || ! content.image)
+                return null;
+            const png = await (await fetch(content.image)).arrayBuffer();
+            return { png, svg: content.vector ? content.svg : undefined };
+        };
+
+        const showRefs = this.model.settings().getSetting('refsMode', 'bottom') !== 'hidden';
+
+        return createDoc(items, { references, figures, showRefs });
+    }
+
+    // the results as an html document (like getAsDocx()): self-contained,
+    // with the figures inline, for the html and pdf exports; or with the
+    // figures referenced as resources, for the .omv. getAsHTML() below is
+    // the results view as rendered
+    async getAsHtml2(options: IHtmlDocOptions, part?: string): Promise<string> {
+        const { items, references } = this._hydrateAll(part, true);
+
+        for (const item of items)
+            await this._fillImages(item.element, options.images || 'inline');
+
+        const showRefs = options.showRefs ?? (this.model.settings().getSetting('refsMode', 'bottom') !== 'hidden');
+
+        return createHtmlDoc(items, { references, showRefs, generator: options.generator });
+    }
+
+    // an Svg element's svg is drawn in the results view, so that's the only
+    // place it can be got from. this pulls all of them ahead of a save, so
+    // they can be stored in place of the html and scripts which produced them
+    async getSvgs() {
+
+        const svgs: { [part: string]: string } = { };
+
+        for (const analysis of this.model.analyses()) {
+
+            if ( ! analysis.results)
+                continue;
+            if ( ! (analysis.id in this.resources))
+                continue;
+
+            for (const address of this._svgAddresses(analysis.results, [ ])) {
+                const part = flatten([ analysis.id, ...address ]);
+                const content = await this._getContent([ analysis.id, ...address ], { format: 'image/svg+xml' });
+                if (content.svg)
+                    svgs[part] = content.svg;
+            }
+        }
+
+        return svgs;
+    }
+
+    _svgAddresses(pb, address: string[]) : string[][] {
+
+        // hidden elements aren't rendered, so there's nothing to pull
+        if (pb.visible === 1 || pb.visible === 3)
+            return [ ];
+
+        if (pb.svg)
+            return [ address ];
+
+        let elements = null;
+        if (pb.group)
+            elements = pb.group.elements;
+        else if (pb.array)
+            elements = pb.array.elements;
+
+        if (elements === null)
+            return [ ];
+
+        const addresses: string[][] = [ ];
+        for (const child of elements)
+            addresses.push(...this._svgAddresses(child, [ ...address, child.name ]));
+        return addresses;
     }
 
     getAsHTML(options, part?) {
@@ -898,34 +1065,60 @@ class ResultsPanel extends EventDistributor {
 
         if (event.op === 'copy') {
 
-            let options = {
-                margin: '24',
-                docType: true,
-                exclude: [ '.jmvrefs', 'jmv-reference-numbers' ],
-            };
+            // images go onto the clipboard as data uris (see _fillImages())
+            // -- tested to paste fine in word and powerpoint (365), as well
+            // as browsers. an Svg element is hydrated as an image too (see
+            // hydrate.ts's hydrateSvg()), so it's rasterised the same way,
+            // and survives a copy the same as a plain Image would
 
-            if (host.isElectron) {
-                // this is necessary for compatibility with Office 2010
-                // and possibly for other versions, but we haven't explored
-                // exhaustively.
-                options.images = 'absolute';
+            const address = event.address.slice();
+            // syntax is copied only where the results view is showing it
+            const showSyntax = this.model.settings().get('syntaxMode');
+            let data: IClipboardData;
+
+            // each is hydrated twice: for html (verbatimHtml), and parsed
+            // for markdown (see clipboardData())
+
+            if (address.length === 0) {
+                // the whole document
+                const { items, references } = this._hydrateAll(undefined, true);
+                for (const item of items)
+                    await this._fillImages(item.element);
+                const parsed = this._hydrateAll(undefined, false);
+                const showRefs = this.model.settings().getSetting('refsMode', 'bottom') !== 'hidden';
+                data = clipboardDocData(items, parsed.items, { references, showRefs, showSyntax });
+            }
+            else {
+                // a single analysis, or an element/group within one
+                const analysisId = parseInt(address.shift());
+                const analysis = this.model.analyses().get(analysisId);
+                if (analysis === null)
+                    throw new Error('Unable to access analysis');
+                const values = analysis.options.getValues();
+                const hydrated = hydrate(analysis.results, { address, values, analysisId: analysis.id, verbatimHtml: true });
+                const parsed = hydrate(analysis.results, { address, values, analysisId: analysis.id });
+
+                // an image's picture is as the results view has rendered it
+                // -- which also tells us whether it's actually vector
+                let rendered: IRenderedImage | null = null;
+                if (hydrated.type === 'image')
+                    rendered = await this._getContent(unflatten(hydrated.address), { });
+                else
+                    await this._fillImages(hydrated);
+
+                data = clipboardData(hydrated, parsed, rendered, { showSyntax });
             }
 
-            this._getContent(event.address, options).then((content) => {
+            await host.copyToClipboard(data);
 
-                return host.copyToClipboard(content);
-
-            }).then(() => {
-
-                let note = new Notify({
-                    title: _('Copied'),
-                    message: _('The content has been copied to the clipboard'),
-                    duration: 2000,
-                    type: 'success'
-                });
-
-                this.model.trigger('notification', note);
+            let note = new Notify({
+                title: _('Copied'),
+                message: _('The content has been copied to the clipboard'),
+                duration: 2000,
+                type: 'success'
             });
+
+            this.model.trigger('notification', note);
         }
         else if (event.op === 'addNote') {
             let address = event.address.slice(); // clone
@@ -967,7 +1160,47 @@ class ResultsPanel extends EventDistributor {
                 let status = await this.model.save(saveOptions);
                 if (host.isElectron === false && status.path) {
                     let source = path.basename(status.path);
-                    let url = `dl/${ source }?filename=${ path.basename(result.file) }`;
+                    let url = `dl/${ encodeURIComponent(source) }?filename=${ encodeURIComponent(path.basename(result.file)) }`;
+                    await host.triggerDownload(url);
+                }
+            }
+            else if (event.target.type === 'Svg') {
+
+                let options = {
+                    title: _('Export image'),
+                    filters: [
+                        { name: 'SVG', description: _('SVG Image {ext}', { ext: '(.svg)' }), extensions: [ 'svg' ] },
+                        { name: 'PNG', description: _('PNG Image {ext}', { ext: '(.png)' }), extensions: [ 'png' ] },
+                    ]
+                };
+                let result = await host.showSaveDialog(options);
+                if (result.cancelled)
+                    return;
+
+                // the engine can't render this one -- the svg only exists in
+                // the results view -- so we pull it and send it as content
+                let content;
+                if (result.file.toLowerCase().endsWith('.png')) {
+                    let pulled = await this._getContent(event.address, { format: 'image/png' });
+                    content = await (await fetch(pulled.image)).arrayBuffer();
+                }
+                else {
+                    let pulled = await this._getContent(event.address, { format: 'image/svg+xml' });
+                    content = pulled.svg;
+                }
+
+                let saveOptions = {
+                    path: result.file,
+                    name: 'Image',
+                    export: true,
+                    content: content,
+                    overwrite: host.isElectron === false,
+                };
+
+                let status = await this.model.save(saveOptions);
+                if (host.isElectron === false && status.path) {
+                    let source = path.basename(status.path);
+                    let url = `dl/${ encodeURIComponent(source) }?filename=${ encodeURIComponent(path.basename(result.file)) }`;
                     await host.triggerDownload(url);
                 }
             }
@@ -989,6 +1222,8 @@ class ResultsPanel extends EventDistributor {
                     ]
                 };
 
+                options.filters.push({ name: 'Word', description: _('Word Document {ext}', { ext: '(.docx)' }), extensions: [ 'docx' ] });
+                options.filters.push({ name: 'OpenDocument', description: _('OpenDocument Text {ext}', { ext: '(.odt)' }), extensions: [ 'odt' ] });
                 if (part === '')
                     options.filters.push({ name: 'LaTeX', description: _('LaTeX bundle {ext}', { ext: '(.zip)' }), extensions:  [ 'zip' ] });
 
@@ -999,7 +1234,7 @@ class ResultsPanel extends EventDistributor {
                 let status = await this.model.save(saveOptions);
                 if (host.isElectron === false && status.path) {
                     let source = path.basename(status.path);
-                    let url = `dl/${ source }?filename=${ path.basename(result.file) }`;
+                    let url = `dl/${ encodeURIComponent(source) }?filename=${ encodeURIComponent(path.basename(result.file)) }`;
                     await host.triggerDownload(url);
                 }
             }
@@ -1040,25 +1275,16 @@ class ResultsPanel extends EventDistributor {
         else if (event.op === 'refsClearSelection') {
             this._refsTable.clearSelection();
         }
-        else if (['copy2', 'copyLatex'].includes(event.op)) {
-            const address = event.address;
+        else if (event.op === 'copyLatex') {
+            const address = event.address.slice();
             const analysisId = parseInt(address.shift());
             const analysis = this.model.analyses().get(analysisId);
-            const results = analysis.results;
-            const values = analysis.options.getValues();
-            const hydrated = hydrate(results, address, values);
+            if (analysis === null)
+                throw new Error('Unable to access analysis');
+            const hydrated = hydrate(analysis.results, { address, values: analysis.options.getValues(), analysisId: analysis.id });
+            const text = latexify(hydrated);
 
-            let content;
-            if (event.op === 'copy2') {
-                const html = htmlify(hydrated);
-                content = { html, text: html };
-            }
-            else {
-                const text = latexify(hydrated);
-                content = { text };
-            }
-
-            await host.copyToClipboard(content);
+            await host.copyToClipboard({ text });
 
             const note = new Notify({
                 title: _('Copied'),
@@ -1068,6 +1294,47 @@ class ResultsPanel extends EventDistributor {
             });
             this.model.trigger('notification', note);
 
+        }
+        else if (event.op === 'copyImage') {
+            // a table as a picture (only tables are offered this), as the
+            // png alone, so it's pasted as the picture wherever it goes
+            const address = event.address.slice();
+            const analysisId = parseInt(address.shift());
+            const analysis = this.model.analyses().get(analysisId);
+            if (analysis === null)
+                throw new Error('Unable to access analysis');
+            const hydrated = hydrate(analysis.results, { address, values: analysis.options.getValues(), analysisId: analysis.id });
+            if (hydrated?.type !== 'table')
+                throw new Error('Only a table can be copied as an image');
+
+            let image: string;
+            try {
+                image = await imagify(hydrated);
+            }
+            catch (e) {
+                // safari won't allow it (see imagify.ts); anything else is
+                // a genuine error
+                if ( ! (e instanceof DOMException && e.name === 'SecurityError'))
+                    throw e;
+                const note = new Notify({
+                    title: _('Unable to copy'),
+                    message: _('Unavailable under Safari and iPads'),
+                    duration: 3000,
+                    type: 'error',
+                });
+                this.model.trigger('notification', note);
+                return;
+            }
+
+            await host.copyToClipboard({ image });
+
+            const note = new Notify({
+                title: _('Copied'),
+                message: _('The content has been copied to the clipboard'),
+                duration: 2000,
+                type: 'success'
+            });
+            this.model.trigger('notification', note);
         }
         else {
 

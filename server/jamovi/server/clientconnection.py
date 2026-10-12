@@ -67,6 +67,7 @@ class ClientConnection:
                 else:
                     instance = self._session[message.instanceId]
                 instance.set_coms(self)
+                self._instance_id = instance.id
                 response = InstanceResponse()
                 response.instanceId = instance.id
                 self.send(response, instance.id, request)
@@ -159,7 +160,7 @@ class ClientConnection:
                 break
 
     def on_close(self, clean: bool):
-        log.debug('Websocket closed (clean=%s)', clean)
+        log.debug('Websocket closed (instance %s, clean=%s)', self._instance_id, clean)
         ClientConnection.number_of_connections -= 1
         for listener in self._close_listeners:
             # clean=False when the connection drops uncleanly (e.g. computer sleep);
@@ -185,7 +186,7 @@ async def client_connection_handler(request: web.Request, session) -> web.WebSoc
     if sock:
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-    log.debug('Websocket opened')
+    log.debug('Websocket opened (instance %s)', instance_id)
     ClientConnection.number_of_connections += 1
 
     conn = ClientConnection(ws, session, instance_id)

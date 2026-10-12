@@ -14,7 +14,7 @@ import platform
 
 log = logging.getLogger('jamovi')
 if not sys.executable.endswith('pythonw.exe'):
-    formatter = logging.Formatter('%(name)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(message)s')
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(formatter)
     log.addHandler(handler)
@@ -48,7 +48,8 @@ async def main():  # run down below()
 
     session_id = conf.get('session_id', None)
 
-    debug = '--debug' in sys.argv
+    # debug can be specified with --debug, or with JAMOVI_DEBUG (or env.conf)
+    debug = '--debug' in sys.argv or conf.get('debug', False) not in (False, '', '0', 'false', 'False')
     stdin_slave = '--stdin-slave' in sys.argv
     start_wb = '--start-wb' in sys.argv
 

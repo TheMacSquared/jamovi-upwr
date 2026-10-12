@@ -144,6 +144,9 @@ class Session(dict):
     def get_language(self):
         return i18n.get_language()
 
+    def set_auth(self, auth_token):
+        self._backend.set_auth(auth_token)
+
     def apply_settings(self, settings: dict):
         if 'updateStatus' in settings:
             update_status = settings['updateStatus']
@@ -317,6 +320,8 @@ class Session(dict):
         except ValueError:
             AUTOSAVE_ACTIVE = None
 
+        AUTOSAVE = AUTOSAVE_IDLE is not None or AUTOSAVE_ACTIVE is not None
+
         now = monotonic()
 
         session_start_time = now
@@ -327,6 +332,19 @@ class Session(dict):
         last_idle_warning = None
         last_time_limit_warning = None
         session_expiry_prevented = False
+
+        # the connected state of each instance, from the last time around the
+        # loop, so we can log connections/disconnections as they happen
+        connection_states = { }
+        expiry_prevented = False
+        last_status_log = now
+
+        log.debug('%s: starting run loop, time_limit=%s, timeout_no_connection=%s, '
+                  'timeout_no_connection_unclean=%s, timeout_no_connection_virgin=%s, '
+                  'timeout_idle=%s, timeout_idle_notice=%s, session_expires=%s, '
+                  'session_expires_prevent_path=%s',
+                  self._id, TIME_LIMIT, TIMEOUT_NC, TIMEOUT_NC_UNCLEAN, TIMEOUT_NC_VIRGIN,
+                  TIMEOUT_IDLE, TIMEOUT_IDLE_NOTICE, SESSION_EXPIRES, SESSION_EXPIRES_PREVENT_PATH)
 
         self._running = True
 
@@ -353,6 +371,26 @@ class Session(dict):
                         session_idle_since = idle_since
 
                     status = instance.connection_status()
+
+                    # log connections/disconnections as they occur
+                    if connection_states.get(id) != status.connected:
+                        first_seen = id not in connection_states
+                        connection_states[id] = status.connected
+                        if status.connected:
+                            log.debug('instance %s: connected', id)
+                        else:
+                            if status.unclean:
+                                timeout = TIMEOUT_NC_UNCLEAN
+                            elif status.virgin:
+                                timeout = TIMEOUT_NC_VIRGIN
+                            else:
+                                timeout = TIMEOUT_NC
+                            log.debug('instance %s: %s (unclean=%s, virgin=%s), '
+                                      'will be ended after %s seconds without a connection',
+                                      id,
+                                      'awaiting connection' if first_seen and status.virgin else 'disconnected',
+                                      status.unclean, status.virgin, timeout)
+
                     if not status.connected:
 
                         # determine time of most recent connection for session
@@ -367,10 +405,16 @@ class Session(dict):
                                 or (status.virgin is True and no_conn_for > TIMEOUT_NC_VIRGIN)
                                 or (status.virgin is False and status.unclean is False and no_conn_for > TIMEOUT_NC)):
 
-                            try:
-                                await instance.autosave()
-                            except Exception as e:
-                                log.exception(e)
+                            log.debug('instance %s: ending, no connection for %d seconds '
+                                      '(unclean=%s, virgin=%s)',
+                                      id, no_conn_for, status.unclean, status.virgin)
+
+                            if AUTOSAVE:
+                                try:
+                                    await instance.autosave()
+                                except Exception as e:
+                                    log.exception(e)
+
                             self._notify_session_event(SessionEvent.Type.INSTANCE_ENDED, id)
                             instance.close()
                             del self[id]
@@ -394,11 +438,21 @@ class Session(dict):
                     else:
                         instance._edit_started = None
 
+                # discard the states of instances which are no longer with us
+                for id in set(connection_states) - set(self):
+                    del connection_states[id]
+
                 if SESSION_EXPIRES_PREVENT_PATH:
-                    expiry_prevented = prevent_session_expiry(SESSION_EXPIRES_PREVENT_PATH)
-                    if expiry_prevented:
+                    prevented = prevent_session_expiry(SESSION_EXPIRES_PREVENT_PATH)
+                    if prevented != expiry_prevented:
+                        expiry_prevented = prevented
+                        log.debug('session expiry prevention %s (%s)',
+                                  'engaged' if prevented else 'disengaged',
+                                  SESSION_EXPIRES_PREVENT_PATH)
+                    if prevented:
                         session_no_connection_since = now
                         session_idle_since = now
+                        session_start_time = now  # the time limit starts once it's in use
                     elif session_expiry_prevented:
                         log.info('session is active (will expire)')
                     session_expiry_prevented = expiry_prevented
@@ -409,6 +463,8 @@ class Session(dict):
                     # and no connections for a while, end the session
                     if ((session_no_connection_unclean and no_conn_for > TIMEOUT_NC_UNCLEAN)
                             or (session_no_connection_unclean is False and no_conn_for > TIMEOUT_NC)):
+                        log.debug('%s: no instances, and no connection for %d seconds (unclean=%s)',
+                                  self._id, no_conn_for, session_no_connection_unclean)
                         log.info('ending session: idle')
                         self.stop()
 
@@ -416,26 +472,44 @@ class Session(dict):
                 # criteria has been met
                 idle_for = now - session_idle_since
 
+                # periodically log where things are up to
+                if now - last_status_log > 60:
+                    last_status_log = now
+                    log.debug('%s: %d instance(s), idle for %d seconds, '
+                              'no connection for %d seconds (unclean=%s), '
+                              'running for %d seconds',
+                              self._id, len(self), idle_for,
+                              now - session_no_connection_since,
+                              session_no_connection_unclean,
+                              now - session_start_time)
+
                 if TIMEOUT_IDLE == 0:
                     # do nothing
                     pass
                 elif idle_for > TIMEOUT_IDLE:
+                    log.debug('%s: idle for %d seconds, exceeding timeout_idle of %s',
+                              self._id, idle_for, TIMEOUT_IDLE)
                     log.info('ending session: idle')
                     self.stop()
                 elif idle_for > (TIMEOUT_IDLE - TIMEOUT_IDLE_NOTICE):
                     # notify session is idle
                     if idle_warning_since is None:
                         idle_warning_since = now
+                        log.debug('%s: idle for %d seconds, notifying shutdown in %d seconds',
+                                  self._id, idle_for, TIMEOUT_IDLE - idle_for)
                         notif = SessionShutdownIdleNotification(shutdown_in=TIMEOUT_IDLE - idle_for)
                         self._notify(notif)
                         last_idle_warning = now
                     elif last_idle_warning is not None and now - last_idle_warning > 30:
+                        log.debug('%s: still idle, notifying shutdown in %d seconds',
+                                  self._id, TIMEOUT_IDLE - idle_for)
                         notif = SessionShutdownIdleNotification(shutdown_in=TIMEOUT_IDLE - idle_for)
                         self._notify(notif)
                         last_idle_warning += 30
                 else:
                     if idle_warning_since is not None:
                         # clear notification
+                        log.debug('%s: no longer idle, dismissing shutdown notification', self._id)
                         notif = SessionShutdownIdleNotification().dismiss()
                         self._notify(notif)
                         idle_warning_since = None
@@ -443,19 +517,26 @@ class Session(dict):
 
                 if TIME_LIMIT and now - session_start_time > TIME_LIMIT - TIMEOUT_IDLE_NOTICE:
                     if now - session_start_time > TIME_LIMIT:
+                        log.debug('%s: running for %d seconds, exceeding time_limit of %s',
+                                  self._id, now - session_start_time, TIME_LIMIT)
                         log.info('ending session: exceeded time limit')
                         self.stop()
                     elif last_time_limit_warning is None:
                         shutdown_in = TIME_LIMIT - (now - session_start_time)
+                        log.debug('%s: approaching time limit, notifying shutdown in %d seconds',
+                                  self._id, shutdown_in)
                         notif = SessionShutdownTimeLimitNotification(shutdown_in=shutdown_in)
                         self._notify(notif)
                         last_time_limit_warning = now
                     elif last_time_limit_warning is not None and now - last_time_limit_warning > 30:
                         shutdown_in = TIME_LIMIT - (now - session_start_time)
+                        log.debug('%s: still approaching time limit, notifying shutdown in %d seconds',
+                                  self._id, shutdown_in)
                         notif = SessionShutdownTimeLimitNotification(shutdown_in=shutdown_in)
                         self._notify(notif)
                         last_time_limit_warning += 30
         finally:
+            log.debug('%s: run loop ended', self._id)
             if self._settings is not None:
                 try:
                     await self._settings.flush()

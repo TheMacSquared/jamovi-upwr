@@ -5,7 +5,7 @@ import ERDM from "element-resize-detector";
 import RefTable from './refs';
 
 import { createItem } from './create';
-import { exportElem } from '../common/utils/formatio';
+import { exportElem, isVectorImage } from '../common/utils/formatio';
 import b64 from '../common/utils/b64';
 import Annotations, { AnnotationAction } from './annotations';
 import Tracker from './itemtracker';
@@ -387,12 +387,20 @@ class Main {  // this is constructed at the bottom
             let options = eventData.options;
 
             let node: HTMLElement = this.results;
-            for (let i = 0; i < address.length; i++)
+            for (let i = 0; node !== null && i < address.length; i++)
                 node = node.querySelector(`[data-name="${b64.enc(address[i])}"]`);
+
+            if (node === null) {
+                // the element isn't rendered -- it may be hidden. reply
+                // regardless, so that whoever asked isn't left waiting
+                this.mainWindow.postMessage({ type: 'getcontent', data: { content: { }, address } }, '*');
+                return;
+            }
 
             let incHtml = true;
             let incText = true;
             let incImage = false;
+            let incSvg = false;
 
             if (node.classList.contains('jmv-results-syntax'))
                 incHtml = false;
@@ -400,39 +408,52 @@ class Main {  // this is constructed at the bottom
             if (node.classList.contains('jmv-results-image')) {
                 incText = false;
                 incImage = true;
+                // a vector image is copied as its svg, like an Svg element,
+                // with the raster as a fallback
+                if (isVectorImage(node))
+                    incSvg = true;
             }
 
-            let content = {};
+            // a vector Image is a complete svg file, so it can be offered as
+            // an image/svg+xml clipboard flavour too. an Svg element isn't
+            // (yet): its markup leans on module css, and hasn't been
+            // paste-tested that way
+            const vector = incSvg && node.classList.contains('jmv-results-image');
 
-            Promise.resolve().then(() => {
+            if (node.classList.contains('jmv-results-svg')) {
+                incText = false;
+                incSvg = true;
+                // a raster fallback, for pasting into applications which
+                // won't accept the svg
+                incImage = true;
+            }
+
+            if (options?.format) {
+                // the caller only wants the one thing
+                incText = options.format === 'text/plain';
+                incHtml = options.format === 'text/html';
+                incImage = options.format === 'image/png';
+                incSvg = options.format === 'image/svg+xml';
+            }
+
+            (async () => {
+
+                const content: { text?: string, image?: string, svg?: string, html?: string, vector?: boolean } = { };
+                if (vector)
+                    content.vector = true;
 
                 if (incText)
-                    return exportElem(node, 'text/plain', options);
-
-            }).then((text) => {
-
-                if (text)
-                    content.text = text;
-
+                    content.text = await exportElem(node, 'text/plain', options);
                 if (incImage)
-                    return exportElem(node, 'image/png', options);
-
-            }).then((image) => {
-
-                if (image)
-                    content.image = image;
-
+                    content.image = await exportElem(node, 'image/png', options);
+                if (incSvg)
+                    content.svg = await exportElem(node, 'image/svg+xml', options);
                 if (incHtml)
-                    return exportElem(node, 'text/html', options);
+                    content.html = await exportElem(node, 'text/html', options);
 
-            }).then((html) => {
-
-                if (html)
-                    content.html = html;
-
-                let event = { type: 'getcontent', data: { content, address } };
+                const event = { type: 'getcontent', data: { content, address } };
                 this.mainWindow.postMessage(event, '*');
-            });
+            })();
         }
         else if (hostEvent.type === 'menuEvent') {
             this._menuEvent(eventData);

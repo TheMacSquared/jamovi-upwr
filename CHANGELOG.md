@@ -5,6 +5,23 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+## 1.1.0 — w przygotowaniu (gałąź `test/upstream-28.11`)
+Baza jamovi 28.2 → 28.11. Wersja testowa; 1.0.x (gałąź `main`) bez zmian.
+
+- Upstream jamovi 28.11: eksport wyników do .docx, .odt i LaTeX, kopiowanie
+  tabeli jako obrazu i jako markdown, element wyników `Text` (markdown) i `Svg`,
+  opcja `File`, rozwijane opisy w bibliotece danych, autosave, refaktor serwera
+  (projekt/instancja), poprawki pamięci w rdzeniu danych.
+- jmvcore 28.3.1 (28.3 upstream + `metody`, motywy jUPWR).
+- jmv 2.8.5: walidacja danych z upstreamu (regresje, rzetelność, propTestN, Dunn).
+- scatr bez zmiany wersji (upstream: wyłącznie tłumaczenia nl, pt_BR, ru).
+- Biblioteka danych: układ wpisu z upstreamu (tagi w nagłówku, rozwijany opis),
+  pastelowe kolory tagów jUPWR zachowane.
+- Narzędzia klienta: TypeScript 7, vite 8, vitest 5, js-yaml 5 (import
+  przestrzeni nazw w panelu „O zbiorze”).
+- Kompilator: moduły zbudowane nowym `jmc` wymagają jamovi ≥ 28.4, więc nie
+  zainstalują się w jUPWR 1.0.x.
+
 ## 1.0.7 — 2026-10-11
 Licencje zbiorów danych w dokumentacji biblioteki, uporządkowany zestaw zbiorów
 w jDane, drobne poprawki w jEksplor i uproszczone wykresy pomocnicze.

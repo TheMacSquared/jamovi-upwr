@@ -7,12 +7,19 @@ declare global {
         config: {
             client: {
                 roots: [string, string, string],
-            }
+            },
+            // limits the deployment enforces, which the client checks first
+            // so a request that would be refused isn't sent. absent where
+            // the deployment doesn't impose them (electron, self-hosted)
+            limits?: {
+                maxUploadMB?: number,
+            },
         }
     }
 }
 
 import { Future } from './utils/common';
+import { clipboardFlavours, IClipboardData } from './formatio/clipboard';
 
 import { EventEmitter } from 'eventemitter3';
 
@@ -31,6 +38,10 @@ function resolveUrl(root) {
 export const baseUrl = resolveUrl(window.config.client.roots[0]);
 export const analysisUIUrl = resolveUrl(window.config.client.roots[1]);
 export const resultsViewUrl = resolveUrl(window.config.client.roots[2]);
+
+// the largest upload the deployment accepts (in MB, as nginx counts them:
+// 1MB = 1048576 bytes), or undefined for no limit
+export const maxUploadMB: number | undefined = window.config.limits?.maxUploadMB;
 
 
 export interface IExtensionGroup {
@@ -145,31 +156,66 @@ async function blobify(dataURI: string): Promise<Blob> {
     return blob;
 }
 
-export const copyToClipboard = etron.copyToClipboard || (async function(data) {
+// whether the clipboard can take an svg as a vector flavour proper
+// (image/svg+xml). chromium 124+ can; firefox and safari can't, and nor can
+// older electrons (25 is chromium 114) -- for which this must answer false
+// rather than throw, so they fall through to the established route
+function supportsSvgFlavour(): boolean {
+    if (typeof ClipboardItem === 'undefined')
+        return false;
+    return (ClipboardItem as any).supports?.('image/svg+xml') === true;
+}
 
-    if (navigator.clipboard) {
+// writes through the web clipboard api. resolves false if the browser
+// wouldn't allow it (or doesn't have it), in which case the caller falls
+// back to something else
+async function writeClipboardItem(data: IClipboardData): Promise<boolean> {
 
-        const clipboardData = {};
+    if ( ! navigator.clipboard?.write)
+        return false;
 
-        if (data.text)
-            clipboardData['text/plain'] = data.text;
-        if (data.html)
-            clipboardData['text/html'] = data.html;
-        if (data.image)
-            clipboardData['image/png'] = blobify(data.image);
+    const clipboardData: { [ mimeType: string ]: string | Blob | Promise<Blob> } = {};
 
-        try {
-            const clipboardItem = new ClipboardItem(clipboardData);
-            await navigator.clipboard.write([ clipboardItem ]);
-            // success!
-            return;
-        }
-        catch (e: unknown) {
-            // clipboard access not allowed
-            if ( ! (e instanceof DOMException))
-                console.log(e);
-        }
+    // the png is a data url, and the svg markup, so both are made blobs
+    const flavours = clipboardFlavours(data, supportsSvgFlavour());
+    for (const [ mimeType, value ] of Object.entries(flavours)) {
+        if (mimeType === 'image/png')
+            clipboardData[mimeType] = blobify(value);
+        else if (mimeType === 'image/svg+xml')
+            clipboardData[mimeType] = new Blob([ value ], { type: mimeType });
+        else
+            clipboardData[mimeType] = value;
     }
+
+    try {
+        const clipboardItem = new ClipboardItem(clipboardData);
+        await navigator.clipboard.write([ clipboardItem ]);
+        return true;
+    }
+    catch (e: unknown) {
+        // clipboard access not allowed
+        if ( ! (e instanceof DOMException))
+            console.log(e);
+        return false;
+    }
+}
+
+export const copyToClipboard = async function(data: IClipboardData) {
+
+    if (etron.copyToClipboard) {
+        // electron's clipboard.write() can't carry a vector flavour, so when
+        // there's one to send it goes through the web api instead (which
+        // electron's chromium supports as of 31). everything else still goes
+        // the established route
+        if (data.svg && supportsSvgFlavour() && await writeClipboardItem(data))
+            return;
+        const { svg, ...rest } = data;
+        await etron.copyToClipboard(rest);
+        return;
+    }
+
+    if (await writeClipboardItem(data))
+        return;
 
     let hasFocus = document.activeElement;
     if ( ! clipboardPromptBox) {
@@ -190,7 +236,7 @@ export const copyToClipboard = etron.copyToClipboard || (async function(data) {
         if (hasFocus)
             hasFocus.focus();
     }
-});
+};
 
 export const setLanguage = etron.setLanguage || (() => {});
 
@@ -248,6 +294,14 @@ export const showOpenDialog = etron.showOpenDialog || (async function(options) {
         showOpenDialog.browser.removeAttribute('accept');
     }
 
+    if (options.multiple)
+        showOpenDialog.browser.setAttribute('multiple', '');
+    else
+        showOpenDialog.browser.removeAttribute('multiple');
+
+    // otherwise choosing the same file again doesn't fire 'change'
+    showOpenDialog.browser.value = '';
+
     let result = await new Promise((resolve, reject) => {
         showOpenDialog.browser.click();
         showOpenDialog.cancelPrevious = () => resolve({ cancelled: true });
@@ -281,6 +335,12 @@ export const showOpenDialog = etron.showOpenDialog || (async function(options) {
 
 export const showSaveDialogExternal = etron.showSaveDialogExternal || (() => {});
 
+// in Electron, File objects obtained from a drop event don't carry a usable
+// path directly (Electron removed the non-standard file.path in v32); this
+// goes through the main process instead. in a browser there's no path, so
+// callers must fall back to uploading the file
+export const getPathForFile = etron.getPathForFile || (() => undefined);
+
 export async function triggerDownload(url) {
     if ( ! triggerDownload.iframe) {
         triggerDownload.iframe = document.createElement('iframe');
@@ -302,6 +362,29 @@ export const openUrl = etron.openUrl || ((url) => {
     window.open(url, '_blank');
 });
 
+// hands a file the server is serving (i.e. an analysis 'openExternal'
+// action's output) to the host: in electron the main process fetches it
+// and opens it with whatever the OS associates with its extension, in a
+// browser it's a download. either way the user sees it as filename
+export const openFile = async function(url: string, filename: string) {
+    url = new URL(url, window.location.href).href;
+    if (etron.openFile)
+        etron.openFile(url, filename);
+    else
+        await triggerDownload(url);
+};
+
+// as openFile, except in electron the user is asked where to save it.
+// resolves to the path it was saved to; undefined if the user cancelled,
+// or in a browser (where it's a download, and the browser reports that)
+export const exportFile = async function(url: string, filename: string): Promise<{ path?: string }> {
+    url = new URL(url, window.location.href).href;
+    if (etron.exportFile)
+        return await etron.exportFile(url, filename);
+    await triggerDownload(url);
+    return { };
+};
+
 export const showMessageBox = etron.showMessageBox; // || (async () => { });
 
 export const setEdited = etron.setEdited || (() => {});
@@ -320,6 +403,7 @@ export default {
     baseUrl,
     analysisUIUrl,
     resultsViewUrl,
+    maxUploadMB,
     closeWindow,
     openWindow,
     open,
@@ -338,10 +422,13 @@ export default {
     showOpenDialog,
     showSaveDialog,
     showSaveDialogExternal,
+    getPathForFile,
     setLanguage,
     showMessageBox,
     os,
     openUrl,
+    openFile,
+    exportFile,
     triggerDownload,
     setDialogProvider,
     toggleDevTools,

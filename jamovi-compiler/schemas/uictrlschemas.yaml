@@ -29,6 +29,7 @@ ControlBase:
                   - ModeSelector
                   - Content
                   - ActionButton
+                  - File
         name:
             type: string
         stage:
@@ -544,6 +545,10 @@ ControlInheritance:
         - GridControl
         - OptionControl
     ActionButton:
+        - ControlBase
+        - GridControl
+        - OptionControl
+    File:
         - ControlBase
         - GridControl
         - OptionControl

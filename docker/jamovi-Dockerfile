@@ -11,7 +11,9 @@ ENV R_VERSION 4.6.0
 
 ##### NODE #####
 
-FROM base AS node-bin
+# this stage only downloads and unpacks node, it never runs it, so build it
+# natively -- emulated tar chokes on the node tarball
+FROM --platform=$BUILDPLATFORM ubuntu:resolute AS node-bin
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -49,7 +51,8 @@ ARG JAMOVI_ROOT=.
 ARG MODS_ROOT=$JAMOVI_ROOT/docker/mods
 
 COPY $JAMOVI_ROOT/server/requirements.txt $MODS_ROOT/server/requirements.tx[t] /tmp/source/
-RUN python3 -m pip install --trusted-host pypi.python.org -r /tmp/source/requirements.txt --break-system-packages
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python3 -m pip install --trusted-host pypi.python.org -r /tmp/source/requirements.txt --break-system-packages --ignore-installed
 
 COPY $JAMOVI_ROOT/readstat /tmp/source/readstat
 WORKDIR /tmp/source/readstat
@@ -82,6 +85,15 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     echo JAMOVI_CLIENT_PATH=/usr/lib/jamovi/client>>/usr/lib/jamovi/bin/env.conf && \
     echo JAMOVI_VERSION_PATH=/usr/lib/jamovi/version>>/usr/lib/jamovi/bin/env.conf && \
     echo JAMOVI_R_VERSION=$R_VERSION-$RARCH>>/usr/lib/jamovi/bin/env.conf
+
+# stage libnanomsg at a fixed path -- this stage knows its own multiarch dir,
+# so consumers don't need to resolve it themselves. both names are needed: the
+# soname for nanomsg's compiled cpy wrapper, the unversioned one for its ctypes
+# fallback
+# (a symlink here would be dereferenced by COPY anyway, so stage both outright)
+RUN mkdir -p /staging && \
+    cp /usr/lib/$(gcc -print-multiarch)/libnanomsg.so /staging/libnanomsg.so.5 && \
+    cp /staging/libnanomsg.so.5 /staging/libnanomsg.so
 
 
 ####### CLIENT #######
@@ -296,6 +308,9 @@ FROM r-base AS jamovi
 ARG TARGETARCH
 ARG JAMOVI_ROOT=.
 
+# nodejs comes in behind libnode anyway, but name it explicitly -- 'jmc --home
+# docker:' builds modules in a container off this image, and runs the compiler
+# with it
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     python3-minimal \
     python3-pkg-resources \
@@ -314,7 +329,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     libharfbuzz0b \
     libfribidi0 \
     libtiff6 \
-    libreadline8t64
+    libreadline8t64 \
+    nodejs
 
 COPY --from=jmv     /usr/lib/jamovi/ /usr/lib/jamovi/
 COPY --from=client  /usr/lib/jamovi/client/ /usr/lib/jamovi/client/
@@ -322,15 +338,7 @@ COPY --from=i18n    /usr/lib/jamovi/i18n/json /usr/lib/jamovi/i18n/json
 COPY --from=engine  /usr/lib/jamovi/bin/jamovi-engine /usr/lib/jamovi/bin/jamovi-engine
 COPY --from=server  /usr/local/lib/python3.14/dist-packages /usr/local/lib/python3.14/dist-packages
 
-# the multiarch dir differs per architecture, so resolve it at build time
-RUN --mount=type=bind,from=server,source=/usr/lib,target=/server_root/usr/lib \
-    if [ "$TARGETARCH" = "arm64" ]; then \
-        LIBARCH="aarch64-linux-gnu"; \
-    else \
-        LIBARCH="x86_64-linux-gnu"; \
-    fi && \
-    mkdir -p /usr/lib/${LIBARCH} && \
-    cp /server_root/usr/lib/${LIBARCH}/libnanomsg.so /usr/lib/${LIBARCH}/libnanomsg.so
+COPY --from=server  /staging/libnanomsg.so.5 /staging/libnanomsg.so /usr/lib/
 
 COPY --from=server  /usr/lib/jamovi/ /usr/lib/jamovi/
 

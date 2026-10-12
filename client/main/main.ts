@@ -44,6 +44,7 @@ import keyboardJS  from 'keyboardjs';
 import HighContrast from '../common/highcontrast';
 import Store from './store';
 import DatasetInfo from './datasetinfo';
+import { relocate } from './relocate';
 
 declare global {
     interface Window {
@@ -76,16 +77,17 @@ try {
     
     i18n.setAvailableLanguages(languages.available);
     let current = languages.current;
-    let options: {
-        excludeDev?: boolean;
-    } = {};
-    if (host.isElectron)
-        // prevent the use of in-dev languages as 'system default' in electron
-        options.excludeDev = true;
-    if ( ! current)
+    if ( ! current) {
+        let options: {
+            excludeDev?: boolean;
+        } = {};
+        if (host.isElectron)
+            // prevent the use of in-dev languages as 'system default' in electron
+            options.excludeDev = true;
         current = i18n.findBestMatchingLanguage(i18n.systemLanguage(), languages.available, options);
+    }
     else // this is a bit of a hack to ensure that the current language is valid, and falls back to english if not, also corrects any important region/script issues (e.g. zh-cn vs zh-Hans-CN)
-        current = i18n.findBestMatchingLanguage(current, languages.available, options);
+        current = i18n.findBestMatchingLanguage(current, languages.available);
 
     if ( ! current)
         current = 'en';
@@ -243,10 +245,13 @@ if (window.navigator.platform === 'MacIntel') {
     ]);
 }
 
-// prevent back navigation
-history.pushState(null, null, document.URL);
+// prevent back navigation. the app's url is pushed again whenever back is
+// pressed -- the app's, not whatever back went to, which is the url the
+// page was loaded at, before a data set was opened
+let appUrl = document.URL;
+history.pushState(null, '', appUrl);
 window.addEventListener('popstate', function () {
-    history.pushState(null, null, document.URL);
+    history.pushState(null, '', appUrl);
 });
 
 const highContrast = new HighContrast(document.body, document.body, () => {
@@ -429,8 +434,15 @@ ready(async() => {
         event.preventDefault();
     };
     document.ondrop = (event: DragEvent) => {
-        for (let file of event.dataTransfer.files)
-            backstageModel.requestOpen({ path: file.path, title: file.name });
+        for (let file of event.dataTransfer.files) {
+            // in Electron, host.getPathForFile() resolves the real path;
+            // in a browser there's no path, so we upload the file instead
+            const path = host.getPathForFile(file);
+            if (path)
+                backstageModel.requestOpen({ path, title: file.name });
+            else
+                backstageModel.requestOpen({ file });
+        }
         event.preventDefault();
     };
 
@@ -603,13 +615,14 @@ ready(async() => {
         });
     });
 
-    if (host.os === 'ios') {
-        let headerAlert = document.createElement('jmv-headeralert') as HeaderAlert;
-        document.body.prepend(headerAlert);
-        host.on('window-open-failed', (event: WindowOpenFailEvent) => {
-            headerAlert.notify(event);
-        });
-    }
+    // browsers block window.open() when it isn't in response to a user
+    // gesture (i.e. an analysis 'action' opening a data set in a new tab,
+    // or safari generally), so we fall back to a header with a button
+    let headerAlert = document.createElement('jmv-headeralert') as HeaderAlert;
+    document.body.prepend(headerAlert);
+    host.on('window-open-failed', (event: WindowOpenFailEvent) => {
+        headerAlert.notify(event);
+    });
 
     instance.on('moduleInstalled', (event) => {
         optionspanel.reloadAnalyses(event.name);
@@ -622,20 +635,49 @@ ready(async() => {
 
     instance.on('resultsAction', (event: CustomEvent) => {
         const data = event.detail;
-        if (data.action === 'open') {
-            if (data.result.status !== 'error') {
-                const options = Object.assign({}, data.result, { temp: true });
-                backstageModel.requestOpen(options);
-            }
-            else {
-                const notif = {
-                    title: _('Unable to open'),
-                    message: data.result.message,
-                    type: 'error',
-                    duration: 3000,
-                };
-                notifications.notify(new Notify(notif));
-            }
+        const failed = (message: string) => {
+            const notif = {
+                title: data.action === 'export' ? _('Unable to export') : _('Unable to open'),
+                message,
+                type: 'error',
+                duration: 3000,
+            };
+            notifications.notify(new Notify(notif));
+        };
+
+        if (data.result.status === 'error') {
+            failed(data.result.message);
+        }
+        else if (data.action === 'open') {
+            const options = Object.assign({}, data.result, { temp: true });
+            backstageModel.requestOpen(options);
+        }
+        else if (data.action === 'openExternal') {
+            // the file is in the session temp, served (once) by the
+            // instance's temp/ route, c.f. dl/ for browser saves
+            const name = data.result.path.split('/').pop();
+            const filename = data.result.filename || name;
+            const url = `temp/${ encodeURIComponent(name) }?filename=${ encodeURIComponent(filename) }`;
+            host.openFile(url, filename).catch((e) => failed(e.message || String(e)));
+        }
+        else if (data.action === 'export') {
+            // as above, except in electron the user picks where it goes.
+            // in a browser it's a download, and the browser reports that
+            const name = data.result.path.split('/').pop();
+            const filename = data.result.filename || name;
+            const url = `temp/${ encodeURIComponent(name) }?filename=${ encodeURIComponent(filename) }`;
+            host.exportFile(url, filename).then((result) => {
+                if (result.path) {
+                    // as for a data set or results export
+                    const saved = result.path.split(/[\\/]/).pop() || result.path;
+                    notifications.notify(new Notify({
+                        title: _('Exported'),
+                        message: _(`Exported to '{filename}'`, { filename: saved }),
+                        type: 'info',
+                        duration: 3000,
+                    }));
+                }
+            }).catch((e) => failed(e.message || String(e)));
         }
     });
 
@@ -1009,7 +1051,13 @@ ready(async() => {
                 if (result.status === 'OK')
                     break;
 
-                if (result.status === 'requires-auth' && result.event === 'full') {
+                if (result.status === 'reload' || result.status === 'redirect') {
+                    // the server asks for the page to be loaded again
+                    relocate(result);
+                    await new Promise((resolve, reject) => { /* never */ });
+                }
+
+                if (result.status === 'full') {
                     location = 'full';
                     params = {};
                     continue;
@@ -1038,11 +1086,14 @@ ready(async() => {
 
         infoBox.hide();
 
-        if ('url' in result)
-            history.replaceState({}, '', `${host.baseUrl}${result.url}`);
+        if (result.status === 'OK' && result.instanceId) {
+            instanceId = result.instanceId;
+            appUrl = `${host.baseUrl}${instanceId}/`;
+            history.replaceState({}, '', appUrl);
+        }
 
-        instanceId = /\/([a-z0-9-]+)\/$/.exec(window.location.pathname)[1];
         await instance.connect(instanceId);
+        auth.beginSync();
 
         progNotif.dismiss();
     }

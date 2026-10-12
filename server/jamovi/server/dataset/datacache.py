@@ -25,7 +25,6 @@ CellValue: TypeAlias = str | int | float | None
 
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
 
 
 class LRUCache:

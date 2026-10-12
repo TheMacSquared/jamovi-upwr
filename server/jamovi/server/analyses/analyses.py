@@ -19,8 +19,8 @@ class Analyses:
 
     weights_changed: EventHook
 
-    def __init__(self, dataset, modules):
-        self._dataset = dataset
+    def __init__(self, project, modules):
+        self._project = project
         self._modules = modules
         self._modules.add_listener(self._module_event)
 
@@ -46,13 +46,17 @@ class Analyses:
             for id in ids:
                 self.recreate(id).rerun()
 
+    @property
+    def project(self):
+        return self._project
+
     def _construct(self, id, name, ns, options_pb=None, enabled=None):
 
         if name == 'empty' and ns == 'jmv':
-            return Analysis(self._dataset, id, name, ns, Options.create({}), self, enabled=False)
+            return Analysis(self._project, id, name, ns, Options.create({}), self, enabled=False)
 
         if name == 'weights' and ns == 'jmv':
-            return Weights(self._dataset, id, name, ns, None, self, enabled=False)
+            return Weights(self._project, id, name, ns, None, self, enabled=False)
 
         try:
             module_meta = self._modules.get(ns)
@@ -80,12 +84,12 @@ class Analyses:
             else:
                 Ctor = Analysis
 
-            return Ctor(self._dataset, id, analysis_name, ns, options, self,
+            return Ctor(self._project, id, analysis_name, ns, options, self,
                         enabled, addons=addons, arbitrary_code=arbitrary_code)
 
         except Exception as e:
             log.exception(e)
-            return Analysis(self._dataset, id, name, ns, Options.create({}), self, enabled=False, load_error=True)
+            return Analysis(self._project, id, name, ns, Options.create({}), self, enabled=False, load_error=True)
 
     def _construct_from_pb(self, analysis_pb, new_id=False, status=Analysis.Status.NONE):
         for ref_pb in analysis_pb.references:
@@ -122,12 +126,24 @@ class Analyses:
 
         return analysis
 
-    def create_from_serial(self, serial):
+    def create_from_serial(self, serial, files=()):
 
         analysis_pb = jcoms.AnalysisResponse()
         analysis_pb.ParseFromString(serial)
 
         analysis = self._construct_from_pb(analysis_pb, status=Analysis.Status.COMPLETE)
+
+        # files is the set of file ids (see OptionFile) that came with the
+        # analysis and are now in the session; anything else the options
+        # refer to isn't available, and is dropped so the user is shown it
+        # needs re-selecting
+        analysis.options.keep_file_ids(files)
+        # an action option (a button) is only ever true while its run is in
+        # flight, and is cleared after. it can't come from a file: a crafted
+        # .omv would otherwise trigger the action (opening a data set, or
+        # handing a file to the OS) on open, without anyone clicking
+        analysis.options.clear_actions()
+        analysis.results.options.CopyFrom(analysis.options.as_pb())
 
         self._analyses.append(analysis)
 
@@ -269,6 +285,19 @@ class Analyses:
     def _notify_output_received(self, analysis, output):
         for listener in self._output_received_listeners:
             listener(analysis, output)
+
+    def set_svgs(self, svgs):
+        # svgs harvested from the results view, keyed by part -- the analysis
+        # id followed by the address of the element within it, as in
+        # '3/group/chart'
+        for part, content in svgs.items():
+            segments = part.split('/')
+            try:
+                analysis = self.get(int(segments[0]))
+            except ValueError:
+                analysis = None
+            if analysis is not None and analysis.has_results:
+                analysis.set_svg(segments[1:], content)
 
     def get(self, id, instance_id=None):
         for analysis in self._analyses:

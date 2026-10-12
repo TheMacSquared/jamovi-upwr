@@ -28,12 +28,20 @@ int Column::id() const {
 
 const char *Column::name() const
 {
-    return _mm->resolve(struc()->name);
+    const char *name = struc()->name;
+    if (name != NULL)
+        return _mm->resolve(name);
+    else
+        return "";
 }
 
 const char *Column::importName() const
 {
-    return _mm->resolve(struc()->importName);
+    const char *importName = struc()->importName;
+    if (importName != NULL)
+        return _mm->resolve(importName);
+    else
+        return "";
 }
 
 const char *Column::description() const
@@ -380,12 +388,12 @@ bool Column::shouldTreatAsMissing(int rowIndex)
     }
     else
     {
-        const char *sv = svalue(rowIndex);
+        string sv = svalue(rowIndex);
         const char *sv2 = NULL;
         int iv = ivalue(rowIndex);
         double dv = dvalue(rowIndex);
 
-        return shouldTreatAsMissing(sv, iv, dv, sv2);
+        return shouldTreatAsMissing(sv.c_str(), iv, dv, sv2);
     }
 }
 
@@ -520,8 +528,8 @@ int Column::ivalue(int index)
     }
     else // if (dataType() == DataType::TEXT)
     {
-        const char *v = svalue(index);
-        if (v[0] == '\0')
+        string v = svalue(index);
+        if (v.empty())
         {
             return INT_MIN;
         }
@@ -530,9 +538,9 @@ int Column::ivalue(int index)
             int value;
             char junk;
             double d;
-            if (sscanf(v, "%i%1c", &value, &junk) == 1)
+            if (sscanf(v.c_str(), "%i%1c", &value, &junk) == 1)
                 return value;
-            else if (sscanf(v, "%lf%1c", &d, &junk) == 1)
+            else if (sscanf(v.c_str(), "%lf%1c", &d, &junk) == 1)
                 return (int) d;
             else
                 return INT_MIN;
@@ -540,10 +548,8 @@ int Column::ivalue(int index)
     }
 }
 
-const char *Column::svalue(int index)
+string Column::svalue(int index)
 {
-    static string tmp;
-
     if (dataType() == DataType::INTEGER)
     {
         int value = cellAt<int>(index);
@@ -555,8 +561,7 @@ const char *Column::svalue(int index)
         {
             stringstream ss;
             ss << value;
-            tmp = ss.str();
-            return tmp.c_str();
+            return ss.str();
         }
     }
     else if (dataType() == DataType::DECIMAL)
@@ -569,14 +574,14 @@ const char *Column::svalue(int index)
         else
         {
             // we round and divide so it matches _transferLevels()
-            int64_t thous = (int64_t)round(value * 1000);
+            // (adding 0.0 turns -0.0 into 0.0, so it isn't displayed as -0)
+            double thous = round(value * 1000) + 0.0;
 
             stringstream ss;
             ss.setf(ios::fixed);
             ss << setprecision(dps());
-            ss << ((double)thous) / 1000;
-            tmp = ss.str();
-            return tmp.c_str();
+            ss << thous / 1000;
+            return ss.str();
         }
     }
     else if (dataType() == DataType::TEXT && measureType() == MeasureType::ID)

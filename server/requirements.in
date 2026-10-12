@@ -1,8 +1,12 @@
 Cython
 PyYAML
-numpy==2.1.1
-scipy==1.14.1
-    # numpy and scipy to match the flatpak
+numpy==2.5.2
+scipy==1.18.1
+    # pinned to match the flatpak, which installs these as prebuilt wheels:
+    # https://github.com/flathub/org.jamovi.jamovi/blob/master/org.jamovi.jamovi.yaml
+    # any version here must have cp313 manylinux wheels for x86_64 AND aarch64
+    # (the flatpak's freedesktop 25.08 runtime is python 3.13), as well as cp314
+    # for the container's ubuntu resolute base
 chardet
 nanomsg
 openpyxl

@@ -5,7 +5,7 @@ import interactionManager from '../common/interactionmanager';
 
 import Elem, { ElementModel } from './element';
 import { AnalysisStatus } from './create';
-import { h, htmlTrusted, rich, richParagraphs, setRich } from '../common/htmlelementcreator';
+import { h, htmlTrusted, rich, richParagraphs, setRich, RichOptions } from '../common/htmlelementcreator';
 
 const SUPSCRIPTS = ["\u1D43", "\u1D47", "\u1D48", "\u1D49", "\u1DA0", "\u1D4D", "\u02B0", "\u2071",
                 "\u02B2", "\u1D4F", "\u02E1", "\u1D50", "\u207F", "\u1D52", "\u1D56", "\u02B3", "\u02E2",
@@ -248,6 +248,10 @@ const trustedContent = function(html: string): ChildNode[] {
     return Array.from(wrapper.childNodes);
 };
 
+// cell symbols are unicode superscripts by convention, but jmv falls back to
+// markup where none exists (e.g. '<sup>μ</sup>' for the mean)
+const supOptions: RichOptions = { tags: [ 'sub', 'sup' ] };
+
 const appendTableRichContent = function(element: Element, content: string) {
     if (content === '')
         element.append('\u00a0');
@@ -322,6 +326,40 @@ export class View extends Elem.View<Model> {
 
     label() {
         return _('Table');
+    }
+
+    renderFooter(table: ITableElementData | undefined, footnotes: string[], nPhysCols: number) {
+
+        if (table === undefined)
+            return;
+
+        let footerRows: HTMLTableRowElement[] = [];
+        for (let i = 0; i < table.notes.length; i++) {
+            let noteCell = h('td', { class: 'table-note', colspan: nPhysCols.toString() });
+            let paragraphs = richParagraphs(table.notes[i].note);
+            if (paragraphs.length === 0)
+                paragraphs.push(h('p'));
+            paragraphs[0].prepend(h('i', {}, `${ _('Note') }.`), ' ');
+            noteCell.append(...paragraphs);
+            footerRows.push(h('tr', {}, noteCell));
+        }
+
+        for (let i = 0; i < footnotes.length; i++) {
+            let footnoteCell = h('td', { colspan: nPhysCols.toString() });
+            footnoteCell.append(SUPSCRIPTS[i] + ' ', rich(footnotes[i]));
+            footerRows.push(h('tr', {}, footnoteCell));
+        }
+
+        this.$tableFooter.replaceChildren(...footerRows);
+
+        if (this.refs.hasVisibleContent()) {
+            let $refsRow = h('tr', { class: 'jmvrefs' }, h('td', { colspan: nPhysCols.toString() }));
+            // class="jmvrefs" excludes this from some exports/copy
+            $refsRow.childNodes[0].appendChild(this.refs);
+            this.$tableFooter.append($refsRow);
+        }
+        else
+            this.refs.remove();
     }
 
     render() {
@@ -701,42 +739,14 @@ export class View extends Elem.View<Model> {
 
         this.$columnHeaderRow.replaceChildren(...headerCells);
 
-        let nPhysCols = Math.max(1, cells.header.length);
-
-        let footerRows: HTMLTableRowElement[] = [];
-        for (let i = 0; i < table.notes.length; i++) {
-            let noteCell = h('td', { class: 'table-note', colspan: nPhysCols.toString() });
-            let paragraphs = richParagraphs(table.notes[i].note);
-            if (paragraphs.length === 0)
-                paragraphs.push(h('p'));
-            paragraphs[0].prepend(h('i', {}, `${ _('Note') }.`), ' ');
-            noteCell.append(...paragraphs);
-            footerRows.push(h('tr', {}, noteCell));
-        }
-
-        for (let i = 0; i < footnotes.length; i++) {
-            let footnoteCell = h('td', { colspan: nPhysCols.toString() });
-            footnoteCell.append(SUPSCRIPTS[i] + ' ', rich(footnotes[i]));
-            footerRows.push(h('tr', {}, footnoteCell));
-        }
-
-        this.$tableFooter.replaceChildren(...footerRows);
-
-        if (this.refs.hasVisibleContent()) {
-            let $refsRow = h('tr', { class: 'jmvrefs' }, h('td', { colspan: nPhysCols.toString() }));
-            // class="jmvrefs" excludes this from some exports/copy
-            $refsRow.childNodes[0].appendChild(this.refs);
-            this.$tableFooter.append($refsRow);
-        }
-        else
-            this.refs.remove();
-
         if (cells.header.length === 0) {
             this.$titleCell.setAttribute('colspan', '1');
             this.$titleCell.setAttribute('scope', 'col');
-            this.$tableBody.replaceChildren();
+            this.renderFooter(table, footnotes, 1);
             return;
         }
+
+        let nPhysCols = cells.header.length;
 
         if (cells.body.length === 0 || cells.body[0].length === 0) {
             this.$titleCell.setAttribute('colspan', nPhysCols.toString());
@@ -746,6 +756,7 @@ export class View extends Elem.View<Model> {
                 this.$titleCell.setAttribute('scope', 'col');
 
             this.$tableBody.replaceChildren(h('tr', {}, h('td', { colspan: nPhysCols.toString() }, '\u00a0')));
+            this.renderFooter(table, footnotes, nPhysCols);
             return;
         }
 
@@ -814,7 +825,7 @@ export class View extends Elem.View<Model> {
                             tableCell.append(...trustedContent(String(content)));
                         else
                             tableCell.append(String(content));
-                        tableCell.append(h('span', { class: 'jmv-results-table-sup' }, cell.sups));
+                        tableCell.append(h('span', { class: 'jmv-results-table-sup' }, rich(cell.sups, supOptions)));
                         rowCells.push(tableCell);
                     }
                     else if (colNo >= rowHeadingCount) { // don't add blank cells into heading area.
@@ -832,6 +843,8 @@ export class View extends Elem.View<Model> {
         }
 
         this.$tableBody.replaceChildren(...bodyRows);
+
+        this.renderFooter(table, footnotes, nPhysCols);
 
         this._ascButtons = this.$tableHeader.querySelectorAll('button.sort-asc');
         this._descButtons = this.$tableHeader.querySelectorAll('button.sort-desc');
@@ -915,10 +928,10 @@ export class View extends Elem.View<Model> {
 
                 lastCellValue = cellValue;
                 let newHeading = rowHeadings[rowNo]  + ' ' + cellValue;
-                //if the calculated heading already exists then it means the next column must be used to differentiate. 
-                //Except when the next column has a column heading, then the assumption is that the column must have sub headings in it 
+                //if the calculated heading already exists then it means the next column must be used to differentiate.
+                //Except when the next column has a column heading, then the assumption is that the column must have sub headings in it
                 // and so the headings end at this column. This is not a perfect assumption be good enough until otherwise determined.
-                if (rowHeadings.includes(newHeading) && colNo + 1 < cells.header.length  && cells.header[colNo+1].value.trim() === '') 
+                if (rowHeadings.includes(newHeading) && colNo + 1 < cells.header.length  && cells.header[colNo+1].value.trim() === '')
                     includeNext = true;
                 rowHeadings[rowNo] = newHeading;
             }

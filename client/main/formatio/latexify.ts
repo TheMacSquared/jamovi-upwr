@@ -7,6 +7,7 @@ import { IRow } from './hydrate';
 import { IPreformatted } from './hydrate';
 import { IText } from './hydrate';
 import { ITextChunk } from './hydrate';
+import { html2Chunks } from './hydrate';
 import { IReference } from '../references';
 
 export interface ILatexifyOptions {
@@ -208,7 +209,7 @@ function generateHeading(title: string, level: number): Array<string> {
 function generateFigure(figure: IImage): Array<string> {
     let output = [];
 
-    const figTitle = figure.title ? replace4LaTeX(figure.title) : 'PLACEHOLDER ' + randomString(8);
+    const figTitle = figure.title ? formatHTML(figure.title) : 'PLACEHOLDER ' + randomString(8);
     output.push('\\begin{figure}[htbp]');
     output.push('\\caption{' + figTitle + (figure.refs ? (', created using the ' + concatRefs(figure.refs)) : '') + '}');
     output.push('\\label{fig:Figure_' + figTitle.replace(' ', '_').replace(/\$.*?\$/g, '').replace('__', '_') + '}');
@@ -223,14 +224,14 @@ function generateFigure(figure: IImage): Array<string> {
 // generate tables
 function generateTable(table: ITable): Array<string> {
     // replace non-printable characters, handle footnotes
-    table = cleanTable(table);
+    cleanTable(table);
 
     // define variables
     let output = [];
     let notes = [];
     const colLength = tableCellWidth(table);
     const colAlign = tableCellAlign(table);
-    const tblTitle = replace4LaTeX(table.title);
+    const tblTitle = formatHTML(table.title);
     let rleBody = true;
 
     output.push('\\begin{table}[!htbp]');
@@ -291,116 +292,121 @@ function generatePreformatted(preformatted: IPreformatted, level: number, shwSyn
     return output;
 }
 
-// generate formatted text (annotations)
+// generate formatted text (annotations, notices, html/text elements)
 function generateText(text: IText, level: number): Array<string> {
     // icons and colours for message boxes for notices
     // cf. https://github.com/jamovi/jamovi/tree/main/client/resultsview/notice.ts#L64-L79
-    // msgType - 1: 'warning-1', 2: 'warning-2', 3: 'info', 4: 'error'
+    // box - 1: 'warning-1', 2: 'warning-2', 3: 'info', 4: 'error'
     const iconType  = ['\\faExclamationTriangle', '\\faExclamationTriangle', '\\faInfoCircle', '\\faBolt'];
     const iconColor = ['gray',                  'orange',                'blue',           'red'];
-    let output = ['\\begin{flushleft}\n'];
-    let calgn = 'left';
-    let cindt = 0;
-    let citem = '';
-    let clist = '';
-    let cmsgb = 0;
-    let cnotc = '';
+    let output = [];
+    let list = '';    // the open list environment (itemize / enumerate)
+    let align = '';   // the open alignment environment (center / flushright)
+    let indent = 0;
+
+    const closeList = () => {
+        if (list !== '') {
+            output.push('\\end{' + list + '}');
+            list = '';
+        }
+    };
+    const closeAlign = () => {
+        if (align !== '') {
+            output.push('\\end{' + align + '}');
+            align = '';
+        }
+    };
 
     // add a sentence regarding used references (if present)
     if (text.refs) {
         output.push('Created using the ' + concatRefs(text.refs) + '.\n');
     }
 
-    for (let chunk of text.chunks) {
-        // deal with headers
-        if (hasAttr(chunk, 'header')) {
-            output.push(...generateHeading(chunk.content.trim(), level + 1));
-        }
-        // format message boxes: [1] end previous box
-        if (cmsgb !== (hasAttr(chunk, 'box') ? chunk.attributes.box : 0)) {
-            if (cmsgb !== 0) {
-                output.push(cnotc + '}\n');
-            }
-        }
-        // format lists: [1] end previous list
-        if (clist !== (hasAttr(chunk, 'list') ? chunk.attributes.list : '')) {
-            if (clist !== '') {
-                output.push('\\end{'   + (clist === 'ordered' ? 'enumerate' : 'itemize') + '}\n');
-            }
-        }
-        // format paragraphs: [1] end previous alignment
-        // needs to come after list formatting is finished, as list formatting is embedded
-        // in formatting alignment)
-        if (calgn !== (hasAttr(chunk, 'align') ? chunk.attributes.align : 'left')) {
-            output.push(calgn === 'justify' ? '\n\n' : ('\\end{' + (calgn === 'center' ? '' : 'flush') + calgn + '}\n\n'));
-        }
-        // format paragraphs: [2] begin new alignment
-        if (calgn !== (hasAttr(chunk, 'align') ? chunk.attributes.align : 'left')) {
-            calgn = (hasAttr(chunk, 'align') ? chunk.attributes.align : 'left');
-            output.push(calgn === 'justify' ? '' : '\\begin{' + (calgn === 'center' ? '' : 'flush') + calgn + '}\n');
-        }
-        // format lists: [2] begin new list
-        if (clist !== (hasAttr(chunk, 'list') ? chunk.attributes.list : '')) {
-            clist = (hasAttr(chunk, 'list') ? chunk.attributes.list : '');
-            if (clist !== '') {
-                output.push('\\begin{' + (clist === 'ordered' ? 'enumerate' : 'itemize') + '}\n');
-                citem = '\\item{';
-            }
-        }
-        // format message boxes: [2] begin new box
-        if (cmsgb !== (hasAttr(chunk, 'box') ? chunk.attributes.box : 0)) {
-            cmsgb = (hasAttr(chunk, 'box') ? chunk.attributes.box : 0);
-            if (cmsgb !== 0) {
-                output.push('\\awesomebox{4pt}{' + iconType[chunk.attributes.box - 1] +
-                            '}{' + iconColor[chunk.attributes.box - 1] + '}{\n');
-                cnotc = '    ';
-            }
-        }
-        // format indentation
-        if (cindt !== (hasAttr(chunk, 'indent') ? parseInt(chunk.attributes.indent) : 0)) {
-            cindt = (hasAttr(chunk, 'indent') ? parseInt(chunk.attributes.indent) : 0);
-            output.push('\n\\setlength\\leftskip{' + cindt + 'cm}\n\n');
-        }
-        // concatenate or push chunks
-        if (hasAttr(chunk, 'list')) {
-            // list items may consist of several chunks which need to be concatenated;
-            // when a CR is encountered, the item is pushed and a new item is started
-            if (chunk.content.endsWith('\n')) {
-                output.push(citem + formatAttr(chunk).trim() + '}\n');
-                citem = '\\item{';
-            }
-            else {
-                citem += formatAttr(chunk);
-            }
-        }
-        else if (hasAttr(chunk, 'box')) {
-            // message boxes may also consist of several chunks which need concatenation;
-            // when a CR is encountered a LaTeX line feed (\\) is pushed and a new line
-            // is started
-            if (chunk.content.endsWith('\n')) {
-                output.push(cnotc + formatAttr(chunk).trim() + ' \\\\\n');
-                cnotc = '    ';
-            }
-            else {
-                cnotc += formatAttr(chunk);
-            }
-        } else {
-            // format other attributes (if the chunk doesn't contain attributes,
-            // then the content remains unchanged)
-            output.push(formatAttr(chunk) +
-                (chunk.content.endsWith('\n') ? ((chunk.content.length > 1 ? ' \\\\' : '') + '\n') : ''));
+    // a notice: a box, with its title as the first line
+    if (text.box) {
+        output.push('\\awesomebox{4pt}{' + iconType[text.box - 1] + '}{' + iconColor[text.box - 1] + '}{');
+        if (text.title) {
+            output.push('\\textbf{' + replace4LaTeX(text.title) + '} \\\\');
         }
     }
-    // finish unfinished business: write out notices and list items, and end the paragrpah alignment
-    if (cmsgb !== 0 && cnotc.length > 0) {
-        output.push(cnotc + '\n}\n');
-    }
-    if (clist !== '' && clist.length > 0) {
-        output.push(clist + '}\n\\end{'   + (clist === 'ordered' ? 'enumerate' : 'itemize') + '}\n');
-    }
-    output.push(calgn === 'justify' ? '\n' : ('\\end{' + (calgn === 'center' ? '' : 'flush') + calgn + '}\n'));
 
-    return output.join('').split('\n');
+    for (const paragraph of text.paragraphs) {
+        const attrs = paragraph.attributes || {};
+        const content = paragraph.chunks.map(formatAttr).join('');
+
+        if (attrs.header) {
+            closeList();
+            closeAlign();
+            output.push(...generateHeading(content, level + attrs.header - 1));
+            continue;
+        }
+
+        if (attrs.codeBlock) {
+            closeList();
+            closeAlign();
+            output.push('\\begin{verbatim}');
+            output.push(...paragraph.chunks.map(c => c.content).join('').split('\n'));
+            output.push('\\end{verbatim}');
+            continue;
+        }
+
+        // alignment (justified is LaTeX's default, so needs no environment)
+        const pAlign = attrs.align === 'center' ? 'center' : attrs.align === 'right' ? 'flushright' : '';
+        if (pAlign !== align) {
+            closeList();
+            closeAlign();
+            if (pAlign !== '') {
+                align = pAlign;
+                output.push('\\begin{' + align + '}');
+            }
+        }
+
+        // lists
+        const pList = attrs.list === 'ordered' ? 'enumerate' : attrs.list === 'bullet' ? 'itemize' : '';
+        if (pList !== list) {
+            closeList();
+            if (pList !== '') {
+                list = pList;
+                output.push('\\begin{' + list + '}');
+            }
+        }
+
+        // indentation (list items are indented by the list itself)
+        const pIndent = (pList === '' && attrs.indent) ? attrs.indent : 0;
+        if (pIndent !== indent) {
+            indent = pIndent;
+            output.push('\\setlength\\leftskip{' + indent + 'cm}');
+        }
+
+        if (pList !== '') {
+            output.push('\\item{' + content + '}');
+        }
+        else if (text.box) {
+            output.push(content + ' \\\\');
+        }
+        else {
+            // a paragraph, separated from the next by a blank line
+            output.push(content);
+            output.push('');
+        }
+    }
+
+    closeList();
+    closeAlign();
+    if (indent !== 0) {
+        output.push('\\setlength\\leftskip{0cm}');
+    }
+    if (text.box) {
+        // the last line of the box needn't end with a line break
+        const last = output.length - 1;
+        if (output[last].endsWith(' \\\\')) {
+            output[last] = output[last].slice(0, -3);
+        }
+        output.push('}');
+    }
+    output.push('');
+
+    return output;
 }
 
 // generate random string
@@ -455,7 +461,8 @@ function tableCellAlign(table: ITable): Array<string> {
 }
 
 // replace non-printable characters in tables, handle footnotes, etc.
-function cleanTable(table: ITable): ITable {
+// mutates table's cells in place
+function cleanTable(table: ITable): void {
 
     for (let i = 0; i < table.rows.length; ++i) {
         const row = table.rows[i];
@@ -464,27 +471,33 @@ function cleanTable(table: ITable): ITable {
             if (cell === null) {
                 continue;
             }
-            // handle row spans: [EMPTY] is replaced by replace4LaTeX when processing the next row(s)
-            if (cell.rowSpan) {
-                for (let k = 1; k < cell.rowSpan; ++k) {
-                    table.rows[i + k].cells[j].content = '[EMPTY]';
-                }
+            // a cell covered by the one above it is left blank ([EMPTY] is
+            // replaced by replace4LaTeX)
+            if (cell.rowSpan === 0) {
+                cell.content = '[EMPTY]';
+                cell.sups = [];
             }
-            // replace non-printable characters
-            if (cell.content.length > 0) {
+            // format the cell's chunks (which also replaces non-printable characters)
+            if (cell.rowSpan === 0) {
                 cell.content = replace4LaTeX(cell.content);
             }
-            // handle superscripts for footnotes (= specific notes)
+            else {
+                cell.content = cell.chunks.map(formatAttr).join('');
+            }
+            // a footnote marker or symbol beside the cell's value. both are
+            // used exactly as hydrate.ts gives them -- a footnote's already
+            // '<sup>a</sup>', and a symbol's already whatever it needs to
+            // be, plain ('*') or its own markup ('<sup>μ</sup>') -- so
+            // formatHTML() renders each correctly on its own, with nothing
+            // forced (cf. htmlify.ts's cellNodes(), resultsview/table.ts)
             if (row.type != 'footnote' && cell.sups && cell.sups.length > 0) {
-                cell.content = rmDblDollar(cell.content + '$^{' + replace4LaTeX(cell.sups.join(',')) + '}$');
+                cell.content = rmDblDollar(cell.content + formatHTML(cell.sups.join('')));
             }
         }
     }
-
-    return table;
 }
 
-// replace LaTeX special characters, non-printable characters, and HTML attributesin strings
+// replace LaTeX special characters, non-printable characters, and HTML attributes in strings
 function replace4LaTeX(content: string): string {
     const stringRepl = {
                         // LaTeX special characters
@@ -516,15 +529,14 @@ function replace4LaTeX(content: string): string {
     return rmDblDollar(content);
 }
 
-// format color hex codes to be compatible with LaTeX
-function formatRGB(content: string): string {
-    if (content === content.match(/^#[0-f]{6}$/)[0]) {
-        content = [(parseInt(content.slice(1, 3), 16) / 255).toFixed(2),
-                   (parseInt(content.slice(3, 5), 16) / 255).toFixed(2),
-                   (parseInt(content.slice(5, 7), 16) / 255).toFixed(2)].join(', ');
-    }
-
-    return content;
+// format color hex codes to be compatible with LaTeX, or undefined if the
+// color isn't a hex code
+function formatRGB(content: string): string | undefined {
+    if ( ! /^#[0-9a-fA-F]{6}$/.test(content))
+        return undefined;
+    return [(parseInt(content.slice(1, 3), 16) / 255).toFixed(2),
+            (parseInt(content.slice(3, 5), 16) / 255).toFixed(2),
+            (parseInt(content.slice(5, 7), 16) / 255).toFixed(2)].join(', ');
 }
 
 // format a superTitle row
@@ -535,6 +547,10 @@ function formatSuperTitle(row: IRow): Array<string> {
 
     for (let i = 0; i < row.cells.length; ++i) {
         if (row.cells[i]) {
+            if (row.cells[i].colSpan === 0) {
+                // covered by the multicolumn before it
+                continue;
+            }
             if (row.cells[i].content) {
                 if (empty > 0) {
                     cells.push('\\multicolumn{' + empty + '}{c}{~}');
@@ -543,7 +559,6 @@ function formatSuperTitle(row: IRow): Array<string> {
                 if (row.cells[i].colSpan) {
                     cells.push('\\multicolumn{' + row.cells[i].colSpan + '}{c}{' + row.cells[i].content + '}');
                     mrule.push('\\cmidrule{' + (i + 1) + '-' + (i + row.cells[i].colSpan) + '}');
-                    i += (row.cells[i].colSpan - 1);
                 }
                 else {
                     cells.push(row.cells[i].content);
@@ -571,14 +586,14 @@ function formatTableRow(row: IRow, colLength: Array<number>, colAlign: Array<str
         else {
             crrCll = '~';
         }
-        addSpc = colLength[i] - crrCll.length;
+        addSpc = Math.max(0, colLength[i] - crrCll.length);
         if (colAlign[i] === 'l') {
             cells.push(crrCll + ' '.repeat(addSpc));
         }
         else if (colAlign[i] === 'r') {
             cells.push(' '.repeat(addSpc) + crrCll);
         }
-        else if (colAlign[i] === 'r') {
+        else {
             cells.push(' '.repeat(Math.ceil(addSpc / 2)) + crrCll +
                        ' '.repeat(Math.floor(addSpc / 2)));
         }
@@ -591,24 +606,33 @@ function formatTableRow(row: IRow, colLength: Array<number>, colAlign: Array<str
 function formatNote(row: IRow): Array<string> {
     let output = [];
 
-    for (let i = 0; i < row.cells.length; ++i) {
-        if (row.cells[i].content.length > 0 && row.cells[i].sups.length > 0) {
-            if (row.cells[i].sups[0] === 'note') {
-                // General and significance notes
-                output.push('\\textit{Note.}~' + row.cells[i].content.trim() + ' \\\\');
-            }
-            else {
-                // Specific notes
-                output.push(rmDblDollar('$^{' + row.cells[i].sups.join(',') + '}$~' + row.cells[i].content.trim() + ' \\\\'));
-            }
+    for (const cell of row.cells) {
+        if ( ! cell || cell.content.length === 0)
+            continue;
+        if ( ! cell.sups || cell.sups.length === 0) {
+            // an html table's note (from its tfoot), shown as it is
+            output.push(cell.content.trim() + ' \\\\');
+        }
+        else if (cell.sups[0] === 'note') {
+            // General and significance notes
+            output.push('\\textit{Note.}~' + cell.content.trim() + ' \\\\');
+        }
+        else {
+            // Specific notes
+            output.push(rmDblDollar(formatHTML(cell.sups.join('')) + '~' + cell.content.trim() + ' \\\\'));
         }
     }
 
     return output;
 }
 
+// a string with inline html (a title), formatted
+function formatHTML(html: string): string {
+    return html2Chunks(html).map(formatAttr).join('');
+}
+
 function formatAttr(chunk: ITextChunk): string {
-    let output = chunk.content.substring(0, chunk.content.length - (chunk.content.endsWith('\n') ? 1 : 0));
+    let output = chunk.content;
     if (!hasAttr(chunk, 'formula')) {
       output = replace4LaTeX(output);
     }
@@ -625,8 +649,8 @@ function formatAttr(chunk: ITextChunk): string {
     if (hasAttr(chunk, 'strike')) {
         output = '\\st{' + output + '}';
     }
-    if (hasAttr(chunk, 'code-block')) {
-        output = '\\verbatim{' + output + '}\n';
+    if (hasAttr(chunk, 'code')) {
+        output = '\\texttt{' + output + '}';
     }
     if (hasAttr(chunk, 'link')) {
         output = '\\href{' + chunk.attributes.link + '}{' + output + '}';
@@ -635,16 +659,18 @@ function formatAttr(chunk: ITextChunk): string {
         output = '${' + formatFrml(output) + '}$';
     }
     if (hasAttr(chunk, 'script') && chunk.attributes.script === 'super') {
-        output = '$^{' + + output + '}$';
+        output = '$^{' + output + '}$';
     }
     if (hasAttr(chunk, 'script') && chunk.attributes.script === 'sub') {
-        output = '$_{' + + output + '}$';
+        output = '$_{' + output + '}$';
     }
-    if (hasAttr(chunk, 'color')) {
-        output = '\\textcolor[rgb]{' + formatRGB(chunk.attributes.color) + '}{' + output + '}';
+    const color = hasAttr(chunk, 'color') ? formatRGB(chunk.attributes.color) : undefined;
+    if (color) {
+        output = '\\textcolor[rgb]{' + color + '}{' + output + '}';
     }
-    if (hasAttr(chunk, 'background')) {
-        output = '\\colorbox[rgb]{' + formatRGB(chunk.attributes.background) + '}{' + output + '}';
+    const background = hasAttr(chunk, 'background') ? formatRGB(chunk.attributes.background) : undefined;
+    if (background) {
+        output = '\\colorbox[rgb]{' + background + '}{' + output + '}';
     }
 
     return rmDblDollar(output);

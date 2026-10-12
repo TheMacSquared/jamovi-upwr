@@ -163,13 +163,38 @@ Action:
             type: boolean
         action:
             enum:
-              - "open"
+              - "open"          # open a data set the analysis produced, in a new window
+              - "openExternal"  # hand a file to the OS (desktop) or download it (browser)
+              - "export"        # save a file, asking where (desktop) or download it (browser)
         default:        # to deprecate
             type: bool  # to deprecate
         description: *Description
     # required:
     #     - action
     #     - title
+
+File:
+    "$schema": http://json-schema.org/draft-04/schema#
+    additionalProperties: false
+    properties:
+        name:
+            type: string
+        type:
+            enum:
+              - "File"
+        title:
+            type: string
+        hidden:
+            type: boolean
+        multiple:
+            type: boolean
+        extensions:
+            type: array
+            items:
+                type: string
+            minItems: 1
+            uniqueItems: true
+        description: *Description
 
 Integer:
     "$schema": http://json-schema.org/draft-04/schema#

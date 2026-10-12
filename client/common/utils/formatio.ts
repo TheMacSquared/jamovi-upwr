@@ -123,6 +123,9 @@ export function exportElem(el, format=undefined, options: { exclude?: string[], 
     else if (format === 'image/png') {
         return _imagify(el);
     }
+    else if (format === 'image/svg+xml') {
+        return _svgify(el);
+    }
     else {
 
         let html;
@@ -266,56 +269,237 @@ function _textify(el) {
     return str;
 }
 
-function _imagify(el) {
+// the url of an Image element's picture, or null if it has none
+function imageSrc(el: HTMLElement): string | null {
+    const bgiu = getComputedStyle(el).backgroundImage;
+    if (bgiu === 'none')
+        return null;
+    return /(?:\(['"]?)(.*?)(?:['"]?\))/.exec(bgiu)![1];
+}
+
+function isSvgUrl(src: string): boolean {
+    return /\.svg(\?|$)/i.test(src);
+}
+
+// whether an Image element is showing a vector (svg) rather than a raster
+export function isVectorImage(el: HTMLElement): boolean {
+    const image = el.querySelector<HTMLElement>('.jmv-results-image-image');
+    const src = image ? imageSrc(image) : null;
+    return src !== null && isSvgUrl(src);
+}
+
+// inserts an opaque white rect as the svg's first child, so it reads
+// correctly pasted onto a page or app that isn't already white (the engine
+// renders these transparent, matching the results view's own background)
+function addWhiteBackground(svg: SVGElement) {
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', '0');
+    rect.setAttribute('y', '0');
+    rect.setAttribute('width', '100%');
+    rect.setAttribute('height', '100%');
+    rect.setAttribute('fill', 'white');
+    svg.insertBefore(rect, svg.firstChild);
+}
+
+async function _svgify(el: HTMLElement) {
+
+    // a vector Image element's svg is a file on the server, not markup in
+    // the document, so it's fetched rather than harvested
+    if (el.classList.contains('jmv-results-image')) {
+        if ( ! isVectorImage(el))
+            return '';
+        const src = imageSrc(el.querySelector('.jmv-results-image-image'))!;
+        const response = await fetch(src);
+        if ( ! response.ok)
+            throw new Error(`Unable to load image ${ src }`);
+        const text = await response.text();
+        const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+        const svg = doc.documentElement as unknown as SVGElement;
+        addWhiteBackground(svg);
+        return new XMLSerializer().serializeToString(svg);
+    }
+
+    let source;
+    if (el.tagName.toLowerCase() === 'svg')
+        source = el;
+    else
+        source = el.querySelector('svg.jmv-results-svg-content') ?? el.querySelector('svg');
+
+    if (source === null)
+        return '';
+
+    return `<?xml version="1.0" encoding="UTF-8"?>\n${ _svgMarkup(source) }`;
+}
+
+// an svg as it appears in the results is not self-contained -- it takes its
+// namespaces, its size and its styling from the document around it. this
+// bakes those in, so the markup can stand on its own
+function _svgMarkup(source) {
+
+    const svg = source.cloneNode(true);
+
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    if ( ! svg.hasAttribute('xmlns:xlink'))
+        svg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+
+    // once the svg leaves the document it has no layout to be sized by, so
+    // it needs to carry its own dimensions
+    const rect = source.getBoundingClientRect();
+    const width = source.getAttribute('width') || `${ rect.width }`;
+    const height = source.getAttribute('height') || `${ rect.height }`;
+    if ( ! svg.hasAttribute('viewBox') && parseFloat(width) && parseFloat(height))
+        svg.setAttribute('viewBox', `0 0 ${ parseFloat(width) } ${ parseFloat(height) }`);
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+
+    addWhiteBackground(svg);
+
+    // text properties are inherited from the document we're leaving behind
+    const cs = getComputedStyle(source);
+    svg.style.fontFamily = cs.fontFamily;
+    svg.style.fontSize = cs.fontSize;
+    svg.style.color = cs.color;
+
+    // the module's stylesheets are in the document head, not in the svg, so
+    // they have to come along too
+    const sss = Array.from(document.querySelectorAll<HTMLStyleElement>('style.module-asset'))
+        .map(ss => ss.textContent)
+        .join('\n');
+
+    if (sss.trim() !== '') {
+        const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+        style.textContent = sss;
+        svg.insertBefore(style, svg.firstChild);
+    }
+
+    return new XMLSerializer().serializeToString(svg);
+}
+
+// how many times the device pixel ratio a vector is rasterised at, for the
+// png fallback / export. the engine renders raster images at 2x, so at 1x
+// (dpr on a non-hidpi display) the png of an svg would be the poorer of the
+// two. 4 is also reasonable, at the cost of pngs some 4 times the size
+const VECTOR_RASTER_SCALE = 2;
+
+// renders an Svg element's markup to a raster, and returns it wrapped as an
+// <img> -- for embedding in html bound for the clipboard, where an inline
+// <svg> isn't a live consumer: word, powerpoint and gmail all strip it down
+// to its text nodes on paste, same as they do the html flavour of a copied
+// vector Image (see resultspanel's use of this). elsewhere -- the html/pdf
+// report export, whose consumer is a real browser -- the live, self-
+// contained markup from _svgMarkup is kept and used directly instead
+async function _svgToImgHtml(source: SVGElement): Promise<string> {
+
+    const markup = _svgMarkup(source);
+    const rect = source.getBoundingClientRect();
+    const scale = VECTOR_RASTER_SCALE * (window.devicePixelRatio || 1);
+
+    const image = new Image();
+    image.src = `data:image/svg+xml,${ encodeURIComponent(markup) }`;
+    await image.decode();
+
+    const canvas = document.createElement('canvas');
+    canvas.width = rect.width * scale;
+    canvas.height = rect.height * scale;
+    const context = canvas.getContext('2d')!;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    return `<img src="${ canvas.toDataURL() }" style="width: ${ rect.width }px; height: ${ rect.height }px;">`;
+}
+
+async function _imagify(el) {
 
     // HACK!! :/
     if (el.classList.contains('jmv-results-image'))
-        el = el.querySelector('.jmv-results-image-image');
+        return _imagifyImage(el.querySelector('.jmv-results-image-image'));
+    else if (el.classList.contains('jmv-results-svg'))
+        // the .content wrapper, rather than the svg itself, because the svg
+        // has no offsetWidth/offsetHeight to size the canvas by
+        el = el.querySelector('.content');
 
     let margin = 0;
 
-    return Promise.resolve().then(() => {
+    let html = await exportElem(el, 'text/html', { margin: margin, docType: false });
+    html = html.replace(/&nbsp\;/g, ' ');
 
-        return exportElem(el, 'text/html', { margin: margin, docType: false });
+    let sourceWidth = el.offsetWidth;
+    let sourceHeight = el.offsetHeight;
+    let scale = VECTOR_RASTER_SCALE * (window.devicePixelRatio || 1);
+    let destWidth = sourceWidth * scale;
+    let destHeight = sourceHeight * scale;
 
-    }).then((html) => {
+    let svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${ destWidth }" height="${ destHeight }">
+            <foreignObject width="100%" height="100%">
+                <div xmlns="http://www.w3.org/1999/xhtml">
+                    ${ html }
+                </div>
+            </foreignObject>
+        </svg>`;
 
-        return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = `data:image/svg+xml,${ encodeURIComponent(svg) }`;
+    await image.decode();
 
-            let canvas = document.createElement('canvas');
-            let sourceWidth = el.offsetWidth;
-            let sourceHeight = el.offsetHeight;
-            let destWidth = sourceWidth * (window.devicePixelRatio || 1);
-            let destHeight = sourceHeight * (window.devicePixelRatio || 1);
+    let canvas = document.createElement('canvas');
+    canvas.width = destWidth + 2 * margin;
+    canvas.height = destHeight + 2 * margin;
 
-            canvas.width = destWidth + 2 * margin;
-            canvas.height = destHeight + 2 * margin;
+    let context = canvas.getContext('2d');
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, sourceWidth, sourceHeight,
+                             margin, margin, destWidth, destHeight);
+    return canvas.toDataURL();
+}
 
-            let image = new Image();
-            image.onload = function() {
-                let context = canvas.getContext('2d');
-                context.fillStyle = 'white';
-                context.fillRect(0, 0, canvas.width, canvas.height);
-                context.drawImage(image, 0, 0, sourceWidth, sourceHeight,
-                                         margin, margin, destWidth, destHeight);
-                resolve(canvas.toDataURL());
-            };
+// an Image element is just a picture, so it can be drawn straight onto the
+// canvas -- there's no need for the html -> <foreignObject> detour above.
+// and for a vector (svg) image there mustn't be: firefox won't render an svg
+// nested inside another svg-as-image, so it would come out blank
+function _imagifyImage(el: HTMLElement): Promise<string> {
+    const src = imageSrc(el);
+    if (src === null)
+        return Promise.resolve('');
+    return flattenImage(src, el.offsetWidth, el.offsetHeight);
+}
 
-            html = html.replace(/&nbsp\;/g, ' ');
+// draws the picture at src onto a white canvas, and returns it as a png data
+// url. the engine renders result images with a transparent background (so
+// they sit on the results view's own), which looks fine there but not on a
+// dark page in whatever it's pasted into -- so everything that leaves as a
+// picture goes through here.
+//
+// a raster is drawn at its own resolution (the engine's 2x); a vector at
+// VECTOR_RASTER_SCALE times the device pixel ratio of its displayed size
+async function flattenImage(src: string, displayWidth: number, displayHeight: number): Promise<string> {
 
-            let svg = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="${ destWidth }" height="${ destHeight }">
-                    <foreignObject width="100%" height="100%">
-                        <div xmlns="http://www.w3.org/1999/xhtml">
-                            ${ html }
-                        </div>
-                    </foreignObject>
-                </svg>`;
-            let encoded = encodeURIComponent(svg);
-            let url = `data:image/svg+xml,${encoded}`;
-            image.src = url;
-        });
-    });
+    const vector = isSvgUrl(src);
+
+    const image = new Image();
+    image.src = src;
+    try {
+        await image.decode();
+    }
+    catch {
+        throw new Error(`Unable to load image ${ src }`);
+    }
+
+    const canvas = document.createElement('canvas');
+    if (vector) {
+        const scale = VECTOR_RASTER_SCALE * (window.devicePixelRatio || 1);
+        canvas.width = displayWidth * scale;
+        canvas.height = displayHeight * scale;
+    }
+    else {
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+    }
+    const context = canvas.getContext('2d')!;
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL();
 }
 
 function genBorderCSS(side, cs) {
@@ -407,9 +591,11 @@ function _htmlify(el, options) {
         case 'tr':
             include = (el.childElementCount > 0);
             break;
+        case 'br':
+            return Promise.resolve('<br>');
         case 'span':
             include = true;
-            styles = [ 'font-weight' ];
+            styles = [ 'font-weight', 'font-style' ];
             break;
         case 'p':
             include = true;
@@ -456,7 +642,8 @@ function _htmlify(el, options) {
                 'padding',
                 'border',
                 'vertical-align',
-                'font-weight'
+                'font-weight',
+                'font-style'
             ];
             break;
         case 'style':
@@ -465,7 +652,11 @@ function _htmlify(el, options) {
             break;
         case 'svg':
             includeVerbatim = true;
-            break;
+            if (options.svgAsImage)
+                return _svgToImgHtml(el);
+            // el.outerHTML would give us markup which only renders correctly
+            // in the document it came from
+            return Promise.resolve(_svgMarkup(el));
         default:
             if (el.shadowRoot)
                 return _htmlify(el.shadowRoot, options);
@@ -542,10 +733,6 @@ function _htmlify(el, options) {
                 promises.push(_htmlify(child, options));
         }
 
-        if (includeVerbatim) {
-            html += el.outerHTML;
-        }
-
         return Promise.all(promises).then(all => {
 
             return html + all.join('');
@@ -580,8 +767,6 @@ function _htmlifyDiv(el, options) {
         return Promise.resolve('');
     }
 
-    let str = '';
-
     const style = window.getComputedStyle(el);
 
     let bgiu = style.backgroundImage;
@@ -615,29 +800,29 @@ function _htmlifyDiv(el, options) {
         return `<img src="${ bgi }" data-address="${ address }" style="width: ${ width }; height: ${ height };" alt="">`;
     }
 
-    return new Promise((resolve, reject) => {
+    // a chart image goes onto a white background (see flattenImage); other
+    // background-images here are UI glyphs -- notice icons, sort arrows and
+    // the like -- meant to sit transparent against whatever they're on, so
+    // they're carried over as-is
+    const asDataURI = el.classList.contains('jmv-results-image-image')
+        ? flattenImage(bgi, el.offsetWidth, el.offsetHeight)
+        : rawDataURI(bgi);
 
-        let xhr = new XMLHttpRequest();  // jQuery doesn't support binary!
-        xhr.open('GET', bgi);
-        xhr.responseType = 'arraybuffer';
-        xhr.onload = function(e) {
-            let mime = this.getResponseHeader('content-type');
-            let data = new Uint8Array(this.response);
-            // .apply(null, data) stack-overflows on large images; Array.from with a map avoids that
-            let b64 = btoa(Array.from(data, c => String.fromCharCode(c)).join(''));
-            let dataURI = `data:${ mime };base64,${b64}`;
-            resolve(dataURI);
-        };
-        xhr.onerror = function(e) {
-            reject(e);
-        };
-        xhr.send();
-
-        return str;
-    }).then((dataURI) => {
-
+    return asDataURI.then((dataURI) => {
         // we add the `</img>` closing tag for compatibility with xhtml and svg foreign objects
         return `<img src="${ dataURI }" style="width: ${ width }; height: ${ height };"></img>`;
+    });
+}
+
+// fetches src and returns it as a data uri, verbatim -- no flattening
+async function rawDataURI(src: string): Promise<string> {
+    const response = await fetch(src);
+    const blob = await response.blob();
+    return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
     });
 }
 

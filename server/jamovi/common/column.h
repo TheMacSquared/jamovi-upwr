@@ -180,7 +180,7 @@ protected:
             throw std::runtime_error("index out of bounds");
 
         size_t blockIndex = (size_t)rowIndex * sizeof(T) / VALUES_SPACE;
-        if (blockIndex >= (size_t)cs->blockCapacity)
+        if (blockIndex >= (size_t)cs->blocksUsed)
             throw std::runtime_error("block index out of bounds");
 
         Block **blocks = _mm->resolve<Block*>(cs->blocks);
@@ -192,7 +192,7 @@ protected:
     }
 
     int ivalue(int index);
-    const char *svalue(int index);
+    std::string svalue(int index);
     double dvalue(int index, bool acceptEuroDecimal=false);
 
     bool isEuroDecimalTextColumn();

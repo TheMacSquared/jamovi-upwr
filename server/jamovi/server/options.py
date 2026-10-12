@@ -1,8 +1,10 @@
 
 from typing import Any
+from typing import Container
 
 from .jamovi_pb2 import AnalysisOption
 from .jamovi_pb2 import AnalysisOptions
+from .sessionfiles import is_file_id
 
 
 NONE = AnalysisOption.Other.Value('NONE')
@@ -129,6 +131,8 @@ class Option:
             return [ ]
         elif self.type == 'Output':
             return { 'value': False, 'vars': [ ], 'synced': [ ] }
+        elif self.type == 'File':
+            return [ ]
         else:
             return None
 
@@ -208,6 +212,42 @@ class OptionPairs(OptionTerms):
         self.set_value(valuess)
 
 
+class OptionFile(Option):
+    # a list of { id, filename } (always a list, even when not multiple --
+    # only jmvcore's OptionFile collapses a single file to a singleton). id
+    # names the file in the session temp dir (see sessionfiles.py), and is
+    # NONE if the file isn't there -- restored from an .omv that didn't carry
+    # it, say -- in which case the filename is kept so the user can see what
+    # needs re-selecting
+
+    @staticmethod
+    def _entries(pb: AnalysisOption):
+        # yields the 'id' sub-option of each file
+        if not pb.HasField('c'):
+            return
+        for file_pb in pb.c.options:
+            if not file_pb.HasField('c') or not file_pb.c.hasNames:
+                continue
+            for i, name in enumerate(file_pb.c.names):
+                if name == 'id':
+                    yield file_pb.c.options[i]
+
+    @staticmethod
+    def ids(pb: AnalysisOption):
+        # the (well-formed) ids in pb. an id is client-supplied, so anything
+        # that isn't one is ignored rather than ever reaching the filesystem
+        for id_pb in OptionFile._entries(pb):
+            if id_pb.HasField('s') and is_file_id(id_pb.s):
+                yield id_pb.s
+
+    @staticmethod
+    def keep_ids(pb: AnalysisOption, ids: Container[str]):
+        # sets to NONE every id not in ids (or not well-formed)
+        for id_pb in OptionFile._entries(pb):
+            if not id_pb.HasField('s') or not is_file_id(id_pb.s) or id_pb.s not in ids:
+                id_pb.o = NONE
+
+
 class OptionArray(Option):
     def __iter__(self):
         template = self.defn['template']
@@ -246,6 +286,7 @@ OptionTypes = {
     'Pairs': OptionPairs,
     'Array': OptionArray,
     'Group': OptionGroup,
+    'File': OptionFile,
 }
 
 
@@ -394,6 +435,25 @@ class Options:
             pb = self._pb.options[i]
             option.attach(pb)
             option.rename_using(changes)
+
+    def file_ids(self, pb: AnalysisOptions | None = None):
+        # see OptionFile
+        if pb is None:
+            pb = self._pb
+        for i, name in enumerate(pb.names):
+            option = self._options.get(name, None)
+            if option is not None and option.type == 'File':
+                yield from OptionFile.ids(pb.options[i])
+
+    def keep_file_ids(self, ids: Container[str], pb: AnalysisOptions | None = None):
+        # see OptionFile. pb defaults to our own, but can be a copy about to
+        # be written out, so the live options are left alone
+        if pb is None:
+            pb = self._pb
+        for i, name in enumerate(pb.names):
+            option = self._options.get(name, None)
+            if option is not None and option.type == 'File':
+                OptionFile.keep_ids(pb.options[i], ids)
 
     def clear_actions(self):
         for i, name in enumerate(self._pb.names):

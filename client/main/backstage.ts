@@ -210,6 +210,8 @@ export class BackstageModel extends EventMap<IBackstageModel> {
         this._pcExportListModel.fileExtensions = [
             { extensions: ['pdf'], description: _('PDF Document {ext}', { ext: '(.pdf)' }) },
             { extensions: ['html', 'htm'], description: _('Web Page {ext}', { ext: '(.html, .htm)' }) },
+            { extensions: ['docx'], description: _('Word Document {ext}', { ext: '(.docx)' }) },
+            { extensions: ['odt'], description: _('OpenDocument Text {ext}', { ext: '(.odt)' }) },
             { extensions: ['omt'], description: _('jamovi template {ext}', { ext: '(.omt)' }) },
             { extensions: ['csv'], description: _('CSV (Comma delimited) {ext}', { ext: '(.csv)' }) },
             { extensions: ['ods'], description: _('Open Document (LibreOffice) {ext}', { ext: '(.ods)' }) },
@@ -234,6 +236,8 @@ export class BackstageModel extends EventMap<IBackstageModel> {
         this._deviceExportListModel.fileExtensions = [
             { extensions: ['pdf'], description: _('PDF Document {ext}', { ext: '(.pdf)' }) },
             { extensions: ['html', 'htm'], description: _('Web Page {ext}', { ext: '(.html, .htm)' }) },
+            { extensions: ['docx'], description: _('Word Document {ext}', { ext: '(.docx)' }) },
+            { extensions: ['odt'], description: _('OpenDocument Text {ext}', { ext: '(.odt)' }) },
             { extensions: ['omt'], description: _('jamovi template {ext}', { ext: '(.omt)' }) },
             { extensions: ['csv'], description: _('CSV (Comma delimited) {ext}', { ext: '(.csv)' }) },
             { extensions: ['zip'], description: _('LaTeX bundle {ext}', { ext: '(.zip)' }) },
@@ -975,7 +979,9 @@ export class BackstageModel extends EventMap<IBackstageModel> {
                 this.set('activated', false);
 
             let status = await stream;
-            let iid = status.url.match(/([a-z0-9-]+)\/$/)[1];
+            if (status.status !== 'OK' || ! status.instanceId)
+                throw new Error(_('Unexpected response'));
+            let iid = status.instanceId;
             if (this.instance.attributes.blank
                     && this.instance.dataSetModel().attributes.edited === false)
                 host.navigate(iid);
@@ -1094,7 +1100,7 @@ export class BackstageModel extends EventMap<IBackstageModel> {
             if (status.download) {
                 let source = path.basename(status.path);
                 let target = path.basename(options.path);
-                let url = `dl/${ source }?filename=${ target }`;
+                let url = `dl/${ encodeURIComponent(source) }?filename=${ encodeURIComponent(target) }`;
                 await host.triggerDownload(url);
             }
         }

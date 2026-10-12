@@ -33,6 +33,12 @@ export function init() {
 
 }
 
+// called once the instance has connected. an instance can't connect without a
+// session, so before this there's no pod to send anything to.
+export function beginSync() {
+
+}
+
 export interface IEmbedOptions {
     channelId: number;
 }
@@ -41,4 +47,4 @@ export async function embed(options: IEmbedOptions): Promise<{ [x: string]: any 
     return { };
 }
 
-export default { init, currentUser, events, getAuthToken, signOut, promptSignIn, waitForSignIn, embed };
+export default { init, beginSync, currentUser, events, getAuthToken, signOut, promptSignIn, waitForSignIn, embed };

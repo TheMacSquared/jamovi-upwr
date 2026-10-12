@@ -197,11 +197,11 @@ void ColumnW::setDValue(int rowIndex, double value, bool initing)
 
 void ColumnW::setSValue(int rowIndex, const char *value, bool initing)
 {
+    if (dataType() != DataType::TEXT || measureType() != MeasureType::ID)
+        throw runtime_error("setSValue() requires a text ID column");
+
     if ( ! initing)
         _discardScratchColumn();
-
-    assert(dataType() == DataType::TEXT);
-    assert(measureType() == MeasureType::ID);
 
     if (value == NULL || value[0] == '\0')
     {
@@ -235,11 +235,21 @@ void ColumnW::setIValue(int rowIndex, int value, bool initing)
             if (oldValue != INT_MIN)
             {
                 Level *level = rawLevel(oldValue);
-                assert(level != NULL);
+                if (level == NULL)
+                    throw runtime_error("level not found");
                 level->count--;
 
                 if (level->count == 0 && level->pinned == false)
+                {
                     removeLevel(oldValue);
+
+                    // removing a text level renumbers the levels above it
+                    if (dataType() == DataType::TEXT && newValue != INT_MIN && newValue > oldValue)
+                    {
+                        newValue--;
+                        value = newValue;
+                    }
+                }
                 else if (columnType() != ColumnType::FILTER && ! this->_parent->isRowFiltered(rowIndex))
                     level->countExFiltered--;
             }
@@ -256,8 +266,9 @@ void ColumnW::setIValue(int rowIndex, int value, bool initing)
                 const char *c_str = str.c_str();
                 insertLevel(newValue, c_str, c_str);
                 level = rawLevel(newValue);
+                if (level == NULL)
+                    throw runtime_error("level not found");
             }
-            assert(level != NULL);
             level->count++;
             if (columnType() != ColumnType::FILTER && ! this->_parent->isRowFiltered(rowIndex))
                 level->countExFiltered++;
@@ -309,17 +320,25 @@ void ColumnW::appendLevel(int value, const char *label, const char *importValue,
 {
     ColumnStruct *s = struc();
 
-    string tmp;
+    // label and importValue may point into the memory map, which can move
+    // when we allocate below, so we work from copies
+
+    string labelCopy;
     if (label == NULL)
     {
         stringstream ss;
         ss << value;
-        tmp = ss.str();
-        label = tmp.c_str();
+        labelCopy = ss.str();
+    }
+    else
+    {
+        labelCopy = label;
     }
 
-    if (importValue == NULL)
-        importValue = label;
+    string importValueCopy = (importValue == NULL) ? labelCopy : string(importValue);
+
+    label = labelCopy.c_str();
+    importValue = importValueCopy.c_str();
 
     bool treatAsMissing;
     if (dataType() == DataType::TEXT)
@@ -359,8 +378,6 @@ void ColumnW::appendLevel(int value, const char *label, const char *importValue,
     memcpy(chars, label, length);
     chars = _mm->base(chars);
 
-    if (importValue == NULL)
-        importValue = label;
     length = strlen(importValue)+1;
     size_t importAllocated;
     char *importChars = _mm->allocate<char>(length, &importAllocated);
@@ -405,7 +422,8 @@ void ColumnW::updateLevelCounts() {
             if (v == INT_MIN)
                 continue;
             Level *level = rawLevel(v);
-            assert(level != NULL);
+            if (level == NULL)
+                throw runtime_error("level not found");
             level->count++;
             if ( ! this->_parent->isRowFiltered(i))
                 level->countExFiltered++;
@@ -456,8 +474,6 @@ void ColumnW::insertLevel(int value, const char *label, const char *importValue,
             Level &level = levels[i];
             Level &nextLevel = levels[i+1];
 
-            assert(level.value != value);
-
             if (ascending && level.value > value)
             {
                 nextLevel = level;
@@ -507,7 +523,8 @@ void ColumnW::removeLevel(int value)
             break;
     }
 
-    assert(i != s->levelsUsed); // level not found
+    if (i == s->levelsUsed)
+        throw runtime_error("level not found");
 
     int index = i;
 
@@ -573,6 +590,7 @@ void ColumnW::setMissingValues(const vector<MissingValue> &newMissingValues)
                 length = strlen(newMissingValue.value.s) + 1;
                 sValue = _mm->allocateSize<char>(length, &allocated);
                 memcpy(sValue, newMissingValue.value.s, length);
+                s = struc();
                 missingValues = _mm->resolve<MissingValue>(s->missingValues);
                 missingValues[i].value.s = _mm->base<char>(sValue);
                 break;
@@ -608,6 +626,7 @@ void ColumnW::setMissingValues(const vector<MissingValue> &newMissingValues)
         }
     }
 
+    s = struc();
     s->changes++;
 }
 
@@ -778,22 +797,19 @@ void ColumnW::changeDMType(DataType::Type dataType, MeasureType::Type measureTyp
         {
             for (int rowNo = 0; rowNo < rowCount(); rowNo++)
             {
-                const char *value = old.svalue(rowNo);
-                string copy = string(value);
-                // value is in shared memory, which may move if setSValue
-                // results in a segment enlargement, so we make a copy
-                setSValue(rowNo, copy.c_str(), true);
+                string value = old.svalue(rowNo);
+                setSValue(rowNo, value.c_str(), true);
             }
         }
         else
         {
             for (int rowNo = 0; rowNo < rowCount(); rowNo++)
             {
-                const char *value = old.svalue(rowNo);
+                string value = old.svalue(rowNo);
 
-                if (value[0] != '\0')
+                if ( ! value.empty())
                 {
-                    int levelIndex = valueForLabel(value);
+                    int levelIndex = valueForLabel(value.c_str());
                     setIValue(rowNo, levelIndex, true);
                 }
                 else
@@ -854,24 +870,24 @@ void ColumnW::_transferLevels(ColumnW &dest, ColumnW &src)
         {
             if (src.dataType() == DataType::DECIMAL)
             {
-                set<int64_t> values;
+                set<double> values;
 
                 for (int i = 0; i < src.rowCount(); i++)
                 {
                     double value = src.dvalue(i);
                     if ( ! isnan(value))
-                        values.insert((int64_t)round(value * 1000));
+                        values.insert(round(value * 1000) + 0.0);  // + 0.0 turns -0.0 into 0.0
                 }
 
                 int count = 0;
-                set<int64_t>::iterator itr;
+                set<double>::iterator itr;
                 for (itr = values.begin(); itr != values.end(); itr++)
                 {
-                    int64_t value = *itr;
+                    double value = *itr;
                     stringstream ss;
                     ss.setf(ios::fixed);
                     ss << setprecision(src.dps());
-                    ss << ((double)value) / 1000;
+                    ss << value / 1000;
                     string v = ss.str();
                     dest.insertLevel(count++, v.c_str(), v.c_str());
                 }
@@ -883,7 +899,7 @@ void ColumnW::_transferLevels(ColumnW &dest, ColumnW &src)
                 {
                     value = src.ivalue(i);
                     if (value != INT_MIN && ! dest.hasLevel(value))
-                        dest.insertLevel(value, src.svalue(i));
+                        dest.insertLevel(value, src.svalue(i).c_str());
                 }
 
                 ColumnStruct *s = dest.struc();
@@ -896,9 +912,9 @@ void ColumnW::_transferLevels(ColumnW &dest, ColumnW &src)
                 int count = 0;
                 for (int i = 0; i < src.rowCount(); i++)
                 {
-                    const char *value = src.svalue(i);
-                    if (value[0] != '\0' && ! dest.hasLevel(value))
-                        dest.appendLevel(count++, value);
+                    string value = src.svalue(i);
+                    if ( ! value.empty() && ! dest.hasLevel(value.c_str()))
+                        dest.appendLevel(count++, value.c_str());
                 }
             }
         }
@@ -912,7 +928,7 @@ void ColumnW::_transferLevels(ColumnW &dest, ColumnW &src)
                     if (src.dataType() == DataType::DECIMAL)
                         dest.insertLevel(value); // src.svalue() would return a decimal string
                     else
-                        dest.insertLevel(value, src.svalue(i));
+                        dest.insertLevel(value, src.svalue(i).c_str());
                 }
             }
         }

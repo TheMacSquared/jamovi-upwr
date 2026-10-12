@@ -32,6 +32,7 @@ else
 const electron = require('electron');
 const shell = electron.shell;
 const contextBridge = electron.contextBridge;
+const webUtils = electron.webUtils;
 
 const ipc = electron.ipcRenderer;
 
@@ -78,6 +79,14 @@ function toggleDevTools() {
 
 function openUrl(url) {
     ipc.send('request', { type: 'openUrl', data: { url } });
+}
+
+function openFile(url, filename) {
+    ipc.send('request', { type: 'openFile', data: { url, filename } });
+}
+
+async function exportFile(url, filename) {
+    return await ipc.invoke('export-file', { url, filename });
 }
 
 const zoomLevels = [ 30, 50, 67, 80, 90, 100, 110, 120, 133, 150, 170, 200, 240, 300 ];
@@ -167,6 +176,10 @@ function setDialogProvider(provider) {
     dialogProvider = provider;
 }
 
+function getPathForFile(file) {
+    return webUtils.getPathForFile(file).replace(/\\/g, '/');
+}
+
 async function showSaveDialog(options) {
     return await dialogProvider.showDialog('export', options);
 }
@@ -232,7 +245,10 @@ contextBridge.exposeInMainWorld(
         showSaveDialog,
         showSaveDialogExternal,
         showOpenDialog,
+        getPathForFile,
         os,
         openUrl,
+        openFile,
+        exportFile,
         setDialogProvider
     });

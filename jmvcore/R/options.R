@@ -439,7 +439,50 @@ OptionAction <- R6::R6Class(
     inherit=OptionBool,
     private=list(
         .action=NA,
-        .params=NA
+        .params=NA,
+        # 'openExternal' hands a file the analysis produced to the host: the
+        # desktop app opens it with whatever the OS associates with its
+        # extension (i.e. a .docx in word), the browser downloads it. the
+        # result must carry a filename; the file itself is either at
+        # params$fullPath, or wherever res$path says the analysis wrote it,
+        # and gets moved into the 'external' subdir of session temp under
+        # the filename's extension (so the OS can tell what it is). the
+        # subdir is what the server serves from, so nothing else in session
+        # temp (i.e. File option uploads) is reachable that way. an 'export'
+        # action is the same, except the desktop app asks the user where to
+        # save the file rather than opening it
+        .normaliseExternal=function(res, params) {
+            filename <- res$filename
+            if ( ! is.character(filename) || length(filename) != 1 || filename == '')
+                stop(sprintf('module developer fail: an %s action result requires a filename', private$.action))
+            filename <- basename(filename)
+            ext <- tools::file_ext(filename)
+            ext <- if (ext == '') '' else paste0('.', ext)
+
+            src <- res$path
+            if (is.null(src))
+                src <- params$fullPath
+            if ( ! file.exists(src))
+                stop(sprintf("the action produced no file at '%s'", src))
+
+            dir <- file.path(dirname(params$fullPath), 'external')
+            dir.create(dir, showWarnings=FALSE)
+            dest <- file.path(dir, paste0(basename(params$fullPath), ext))
+            if (normalizePath(src) != normalizePath(dest, mustWork=FALSE)) {
+                if ( ! file.rename(src, dest)) {
+                    # i.e. across file systems
+                    if ( ! file.copy(src, dest, overwrite=TRUE))
+                        stop(sprintf("unable to move '%s' into the session temp", src))
+                    file.remove(src)
+                }
+            }
+
+            res$path <- paste0('{{SessionTemp}}/external/', basename(dest))
+            res$filename <- filename
+            if (is.null(res$title))
+                res$title <- filename
+            res
+        }
     ),
     public=list(
         initialize=function(name, value, action='open', ...) {
@@ -496,6 +539,20 @@ OptionAction <- R6::R6Class(
                 ))
             } else if (is.list(res)) {
 
+                if (private$.action %in% c('openExternal', 'export')) {
+                    res <- try(private$.normaliseExternal(res, params))
+                    if (inherits(res, 'try-error')) {
+                        err <- as.character(attr(res, 'condition'))
+                        action$.setResult(list(
+                            status='error',
+                            message=err
+                        ))
+                        return()
+                    }
+                    action$.setResult(res)
+                    return()
+                }
+
                 data <- res$data
                 if ( ! is.null(data)) {
                     res2 <- try(
@@ -506,7 +563,7 @@ OptionAction <- R6::R6Class(
                             vldExt=FALSE)
                     )
                     if (inherits(res2, 'try-error')) {
-                        err <- as.character(attr(res, 'condition'))
+                        err <- as.character(attr(res2, 'condition'))
                         action$.setResult(list(
                             status='error',
                             message=err
@@ -910,6 +967,126 @@ OptionString <- R6::R6Class(
 OptionLevel <- R6::R6Class(
     "OptionString",
     inherit=Option)
+
+#' @rdname Options
+#' @export
+OptionFile <- R6::R6Class(
+    "OptionFile",
+    inherit=Option,
+    private=list(
+        .multiple=FALSE,
+        .extensions=NULL,
+        # the raw value of a file is list(id=, filename=) as it arrives over
+        # the wire -- id names the file in the session temp dir, and is NULL
+        # if the file isn't available (restored from an .omv that didn't
+        # carry it, say) -- or list(path=, filename=) when given a path from
+        # plain R. either way, what module code sees is list(path=, filename=)
+        .normalise=function(file) {
+            if (is.null(file))
+                return(NULL)
+            if (is.character(file))
+                return(list(path=file, filename=basename(file)))
+            if ( ! is.list(file))
+                reject("Argument '{a}' must be a file path, or a list with 'path' and 'filename'",
+                       code="a_must_be_a_file",
+                       a=self$name)
+            filename <- file$filename
+            if (is.null(filename))
+                filename <- if (is.null(file$path)) '' else basename(file$path)
+            if ( ! is.null(file$path))
+                return(list(path=file$path, filename=filename))
+            id <- file$id
+            if ( ! private$.isId(id))
+                id <- NULL
+            list(id=id, filename=filename)
+        },
+        # an id is the hex sha-256 of the content plus an extension. it comes
+        # from the client, so it's only ever joined to the session temp dir
+        # once it's been checked to look like one
+        .isId=function(id) {
+            is.character(id) && length(id) == 1 && ! is.na(id) &&
+                grepl('^[0-9a-f]{64}(\\.[A-Za-z0-9]{1,16})?$', id)
+        },
+        .resolve=function(file) {
+            path <- file$path
+            if (is.null(path) && ! is.null(file$id)) {
+                parent <- private$.parent
+                analysis <- if (is.null(parent)) NULL else parent$analysis
+                if ( ! is.null(analysis))
+                    path <- file.path(analysis$.getSessionTemp(), file$id)
+            }
+            list(path=path, filename=file$filename)
+        },
+        .check=function(data, checkValues, checkVars, checkData) {
+            if ( ! checkValues)
+                return()
+            files <- self$value
+            if ( ! private$.multiple)
+                files <- list(files)
+            for (file in files) {
+                if (is.null(file))
+                    next()
+                if (is.null(file$path) || ! file.exists(file$path))
+                    reject("The file '{filename}' needs to be re-selected",
+                           code="file_needs_reselecting",
+                           filename=file$filename)
+            }
+        }),
+    public=list(
+        initialize=function(name, value=NULL, multiple=FALSE, extensions=NULL, ...) {
+            private$.multiple <- multiple
+            private$.extensions <- extensions
+            super$initialize(name, value, ...)
+        }),
+    active=list(
+        multiple=function() private$.multiple,
+        extensions=function() private$.extensions,
+        value=function(value) {
+            if (missing(value)) {
+                raw <- private$.value
+                if (private$.multiple) {
+                    if (is.null(raw))
+                        return(list())
+                    return(lapply(raw, private$.resolve))
+                }
+                if (is.null(raw))
+                    return(NULL)
+                return(private$.resolve(raw))
+            }
+            # over the wire the value is always an (unnamed) list of files,
+            # each a named list(id=, filename=), regardless of multiple. from
+            # R we also accept a path (or paths), or a single named list.
+            if (is.null(value))
+                files <- list()
+            else if (is.character(value))
+                files <- lapply(value, private$.normalise)
+            else if (is.list(value) && ! is.null(names(value)))
+                files <- list(private$.normalise(value))
+            else
+                files <- lapply(value, private$.normalise)
+
+            if (private$.multiple) {
+                private$.value <- files
+            } else {
+                if (length(files) > 1)
+                    reject("Argument '{a}' must be a single file",
+                           code="a_must_be_a_single_file",
+                           a=self$name)
+                private$.value <- if (length(files) == 0) NULL else files[[1]]
+            }
+        },
+        valueAsSource=function() {
+            # the filenames, not where the files are -- a session temp path
+            # means nothing outside the session, but a name is something the
+            # user can satisfy by putting the file in the working directory
+            files <- self$value
+            if ( ! private$.multiple)
+                files <- list(files)
+            filenames <- unlist(lapply(files, function(file) file$filename))
+            if (is.null(filenames))
+                return('NULL')
+            sourcify(filenames, '    ')
+        }))
 
 #' @rdname Options
 #' @export

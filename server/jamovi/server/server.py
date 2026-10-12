@@ -9,8 +9,8 @@ import logging
 import threading
 import asyncio
 from asyncio import create_task
-from urllib.parse import urlparse
-from tempfile import NamedTemporaryFile, TemporaryDirectory
+from urllib.parse import urlparse, quote
+from tempfile import NamedTemporaryFile, TemporaryDirectory, gettempdir
 from shutil import rmtree
 
 from aiohttp import web
@@ -21,10 +21,15 @@ from .utils import conf
 from .appinfo import app_info
 from jamovi.core import Dirs
 from .i18n import _
-from .webhandlers import forward_handler
+from .webhandlers import make_single_file_handler, make_static_dir_handler
+from .webhandlers import make_forward, make_host_dispatch_middleware
+from .uploads import read_upload_form, UploadTooLargeError
+from .sessionfiles import TooLargeError
 from .exceptions import FileExistsException, UserException
 
 log = logging.getLogger(__name__)
+
+CLIENT_MAX_SIZE = 100 * 1024 * 1024
 
 
 access_key = conf.get('access_key', None)
@@ -35,68 +40,28 @@ if access_key is None:
     access_key_generated = True
     conf.set('access_key', access_key)
 
-
-# Generic static-file helpers (no session dependency)
-
-def _make_single_file_handler(path: str, mime_type: str | None = None,
-                               extra_headers: dict | None = None):
-    async def handler(_: web.Request) -> web.Response:
-        ct = mime_type or mimetypes.guess_type(path)[0] or 'application/octet-stream'
-        with open(path, 'rb') as f:
-            body = f.read()
-        return web.Response(body=body, content_type=ct,
-                            headers=dict(extra_headers) if extra_headers else {})
-    return handler
-
-
-def _make_static_dir_handler(directory: str, extra_headers: dict | None = None,
-                              default_filename: str | None = None):
-    _real = os.path.realpath(directory)
-
-    async def handler(request: web.Request) -> web.Response:
-        rel = request.match_info.get('path', '')
-        if not rel:
-            if default_filename:
-                rel = default_filename
-            else:
-                raise web.HTTPNotFound()
-        filepath = os.path.realpath(os.path.join(_real, rel))
-        if not filepath.startswith(_real):
-            raise web.HTTPForbidden()
-        if not os.path.isfile(filepath):
-            raise web.HTTPNotFound()
-        ct, enc = mimetypes.guess_type(filepath)
-        headers = dict(extra_headers) if extra_headers else {}
-        if enc:
-            headers['Content-Encoding'] = enc
-        with open(filepath, 'rb') as f:
-            body = f.read()
-        return web.Response(body=body, content_type=ct or 'application/octet-stream',
-                            headers=headers)
-    return handler
-
-
-def _make_forward(base_url: str, default_filename: str = 'index.html'):
-    async def handler(request: web.Request) -> web.StreamResponse:
-        return await forward_handler(request, base_url=base_url,
-                                     default_filename=default_filename)
-    return handler
-
-
-def _make_host_dispatch_middleware(apps_by_host: dict):
-    @web.middleware
-    async def dispatch(request: web.Request, handler):
-        host = request.headers.get('Host', '').split(':')[0]
-        target = apps_by_host.get(host)
-        if target is not None:
-            match_info = await target.router.resolve(request)
-            request._match_info = match_info
-            return await match_info.handler(request)
-        return await handler(request)
-    return dispatch
+# where uploads are written to, and (in cloud mode) the only place local
+# paths may be opened from -- so a directory of its own, not the temp root
+if conf.get('upload_path', None) is None:
+    conf.set('upload_path', os.path.join(gettempdir(), 'jamovi-uploads'))
 
 
 # Route handler class
+
+def content_disposition(filename: str) -> str:
+    # an attachment header for a name we don't control: no header-breaking
+    # or quote-breaking characters in the plain filename (an ascii fallback),
+    # with the real name percent-encoded per rfc 5987 for browsers that read it
+    filename = filename.replace('\r', '').replace('\n', '')
+    fallback = filename.encode('ascii', 'replace').decode('ascii').replace('"', '').replace('\\', '')
+    encoded = quote(filename, safe='')
+    return f'attachment; filename="{ fallback }"; filename*=UTF-8\'\'{ encoded }'
+
+
+def _opened(instance_id: str) -> str:
+    # the last line of a successful open
+    return json.dumps({ 'status': 'OK', 'instanceId': instance_id }) + '\n'
+
 
 class _Handlers:
     """All aiohttp route handlers, grouped by the session and config they share."""
@@ -142,12 +107,13 @@ class _Handlers:
         rows = [
             {
                 'id': id,
-                'title': inst._data.title,
+                'title': inst.project.title,
                 'buffer': inst._buffer_path,
-                'rowCount': inst._data.row_count,
-                'columnCount': inst._data.column_count,
+                'rowCount': inst.project.get_dataset().row_count,
+                'columnCount': inst.project.get_dataset().column_count,
             }
             for id, inst in self._session.items()
+            if inst.project.has_datasets
         ]
         return web.Response(text=json.dumps(rows), content_type='application/json',
             headers={'Cache-Control': 'private, no-store, must-revalidate, max-age=0'})
@@ -197,7 +163,7 @@ class _Handlers:
                 return web.Response(content_type='text/plain',
                     text=f'{{"status":"terminated",'
                          f'"message":{json.dumps(_("This data set is no longer available"))}}}')
-            if url == '' and instance._data.has_dataset:
+            if url == '' and instance.project.has_datasets:
                 return web.Response(status=204)
 
         title = request.rel_url.query.get('title')
@@ -223,7 +189,7 @@ class _Handlers:
             message = str(e) or type(e).__name__
             parts.append(f'{{"status":"error","message":{json.dumps(message)}}}\n')
         else:
-            parts.append(f'{{"status":"OK","url":"{instance.id}/"}}\n')
+            parts.append(_opened(instance.id))
 
         return web.Response(content_type='text/plain', text=''.join(parts))
 
@@ -232,45 +198,51 @@ class _Handlers:
         if err is not None:
             return err
 
+        # in cloud mode, local paths must be inside upload_path
+        upload_path = conf.get('upload_path')
+        os.makedirs(upload_path, exist_ok=True)
+        try:
+            fields, files = await read_upload_form(request, upload_path)
+        except ValueError:
+            return web.Response(status=400, text='400: Bad Request')
+
         options: dict = {}
-        data = await request.post()
-        options_raw = data.get('options', '{}')
-        if isinstance(options_raw, str):
-            try:
-                options_dict = json.loads(options_raw)
-                if isinstance(options_dict, dict):
-                    options = options_dict
-            except ValueError:
-                pass
+        try:
+            options_dict = json.loads(fields.get('options', '{}'))
+            if isinstance(options_dict, dict):
+                options = options_dict
+        except ValueError:
+            pass
 
         file_path: str
         file_title = None
         file_ext = None
         is_temp = False
+        remove_after = False
 
-        if 'file' in data:
-            ff = data['file']
-            if not isinstance(ff, web.FileField):
-                return web.Response(status=400, text='400: Bad Request')
-            file_title, dot_ext = os.path.splitext(ff.filename)
-            with NamedTemporaryFile(suffix=dot_ext, delete=False) as tmp:
-                tmp.write(ff.file.read())
-            file_path = tmp.name
+        if files:
+            uploaded = files[0]
+            file_path = uploaded.path
+            file_title, dot_ext = os.path.splitext(uploaded.filename)
+            file_ext = dot_ext[1:] if dot_ext else None
             is_temp = True
+            if uploaded.ours:
+                remove_after = True  # it's our temp file
+            else:
+                # an upload accelerator's copy, in upload_path, is ours to
+                # remove once read too. anything outside it is someone's own
+                # file, and is left alone
+                real = os.path.realpath(uploaded.path)
+                root = os.path.realpath(upload_path)
+                try:
+                    remove_after = os.path.commonpath([root, real]) == root
+                except ValueError:
+                    remove_after = False  # different drives on windows
         elif 'path' in options:
             file_path = options['path']
             is_temp = options.get('temp', False) is not False
             file_title = options.get('title')
             file_ext = options.get('ext')
-        elif 'file.path' in data:
-            raw_path = data['file.path']
-            raw_name = data['file.name']
-            if not isinstance(raw_path, str) or not isinstance(raw_name, str):
-                return web.Response(status=400, text='400: Bad Request')
-            file_path = raw_path
-            file_title, dot_ext = os.path.splitext(raw_name)
-            file_ext = dot_ext[1:] if dot_ext else None
-            is_temp = True
         else:
             return web.Response(status=400, text='400: Bad Request')
 
@@ -282,7 +254,7 @@ class _Handlers:
             instance = await self._session.create()
             async for progress in instance.open(
                 file_path, title=file_title, is_temp=is_temp,
-                ext=file_ext, options=options,
+                ext=file_ext, options=options, remove_after=remove_after,
             ):
                 p, n = progress
                 await resp.write(f'{{"status":"in-progress","p":{p},"n":{n}}}\n'.encode())
@@ -291,7 +263,7 @@ class _Handlers:
             message = str(e) or type(e).__name__
             await resp.write(f'{{"status":"error","message":{json.dumps(message)}}}\n'.encode())
         else:
-            await resp.write(f'{{"status":"OK","url":"{instance.id}/"}}\n'.encode())
+            await resp.write(_opened(instance.id).encode())
         await resp.write_eof()
         return resp
 
@@ -319,6 +291,20 @@ class _Handlers:
             elif isinstance(field, str):
                 options['content'] = field
 
+        # svgs harvested from the results view, keyed by the part they
+        # belong to. see Instance._assign_svgs()
+        svgs: dict = {}
+        for key, field in data.items():
+            if not key.startswith('svg:'):
+                continue
+            part = key[4:]
+            if isinstance(field, web.FileField):
+                svgs[part] = field.file.read()
+            elif isinstance(field, str):
+                svgs[part] = field.encode('utf-8')
+        if svgs:
+            options['svgs'] = svgs
+
         resp = web.StreamResponse(headers={'Content-Type': 'text/plain'})
         await resp.prepare(request)
 
@@ -338,6 +324,64 @@ class _Handlers:
         await resp.write(json.dumps(result).encode())
         await resp.write_eof()
         return resp
+
+    async def upload(self, request: web.Request) -> web.Response:
+        # files chosen for a 'File' analysis option. they go into the
+        # session temp dir, which the engine can also read, named by their
+        # content (see sessionfiles.py); the client gets back { id, filename }
+        # for each. a file arrives either as a body (a browser), or as a
+        # file.path/file.name pair: from an upload accelerator that has
+        # already written it into upload_path, or, under electron, the path
+        # the user chose in the native dialog -- which is only honoured where
+        # opening local files is allowed
+        instance_id = request.match_info['instance_id']
+        instance = self._session.get(instance_id)
+        if instance is None:
+            return web.Response(status=404, text='404: Not Found')
+
+        session_files = instance.session_files
+
+        def too_large():
+            return web.json_response({ 'message': instance.file_storage_message() }, status=413)
+
+        try:
+            _unused, uploaded = await read_upload_form(request, session_files.dir, max_bytes=instance.file_storage_headroom())
+        except UploadTooLargeError:
+            return too_large()
+        except ValueError:
+            return web.Response(status=400, text='400: Bad Request')
+
+        upload_path = os.path.realpath(conf.get('upload_path'))
+        files: list[dict] = []
+        try:
+            for f in uploaded:
+                if f.ours:
+                    file_id = session_files.adopt(f.path, f.sha256, f.filename)
+                else:
+                    real = os.path.realpath(f.path)
+                    try:
+                        under_upload_path = os.path.commonpath([upload_path, real]) == upload_path
+                    except ValueError:
+                        under_upload_path = False  # different drives on windows
+                    if under_upload_path:
+                        move_source = True  # the accelerator's copy, no longer needed
+                    elif instance.perms.open.local:
+                        move_source = False  # the user's own file
+                    else:
+                        return web.Response(status=403, text='403: Forbidden')
+                    try:
+                        file_id = session_files.add_path(real, f.filename, max_bytes=instance.file_storage_headroom(), move=move_source)
+                    except FileNotFoundError:
+                        return web.Response(status=404, text='404: Not Found')
+                    except TooLargeError:
+                        if move_source:
+                            os.remove(real)  # the accelerator's copy isn't needed either way
+                        raise
+                files.append({ 'id': file_id, 'filename': f.filename })
+        except TooLargeError:
+            return too_large()
+
+        return web.json_response(files)
 
     # -- resources / modules --------------------------------------------------
 
@@ -470,14 +514,58 @@ class _Handlers:
         if not os.path.isfile(filepath):
             raise web.HTTPNotFound()
         ct, enc = mimetypes.guess_type(filepath)
-        headers = {}
-        filename_param = request.rel_url.query.get('filename')
-        if filename_param:
-            headers['Content-Disposition'] = f'attachment; filename="{filename_param}"'
+        filename = request.rel_url.query.get('filename') or os.path.basename(filepath)
+        # always an attachment: this is served on the app's origin, and an
+        # .html export rendered inline there would run as the app
+        headers = {
+            'Content-Disposition': content_disposition(filename),
+            'X-Content-Type-Options': 'nosniff',
+        }
         if enc:
             headers['Content-Encoding'] = enc
         with open(filepath, 'rb') as f:
             body = f.read()
+        return web.Response(body=body, content_type=ct or 'application/octet-stream',
+                            headers=headers)
+
+    async def download_temp(self, request: web.Request) -> web.Response:
+        # a file produced by an analysis 'openExternal' action. it lives in
+        # the 'external' subdir of session temp (where jmvcore puts it; the
+        # rest of session temp, i.e. File option uploads, isn't reachable
+        # here) and is one-shot: the client fetches it once, to download or
+        # to hand to the OS, and it's removed once served so it doesn't
+        # count against the session's file storage cap
+        instance_id = request.match_info['instance_id']
+        instance = self._session.get(instance_id)
+        if instance is None:
+            raise web.HTTPNotFound()
+        if instance.perms.save.download is False:
+            raise web.HTTPForbidden()
+
+        external_real_path = os.path.realpath(os.path.join(self._session.session_temp, 'external'))
+        filepath = os.path.realpath(os.path.join(external_real_path, request.match_info['filename']))
+        if os.path.dirname(filepath) != external_real_path:
+            raise web.HTTPForbidden()
+        if not os.path.isfile(filepath):
+            raise web.HTTPNotFound()
+
+        filename = request.rel_url.query.get('filename') or os.path.basename(filepath)
+        ct, enc = mimetypes.guess_type(filename)
+        headers = {
+            # 'attachment' is load-bearing: the browser client fetches this
+            # in a hidden iframe, and this is what stops, say, an .html from
+            # being rendered same-origin with the app. nosniff likewise
+            'Content-Disposition': content_disposition(filename),
+            'X-Content-Type-Options': 'nosniff',
+        }
+        if enc:
+            headers['Content-Encoding'] = enc
+        with open(filepath, 'rb') as f:
+            body = f.read()
+        try:
+            os.remove(filepath)
+        except OSError:
+            pass
         return web.Response(body=body, content_type=ct or 'application/octet-stream',
                             headers=headers)
 
@@ -502,8 +590,10 @@ class _Handlers:
         router.add_get(r'/{instance_id:[a-f0-9-]+}/open', self.open_get)
         router.add_post(r'/{instance_id:[a-f0-9-]+}/open', self.open_post)
         router.add_post(r'/{instance_id:[a-f0-9-]+}/save', self.save)
+        router.add_post(r'/{instance_id:[a-f0-9-]+}/upload', self.upload)
         router.add_get(r'/{instance_id:[a-f0-9-]+}/coms', self.websocket)
         router.add_get(r'/{path:[a-f0-9-]+/dl/.+}', self.download)
+        router.add_get(r'/{instance_id:[a-f0-9-]+}/temp/{filename:[^/]+}', self.download_temp)
         router.add_get(r'/modules/{module_name:[0-9a-zA-Z]+}', self.module_descriptor)
         router.add_get(
             r'/modules/{module_name:[0-9a-zA-Z]+}/i18n/{code:.+}',
@@ -517,16 +607,16 @@ class _Handlers:
         router.add_post('/utils/to-pdf', self.pdf)
         router.add_get('/api/datasets', self.datasets)
         router.add_get('/i18n/', self.i18n_manifest)
-        router.add_get(r'/i18n/{path:.+}', _make_static_dir_handler(self._i18n_path))
+        router.add_get(r'/i18n/{path:.+}', make_static_dir_handler(self._i18n_path))
 
         if ds:
-            router.add_get(r'/{instance_id:[a-f0-9-]+}/{path:.*}', _make_forward(ds))
-            router.add_get(r'/{path:.*}', _make_forward(ds))
+            router.add_get(r'/{instance_id:[a-f0-9-]+}/{path:.*}', make_forward(ds))
+            router.add_get(r'/{path:.*}', make_forward(ds))
         else:
-            router.add_get(r'/assets/{path:.+}', _make_static_dir_handler(ap, ch))
+            router.add_get(r'/assets/{path:.+}', make_static_dir_handler(ap, ch))
             router.add_get(r'/{instance_id:[a-f0-9-]+}/',
-                _make_single_file_handler(os.path.join(cp, 'index.html'), 'text/html', ch))
-            router.add_get(r'/{path:[-0-9a-z.]*}', _make_static_dir_handler(cp, ch))
+                make_single_file_handler(os.path.join(cp, 'index.html'), 'text/html', ch))
+            router.add_get(r'/{path:[-0-9a-z.]*}', make_static_dir_handler(cp, ch))
 
     def add_analysisui_routes(self, router: web.UrlDispatcher):
         ch = self._cache_headers
@@ -537,14 +627,14 @@ class _Handlers:
         if ds:
             router.add_get('/', self.version)
             router.add_get(r'/{instance_id:[a-f0-9-]+}/{path:.*}',
-                _make_forward(ds, 'analysisui.html'))
-            router.add_get(r'/{path:.*}', _make_forward(ds))
+                make_forward(ds, 'analysisui.html'))
+            router.add_get(r'/{path:.*}', make_forward(ds))
         else:
             analysisui_path = os.path.join(cp, 'analysisui.html')
             router.add_get(r'/{instance_id:[-0-9a-f]+}/',
-                _make_single_file_handler(analysisui_path, 'text/html', ch))
-            router.add_get(r'/assets/{path:.+}', _make_static_dir_handler(ap, ch))
-            router.add_get(r'/{path:[-.0-9a-zA-Z]+}', _make_static_dir_handler(cp, ch))
+                make_single_file_handler(analysisui_path, 'text/html', ch))
+            router.add_get(r'/assets/{path:.+}', make_static_dir_handler(ap, ch))
+            router.add_get(r'/{path:[-.0-9a-zA-Z]+}', make_static_dir_handler(cp, ch))
 
     def add_resultsview_routes(self, router: web.UrlDispatcher):
         ch = self._cache_headers
@@ -561,14 +651,14 @@ class _Handlers:
                 r'/{instance_id:[-0-9a-z]+}/{analysis_id:[0-9]+}/module/{path:.+}',
                 self.module_asset)
             router.add_get(r'/{instance_id:[a-f0-9-]+}/{analysis_id:[0-9]+}/{path:.*}',
-                _make_forward(ds, 'resultsview.html'))
-            router.add_get(r'/{path:.*}', _make_forward(ds))
+                make_forward(ds, 'resultsview.html'))
+            router.add_get(r'/{path:.*}', make_forward(ds))
         else:
             resultsview_path = os.path.join(cp, 'resultsview.html')
             router.add_get(r'/{instance_id:[-0-9a-z]+}/{analysis_id:[0-9]+}/',
-                _make_single_file_handler(resultsview_path, 'text/html', ch))
-            router.add_get(r'/assets/{path:.+}', _make_static_dir_handler(ap, ch))
-            router.add_get(r'/{path:[-.0-9a-zA-Z]+}', _make_static_dir_handler(cp, ch))
+                make_single_file_handler(resultsview_path, 'text/html', ch))
+            router.add_get(r'/assets/{path:.+}', make_static_dir_handler(ap, ch))
+            router.add_get(r'/{path:[-.0-9a-zA-Z]+}', make_static_dir_handler(cp, ch))
             router.add_get(
                 r'/{instance_id:[-0-9a-z]+}/{analysis_id:[0-9]+}/res/{resource_id:.+}',
                 self.resource)
@@ -749,7 +839,7 @@ class Server:
         handlers = _Handlers(self._session, client_path, assets_path, i18n_path,
                              self._dev_server, cache_headers, self)
 
-        main_app = web.Application()
+        main_app = web.Application(client_max_size=CLIENT_MAX_SIZE)
         handlers.add_main_routes(main_app.router)
 
         try:
@@ -759,10 +849,10 @@ class Server:
         except ImportError:
             pass
 
-        analysisui_app = web.Application()
+        analysisui_app = web.Application(client_max_size=CLIENT_MAX_SIZE)
         handlers.add_analysisui_routes(analysisui_app.router)
 
-        resultsview_app = web.Application()
+        resultsview_app = web.Application(client_max_size=CLIENT_MAX_SIZE)
         handlers.add_resultsview_routes(resultsview_app.router)
 
         runners: list[web.AppRunner] = []
@@ -779,7 +869,7 @@ class Server:
             port_c = int(runners[2].addresses[0][1])
 
         elif separate_by == 'path':
-            root_app = web.Application()
+            root_app = web.Application(client_max_size=CLIENT_MAX_SIZE)
             root_app.add_subapp(path_a + '/', main_app)
             root_app.add_subapp(path_b + '/', analysisui_app)
             root_app.add_subapp(path_c + '/', resultsview_app)
@@ -790,8 +880,8 @@ class Server:
             port_a = port_b = port_c = int(runner.addresses[0][1])
 
         else:  # separate_by == 'host'
-            dispatch_app = web.Application(middlewares=[
-                _make_host_dispatch_middleware({
+            dispatch_app = web.Application(client_max_size=CLIENT_MAX_SIZE, middlewares=[
+                make_host_dispatch_middleware({
                     host_a: main_app,
                     host_b: analysisui_app,
                     host_c: resultsview_app,
