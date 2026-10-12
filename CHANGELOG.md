@@ -25,6 +25,9 @@ Windows i macOS zbudowane, aplikacje uruchamiają się; w trakcie testów.
   przestrzeni nazw w panelu „O zbiorze”).
 - Kompilator: moduły zbudowane nowym `jmc` wymagają jamovi ≥ 28.4, więc nie
   zainstalują się w jUPWR 1.0.x.
+- Poprawka regresji z upstreamu 28.11 w kliencie: tabela, która traci wszystkie
+  kolumny (np. Zmienne ilościowe po usunięciu ostatniej zmiennej), czyści też
+  wiersze zamiast pokazywać stare wyniki bez nagłówków.
 
 ## 1.0.7 — 2026-10-11
 Licencje zbiorów danych w dokumentacji biblioteki, uporządkowany zestaw zbiorów

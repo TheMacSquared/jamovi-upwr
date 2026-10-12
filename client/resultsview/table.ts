@@ -742,6 +742,7 @@ export class View extends Elem.View<Model> {
         if (cells.header.length === 0) {
             this.$titleCell.setAttribute('colspan', '1');
             this.$titleCell.setAttribute('scope', 'col');
+            this.$tableBody.replaceChildren();
             this.renderFooter(table, footnotes, 1);
             return;
         }
