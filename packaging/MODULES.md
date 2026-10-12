@@ -70,10 +70,14 @@ dużo większy niż jRISK — to oczekiwane.
 jUPWR moduły opcjonalne trzeba przebudować i dołączyć do wydania**, nawet gdy ich kod się
 nie zmienił. Ta tabela mówi, czy to zrobiono.
 
+Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany dla 1.1.0
+**nie zainstaluje się w 1.0.x** (jamovi 28.2) — studentom 1.0.x dawać `.jmo` z wierszy 1.0.x.
+
 ### jRISK
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.0 | 28.11 | 0.4.0 | ✅ 2026-10-12 | ✅ 2026-10-12 |
 | 1.0.7 | 28.2 | 0.4.0 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.4.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.4.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
@@ -104,6 +108,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.0 | 28.11 | 0.3.2 | ✅ 2026-10-12 | ✅ 2026-10-12 |
 | 1.0.7 | 28.2 | 0.3.2 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.3.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
@@ -131,6 +136,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.0 | 28.11 | 0.1.3 | ✅ 2026-10-12 | ✅ 2026-10-12 |
 | 1.0.7 | 28.2 | 0.1.3 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.1.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.1.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
@@ -149,6 +155,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jPomiar | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.0 | 28.11 | 0.3.0 | ✅ 2026-10-12 | ✅ 2026-10-12 |
 | 1.0.7 | 28.2 | 0.3.0 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.3.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.0 | ✅ 2026-09-18 | ✅ 2026-09-18 |
@@ -162,6 +169,7 @@ Docker sprawdzony przy wydaniu 1.0.7 (2026-10-11).
 
 | jUPWR | jamovi | jWody | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.0 | 28.11 | 0.1.1 | ✅ 2026-10-12 | ✅ 2026-10-12 |
 | 1.0.7 | 28.2 | 0.1.1 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.1.1 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.1.1 | ✅ 2026-09-28, arm64; testy artefaktu | ✅ 2026-10-03 |
