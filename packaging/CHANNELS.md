@@ -90,5 +90,10 @@ Obrazy różnią się tagiem (`jupwr/jupwr:<wersja>`), więc build nie nadpisuje
 4. Wpis w `CHANGELOG.md`, wiersze w `packaging/MODULES.md`.
 5. `packaging/scripts/release-check.sh` bez ostrzeżeń — sprawdza też gałąź vs wersja,
    jamovi vs tabela powyżej, wskaźniki submodułów i nieprzeniesione poprawki.
-6. Docker build, potem build natywny w katalogu tej linii.
+6. Docker build, potem build natywny w katalogu tej linii. Windows: jedno polecenie
+   `pwsh -ExecutionPolicy Bypass -File packaging\scripts\windows\release.ps1 -Docker`
+   (Docker, build.ps1, NSIS, release-check.sh, `RELEASE-INFO-<wersja>.txt`).
+   macOS: skrypty `packaging/scripts/macos/` po kolei. Build nie powinien zostawiać
+   zmian w `git status` (npm ci nie zapisuje lockfile'a, pliki przepisane przez jmc
+   są przywracane) — jeśli zostawia, to błąd skryptu, nie rzecz do commitowania.
 7. Tag `jupwr-<wersja>`, push gałęzi i tagu, GitHub Release.

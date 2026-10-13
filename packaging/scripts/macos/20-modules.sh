@@ -6,7 +6,7 @@
 
 JMC="$REPO_ROOT/jamovi-compiler/index.js"
 BASE_R="$PAYLOAD/modules/base/R"
-[ -d "$REPO_ROOT/jamovi-compiler/node_modules" ] || ( cd "$REPO_ROOT/jamovi-compiler" && npm install )
+npm_deps "$REPO_ROOT/jamovi-compiler"
 mkdir -p "$BASE_R"
 
 # === RProtoBuf — KRYTYCZNE ===

@@ -5,10 +5,7 @@
 
 cd "$REPO_ROOT/client"
 
-if [ ! -d node_modules ]; then
-    log "npm install (klient)..."
-    npm install
-fi
+npm_deps "$REPO_ROOT/client"
 
 log "Kopiowanie proto (build:coms) + vite build..."
 npm run build:coms

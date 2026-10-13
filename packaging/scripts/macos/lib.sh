@@ -35,6 +35,21 @@ die()  { printf '\033[1;31m[BŁĄD]\033[0m %s\n' "$*" >&2; exit 1; }
 
 mkdir -p "$BUILD_DIR"
 
+# npm_deps <katalog> — zależności npm, gdy brak node_modules albo package.json /
+# package-lock.json są nowsze niż ostatnia instalacja (node_modules/.package-lock.json).
+# `npm ci`, nie `npm install`: ci instaluje dokładnie lockfile i nigdy go nie zapisuje,
+# a `npm install` w innej wersji npm przepisywał package-lock.json (brudne drzewo).
+# Odpowiednik Ensure-NpmDeps z packaging/scripts/windows/build.ps1.
+npm_deps() {
+    local dir="$1" stamp="$1/node_modules/.package-lock.json" cmd=install
+    [ -f "$dir/package-lock.json" ] && cmd=ci
+    if [ ! -f "$stamp" ] || [ "$dir/package.json" -nt "$stamp" ] \
+        || { [ -f "$dir/package-lock.json" ] && [ "$dir/package-lock.json" -nt "$stamp" ]; }; then
+        log "npm $cmd ($(basename "$dir"))..."
+        ( cd "$dir" && npm "$cmd" )
+    fi
+}
+
 # --- ochrona plików źródłowych przed nadpisaniem przez jmc ------------------
 # jmc zapisuje część plików z powrotem do drzewa ŹRÓDŁOWEGO, nie do payloadu:
 #   * <moduł>/jamovi/0000.yaml  (index.js:576-593, indexPath = <srcDir>/jamovi)

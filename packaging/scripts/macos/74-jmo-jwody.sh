@@ -10,7 +10,7 @@
 JMC="$REPO_ROOT/jamovi-compiler/index.js"
 BASE_R="$PAYLOAD/modules/base/R"
 [ -d "$BASE_R/jmvcore" ] || die "Brak jmvcore w $BASE_R — uruchom najpierw 20-modules.sh"
-[ -d "$REPO_ROOT/jamovi-compiler/node_modules" ] || ( cd "$REPO_ROOT/jamovi-compiler" && npm install )
+npm_deps "$REPO_ROOT/jamovi-compiler"
 
 # wersja modułu: jmc czyta ją wyłącznie z jamovi/0000.yaml
 WODY_VERSION="$(sed -n 's/^version: *//p' "$REPO_ROOT/jWody/jamovi/0000.yaml")"

@@ -3,7 +3,7 @@
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 cd "$REPO_ROOT/i18n"
-[ -d node_modules ] || { log "npm install (i18n)..."; npm install; }
+npm_deps "$REPO_ROOT/i18n"
 
 mkdir -p "$PAYLOAD/i18n/json"
 log "Build i18n -> $PAYLOAD/i18n/json"
