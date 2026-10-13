@@ -27,12 +27,12 @@ poprawki zmiennej przekształconej i jRISK są w 1.0.8.
   większa czcionka; diagram FTA rozszerza się z liczbą zdarzeń elementarnych,
   więc etykiety liści się nie nakładają.
 
-## 1.1.0 — w przygotowaniu (gałąź `test/upstream-28.11`)
+## 1.1.0 — 2026-10-12 (gałąź `test/upstream-28.11`)
 Baza jamovi 28.2 → 28.11. Wersja testowa; 1.0.x (gałąź `main`) bez zmian.
 
 Stan buildów (2026-10-12): Docker (`jupwr/jupwr:1.1.0`) zbudowany i sprawdzony
 (analizy jUPWR przeliczone i porównane z 1.0.7, eksport .docx sprawdzony),
-Windows i macOS zbudowane, aplikacje uruchamiają się; w trakcie testów.
+Windows i macOS zbudowane, aplikacje uruchamiają się.
 
 - Upstream jamovi 28.11: eksport wyników do .docx, .odt i LaTeX, kopiowanie
   tabeli jako obrazu i jako markdown, element wyników `Text` (markdown) i `Svg`,
