@@ -25,6 +25,64 @@ echo "jUPWR $JUPWR (jamovi $(cat version))"
 NSIS="$(awk '/^[[:space:]]*!define VERSION / {gsub(/"/, "", $3); print $3}' packaging/scripts/windows/jUPWR.nsi)"
 [ -n "$JUPWR" ] && [ "$JUPWR" = "$NSIS" ] && ok "Windows NSIS = $NSIS" || bad "wersja NSIS ($NSIS) != jupwr.ts ($JUPWR)"
 
+# linia wydań (packaging/CHANNELS.md): gałąź, seria wersji, jamovi, submoduły, poprawki ze stable
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+SERIES="${JUPWR%.*}"
+RELEASES="$(git branch -r --list 'origin/release/*' --format='%(refname:short)' | sed 's#^origin/release/##' | sort -V)"
+case "$BRANCH" in
+    release/*)
+        [ "$SERIES" = "${BRANCH#release/}" ] && ok "gałąź $BRANCH, wersja z serii $SERIES" \
+            || bad "gałąź $BRANCH, ale wersja $JUPWR (oczekiwana seria ${BRANCH#release/}.x)" ;;
+    main)
+        low=""
+        for s in $RELEASES; do
+            top="$(printf '%s\n%s\n' "$s" "$SERIES" | sort -V | tail -1)"
+            { [ "$top" != "$SERIES" ] || [ "$s" = "$SERIES" ]; } && low="$low $s"
+        done
+        [ -z "$low" ] && ok "gałąź main, seria $SERIES wyższa niż release/*" \
+            || bad "gałąź main z wersją $JUPWR — seria nie wyższa niż release/:$low" ;;
+    *) bad "gałąź $BRANCH nie jest linią wydań (main / release/*) — patrz packaging/CHANNELS.md" ;;
+esac
+
+JAMOVI="$(cat version)"
+CH_JAMOVI="$(awk -F '|' -v b="\`$BRANCH\`" '
+    {g=$3; gsub(/^[[:space:]]+|[[:space:]]+$/, "", g)}
+    g == b {j=$5; gsub(/^[[:space:]]+|[[:space:]]+$/, "", j); print j; exit}' packaging/CHANNELS.md)"
+case "$JAMOVI" in
+    "$CH_JAMOVI".*) [ -n "$CH_JAMOVI" ] && ok "jamovi $JAMOVI zgodne z CHANNELS.md ($CH_JAMOVI)" \
+        || bad "brak wiersza gałęzi $BRANCH w packaging/CHANNELS.md" ;;
+    *) bad "jamovi $JAMOVI, a CHANNELS.md podaje dla $BRANCH: ${CH_JAMOVI:-brak wiersza}" ;;
+esac
+
+# wskaźnik submodułu musi leżeć na gałęzi, którą .gitmodules tej linii każe śledzić —
+# inaczej świeży klon padnie, gdy tamta gałąź zostanie usunięta
+for key in $(git config -f .gitmodules --name-only --get-regexp '^submodule\..*\.path$'); do
+    name="${key#submodule.}"; name="${name%.path}"
+    path="$(git config -f .gitmodules "submodule.$name.path")"
+    sbranch="$(git config -f .gitmodules "submodule.$name.branch")"
+    ptr="$(git ls-tree HEAD "$path" | awk '{print $3}')"
+    if [ ! -e "$path/.git" ]; then bad "submoduł $path niezainicjowany (git submodule update --init)"; continue; fi
+    git -C "$path" fetch -q origin "$sbranch" 2>/dev/null
+    git -C "$path" merge-base --is-ancestor "$ptr" "origin/$sbranch" 2>/dev/null \
+        && ok "submoduł $path: ${ptr:0:8} na origin/$sbranch" \
+        || bad "submoduł $path: ${ptr:0:8} nie leży na origin/$sbranch"
+done
+
+# na main: commity z najnowszej release/* bez odpowiednika (ten sam patch albo cherry-pick -x)
+# i bez linii „Tylko-stable:”
+if [ "$BRANCH" = main ] && [ -n "$RELEASES" ]; then
+    rel="origin/release/$(echo "$RELEASES" | tail -1)"
+    picked="$(git log --format=%B HEAD | grep -oE 'cherry picked from commit [0-9a-f]{40}' | awk '{print $5}')"
+    missing=""
+    for c in $(git cherry HEAD "$rel" | awk '$1 == "+" {print $2}'); do
+        git log -1 --format=%B "$c" | grep -q '^Tylko-stable:' && continue
+        echo "$picked" | grep -qx "$c" && continue
+        missing="$missing ${c:0:8}"
+    done
+    [ -z "$missing" ] && ok "poprawki z $rel przeniesione na main" \
+        || bad "commity z $rel bez odpowiednika na main:$missing (cherry-pick -x albo 'Tylko-stable:')"
+fi
+
 # listy modułów wbudowanych w trzech buildach
 # Only the jmv stage supplies preinstalled modules; optional artifact stages do not.
 DOCKER="$(awk '/^FROM / { bundled = ($0 ~ / AS jmv$/) } bundled { print }' docker/jamovi-Dockerfile | grep -oE '^COPY \$JAMOVI_ROOT/[A-Za-z]+/ /tmp/source/' | grep -oE 'ROOT/[A-Za-z]+' | cut -d/ -f2 | sort | tr '\n' ' ')"
