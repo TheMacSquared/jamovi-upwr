@@ -101,7 +101,11 @@ class ViewController extends EventEmitter {
         ActionHub.get('transform').on('request', () => {
             this._insertFromSelectedColumns((item, column) => {
                 item.columnType = ColumnType.RECODED;
-                item.parentId = column.id;
+                // jUPWR: an empty column is converted in place, so it would
+                // become its own source (a circular reference); leave the
+                // source unset and let the rule builder pick one
+                if (column.columnType !== ColumnType.NONE)
+                    item.parentId = column.id;
             }, 'right');
         });
 

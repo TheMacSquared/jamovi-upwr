@@ -651,12 +651,18 @@ class Column:
                     if trans.status == FormulaStatus.ERROR:
                         trans_name = trans.name
                         trans_error = True
-                    if self._parent_id != 0:
+                    if trans.is_rules:
+                        # jUPWR: rules don't depend on the source column
+                        self.formula = trans.produce_formula(None)
+                    elif self._parent_id != 0 and self._parent_id != self.id:
                         parent = dataset.get_column_by_id(self._parent_id)
                         self.formula = trans.produce_formula(parent)
                     else:
                         self.formula = ''
-                elif self._parent_id != 0:
+                # jUPWR: a column that is its own source (an empty column
+                # turned into a transform in place) stays empty instead of
+                # reporting a circular reference
+                elif self._parent_id != 0 and self._parent_id != self.id:
                     parent = dataset.get_column_by_id(self._parent_id)
                     self.formula = '`{0}`'.format(parent.name)
                 else:

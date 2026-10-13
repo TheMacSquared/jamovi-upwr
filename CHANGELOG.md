@@ -8,6 +8,12 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - Zmienna przekształcona nominalna/porządkowa: etykiety tekstowe w kolejności
   reguł niezależnie od (ukrytej) zmiennej źródłowej; wcześniej przy źródle
   ciągłym sortowane po kodach znaków („średnia” za „wysoka”).
+- Zmienna przekształcona z regułami liczona bez ukrytej zmiennej źródłowej:
+  brak danych w źródle nie daje już braku w wyniku, nie powstaje odwołanie
+  cykliczne przez źródło (także przy „Przekształcenie” na pustej kolumnie),
+  a poziom pomiaru nie zależy od źródła. Lista poziomów pomiaru bez
+  „Automatyczny”: nowa zmienna domyślnie nominalna, stare pliki pokazują typ
+  faktycznie nadany kolumnie.
 - jRISK 0.4.1 (moduł opcjonalny): czytelne drzewo częstości („Zdarzenia
   i warunkowanie”) i diagram drzewa błędów (FTA) — węzły na tle wykresu
   z ciemnym tekstem (kolor palety tylko na ramce, także w ciemnym motywie),

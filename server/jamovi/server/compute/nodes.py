@@ -482,15 +482,15 @@ class Call(ast.Call, Node):
                 dt = DataType.TEXT
                 break
 
-        if self.func.id == '_RECODE_CONT':
+        if self.func.id in ('_RECODE_CONT', '_RULES_CONT'):
             if dt == DataType.TEXT:
                 dt = DataType.DECIMAL
             mt = MeasureType.CONTINUOUS
-        elif self.func.id == '_RECODE_NOM':
+        elif self.func.id in ('_RECODE_NOM', '_RULES_NOM'):
             if dt == DataType.DECIMAL:
                 dt = DataType.TEXT
             mt = MeasureType.NOMINAL
-        elif self.func.id == '_RECODE_ORD':
+        elif self.func.id in ('_RECODE_ORD', '_RULES_ORD'):
             if dt == DataType.DECIMAL:
                 dt = DataType.TEXT
             mt = MeasureType.ORDINAL
@@ -548,34 +548,12 @@ class Call(ast.Call, Node):
             return [ ]
 
         source = self.args[0]
+        if self.func.id in ('_RULES', '_RULES_NOM', '_RULES_ORD'):
+            # jUPWR: rules -- the whole IF chain is the only argument
+            return self._rule_levels(row_count, [ 0 ])
         if ((self.func.id == '_RECODE_ORD' or self.func.id == '_RECODE_NOM')
                 and source.measure_type == MeasureType.CONTINUOUS):
-            values = self.fvalues(row_count, False)
-            values = [ v for v in values if not is_missing(v) ]
-            texts = set(v for v in values if isinstance(v, str))
-            if len(texts) == 0:
-                levels = sorted(values)
-                levels = map(lambda x: convert(x, str), levels)
-                return enumerate(levels)
-            # jUPWR: text labels keep the order of the recode rules (as with
-            # the automatic measure type); sorting them by code point put
-            # 'średnia' after 'wysoka'. Values passed through from the
-            # source follow, sorted numerically.
-            levels = [ ]
-            for arg_i in arg_level_indices:
-                if arg_i == 0 or arg_i >= len(self.args):
-                    continue
-                arg = self.args[arg_i]
-                if not arg.has_levels:
-                    continue
-                for level in arg.get_levels(row_count, False):
-                    if level[1] in texts and level[1] not in levels:
-                        levels.append(level[1])
-            numbers = sorted(set(v for v in values if not isinstance(v, str)))
-            for value in sorted(texts) + [ convert(v, str) for v in numbers ]:
-                if value not in levels:
-                    levels.append(value)
-            return enumerate(levels)
+            return self._rule_levels(row_count, arg_level_indices[1:])
 
         level_use = OrderedDict()
 
@@ -597,6 +575,34 @@ class Call(ast.Call, Node):
 
         levels = filter(lambda k: level_use[k] > 0, level_use)
 
+        return enumerate(levels)
+
+    def _rule_levels(self, row_count, label_args):
+        values = self.fvalues(row_count, False)
+        values = [ v for v in values if not is_missing(v) ]
+        texts = set(v for v in values if isinstance(v, str))
+        if len(texts) == 0:
+            levels = sorted(set(values))
+            levels = map(lambda x: convert(x, str), levels)
+            return enumerate(levels)
+        # jUPWR: text labels keep the order of the recode rules (as with
+        # the automatic measure type); sorting them by code point put
+        # 'średnia' after 'wysoka'. Values passed through from a column
+        # follow, sorted numerically.
+        levels = [ ]
+        for arg_i in label_args:
+            if arg_i >= len(self.args):
+                continue
+            arg = self.args[arg_i]
+            if not arg.has_levels:
+                continue
+            for level in arg.get_levels(row_count, False):
+                if level[1] in texts and level[1] not in levels:
+                    levels.append(level[1])
+        numbers = sorted(set(v for v in values if not isinstance(v, str)))
+        for value in sorted(texts) + [ convert(v, str) for v in numbers ]:
+            if value not in levels:
+                levels.append(value)
         return enumerate(levels)
 
     @property
