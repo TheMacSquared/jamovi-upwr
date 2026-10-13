@@ -75,8 +75,13 @@ if [ "$BRANCH" = main ] && [ -n "$RELEASES" ]; then
     picked="$(git log --format=%B HEAD | grep -oE 'cherry picked from commit [0-9a-f]{40}' | awk '{print $5}')"
     missing=""
     for c in $(git cherry HEAD "$rel" | awk '$1 == "+" {print $2}'); do
-        git log -1 --format=%B "$c" | grep -q '^Tylko-stable:' && continue
+        body="$(git log -1 --format=%B "$c")"
+        echo "$body" | grep -q '^Tylko-stable:' && continue
         echo "$picked" | grep -qx "$c" && continue
+        # kierunek main -> stable: commit ze stable sam jest cherry-pickiem commita z main
+        # (patch-id się różni, gdy przy przenoszeniu rozwiązano konflikt)
+        src="$(echo "$body" | grep -oE 'cherry picked from commit [0-9a-f]{40}' | awk '{print $5}' | tail -1)"
+        [ -n "$src" ] && git merge-base --is-ancestor "$src" HEAD 2>/dev/null && continue
         missing="$missing ${c:0:8}"
     done
     [ -z "$missing" ] && ok "poprawki z $rel przeniesione na main" \
