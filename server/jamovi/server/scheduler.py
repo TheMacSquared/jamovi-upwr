@@ -156,6 +156,8 @@ class Scheduler:
                     status = Analysis.Status.INITED
                 else:
                     status = Analysis.Status.COMPLETE
+                    # the engine has now written state of its own
+                    analysis.state_dropped = False
 
                 analysis.set_results(results, status=status)
 
@@ -203,7 +205,7 @@ class Scheduler:
             request_pb.options.CopyFrom(analysis.options.as_pb())
             request_pb.changed.extend(analysis.changes)
             request_pb.revision = analysis.revision
-            request_pb.clearState = analysis.clear_state
+            request_pb.clearState = analysis.clear_state or analysis.state_dropped
 
             if perform == 'init':
                 request_pb.perform = PERFORM_INIT

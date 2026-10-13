@@ -549,8 +549,12 @@ def read(data, path, prog_cb, **kwargs):
 
         for entry in zip.infolist():
             if is_analysis.match(entry.filename):
-                zip.extract(entry, data.instance_path)
                 serial = zip.read(entry.filename)
-                data.analyses.create_from_serial(serial)
+                analysis = data.analyses.create_from_serial(serial)
+                # the engine reads the analysis back from this file, so it
+                # must be written without the state (see create_from_serial())
+                extracted_path = zip.extract(entry, data.instance_path)
+                with open(extracted_path, 'wb') as file:
+                    file.write(analysis.results.SerializeToString())
             elif is_resource.match(entry.filename):
                 zip.extract(entry, data.instance_path)

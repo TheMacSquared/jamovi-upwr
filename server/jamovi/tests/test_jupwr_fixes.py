@@ -51,3 +51,100 @@ def test_rule_levels_category_and_text(rules_model: InstanceModel):
     assert r.formula_message == ''
     assert [ level[1] for level in r.levels ] == [ 'kot', 'pies', 'inny' ]
     assert [ r[i] for i in range(3) ] == [ 'pies', 'kot', 'inny' ]
+
+
+# upstream jamovi 28.13 (dcfbcbd6): the analysis state is not restored from
+# .omv files -- R's serialization runs whatever code a crafted file holds.
+# The tests are those of upstream, without its svg fixtures (28.13 only).
+
+import asyncio
+
+import pytest
+
+from jamovi.server import jamovi_pb2 as jcoms
+from jamovi.server.analyses import Analysis, Analyses
+from jamovi.server.options import Options
+
+
+class _FakeDataset:
+    def __init__(self, instance_path):
+        self.instance_path = instance_path
+
+
+class _FakeModules:
+    def add_listener(self, listener):
+        pass
+
+
+class _FakeParent:
+    def _notify_options_changed(self, analysis):
+        pass
+
+    def _notify_results_changed(self, analysis):
+        pass
+
+    def index_of(self, analysis):
+        return 0
+
+
+def test_state_is_dropped_from_files(temp_dir):
+    analysis_pb = jcoms.AnalysisResponse()
+    analysis_pb.name = 'empty'
+    analysis_pb.ns = 'jmv'
+    analysis_pb.results.state = b'top'
+
+    image_pb = analysis_pb.results.group.elements.add()
+    image_pb.name = 'plot'
+    image_pb.state = b'plot'
+    image_pb.image.path = '01 empty/resources/plot.png'
+
+    array_pb = analysis_pb.results.group.elements.add()
+    array_pb.name = 'array'
+    array_pb.array.header.state = b'header'
+    item_pb = array_pb.array.elements.add()
+    item_pb.group.elements.add().state = b'nested'
+
+    analyses = Analyses(_FakeDataset(temp_dir), _FakeModules())
+    analysis = analyses.create_from_serial(analysis_pb.SerializeToString())
+
+    results_pb = analysis.results.results
+    assert results_pb.state == b''
+    assert results_pb.group.elements[0].state == b''
+    assert results_pb.group.elements[1].array.header.state == b''
+    assert results_pb.group.elements[1].array.elements[0].group.elements[0].state == b''
+    # the image still displays from the file
+    assert results_pb.group.elements[0].image.path == '01 empty/resources/plot.png'
+    # and the analysis runs from scratch before anything needs the state
+    assert analysis.state_dropped is True
+
+
+@pytest.mark.asyncio
+async def test_export_runs_the_analysis_first(temp_dir):
+    analysis = Analysis(
+        _FakeDataset(temp_dir), 2, 'descriptives', 'jmv', Options.create({}), _FakeParent(), enabled=True)
+    analysis.results = jcoms.AnalysisResponse()
+    analysis.complete = True
+    analysis.set_status(Analysis.Status.COMPLETE)
+    analysis.state_dropped = True
+
+    save = asyncio.create_task(analysis.save('/tmp/plot.png', 'plot'))
+    await asyncio.sleep(0)
+
+    assert analysis.complete is False
+    assert analysis.status is Analysis.Status.NONE
+    assert analysis.clear_state is True
+    assert analysis.needs_op is False
+
+    # neither the init, nor the results streamed during the run, release it
+    analysis.set_results(jcoms.AnalysisResponse(), status=Analysis.Status.INITED)
+    analysis.set_results(jcoms.AnalysisResponse(), False)
+    await asyncio.sleep(0)
+    assert analysis.needs_op is False
+
+    # the run completing does
+    analysis.set_results(jcoms.AnalysisResponse(), status=Analysis.Status.COMPLETE)
+    await asyncio.sleep(0)
+    assert analysis.needs_op is True
+
+    analysis.op.set_result(None)
+    await save
