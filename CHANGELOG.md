@@ -31,6 +31,11 @@ Windows i macOS zbudowane, aplikacje uruchamiają się; w trakcie testów.
 - Zmienna przekształcona nominalna/porządkowa: etykiety tekstowe w kolejności
   reguł niezależnie od (ukrytej) zmiennej źródłowej; wcześniej przy źródle
   ciągłym sortowane po kodach znaków („średnia” za „wysoka”).
+- jRISK 0.4.1 (moduł opcjonalny): czytelne drzewo częstości („Zdarzenia
+  i warunkowanie”) i diagram drzewa błędów (FTA) — węzły na tle wykresu
+  z ciemnym tekstem (kolor palety tylko na ramce, także w ciemnym motywie),
+  większa czcionka; diagram FTA rozszerza się z liczbą zdarzeń elementarnych,
+  więc etykiety liści się nie nakładają.
 
 ## 1.0.7 — 2026-10-11
 Licencje zbiorów danych w dokumentacji biblioteki, uporządkowany zestaw zbiorów

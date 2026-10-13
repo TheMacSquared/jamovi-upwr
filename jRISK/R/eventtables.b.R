@@ -146,23 +146,28 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         y = c(0, 1, -1, 1.5, 0.5, -0.5, -1.5),
         label = c(
           paste("n =", s$n),
-          paste("A\n", s$nA), paste("nie-A\n", s$nnA),
-          paste("A ∩ B\n", s$nAB), paste("A ∩ nie-B\n", s$nAnB),
-          paste("nie-A ∩ B\n", s$nnAB), paste("nie-A ∩ nie-B\n", s$nnAnB)))
+          paste0("A\n", s$nA), paste0("nie-A\n", s$nnA),
+          paste0("A ∩ B\n", s$nAB), paste0("A ∩ nie-B\n", s$nAnB),
+          paste0("nie-A ∩ B\n", s$nnAB), paste0("nie-A ∩ nie-B\n", s$nnAnB)))
       edges <- data.frame(
         x = c(0, 0, 1, 1, 1, 1),
         y = c(0, 0, 1, 1, -1, -1),
         xend = c(1, 1, 2, 2, 2, 2),
         yend = c(1, -1, 1.5, 0.5, -0.5, -1.5))
 
+      # Neutral panel fill keeps the text readable in every theme; the
+      # palette colour only marks the node borders
+      Border <- jmvcore::colorPalette(1, theme$palette, 'color')
+
       Plot <- ggplot() +
         geom_segment(data = edges, aes(x = x, y = y, xend = xend, yend = yend),
-                     colour = "grey60") +
+                     colour = "grey55", linewidth = 0.6) +
         geom_label(data = nodes, aes(x = x, y = y, label = label),
-                   fill = theme$fill[2], colour = theme$color[1], label.size = 0.3, size = 3.6,
-                   lineheight = 0.9) +
+                   fill = theme$fill[1], text.colour = theme$color[1],
+                   border.colour = Border, linewidth = 0.7, size = 5,
+                   lineheight = 0.95, label.padding = unit(0.35, "lines")) +
         theme_void() +
-        coord_cartesian(xlim = c(-0.3, 2.4))
+        coord_cartesian(xlim = c(-0.35, 2.45), ylim = c(-1.75, 1.75))
 
       print(Plot)
       TRUE
