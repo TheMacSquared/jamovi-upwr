@@ -32,6 +32,7 @@ PBS_PY="$PBS_DIR/python/bin/python3"
 log "Instalacja requirements do python-build-standalone ..."
 "$PBS_PY" -m pip install --upgrade pip wheel setuptools >/dev/null
 "$PBS_PY" -m pip install -r "$REPO_ROOT/server/requirements.txt" >/dev/null
+pip_nanomsg_fresh "$PBS_PY"
 "$PBS_PY" -m pip install --upgrade protobuf >/dev/null   # >= gencode protoc (patrz 30-server.sh)
 
 log "Podmiana Pythona w .app na relokowalny ..."
@@ -66,8 +67,9 @@ CORE_SO=$(find "$JRES/server" -name "core.cpython-*-darwin.so" | head -1)
 [ -n "$CORE_SO" ] && collect "$CORE_SO"
 # .so pakietów R (RProtoBuf linkuje protobuf/abseil — musi dzielić je z silnikiem)
 while IFS= read -r so; do collect "$so"; done < <(find "$JRES/modules" "$JRES/R/library" -name "*.so" 2>/dev/null | grep -iE "RProtoBuf" )
-# nanomsg bywa pod /opt/homebrew/opt — upewnij się, że jest
-[ -f "$LIBS/libnanomsg.6.dylib" ] || cp "$(readlink -f "$BREW_PREFIX/lib/libnanomsg.6.dylib")" "$LIBS/libnanomsg.6.dylib" 2>/dev/null || true
+# rozszerzenie Pythona nanomsg linkuje libnanomsg.<soname> z Homebrew — bierzemy
+# wersję, z którą faktycznie je zbudowano, a nie soname wpisane na sztywno
+while IFS= read -r so; do collect "$so"; done < <(find "$JRES/python" -name "_nanomsg_cpy*.so" 2>/dev/null)
 log "Zebrano $(ls "$LIBS" | wc -l | tr -d ' ') dylibów ($(du -sh "$LIBS" | cut -f1))"
 
 # ---------------------------------------------------------------------------

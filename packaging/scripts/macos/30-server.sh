@@ -25,6 +25,7 @@ PY="$PYVENV/bin/python"
 
 log "Instalacja requirements serwera ..."
 "$PY" -m pip install -r "$REPO_ROOT/server/requirements.txt"
+pip_nanomsg_fresh "$PY"
 
 # protobuf (python) MUSI być >= gencode generowanego przez brew protoc (inaczej VersionError
 # przy starcie: "gencode 7.35.1 runtime 7.34.0"). UWAGA: PyPI używa innego schematu niż protoc
