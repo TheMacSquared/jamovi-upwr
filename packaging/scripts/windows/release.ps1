@@ -102,6 +102,21 @@ if ($LASTEXITCODE -ne 0) {
 }
 Info "OK (log: $log)"
 
+# --- drzewo po buildzie ----------------------------------------------------------
+# jmc zapisuje CRLF w regenerowanych *.h.R / *.u.yaml; .gitattributes normalizuje je do
+# LF, wiec tresc jest ta sama, ale wpis w indeksie bywa nieaktualny i `git status`
+# pokazuje "m jmv" przy pustym diffie (update-index --refresh nie pomaga). Odswiezamy
+# sam indeks submodulow - pliki na dysku bez zmian, prawdziwe zmiany zostaja widoczne.
+Step "Drzewo po buildzie"
+Git submodule foreach --recursive --quiet "git add --renormalize . && git reset -q" | Out-Null
+$dirty = Git status --porcelain
+if ($dirty) {
+    Write-Warning "Zmiany w drzewie po buildzie (artefakty builda albo jmc - nie commitowac):"
+    $dirty | ForEach-Object { Write-Host "      $_" -ForegroundColor Yellow }
+} else {
+    Info "czyste"
+}
+
 # --- instalator NSIS ----------------------------------------------------------
 if (-not $SkipNsis) {
     Step "Instalator NSIS"
