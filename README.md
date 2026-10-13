@@ -77,8 +77,8 @@ Wersja dystrybucji: [`client/common/jupwr.ts`](client/common/jupwr.ts).
 ## Uruchomienie (Docker)
 
 ```bash
-git clone https://github.com/TheMacSquared/jamovi-upwr.git
-cd jamovi-upwr
+git clone https://github.com/TheMacSquared/jamovi-upwr.git jamovi-upwr-latest
+cd jamovi-upwr-latest
 git submodule update --init --recursive
 docker compose --profile main build
 docker compose --profile main up
