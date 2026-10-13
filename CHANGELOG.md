@@ -48,6 +48,24 @@ Windows i macOS zbudowane, aplikacje uruchamiają się.
 - Kompilator: moduły zbudowane nowym `jmc` wymagają jamovi ≥ 28.4, więc nie
   zainstalują się w jUPWR 1.0.x.
 
+## 1.0.8 — 2026-10-13
+Poprawki zmiennej przekształconej (reguły „jeżeli … użyj …”) i jRISK 0.4.1.
+
+- Zmienna przekształcona nominalna/porządkowa: etykiety tekstowe w kolejności
+  reguł niezależnie od (ukrytej) zmiennej źródłowej; wcześniej przy źródle
+  ciągłym sortowane po kodach znaków („średnia” za „wysoka”).
+- Zmienna przekształcona z regułami liczona bez ukrytej zmiennej źródłowej:
+  brak danych w źródle nie daje już braku w wyniku, nie powstaje odwołanie
+  cykliczne przez źródło (także przy „Przekształcenie” na pustej kolumnie),
+  a poziom pomiaru nie zależy od źródła. Lista poziomów pomiaru bez
+  „Automatyczny”: nowa zmienna domyślnie nominalna, stare pliki pokazują typ
+  faktycznie nadany kolumnie.
+- jRISK 0.4.1 (moduł opcjonalny): czytelne drzewo częstości („Zdarzenia
+  i warunkowanie”) i diagram drzewa błędów (FTA) — węzły na tle wykresu
+  z ciemnym tekstem (kolor palety tylko na ramce, także w ciemnym motywie),
+  większa czcionka; diagram FTA rozszerza się z liczbą zdarzeń elementarnych,
+  więc etykiety liści się nie nakładają.
+
 ## 1.0.7 — 2026-10-11
 Licencje zbiorów danych w dokumentacji biblioteki, uporządkowany zestaw zbiorów
 w jDane, drobne poprawki w jEksplor i uproszczone wykresy pomocnicze.
