@@ -134,6 +134,8 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             event = evLabels[i], prob = pEv[i], drop = imp[i]))
       }
 
+      # ~120 px per leaf so the leaf labels never overlap
+      self$results$diagram$setSize(max(640, 120 * length(labels) + 60), 420)
       self$results$diagram$setState(list(
         labels = labels, probs = probs, branch = as.character(branch),
         innerGate = gateLabel[[innerGate]], topGate = gateLabel[[topGate]],
@@ -144,8 +146,9 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       s <- image$state
       if (is.null(s))
         return(FALSE)
-      # Palette fills: leaves (1st), top event (2nd); gates keep neutral fill
-      Fill <- jmvcore::colorPalette(2, theme$palette, 'fill')
+      # Neutral panel fill keeps the text readable in every theme; palette
+      # colours only mark the borders: leaves (1st), top event (2nd)
+      Border <- jmvcore::colorPalette(2, theme$palette, 'color')
 
       branches <- unique(s$branch)
       nB <- length(branches)
@@ -173,16 +176,20 @@ ftaClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       Plot <- ggplot() +
         geom_segment(data = edges, aes(x = x, y = y, xend = xend, yend = yend),
-                     colour = "grey60") +
+                     colour = "grey55", linewidth = 0.6) +
         geom_label(data = leaves, aes(x = x, y = y, label = label),
-                   fill = Fill[1], colour = theme$color[1], label.size = 0.3, size = 3.2,
-                   lineheight = 0.9) +
+                   fill = theme$fill[1], text.colour = theme$color[1],
+                   border.colour = Border[1], linewidth = 0.7, size = 4.4,
+                   lineheight = 0.95, label.padding = unit(0.35, "lines")) +
         geom_label(data = gates, aes(x = x, y = y, label = label),
-                   fill = theme$fill[1], colour = theme$color[1], label.size = 0.3, size = 3.4,
-                   lineheight = 0.9) +
+                   fill = theme$fill[1], text.colour = theme$color[1],
+                   border.colour = "grey55", linewidth = 0.7, size = 4.6,
+                   lineheight = 0.95, label.padding = unit(0.35, "lines")) +
         geom_label(data = top, aes(x = x, y = y, label = label),
-                   fill = Fill[2], colour = theme$color[1], label.size = 0.4, size = 3.6,
-                   lineheight = 0.9) +
+                   fill = theme$fill[1], text.colour = theme$color[1],
+                   border.colour = Border[2], linewidth = 1.2, size = 5,
+                   fontface = "bold", lineheight = 0.95,
+                   label.padding = unit(0.4, "lines")) +
         theme_void() +
         coord_cartesian(xlim = c(0.4, max(leafX) + 0.6),
                         ylim = c(-0.4, 2.8))
