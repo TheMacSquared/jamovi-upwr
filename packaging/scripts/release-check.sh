@@ -29,6 +29,13 @@ NSIS="$(awk '/^[[:space:]]*!define VERSION / {gsub(/"/, "", $3); print $3}' pack
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 SERIES="${JUPWR%.*}"
 RELEASES="$(git branch -r --list 'origin/release/*' --format='%(refname:short)' | sed 's#^origin/release/##' | sort -V)"
+# lokalna gałąź za origin (np. fetch w trakcie buildu): porównania z origin/release/*
+# niżej dałyby fałszywe „bez odpowiednika”, a build nie obejmuje najnowszych commitów
+if [ "$BRANCH" != HEAD ] && git rev-parse -q --verify "origin/$BRANCH" >/dev/null; then
+    behind="$(git rev-list --count "HEAD..origin/$BRANCH")"
+    [ "$behind" = 0 ] && ok "HEAD aktualny względem origin/$BRANCH" \
+        || bad "HEAD za origin/$BRANCH o $behind commit(y/ów): git pull i powtórz build (porównania z origin/* niżej mogą fałszywie alarmować)"
+fi
 case "$BRANCH" in
     release/*)
         [ "$SERIES" = "${BRANCH#release/}" ] && ok "gałąź $BRANCH, wersja z serii $SERIES" \
