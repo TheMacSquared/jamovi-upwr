@@ -68,6 +68,12 @@ git -C jamovi-upwr-latest worktree list      # dwie pozycje: latest [main], stab
 
 Inne dawne worktree (np. `jamovi-upwr-28.11`) usuwa się tak samo: `rm -rf` + `prune`.
 
+Tylko Windows: worktree `jamovi-upwr-legacy` (`legacy/win81`) zostaje na miejscu.
+Po przemianowaniu głównego klonu: `git -C jamovi-upwr-latest worktree repair
+../jamovi-upwr-legacy`, a submoduły trzeba poprawić ręcznie: w pliku `.git`
+każdego submodułu ścieżkę `../../jamovi-upwr/.git/worktrees/...` zamienić na
+`../../jamovi-upwr-latest/.git/worktrees/...` (sam `worktree repair` tego nie robi).
+
 Potem w `jamovi-upwr-latest` usuń `packaging/build` i `node_modules` (klient, electron,
 jamovi-compiler, i18n) — cache CMake, venv i linki w `.bin` mają zaszyte stare ścieżki;
 następny build odtworzy je od zera (stable jest świeży). `node_modules` z builda Dockera
