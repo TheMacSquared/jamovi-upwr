@@ -74,6 +74,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.0.8 | 28.2 | 0.4.1 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.0.7 | 28.2 | 0.4.1 | ✅ 2026-10-13 | ✅ 2026-10-13 |
 | 1.0.7 | 28.2 | 0.4.0 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.4.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
@@ -105,6 +106,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.0.8 | 28.2 | 0.3.2 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.0.7 | 28.2 | 0.3.2 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.3.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
@@ -132,6 +134,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.0.8 | 28.2 | 0.1.3 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.0.7 | 28.2 | 0.1.3 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.1.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.1.2 | ✅ 2026-09-18 | ✅ 2026-09-18 |
@@ -150,6 +153,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 
 | jUPWR | jamovi | jPomiar | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.0.8 | 28.2 | 0.3.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.0.7 | 28.2 | 0.3.0 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.3.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.3.0 | ✅ 2026-09-18 | ✅ 2026-09-18 |
@@ -163,6 +167,7 @@ Docker sprawdzony przy wydaniu 1.0.7 (2026-10-11).
 
 | jUPWR | jamovi | jWody | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.0.8 | 28.2 | 0.1.1 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.0.7 | 28.2 | 0.1.1 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.1.1 | ✅ 2026-10-03 | ✅ 2026-10-03 |
 | 1.0.5 | 28.2 | 0.1.1 | ✅ 2026-09-28, arm64; testy artefaktu | ✅ 2026-10-03 |

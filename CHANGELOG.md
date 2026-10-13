@@ -5,6 +5,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+## 1.0.8 — 2026-10-13
+Poprawki zmiennej przekształconej (reguły „jeżeli … użyj …”) i jRISK 0.4.1.
+
 - Zmienna przekształcona nominalna/porządkowa: etykiety tekstowe w kolejności
   reguł niezależnie od (ukrytej) zmiennej źródłowej; wcześniej przy źródle
   ciągłym sortowane po kodach znaków („średnia” za „wysoka”).
