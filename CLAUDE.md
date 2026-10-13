@@ -14,7 +14,8 @@ Aplikacja dostępna pod http://127.0.0.1:41337 po zbudowaniu.
 - Każdą poprawkę stąd przenieś na `main` przez `git cherry-pick -x`; commit
   z założenia tylko dla stable oznacz linią `Tylko-stable: <powód>`.
 - Submoduły jmv, plots, i18n śledzą tu gałąź `release/1.0` w swoich repozytoriach.
-- Pracuj w katalogu worktree tej linii, nie przełączaj gałęzi w miejscu.
+- Ten katalog to `jamovi-upwr-stable` (latest: `jamovi-upwr-latest`); nie przełączaj
+  gałęzi w miejscu poza zmianą linii stable opisaną w CHANNELS.md.
 - Pełne zasady, układ katalogów i checklista wydania: `packaging/CHANNELS.md`.
 
 ## Architektura — co gdzie jest

@@ -31,24 +31,55 @@ Gałęzi w forkach nie usuwa się, dopóki wskazuje na nie którykolwiek wydany 
 
 Nigdy nie przełączaj linii przez `git checkout` w jednym katalogu: zostają artefakty
 builda (`packaging/build`, `node_modules`, `engine/jamovi-engine.exe`) i submoduły
-z poprzedniej linii. Każda linia ma własny worktree:
+z poprzedniej linii. Każda linia ma własny worktree, nazwany od KANAŁU (nie od wersji),
+więc nazwy katalogów się nie zmieniają:
 
 ```
-<repo>/            main          (latest)
-<repo>-1.0/        release/1.0   (stable)
+jamovi-upwr-latest/    main          (główny klon, w nim jest .git)
+jamovi-upwr-stable/    release/1.0   (worktree; gałąź zmienia się przy zmianie stable)
 ```
 
-Jednorazowo na każdej maszynie (Linux/WSL, macOS, Windows — ścieżki analogiczne):
+Jednorazowo na nowej maszynie (Linux/WSL, macOS, Windows — ścieżki analogiczne):
 
 ```
-cd <repo>
-git fetch origin
-git checkout main && git pull --ff-only
+git clone --recurse-submodules https://github.com/TheMacSquared/jamovi-upwr.git jamovi-upwr-latest
+cd jamovi-upwr-latest
+git worktree add ../jamovi-upwr-stable release/1.0
+cd ../jamovi-upwr-stable
 git submodule update --init --recursive
-git worktree add ../<repo>-1.0 release/1.0
-cd ../<repo>-1.0
-git submodule update --init --recursive
 ```
+
+Przemianowanie dawnego układu (`jamovi-upwr` + `jamovi-upwr-1.0`), przy zatrzymanym
+Dockerze i bez trwającego buildu, z katalogu nadrzędnego:
+
+```
+mv jamovi-upwr jamovi-upwr-latest
+git -C jamovi-upwr-latest worktree repair ../jamovi-upwr-1.0
+git -C jamovi-upwr-latest worktree move ../jamovi-upwr-1.0 ../jamovi-upwr-stable
+```
+
+Potem w obu katalogach usuń `packaging/build` i `node_modules` (klient, electron,
+jamovi-compiler, i18n) — cache CMake, venv i linki w `.bin` mają zaszyte stare ścieżki;
+następny build odtworzy je od zera. Pamięć Claude Code jest przypisana do ścieżki
+(`~/.claude/projects/<ścieżka z myślnikami>/`): przenieś ten katalog pod nazwę wynikającą
+z nowej ścieżki, inaczej agent zacznie bez pamięci.
+
+### Zmiana linii stable (np. release/1.0 → release/1.1)
+
+Jedyny moment, gdy katalog zmienia gałąź w miejscu — rzadki i jednokierunkowy:
+
+```
+cd jamovi-upwr-stable
+git status                      # musi być czysto
+git fetch origin && git switch release/1.1
+git submodule update --init --recursive
+rm -rf packaging/build client/node_modules electron/node_modules \
+       jamovi-compiler/node_modules i18n/node_modules
+```
+
+Poprawka do zamrożonej linii robi się w tymczasowym worktree
+(`git worktree add ../jamovi-upwr-1.0 release/1.0`), usuwanym po wydaniu
+(`git worktree remove`).
 
 Kontener Dockera ma stałą nazwę `jamovi` i stałe porty — nie uruchamiaj obu linii
 naraz (`docker compose --profile main down` przed przejściem do drugiego katalogu).
