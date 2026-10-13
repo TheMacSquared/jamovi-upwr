@@ -533,3 +533,18 @@ _RECODE_NOM = RECODE
 _RECODE_ORD = RECODE
 _RECODE_CONT = RECODE
 _RECODE_ID  = RECODE
+
+
+# jUPWR: a transformed variable built from rules ("jeżeli … użyj …") is
+# computed from the rules alone, without the source column that upstream
+# transforms recode; the suffix carries the chosen measure type
+@row_wise
+@returns(DataType.INTEGER, MeasureType.NOMINAL, [0])
+@levels([0])
+def _RULES(index, x):
+    return x
+
+
+_RULES_NOM = _RULES
+_RULES_ORD = _RULES
+_RULES_CONT = _RULES

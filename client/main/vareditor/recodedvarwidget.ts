@@ -74,13 +74,13 @@ class RecodedVarWidget extends HTMLElement {
         $top.append(h('label', { for: id3, class: 'measure-label' }, _('Measure type')));
         this.$measureIcon = h('div', { class: 'recoded-measure-icon' });
         $top.append(this.$measureIcon);
+        // jUPWR: no 'Auto' -- the type is always a visible, concrete choice
         this.$measureList = h('select', { id: id3 },
-            h('option', { value: 'none' }, _('Auto')),
             h('option', { value: 'nominal' }, _('Nominal')),
             h('option', { value: 'ordinal' }, _('Ordinal')),
             h('option', { value: 'continuous' }, _('Continuous')));
         $top.append(this.$measureList);
-        this.$measureList.value = 'none';
+        this.$measureList.value = 'nominal';
 
         this.$errorMessage = h('div', { class: 'error-msg' }, _('This transform is in error and should be edited.'));
         $top.append(this.$errorMessage);
@@ -306,6 +306,11 @@ class RecodedVarWidget extends HTMLElement {
         this.model.dataset.on('transformsChanged transformRemoved', this._updateTransformList, this);
         this.model.dataset.on('dataSetLoaded', this._onDatasetLoaded, this);
         this.model.dataset.on('columnsChanged', this._updateChannelList, this);
+        // a transform saved with 'Auto' shows the type the server resolved
+        this.model.on('change:measureType', () => {
+            if (this.attached)
+                this._showMeasureType();
+        });
 
     }
 
@@ -329,13 +334,17 @@ class RecodedVarWidget extends HTMLElement {
     // point somewhere or the server drops the formula. Anything real will do,
     // so take the first data column that isn't this variable.
     _ensureParent() {
+        // jUPWR: the model has no 'id' (that was always undefined, so this
+        // variable itself could become its own source); it edits 'ids'
+        let ids = this.model.get('ids');
+        let ownId = ids ? ids[0] : undefined;
+
         let parentId = this.model.get('parentId');
-        if (parentId !== null && parentId !== 0
+        if (parentId !== null && parentId !== 0 && parentId !== ownId
                 && this.model.dataset.getColumnById(parentId) !== undefined)
             return;
 
         let columns = this.model.dataset.get('columns') || [];
-        let ownId = this.model.get('id');
         for (let column of columns) {
             if (column.id === ownId)
                 continue;
@@ -384,8 +393,8 @@ class RecodedVarWidget extends HTMLElement {
             suffix: '',
             formula: [ formula ],
         };
-        if (measureType !== undefined)
-            values.measureType = measureType;
+        // jUPWR: new rules start as nominal (there is no 'Auto' to fall back on)
+        values.measureType = measureType !== undefined ? measureType : MeasureType.NOMINAL;
         dataset.setTransforms([ { id: 0, values: values } ]).then(() => {
             let transforms = dataset.get('transforms');
             let transformId = transforms[transforms.length - 1].id;
@@ -422,16 +431,32 @@ class RecodedVarWidget extends HTMLElement {
             this._applying = false;
         }
 
-        let measureType = transform === undefined ? 'none' : transform.measureType;
+        this._showMeasureType();
+    }
+
+    // jUPWR: the list has no 'Auto'. A transform saved with it (older files)
+    // shows the type the server actually gave the column; nothing is written
+    // until a type is picked.
+    _showMeasureType() {
+        let transformId = this.model.get('transform');
+        let transform = (transformId !== null && transformId !== 0)
+            ? this.model.dataset.getTransformById(transformId)
+            : undefined;
+
+        let measureType: string = transform === undefined ? 'none' : transform.measureType;
+        if (measureType === 'none')
+            measureType = this.model.get('measureType') || 'none';
+        if (measureType !== 'nominal' && measureType !== 'ordinal' && measureType !== 'continuous')
+            measureType = 'nominal';
+
         this.$measureList.value = measureType;
         this.$measureIcon.setAttribute('measure-type', measureType);
     }
 
     _setupMeasureList() {
         // no ID here: a recode produces categories or numbers, never a row
-        // identifier. Auto stays -- it lets the type follow the values, which
-        // is what you want when recoding to numbers.
-        this.measureList = new MeasureList(true, false);
+        // identifier. No Auto either (jUPWR): it hid the type actually used.
+        this.measureList = new MeasureList(false, false);
         this.$measureList.setAttribute('aria-owns', this.measureList.id);
         this.$measureList.addEventListener('mousedown', (event) => {
             if (dropdown.isVisible() === true && dropdown.focusedOn() === this.$measureList)

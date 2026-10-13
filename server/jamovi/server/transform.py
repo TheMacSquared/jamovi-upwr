@@ -121,7 +121,29 @@ class Transform:
         # these pieces are then used to produce a formula for each column
         self._pieces = pieces
 
+    @property
+    def is_rules(self):
+        # jUPWR: the rule builder writes the whole IF chain as a single
+        # element and never refers to $source; upstream transforms are
+        # source-relative fragments (and a lone '$source' when empty)
+        return (len(self._formula) == 1
+                and '$source' not in self._formula[0])
+
     def produce_formula(self, parent):
+        if self.is_rules:
+            # jUPWR: no source column -- it would add a hidden dependency
+            # (circular references), blank rows where it is missing
+            # (IFMISS below) and drive the measure type and level order
+            if self.measure_type == MeasureType.NOMINAL:
+                rules_fun = '_RULES_NOM'
+            elif self.measure_type == MeasureType.ORDINAL:
+                rules_fun = '_RULES_ORD'
+            elif self.measure_type == MeasureType.CONTINUOUS:
+                rules_fun = '_RULES_CONT'
+            else:
+                rules_fun = '_RULES'
+            return rules_fun + '(' + self._pieces[-1] + ')'
+
         # produce a recode formula for the parent
         pieces = list(self._pieces)
         name = '`' + parent.name + '`'
