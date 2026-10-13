@@ -50,6 +50,19 @@ npm_deps() {
     fi
 }
 
+# pip_nanomsg_fresh <python> — przebudowa rozszerzenia nanomsg z sdist, bez cache pip.
+# nanomsg nie ma koła dla macOS arm64, więc pip kompiluje je względem Homebrew
+# libnanomsg i odkłada gotowe koło do cache. Po aktualizacji Homebrew (soname
+# .6 -> .7) cache dalej podaje koło zlinkowane ze starą, już nieistniejącą
+# biblioteką, a 55-relocate nie ma czego wbudować w .app.
+pip_nanomsg_fresh() {
+    local py="$1" spec
+    spec="$(grep -iE '^nanomsg([=<>~! ]|$)' "$REPO_ROOT/server/requirements.txt" | head -1)"
+    [ -n "$spec" ] || spec=nanomsg
+    CFLAGS="-I$BREW_PREFIX/include ${CFLAGS:-}" LDFLAGS="-L$BREW_PREFIX/lib ${LDFLAGS:-}" \
+        "$py" -m pip install --force-reinstall --no-deps --no-cache-dir "$spec" >/dev/null
+}
+
 # --- ochrona plików źródłowych przed nadpisaniem przez jmc ------------------
 # jmc zapisuje część plików z powrotem do drzewa ŹRÓDŁOWEGO, nie do payloadu:
 #   * <moduł>/jamovi/0000.yaml  (index.js:576-593, indexPath = <srcDir>/jamovi)
