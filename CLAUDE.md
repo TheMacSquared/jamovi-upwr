@@ -9,6 +9,16 @@ Fork https://github.com/TheMacSquared/jamovi-upwr z submodułami (jmv, plots, i1
 Budowanie przez Docker: `docker compose --profile main build && docker compose --profile main up`
 Aplikacja dostępna pod http://127.0.0.1:41337 po zbudowaniu.
 
+## Linia wydań — TA GAŁĄŹ: `main` (kanał latest, jUPWR 1.1.x, jamovi 28.11)
+- Tu trafiają nowe funkcje i nowy upstream. Stable to `release/1.0` (1.0.x,
+  jamovi 28.2) — tylko poprawki, w osobnym katalogu worktree.
+- Poprawkę błędu, który występuje też w stable, przenieś na `release/1.0`
+  przez `git cherry-pick -x`; poprawki ze stable przychodzą tu tak samo
+  (`release-check.sh` wypisuje nieprzeniesione).
+- Submoduły jmv, plots, i18n śledzą tu gałąź `main` w swoich repozytoriach.
+- `legacy/win81` to osobna, zamrożona linia (Windows 8.1).
+- Pełne zasady, układ katalogów i checklista wydania: `packaging/CHANNELS.md`.
+
 ## Architektura — co gdzie jest
 
 ### Moduł analityczny (jmv/)
@@ -604,7 +614,7 @@ naprawdę z pakietu korzysta (refs na elemencie, nie na całej analizie).
 
 ### Zadanie 21: nowe elementy wyników jamovi 28.4+ (Text, Svg, vector, File) — PLAN, DECYZJE OTWARTE
 Stan 2026-10-12: tylko plan, nic nie wdrożone; decyzje niepodjęte (wszystkie opcje
-poniżej). Dotyczy wyłącznie gałęzi `test/upstream-28.11` (jUPWR 1.1.x, baza jamovi
+poniżej). Dotyczy wyłącznie linii latest — gałąź `main` (jUPWR 1.1.x, baza jamovi
 28.11). Moduły używające tych elementów wymagają jamovi ≥ 28.4 — `.jmo` z nimi nie
 zainstaluje się w 1.0.x (odnotować w macierzy `packaging/MODULES.md`).
 Rekomendacja ogólna (do decyzji): 1.1.0 wydać jako SAM merge 28.11 (eksport
