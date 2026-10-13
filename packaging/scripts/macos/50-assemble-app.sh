@@ -45,7 +45,7 @@ cp "$REPO_ROOT/platform/app-icon.icns" "$RES/app-icon.icns"
 # usuń domyślną aplikację Electrona, podstaw naszą jako app.asar
 rm -f "$RES/default_app.asar"
 log "Pakowanie kodu aplikacji (app.asar) ..."
-( cd "$REPO_ROOT/electron" && [ -d node_modules ] || npm install ) >/dev/null 2>&1 || true
+npm_deps "$REPO_ROOT/electron" >/dev/null 2>&1 || true
 npx --yes @electron/asar pack "$REPO_ROOT/electron/app" "$RES/app.asar"
 
 # --- 3. payload do Resources/jamovi ---
