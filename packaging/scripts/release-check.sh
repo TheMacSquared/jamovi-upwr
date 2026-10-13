@@ -130,6 +130,12 @@ for d in */jamovi/0000.yaml; do
 done
 
 # licencje zbiorów jDane: każdy zbiór ma pole license, a teksty licencji są w kliencie
-node packaging/scripts/check-dataset-licenses.mjs && ok "licencje zbiorów jDane" || bad "licencje zbiorów jDane — patrz wyżej"
+# (js-yaml bierze z jamovi-compiler/node_modules — w świeżym worktree go nie ma, dopóki
+# build albo npm ci go nie zainstaluje; sprawdzenie samo niczego nie instaluje)
+if [ ! -d jamovi-compiler/node_modules/js-yaml ]; then
+    bad "licencje zbiorów jDane nie sprawdzone: brak jamovi-compiler/node_modules (uruchom: cd jamovi-compiler && npm ci)"
+else
+    node packaging/scripts/check-dataset-licenses.mjs && ok "licencje zbiorów jDane" || bad "licencje zbiorów jDane — patrz wyżej"
+fi
 
 echo; [ $warn -eq 0 ] && echo "Wydanie spójne." || { echo "Ostrzeżeń: $warn"; exit 1; }
