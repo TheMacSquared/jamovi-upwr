@@ -11,7 +11,7 @@ Aplikacja dostępna pod http://127.0.0.1:41337 po zbudowaniu.
 
 ## Linia wydań — TA GAŁĄŹ: `main` (kanał latest, jUPWR 1.1.x, jamovi 28.11)
 - Tu trafiają nowe funkcje i nowy upstream. Stable to `release/1.0` (1.0.x,
-  jamovi 28.2) — tylko poprawki, w osobnym katalogu worktree.
+  jamovi 28.2) — tylko poprawki, w katalogu `jamovi-upwr-stable` (ten katalog to `jamovi-upwr-latest`).
 - Poprawkę błędu, który występuje też w stable, przenieś na `release/1.0`
   przez `git cherry-pick -x`; poprawki ze stable przychodzą tu tak samo
   (`release-check.sh` wypisuje nieprzeniesione).
