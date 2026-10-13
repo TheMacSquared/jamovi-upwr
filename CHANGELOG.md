@@ -5,6 +5,28 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+## 1.1.1 — 2026-10-13 (gałąź `test/upstream-28.11`)
+Poprawki zmiennej przekształconej i tabel wyników, jRISK 0.4.1; te same
+poprawki zmiennej przekształconej i jRISK są w 1.0.8.
+
+- Poprawka regresji z upstreamu 28.11 w kliencie: tabela, która traci wszystkie
+  kolumny (np. Zmienne ilościowe po usunięciu ostatniej zmiennej), czyści też
+  wiersze zamiast pokazywać stare wyniki bez nagłówków.
+- Zmienna przekształcona nominalna/porządkowa: etykiety tekstowe w kolejności
+  reguł niezależnie od (ukrytej) zmiennej źródłowej; wcześniej przy źródle
+  ciągłym sortowane po kodach znaków („średnia” za „wysoka”).
+- Zmienna przekształcona z regułami liczona bez ukrytej zmiennej źródłowej:
+  brak danych w źródle nie daje już braku w wyniku, nie powstaje odwołanie
+  cykliczne przez źródło (także przy „Przekształcenie” na pustej kolumnie),
+  a poziom pomiaru nie zależy od źródła. Lista poziomów pomiaru bez
+  „Automatyczny”: nowa zmienna domyślnie nominalna, stare pliki pokazują typ
+  faktycznie nadany kolumnie.
+- jRISK 0.4.1 (moduł opcjonalny): czytelne drzewo częstości („Zdarzenia
+  i warunkowanie”) i diagram drzewa błędów (FTA) — węzły na tle wykresu
+  z ciemnym tekstem (kolor palety tylko na ramce, także w ciemnym motywie),
+  większa czcionka; diagram FTA rozszerza się z liczbą zdarzeń elementarnych,
+  więc etykiety liści się nie nakładają.
+
 ## 1.1.0 — w przygotowaniu (gałąź `test/upstream-28.11`)
 Baza jamovi 28.2 → 28.11. Wersja testowa; 1.0.x (gałąź `main`) bez zmian.
 
@@ -25,23 +47,6 @@ Windows i macOS zbudowane, aplikacje uruchamiają się; w trakcie testów.
   przestrzeni nazw w panelu „O zbiorze”).
 - Kompilator: moduły zbudowane nowym `jmc` wymagają jamovi ≥ 28.4, więc nie
   zainstalują się w jUPWR 1.0.x.
-- Poprawka regresji z upstreamu 28.11 w kliencie: tabela, która traci wszystkie
-  kolumny (np. Zmienne ilościowe po usunięciu ostatniej zmiennej), czyści też
-  wiersze zamiast pokazywać stare wyniki bez nagłówków.
-- Zmienna przekształcona nominalna/porządkowa: etykiety tekstowe w kolejności
-  reguł niezależnie od (ukrytej) zmiennej źródłowej; wcześniej przy źródle
-  ciągłym sortowane po kodach znaków („średnia” za „wysoka”).
-- Zmienna przekształcona z regułami liczona bez ukrytej zmiennej źródłowej:
-  brak danych w źródle nie daje już braku w wyniku, nie powstaje odwołanie
-  cykliczne przez źródło (także przy „Przekształcenie” na pustej kolumnie),
-  a poziom pomiaru nie zależy od źródła. Lista poziomów pomiaru bez
-  „Automatyczny”: nowa zmienna domyślnie nominalna, stare pliki pokazują typ
-  faktycznie nadany kolumnie.
-- jRISK 0.4.1 (moduł opcjonalny): czytelne drzewo częstości („Zdarzenia
-  i warunkowanie”) i diagram drzewa błędów (FTA) — węzły na tle wykresu
-  z ciemnym tekstem (kolor palety tylko na ramce, także w ciemnym motywie),
-  większa czcionka; diagram FTA rozszerza się z liczbą zdarzeń elementarnych,
-  więc etykiety liści się nie nakładają.
 
 ## 1.0.7 — 2026-10-11
 Licencje zbiorów danych w dokumentacji biblioteki, uporządkowany zestaw zbiorów

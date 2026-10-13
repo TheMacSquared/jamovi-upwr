@@ -77,6 +77,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.1 | 28.11 | 0.4.1 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.1.0 | 28.11 | 0.4.1 | ⬜ do zbudowania | ✅ 2026-10-13 |
 | 1.0.7 | 28.2 | 0.4.1 | ⬜ do zbudowania | ✅ 2026-10-13 |
 | 1.1.0 | 28.11 | 0.4.0 | ✅ 2026-10-12 | ✅ 2026-10-12 |
@@ -110,6 +111,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.1 | 28.11 | 0.3.2 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.1.0 | 28.11 | 0.3.2 | ✅ 2026-10-12 | ✅ 2026-10-12 |
 | 1.0.7 | 28.2 | 0.3.2 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.3.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
@@ -138,6 +140,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.1 | 28.11 | 0.1.3 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.1.0 | 28.11 | 0.1.3 | ✅ 2026-10-12 | ✅ 2026-10-12 |
 | 1.0.7 | 28.2 | 0.1.3 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.1.2 | ✅ 2026-10-03 | ✅ 2026-10-03 |
@@ -157,6 +160,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jPomiar | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.1 | 28.11 | 0.3.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.1.0 | 28.11 | 0.3.0 | ✅ 2026-10-12 | ✅ 2026-10-12 |
 | 1.0.7 | 28.2 | 0.3.0 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.3.0 | ✅ 2026-10-03 | ✅ 2026-10-03 |
@@ -171,6 +175,7 @@ Docker sprawdzony przy wydaniu 1.0.7 (2026-10-11).
 
 | jUPWR | jamovi | jWody | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.1.1 | 28.11 | 0.1.1 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.1.0 | 28.11 | 0.1.1 | ✅ 2026-10-12 | ✅ 2026-10-12 |
 | 1.0.7 | 28.2 | 0.1.1 | ✅ 2026-10-11 | ✅ 2026-10-11 |
 | 1.0.6 | 28.2 | 0.1.1 | ✅ 2026-10-03 | ✅ 2026-10-03 |
