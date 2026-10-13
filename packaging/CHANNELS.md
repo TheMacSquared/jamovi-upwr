@@ -18,6 +18,15 @@ tabelę powyżej (na `main` i nowej `release/*`).
 
 `readstat` jest wspólny dla wszystkich linii (gałąź `sync-28`).
 
+Zagnieżdżony fork `plots/jamovi/i18n` (TheMacSquared/jmvplots-i18n) ma ten sam układ:
+`release/1.0` dla stable, `main` (i śledzona w `plots/.gitmodules` gałąź `jupwr`,
+utrzymywana równo z `main`) dla latest. `jmv/jamovi/i18n` to repo upstreamu (jamovi/jmv-i18n),
+nie nasz fork — tam nic nie zakładamy.
+
+Przy zakładaniu nowej `release/X.Y` gałąź tworzy się we WSZYSTKICH forkach: jmv, jmvplots,
+jamovi-i18n i jmvplots-i18n — na commitach, na które wskazują wskaźniki submodułów.
+Gałęzi w forkach nie usuwa się, dopóki wskazuje na nie którykolwiek wydany tag.
+
 ## Katalogi robocze: jedna linia = jeden katalog
 
 Nigdy nie przełączaj linii przez `git checkout` w jednym katalogu: zostają artefakty
