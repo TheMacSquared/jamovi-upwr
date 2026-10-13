@@ -7,7 +7,8 @@ na Uniwersytecie Przyrodniczym we Wrocławiu.
 ## Repozytorium
 Fork https://github.com/TheMacSquared/jamovi-upwr z submodułami (jmv, plots, i18n, readstat).
 Budowanie przez Docker: `docker compose --profile main build && docker compose --profile main up`
-Aplikacja dostępna pod http://127.0.0.1:41337 po zbudowaniu.
+Aplikacja dostępna pod http://localhost:41337 po zbudowaniu (nie `127.0.0.1` — serwer
+przyjmuje tylko origin `localhost`, `JAMOVI_HOST_A` w `docker-compose.yaml`).
 
 ## Linia wydań — TA GAŁĄŹ: `release/1.0` (kanał stable, jUPWR 1.0.x, jamovi 28.2)
 - Tylko poprawki błędów; nowe funkcje idą na `main` (latest, 1.1.x, jamovi 28.11).

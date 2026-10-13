@@ -84,7 +84,8 @@ docker compose --profile main build
 docker compose --profile main up
 ```
 
-Aplikacja dostępna pod http://127.0.0.1:41337
+Aplikacja dostępna pod http://localhost:41337 (nie `127.0.0.1`: serwer przyjmuje
+połączenia tylko z originu `localhost`, patrz `JAMOVI_HOST_A` w `docker-compose.yaml`).
 
 > Porty są publikowane wyłącznie na pętli zwrotnej (`127.0.0.1`). Serwer działa
 > z pustym `JAMOVI_ACCESS_KEY` i ma podmontowany katalog Dokumenty użytkownika,
