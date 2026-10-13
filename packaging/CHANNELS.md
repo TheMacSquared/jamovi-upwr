@@ -50,19 +50,32 @@ git submodule update --init --recursive
 ```
 
 Przemianowanie dawnego układu (`jamovi-upwr` + `jamovi-upwr-1.0`), przy zatrzymanym
-Dockerze i bez trwającego buildu, z katalogu nadrzędnego:
+Dockerze i bez trwającego buildu, z katalogu nadrzędnego. Stary worktree stable się
+USUWA i zakłada od nowa — `git worktree move`/`remove` odmawiają przy submodułach
+(„working trees containing submodules cannot be moved or removed”), a po przemianowaniu
+głównego klonu pliki `.git` submodułów w worktree mają zaszytą starą ścieżkę względną
+(`../../jamovi-upwr/.git/worktrees/...`), której `worktree repair` nie poprawia.
+Najpierw sprawdź, że w stable nie ma nic do zachowania (`git status`, `git stash list`):
 
 ```
 mv jamovi-upwr jamovi-upwr-latest
-git -C jamovi-upwr-latest worktree repair ../jamovi-upwr-1.0
-git -C jamovi-upwr-latest worktree move ../jamovi-upwr-1.0 ../jamovi-upwr-stable
+rm -rf jamovi-upwr-1.0                       # Windows: Remove-Item -Recurse -Force
+git -C jamovi-upwr-latest worktree prune -v
+git -C jamovi-upwr-latest worktree add ../jamovi-upwr-stable release/1.0
+git -C jamovi-upwr-stable submodule update --init --recursive
+git -C jamovi-upwr-latest worktree list      # dwie pozycje: latest [main], stable [release/1.0]
 ```
 
-Potem w obu katalogach usuń `packaging/build` i `node_modules` (klient, electron,
+Inne dawne worktree (np. `jamovi-upwr-28.11`) usuwa się tak samo: `rm -rf` + `prune`.
+
+Potem w `jamovi-upwr-latest` usuń `packaging/build` i `node_modules` (klient, electron,
 jamovi-compiler, i18n) — cache CMake, venv i linki w `.bin` mają zaszyte stare ścieżki;
-następny build odtworzy je od zera. Pamięć Claude Code jest przypisana do ścieżki
+następny build odtworzy je od zera (stable jest świeży). `node_modules` z builda Dockera
+może należeć do roota: `docker run --rm -v "$PWD/client:/c" alpine rm -rf /c/node_modules`.
+Pamięć Claude Code jest przypisana do ścieżki
 (`~/.claude/projects/<ścieżka z myślnikami>/`): przenieś ten katalog pod nazwę wynikającą
-z nowej ścieżki, inaczej agent zacznie bez pamięci.
+z nowej ścieżki, inaczej agent zacznie bez pamięci. Jeśli nowy katalog już istnieje
+(otwarto sesję w nowej ścieżce), przenieś do niego zawartość starego, łącznie z `memory/`.
 
 ### Zmiana linii stable (np. release/1.0 → release/1.1)
 
