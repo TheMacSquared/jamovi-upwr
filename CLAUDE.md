@@ -9,6 +9,14 @@ Fork https://github.com/TheMacSquared/jamovi-upwr z submodułami (jmv, plots, i1
 Budowanie przez Docker: `docker compose --profile main build && docker compose --profile main up`
 Aplikacja dostępna pod http://127.0.0.1:41337 po zbudowaniu.
 
+## Linia wydań — TA GAŁĄŹ: `release/1.0` (kanał stable, jUPWR 1.0.x, jamovi 28.2)
+- Tylko poprawki błędów; nowe funkcje idą na `main` (latest, 1.1.x, jamovi 28.11).
+- Każdą poprawkę stąd przenieś na `main` przez `git cherry-pick -x`; commit
+  z założenia tylko dla stable oznacz linią `Tylko-stable: <powód>`.
+- Submoduły jmv, plots, i18n śledzą tu gałąź `release/1.0` w swoich repozytoriach.
+- Pracuj w katalogu worktree tej linii, nie przełączaj gałęzi w miejscu.
+- Pełne zasady, układ katalogów i checklista wydania: `packaging/CHANNELS.md`.
+
 ## Architektura — co gdzie jest
 
 ### Moduł analityczny (jmv/)
