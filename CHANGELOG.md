@@ -5,18 +5,17 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+## 1.1.1 — 2026-10-14 (gałąź `test/upstream-28.11`)
+Poprawki zmiennej przekształconej i tabel wyników, fonty wykresów IBM Plex,
+jRISK 0.4.2; te same poprawki zmiennej przekształconej są w 1.0.8 (bez importu
+z .omv, który dotyczy tylko 28.11), jRISK 1.0.8 zostaje na 0.4.1.
+
 - Fonty wykresów jak w interaktywnych wykładach: IBM Plex Sans (tekst, tytuły,
   nagłówki paneli) i IBM Plex Mono (etykiety osi, podpisy) zamiast Source Serif 4,
   Atkinson Hyperlegible i JetBrains Mono.
 - jRISK 0.4.2: w „Zdarzeniach i warunkowaniu” zdarzenia przeciwne zapisane
   jako Aᶜ/Bᶜ zamiast „nie-A”/„nie-B” (tabele, wzory swoistości i NPV, drzewo
   częstości).
-
-## 1.1.1 — 2026-10-13 (gałąź `test/upstream-28.11`)
-Poprawki zmiennej przekształconej i tabel wyników, jRISK 0.4.1; te same
-poprawki zmiennej przekształconej i jRISK są w 1.0.8 (bez importu z .omv,
-który dotyczy tylko 28.11).
-
 - Poprawka regresji z upstreamu 28.11 w kliencie: tabela, która traci wszystkie
   kolumny (np. Zmienne ilościowe po usunięciu ostatniej zmiennej), czyści też
   wiersze zamiast pokazywać stare wyniki bez nagłówków.
