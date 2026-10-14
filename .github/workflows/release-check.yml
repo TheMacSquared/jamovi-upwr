@@ -26,6 +26,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: jamovi-compiler/package-lock.json
+      # js-yaml dla kontroli licencji jDane w release-check.sh
+      - name: Zależności kompilatora
+        run: npm ci --prefix jamovi-compiler
 
       - name: Spójność metadanych (obowiązkowa)
         run: bash packaging/scripts/release-check.sh --metadata-only

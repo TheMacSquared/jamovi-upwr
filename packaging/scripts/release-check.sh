@@ -69,7 +69,14 @@ for key in $(git config -f .gitmodules --name-only --get-regexp '^submodule\..*\
     sbranch="$(git config -f .gitmodules "submodule.$name.branch")"
     ptr="$(git ls-tree HEAD "$path" | awk '{print $3}')"
     if [ ! -e "$path/.git" ]; then bad "submoduł $path niezainicjowany (git submodule update --init)"; continue; fi
-    git -C "$path" fetch -q origin "$sbranch" 2>/dev/null
+    # jawny refspec: klon submodułu z CI (actions/checkout) zna tylko gałąź domyślną,
+    # więc samo „fetch origin <gałąź>” nie tworzy origin/<gałąź>
+    git -C "$path" fetch -q origin "+refs/heads/$sbranch:refs/remotes/origin/$sbranch" 2>/dev/null
+    # płytki klon: wskaźnik starszy niż czubek gałęzi nie byłby widoczny jako przodek
+    if [ "$(git -C "$path" rev-parse --is-shallow-repository 2>/dev/null)" = true ] \
+        && ! git -C "$path" merge-base --is-ancestor "$ptr" "origin/$sbranch" 2>/dev/null; then
+        git -C "$path" fetch -q --unshallow origin "+refs/heads/$sbranch:refs/remotes/origin/$sbranch" 2>/dev/null
+    fi
     git -C "$path" merge-base --is-ancestor "$ptr" "origin/$sbranch" 2>/dev/null \
         && ok "submoduł $path: ${ptr:0:8} na origin/$sbranch" \
         || bad "submoduł $path: ${ptr:0:8} nie leży na origin/$sbranch"
@@ -148,7 +155,10 @@ done
 # licencje zbiorów jDane: każdy zbiór ma pole license, a teksty licencji są w kliencie
 # (js-yaml bierze z jamovi-compiler/node_modules — w świeżym worktree go nie ma, dopóki
 # build albo npm ci go nie zainstaluje; sprawdzenie samo niczego nie instaluje)
-if [ ! -d jamovi-compiler/node_modules/js-yaml ]; then
+# (JUPWR_SKIP_LICENSES=1 tylko dla packaging/tests — katalog testowy nie ma jDane/ ani node_modules)
+if [ "${JUPWR_SKIP_LICENSES:-}" = 1 ]; then
+    :
+elif [ ! -d jamovi-compiler/node_modules/js-yaml ]; then
     bad "licencje zbiorów jDane nie sprawdzone: brak jamovi-compiler/node_modules (uruchom: cd jamovi-compiler && npm ci)"
 else
     node packaging/scripts/check-dataset-licenses.mjs && ok "licencje zbiorów jDane" || bad "licencje zbiorów jDane — patrz wyżej"
