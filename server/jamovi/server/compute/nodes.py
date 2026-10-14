@@ -580,6 +580,9 @@ class Call(ast.Call, Node):
     def _rule_levels(self, row_count, label_args):
         values = self.fvalues(row_count, False)
         values = [ v for v in values if not is_missing(v) ]
+        # jUPWR: a category passed through from a column arrives as a
+        # (code, label) tuple; it is its label that ends up in the cell
+        values = [ convert(v, str) if isinstance(v, tuple) else v for v in values ]
         texts = set(v for v in values if isinstance(v, str))
         if len(texts) == 0:
             levels = sorted(set(values))
