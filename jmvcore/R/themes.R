@@ -321,9 +321,8 @@ jupwrNames <- c(jupwrJasny = 'jasny', jupwrCiemny = 'ciemny')
 
 # fonts shipped with the distribution, keyed by the family name they report
 jupwrFontFiles <- c(
-    'Source Serif 4' = 'SourceSerif4-Regular.ttf',
-    'Atkinson Hyperlegible' = 'AtkinsonHyperlegible-Regular.ttf',
-    'JetBrains Mono' = 'JetBrainsMono-Regular.ttf')
+    'IBM Plex Sans' = 'IBMPlexSans-Regular.ttf',
+    'IBM Plex Mono' = 'IBMPlexMono-Regular.ttf')
 
 jupwrFontState <- new.env(parent = emptyenv())
 
@@ -386,7 +385,8 @@ jupwrRegisterFonts <- function() {
 #'
 #' A family counts as available when it is either shipped with the
 #' distribution or already installed on the machine; otherwise the theme takes
-#' 'serif' / 'sans' / 'mono' so that plots still render.
+#' 'sans' / 'mono' so that plots still render. As in the lecture notes, titles
+#' use the text family (IBM Plex Sans) rather than a separate serif.
 #'
 #' @return a list with the title, text and mono family names
 jupwrFamilies <- function() {
@@ -408,9 +408,9 @@ jupwrFamilies <- function() {
     }
 
     families <- list(
-        title = pick('Source Serif 4', 'serif'),
-        text  = pick('Atkinson Hyperlegible', 'sans'),
-        mono  = pick('JetBrains Mono', 'mono'))
+        title = pick('IBM Plex Sans', 'sans'),
+        text  = pick('IBM Plex Sans', 'sans'),
+        mono  = pick('IBM Plex Mono', 'mono'))
 
     jupwrFontState$families <- families
     families

@@ -1,25 +1,28 @@
 # Fonty motywów jUPWR
 
 Kroje używane przez motywy `jupwrSkrypt`, `jupwrCiemny` i `jupwrPastel`
-(`jmvcore::theme_jupwr_*`). Pliki są **nietknięte** — nie są subsetowane ani
-przepakowywane, więc Reserved Font Names pozostają nienaruszone.
+(`jmvcore::theme_jupwr_*`) — te same co w interaktywnych wykładach (rodzina
+IBM Plex; tytuły bez osobnego kroju szeryfowego). Pliki są **nietknięte** —
+nie są subsetowane ani przepakowywane, więc Reserved Font Name pozostaje
+nienaruszona.
 
 | plik | rodzina | rola w motywie | źródło |
 |---|---|---|---|
-| `SourceSerif4-Regular.ttf`, `-Bold.ttf`, `-It.ttf` | Source Serif 4 | tytuły, podtytuły, nagłówki paneli | [adobe-fonts/source-serif](https://github.com/adobe-fonts/source-serif) 4.005R |
-| `AtkinsonHyperlegible-Regular.ttf` | Atkinson Hyperlegible | tekst, opisy osi, legenda | [googlefonts/atkinson-hyperlegible](https://github.com/googlefonts/atkinson-hyperlegible) 1.006 |
-| `JetBrainsMono-Regular.ttf` | JetBrains Mono | etykiety osi, podpisy | [JetBrains/JetBrainsMono](https://github.com/JetBrains/JetBrainsMono) 2.304 |
+| `IBMPlexSans-Regular.ttf`, `-Bold.ttf`, `-Italic.ttf`, `-BoldItalic.ttf` | IBM Plex Sans | tekst, opisy osi, legenda, tytuły, podtytuły, nagłówki paneli | [IBM/plex](https://github.com/IBM/plex) 3.005 |
+| `IBMPlexMono-Regular.ttf`, `-Bold.ttf`, `-Italic.ttf`, `-BoldItalic.ttf` | IBM Plex Mono | etykiety osi, podpisy | [IBM/plex](https://github.com/IBM/plex) |
+
+Plex Sans ma grekę, indeksy i znaki łączące (x̄, p̂, μ₁, σ²), ale nie ma
+znaków ∩ i ᶜ — te renderer bierze z fontu zastępczego systemu.
 
 ## Licencje
 
-Wszystkie trzy rodziny są na **SIL Open Font License 1.1**, która wprost
-zezwala na dołączanie fontów do oprogramowania i ich redystrybucję. Pełne
-teksty licencji wraz z notami copyright znajdują się w `licenses/`.
+Obie rodziny są na **SIL Open Font License 1.1**, która wprost zezwala na
+dołączanie fontów do oprogramowania i ich redystrybucję. Pełny tekst licencji
+wraz z notą copyright: `licenses/IBMPlex-OFL.txt`.
 
-Reserved Font Names: „Source" (Source Serif 4) oraz „ATKINSON" i
-„HYPERLEGIBLE" (Atkinson Hyperlegible). **Nie modyfikuj tych plików** —
-modyfikacja pod oryginalną nazwą narusza OFL. Jeżeli kiedyś zajdzie potrzeba
-subsetowania, plik wynikowy musi dostać inną nazwę rodziny, a `jupwrFontFiles`
+Reserved Font Name: „Plex". **Nie modyfikuj tych plików** — modyfikacja pod
+oryginalną nazwą narusza OFL. Jeżeli kiedyś zajdzie potrzeba subsetowania,
+plik wynikowy musi dostać inną nazwę rodziny, a `jupwrFontFiles`
 w `jmvcore/R/themes.R` trzeba zaktualizować.
 
 ## Jak trafiają do aplikacji
@@ -30,7 +33,7 @@ tak samo na Linuksie, macOS i Windows. Katalog jest wyszukiwany w kolejności:
 `JUPWR_FONTS_PATH`, `<JAMOVI_HOME>/fonts`, a na końcu `<root>/fonts` wyliczony
 ze ścieżki zainstalowanego jmvcore.
 
-Miejsce docelowe w buildach:
+Miejsce docelowe w buildach (kopiowany cały katalog):
 
 | build | ścieżka | krok |
 |---|---|---|
@@ -38,5 +41,5 @@ Miejsce docelowe w buildach:
 | macOS | `<app>/Contents/Resources/jamovi/fonts` | `packaging/scripts/macos/50-assemble-app.sh` |
 | Windows | `<app>\Resources\fonts` | `packaging/scripts/windows/build.ps1` |
 
-Jeśli fontów zabraknie, motywy schodzą na `serif` / `sans` / `mono` i wykresy
-nadal się renderują — tylko innym krojem.
+Jeśli fontów zabraknie, motywy schodzą na `sans` / `mono` i wykresy nadal się
+renderują — tylko innym krojem.
