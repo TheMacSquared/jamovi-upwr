@@ -320,7 +320,9 @@ def replace_single_equals(formula):
     return formula
 
 
-def read(project, path, prog_cb, **kwargs):
+def read(project, path, prog_cb, *, dataset=None, **kwargs):
+    # jUPWR: with `dataset` (and no project) only the data set is read into
+    # it, which is what importing from a .omv/.omt needs
 
     with ZipFile(path, 'r') as zip:
 
@@ -348,21 +350,22 @@ def read(project, path, prog_cb, **kwargs):
         # go into the session temp dir, which is capped, so before reading
         # anything check they'll fit -- an open that would take the session
         # over the cap is refused, as a data set with too many columns is
-        session_files = SessionFiles(project.session_temp)
-        file_entries = { }
-        for entry in zip.infolist():
-            match = is_file.match(entry.filename)
-            if match and is_file_id(match.group(1)):
-                file_entries.setdefault(match.group(1), entry)
-        extra = sum(entry.file_size for file_id, entry in file_entries.items() if not session_files.exists(file_id))
-        project.instance.check_file_storage(extra)
+        if dataset is None:
+            session_files = SessionFiles(project.session_temp)
+            file_entries = { }
+            for entry in zip.infolist():
+                match = is_file.match(entry.filename)
+                if match and is_file_id(match.group(1)):
+                    file_entries.setdefault(match.group(1), entry)
+            extra = sum(entry.file_size for file_id, entry in file_entries.items() if not session_files.exists(file_id))
+            project.instance.check_file_storage(extra)
 
         meta_content = zip.read('metadata.json').decode('utf-8')
         metadata = json.loads(meta_content)
         meta_document = metadata.get('document', {'resultsLanguage': 'en'})
         meta_dataset = metadata['dataSet']
 
-        data = project.add_dataset()
+        data = project.add_dataset() if dataset is None else dataset
 
         # if 'importPath' in meta_dataset:
         #     try:
@@ -463,7 +466,8 @@ def read(project, path, prog_cb, **kwargs):
         data.set_row_count(row_count)
         data.set_weights_by_name(meta_dataset.get('weights'))
 
-        project.results_language = meta_document.get('resultsLanguage', 'en')
+        if dataset is None:
+            project.results_language = meta_document.get('resultsLanguage', 'en')
 
         columns_w_bad_levels = [ ]  # do some repair work
 
@@ -586,6 +590,9 @@ def read(project, path, prog_cb, **kwargs):
 
         for column in data:
             column.determine_dps()
+
+        if dataset is not None:
+            return
 
         # the files first, so the analyses know which are available. a file
         # is only adopted if its content really hashes to its id: session

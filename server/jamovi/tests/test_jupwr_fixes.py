@@ -1,7 +1,91 @@
-"""jUPWR: regression tests for the 2026-10 audit fixes"""
+"""jUPWR: regression tests for the 2026-10 audit fixes (1: import from
+.omv, 4: rule levels with categories from a column)"""
 
+from os import path
+
+import pytest
+
+from jamovi.server import jamovi_pb2 as jcoms
+from jamovi.server.instance import Instance
+from jamovi.server.session import Session
 from jamovi.server.datasetmodel import DataSetModel
 from jamovi.server.dataset import ColumnType, DataType, MeasureType
+
+
+class FakeComs:
+    def __init__(self):
+        self.sent = [ ]
+        self.errors = [ ]
+
+    def send(self, message=None, instance_id=None, response_to=None,
+             complete=True, progress=(0, 0), status=None):
+        self.sent.append(message)
+
+    def send_error(self, message=None, cause=None, instance_id=None, response_to=None):
+        self.errors.append((message, cause))
+
+    def add_close_listener(self, listener):
+        pass
+
+    def remove_close_listener(self, listener):
+        pass
+
+
+async def _open(instance, file_path='', **kwargs):
+    stream = instance.open(file_path, **kwargs)
+    async for _ in stream:
+        pass
+    return await stream
+
+
+async def _save(instance, file_path):
+    stream = instance.save({ 'path': file_path, 'overwrite': True })
+    async for _ in stream:
+        pass
+    return await stream
+
+
+async def _set_text(instance, values):
+    request = jcoms.DataSetRR()
+    request.op = jcoms.GetSet.Value('SET')
+    request.incData = True
+    block = request.data.add()
+    block.rowStart = 0
+    block.columnStart = 1
+    block.rowCount = len(values)
+    block.columnCount = 1
+    for value in values:
+        block.values.add().s = value
+    await instance.on_request(request)
+
+
+@pytest.mark.asyncio
+async def test_import_from_omv(session: Session, temp_dir: str):
+    source = await session.create()
+    await _open(source)
+    source.set_coms(FakeComs())
+    await _set_text(source, ('x', 'y', 'x'))
+    omv_path = path.join(temp_dir, 'import-source.omv')
+    await _save(source, omv_path)
+    source.close()
+
+    target = await session.create()
+    await _open(target)
+    coms = FakeComs()
+    target.set_coms(coms)
+    await _set_text(target, ('p', 'q'))
+
+    request = jcoms.OpenRequest()
+    request.op = jcoms.OpenRequest.Op.Value('IMPORT_REPLACE')
+    request.filePath = omv_path
+    await target.on_request(request)
+
+    assert coms.errors == [ ]
+    dataset = target.project.get_dataset()
+    assert dataset.row_count == 3
+    values = [ [ dataset[c][r] for r in range(3) ] for c in range(dataset.column_count) ]
+    assert [ 'x', 'y', 'x' ] in values
+    target.close()
 
 
 def _rules_column(dataset_model, formula, b_codes):

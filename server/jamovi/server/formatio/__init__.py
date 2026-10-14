@@ -98,7 +98,11 @@ def read_dataset(dataset, path, prog_cb, settings, *, ext=None):
     if not os.path.exists(path):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
-    _import(dataset, path, prog_cb, settings, ext)
+    if ext == 'omv' or ext == 'omt':
+        # jUPWR: the backstage offers .omv/.omt for import, as 28.2 did
+        omv.read(None, path, prog_cb, dataset=dataset)
+    else:
+        _import(dataset, path, prog_cb, settings, ext)
 
     fix_column_names(dataset)
     dataset.setup()
