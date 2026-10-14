@@ -419,12 +419,26 @@ class RecodedVarWidget extends HTMLElement {
             : undefined;
 
         let formula = '';
-        if (transform !== undefined && transform.formula.length === 1)
+        let legacy = false;
+        if (transform !== undefined && transform.formula.length > 1) {
+            // jUPWR: shown as unrepresentable (not as an empty builder),
+            // so the warning says editing here replaces it
+            legacy = true;
+            formula = transform.formula.join('\n');
+        }
+        else if (transform !== undefined && transform.formula.length === 1)
             formula = transform.formula[0] === '$source' ? '' : transform.formula[0];
 
         this._applying = true;
         try {
-            let ok = this.builder.setFormula(formula);
+            let ok;
+            if (legacy) {
+                this.builder.setUnrepresentable(formula);
+                ok = false;
+            }
+            else {
+                ok = this.builder.setFormula(formula);
+            }
             this.builder.classList.toggle('not-representable', ! ok && formula.trim() !== '');
         }
         finally {

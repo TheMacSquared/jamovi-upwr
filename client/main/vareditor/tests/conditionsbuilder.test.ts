@@ -87,4 +87,45 @@ describe('formulaToChain', () => {
         const { formulaToChain } = await mod();
         expect(formulaToChain('IF(a == 1, "x", (b))')).toBeNull();
     });
+
+    it('keeps a text equal to a column name as text', async () => {
+        const { chainToFormula, formulaToChain } = await mod();
+        const formula = 'IF(a == 1, "b", "other")';
+        expect(chainToFormula(formulaToChain(formula, cols)!, cols)).toBe(formula);
+    });
+
+    it('keeps the texts "NA" and "3" as text', async () => {
+        const { chainToFormula, formulaToChain } = await mod();
+        const formula = 'IF(a == "NA", "3", "other")';
+        expect(chainToFormula(formulaToChain(formula, cols)!, cols)).toBe(formula);
+    });
+
+    it('still shows a plain text without quotes', async () => {
+        const { formulaToChain } = await mod();
+        const chain = formulaToChain('IF(a == "x", "high", "low")', cols);
+        expect(chain!.rows[0].value).toBe('high');
+        expect(chain!.elseValue).toBe('low');
+    });
+});
+
+describe('ConditionsBuilder', () => {
+
+    it('keeps reporting an unrepresentable formula on reload', async () => {
+        const { ConditionsBuilder } = await mod();
+        const b = new ConditionsBuilder(() => [], () => '', () => {});
+        expect(b.setFormula('a + b')).toBe(false);
+        expect(b.setFormula('a + b')).toBe(false);
+    });
+
+    it('reports a legacy transform until the builder replaces it', async () => {
+        const { ConditionsBuilder } = await mod();
+        let written: string[] = [];
+        const b = new ConditionsBuilder(() => [], () => '', (f) => written.push(f));
+        b.setUnrepresentable('$source == 1\n"x"\n$source');
+        expect(b.lastRepresentable).toBe(false);
+        b.chain.elseValue = 'y';
+        b._commit();
+        expect(written).toEqual([ '"y"' ]);
+        expect(b.setFormula('"y"')).toBe(true);
+    });
 });
