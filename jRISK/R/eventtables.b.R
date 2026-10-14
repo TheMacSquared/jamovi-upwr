@@ -50,14 +50,14 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           "Liczności niecałkowite: tabela pokazuje wartości zaokrąglone, prawdopodobieństwa liczone są dokładnie.")
 
       labA <- paste("A: ", varA, " = ", levA, sep = "")
-      labNotA <- "nie-A"
+      labNotA <- "Aᶜ"
       nAB <- sum(w[A & B])
       nAnB <- sum(w[A & !B])
       nnAB <- sum(w[!A & B])
       nnAnB <- sum(w[!A & !B])
 
       countsTable$getColumn("b")$setTitle(paste("B: ", varB, " = ", levB, sep = ""))
-      countsTable$getColumn("notb")$setTitle("nie-B")
+      countsTable$getColumn("notb")$setTitle("Bᶜ")
       countsTable$setRow(rowNo = 1, values = list(
         rowLabel = labA, b = round(nAB), notb = round(nAnB), total = round(nAB + nAnB)))
       countsTable$setRow(rowNo = 2, values = list(
@@ -104,11 +104,11 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         detectorTable$addRow(rowKey = "sens", values = list(
           quantity = "Czułość", formula = "P(B | A)", value = sens))
         detectorTable$addRow(rowKey = "spec", values = list(
-          quantity = "Swoistość", formula = "P(nie-B | nie-A)", value = spec))
+          quantity = "Swoistość", formula = "P(Bᶜ | Aᶜ)", value = spec))
         detectorTable$addRow(rowKey = "ppv", values = list(
           quantity = "PPV", formula = "P(A | B)", value = ppv))
         detectorTable$addRow(rowKey = "npv", values = list(
-          quantity = "NPV", formula = "P(nie-A | nie-B)", value = npv))
+          quantity = "NPV", formula = "P(Aᶜ | Bᶜ)", value = npv))
         detectorTable$setNote("conv",
           "Interpretacja: A = stan rzeczywisty (np. awaria), B = alarm/wynik testu.")
       }
@@ -146,9 +146,9 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         y = c(0, 1, -1, 1.5, 0.5, -0.5, -1.5),
         label = c(
           paste("n =", s$n),
-          paste0("A\n", s$nA), paste0("nie-A\n", s$nnA),
-          paste0("A ∩ B\n", s$nAB), paste0("A ∩ nie-B\n", s$nAnB),
-          paste0("nie-A ∩ B\n", s$nnAB), paste0("nie-A ∩ nie-B\n", s$nnAnB)))
+          paste0("A\n", s$nA), paste0("Aᶜ\n", s$nnA),
+          paste0("A ∩ B\n", s$nAB), paste0("A ∩ Bᶜ\n", s$nAnB),
+          paste0("Aᶜ ∩ B\n", s$nnAB), paste0("Aᶜ ∩ Bᶜ\n", s$nnAnB)))
       edges <- data.frame(
         x = c(0, 0, 1, 1, 1, 1),
         y = c(0, 0, 1, 1, -1, -1),

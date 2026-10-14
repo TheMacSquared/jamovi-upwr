@@ -8,6 +8,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - Fonty wykresów jak w interaktywnych wykładach: IBM Plex Sans (tekst, tytuły,
   nagłówki paneli) i IBM Plex Mono (etykiety osi, podpisy) zamiast Source Serif 4,
   Atkinson Hyperlegible i JetBrains Mono.
+- jRISK 0.4.2: w „Zdarzeniach i warunkowaniu” zdarzenia przeciwne zapisane
+  jako Aᶜ/Bᶜ zamiast „nie-A”/„nie-B” (tabele, wzory swoistości i NPV, drzewo
+  częstości).
 
 ## 1.1.1 — 2026-10-13 (gałąź `test/upstream-28.11`)
 Poprawki zmiennej przekształconej i tabel wyników, jRISK 0.4.1; te same

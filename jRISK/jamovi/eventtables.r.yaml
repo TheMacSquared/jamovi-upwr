@@ -16,7 +16,7 @@ items:
           title: B
           type: integer
         - name: notb
-          title: nie-B
+          title: Bᶜ
           type: integer
         - name: total
           title: Suma
@@ -66,7 +66,7 @@ items:
           title: B
           type: number
         - name: notb
-          title: nie-B
+          title: Bᶜ
           type: number
         - name: total
           title: Suma
