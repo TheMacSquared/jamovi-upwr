@@ -17,6 +17,14 @@ Poprawki zmiennej przekształconej (reguły „jeżeli … użyj …”) i jRISK
   a poziom pomiaru nie zależy od źródła. Lista poziomów pomiaru bez
   „Automatyczny”: nowa zmienna domyślnie nominalna, stare pliki pokazują typ
   faktycznie nadany kolumnie.
+- Reguły zmiennej przekształconej: tekst w cudzysłowie równy nazwie kolumny,
+  „NA” albo liczbie („3”) zostaje tekstem przy ponownym zapisie reguł
+  (wcześniej stawał się odwołaniem do kolumny, brakiem danych lub liczbą).
+- Reguły zmiennej przekształconej: kategoria z kolumny nominalnej z kodami
+  (np. z SPSS) połączona z liczbą niecałkowitą nie przerywa przeliczania
+  (TypeError), a połączona z tekstem daje poziomy w kolejności reguł.
+- Stare przekształcenie (z dawnego edytora) pokazuje ostrzeżenie „edycja tutaj
+  je zastąpi” zamiast pustego panelu reguł, także po ponownym załadowaniu.
 - jRISK 0.4.1 (moduł opcjonalny): czytelne drzewo częstości („Zdarzenia
   i warunkowanie”) i diagram drzewa błędów (FTA) — węzły na tle wykresu
   z ciemnym tekstem (kolor palety tylko na ramce, także w ciemnym motywie),
