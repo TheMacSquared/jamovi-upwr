@@ -3,6 +3,7 @@ import pathlib
 import shutil
 import subprocess
 import tempfile
+import os
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -18,6 +19,7 @@ class ReleaseCheckTests(unittest.TestCase):
             "docker-compose.yaml", "docker/jamovi-Dockerfile",
             "packaging/scripts/macos/20-modules.sh", "packaging/scripts/windows/build.ps1",
             "packaging/scripts/windows/jUPWR.nsi", "CHANGELOG.md", "packaging/MODULES.md", "version",
+            "packaging/CHANNELS.md",
         ]
         for metadata in ROOT.glob("*/jamovi/0000.yaml"):
             description = metadata.parents[1] / "DESCRIPTION"
@@ -27,11 +29,23 @@ class ReleaseCheckTests(unittest.TestCase):
             dest = self.root / path
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / path, dest)
+        # the gate reads the release line from git: a one-commit repo on this checkout's
+        # branch (main or release/*), no remotes (no release/* to compare with) and no
+        # .gitmodules (no submodules to fetch); a detached PR checkout uses the base branch
+        branch = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--abbrev-ref", "HEAD"],
+                                capture_output=True, text=True).stdout.strip()
+        if branch in ("", "HEAD"):
+            branch = os.environ.get("GITHUB_BASE_REF") or "main"
+        git = ["git", "-C", str(self.root), "-c", "user.name=test", "-c", "user.email=test@example.com"]
+        subprocess.run(git + ["init", "-q", "-b", branch], check=True)
+        subprocess.run(git + ["add", "-A"], check=True)
+        subprocess.run(git + ["commit", "-q", "-m", "fixture"], check=True)
 
     def run_check(self, *args):
         return subprocess.run(
             ["bash", str(self.root / "packaging/scripts/release-check.sh"), *args],
             capture_output=True, text=True, timeout=20,
+            env={**os.environ, "JUPWR_SKIP_LICENSES": "1"},
         )
 
     def replace(self, path, old, new):
