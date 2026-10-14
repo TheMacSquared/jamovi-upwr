@@ -695,3 +695,31 @@ commitem z bumpem zmienionych modułów. Testy per etap: analizy w obrazie Docke
 porównane z poprzednią wersją (klasy `*Options`/`*Class`, w obrazie brak
 wrapperów; urządzenie `png(type = "cairo")`, bo domyślny pdf daje „invalid font
 type"), eksport .docx/.odt ręcznie, otwarcie starego .omv, `release-check.sh`.
+
+### Zadanie 22: audyt 2026-10-14 (Codex) — pozostałe punkty i zgłoszenia do upstreamu
+Naprawione w ramach 1.1.1 i 1.0.8 (bez bumpu — nieopublikowane; na
+`release/1.0` cherry-pick bez importu .omv, który dotyczy tylko 28.11):
+import z .omv/.omt (`formatio/__init__.py` `read_dataset`,
+`omv.read(..., dataset=)`), cudzysłowy w builderze reguł (`displayValue`
+z nazwami kolumn), krotki kategorii w `_rule_levels`, ostrzeżenie dla starych
+przekształceń (`setUnrepresentable`, `lastRepresentable`). Testy:
+`server/jamovi/tests/test_jupwr_fixes.py`, `client/main/vareditor/tests/
+conditionsbuilder.test.ts`.
+Pozostaje:
+- (P2) `recodedvarwidget._applyFormula` i zmiana poziomu pomiaru nadpisują
+  przekształcenie współdzielone przez inne kolumny (stare pliki) — przy
+  współdzieleniu tworzyć własne przekształcenie zmiennej.
+- (P2) builder zapisuje wyrażenie (`2 + 3`) w „użyj” i w wartości warunku
+  jako tekst — `formulaToChain` ma zwracać null dla wartości, której
+  `formatValue` nie odtworzy.
+- (marginalne) `transform.is_rules` szuka `$source` także w tekstach
+  w cudzysłowie.
+- IF z kategorią kolumny nominalnej z kodami i liczbą całkowitą daje typ
+  całkowity i kody zamiast etykiet (wnioskowanie typu IF, nie `_rule_levels`).
+- Zgłosić do jamovi (upstream, PÓŹNIEJ): `read_dataset` bez .omv/.omt
+  i `import_from` zerujący wiersze przed odczytem źródła (błąd czytania
+  dowolnego pliku nadal czyści dane); `Analysis.set_svg` używa
+  `self.dataset.instance_path` (jest w `Project`; padają upstreamowe testy
+  SVG w `test_analyses.py`); `client/main/utils/jsonlines.ts` nie buforuje
+  niedokończonej linii między fragmentami i dekoduje UTF-8 bez `stream: true`.
+

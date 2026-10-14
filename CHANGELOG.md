@@ -7,7 +7,8 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## 1.1.1 — 2026-10-13 (gałąź `test/upstream-28.11`)
 Poprawki zmiennej przekształconej i tabel wyników, jRISK 0.4.1; te same
-poprawki zmiennej przekształconej i jRISK są w 1.0.8.
+poprawki zmiennej przekształconej i jRISK są w 1.0.8 (bez importu z .omv,
+który dotyczy tylko 28.11).
 
 - Poprawka regresji z upstreamu 28.11 w kliencie: tabela, która traci wszystkie
   kolumny (np. Zmienne ilościowe po usunięciu ostatniej zmiennej), czyści też
@@ -21,6 +22,17 @@ poprawki zmiennej przekształconej i jRISK są w 1.0.8.
   a poziom pomiaru nie zależy od źródła. Lista poziomów pomiaru bez
   „Automatyczny”: nowa zmienna domyślnie nominalna, stare pliki pokazują typ
   faktycznie nadany kolumnie.
+- Import z pliku .omv/.omt znów działa (regresja upstreamu 28.11): wcześniej
+  kończył się błędem „Unrecognised file format” i zostawiał pustą tabelę
+  (wiersze były usuwane przed odczytem pliku).
+- Reguły zmiennej przekształconej: tekst w cudzysłowie równy nazwie kolumny,
+  „NA” albo liczbie („3”) zostaje tekstem przy ponownym zapisie reguł
+  (wcześniej stawał się odwołaniem do kolumny, brakiem danych lub liczbą).
+- Reguły zmiennej przekształconej: kategoria z kolumny nominalnej z kodami
+  (np. z SPSS) połączona z liczbą niecałkowitą nie przerywa przeliczania
+  (TypeError), a połączona z tekstem daje poziomy w kolejności reguł.
+- Stare przekształcenie (z dawnego edytora) pokazuje ostrzeżenie „edycja tutaj
+  je zastąpi” zamiast pustego panelu reguł, także po ponownym załadowaniu.
 - jRISK 0.4.1 (moduł opcjonalny): czytelne drzewo częstości („Zdarzenia
   i warunkowanie”) i diagram drzewa błędów (FTA) — węzły na tle wykresu
   z ciemnym tekstem (kolor palety tylko na ramce, także w ciemnym motywie),
