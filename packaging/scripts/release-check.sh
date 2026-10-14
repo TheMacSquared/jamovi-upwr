@@ -76,18 +76,22 @@ for key in $(git config -f .gitmodules --name-only --get-regexp '^submodule\..*\
 done
 
 # na main: commity z najnowszej release/* bez odpowiednika (ten sam patch albo cherry-pick -x)
-# i bez linii „Tylko-stable:”
+# i bez linii „Tylko-stable:” (commity zmieniające tylko CHANGELOG.md pomijane)
 if [ "$BRANCH" = main ] && [ -n "$RELEASES" ]; then
     rel="origin/release/$(echo "$RELEASES" | tail -1)"
-    picked="$(git log --format=%B HEAD | grep -oE 'cherry picked from commit [0-9a-f]{40}' | awk '{print $5}')"
+    # znacznik bywa ze skróconym hashem (cherry-pick -x po skróconym sha) — rozwijamy do pełnego
+    picked="$(git log --format=%B HEAD | grep -oE 'cherry picked from commit [0-9a-f]{7,40}' | awk '{print $5}' \
+        | while read -r h; do git rev-parse -q --verify "$h^{commit}" 2>/dev/null; done)"
     missing=""
     for c in $(git cherry HEAD "$rel" | awk '$1 == "+" {print $2}'); do
         body="$(git log -1 --format=%B "$c")"
         echo "$body" | grep -q '^Tylko-stable:' && continue
+        # sam CHANGELOG.md: każda linia ma własne wpisy wersji, nie przenosi się ich
+        [ "$(git diff-tree --no-commit-id --name-only -r "$c")" = CHANGELOG.md ] && continue
         echo "$picked" | grep -qx "$c" && continue
         # kierunek main -> stable: commit ze stable sam jest cherry-pickiem commita z main
         # (patch-id się różni, gdy przy przenoszeniu rozwiązano konflikt)
-        src="$(echo "$body" | grep -oE 'cherry picked from commit [0-9a-f]{40}' | awk '{print $5}' | tail -1)"
+        src="$(echo "$body" | grep -oE 'cherry picked from commit [0-9a-f]{7,40}' | awk '{print $5}' | tail -1)"
         [ -n "$src" ] && git merge-base --is-ancestor "$src" HEAD 2>/dev/null && continue
         missing="$missing ${c:0:8}"
     done
