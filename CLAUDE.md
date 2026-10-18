@@ -754,3 +754,16 @@ Pozostaje:
   SVG w `test_analyses.py`); `client/main/utils/jsonlines.ts` nie buforuje
   niedokończonej linii między fragmentami i dekoduje UTF-8 bez `stream: true`.
 
+
+### Zadanie 23: jCzest — wykresy bez motywu i palety aplikacji — DO ZROBIENIA
+Zgłoszone 2026-10-18 (test 28.13): wykresy w analizach jCzest (tabela kontyngencji,
+także zgodność i zależne) mają domyślne kolory ggplot zamiast palety ustawionej
+w aplikacji. Przyczyna: `.plot = function(image, ...)` w `jCzest/R/tabela.b.R`,
+`zgodnosc.b.R`, `zalezne.b.R` ignoruje przekazywane `ggtheme` i `theme`, kończy
+na `ggplot2::theme_minimal()` i nie dodaje skali palety (`zalezne` ma na sztywno
+`fill = "grey60"`). Naprawa wg wzoru jEksplor (`R/utils.R`, `jakosciowe.b.R`):
+sygnatura `function(image, ggtheme, theme, ...)`, `+ ggtheme` zamiast
+`theme_minimal()`, kolory z `theme$fill`/`theme$color`, a dla zmiennej grupującej
+`fill` skala z palety aplikacji (jak w pozostałych modułach: `theme$palette` /
+`jmvcore::colorPalette`). Bump jCzest (patch), sprawdzić motyw jasny/ciemny
+i palety UPWr/CVD.
