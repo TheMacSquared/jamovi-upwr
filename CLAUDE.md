@@ -13,9 +13,10 @@ przyjmuje tylko origin `localhost`, `JAMOVI_HOST_A` w `docker-compose.yaml`).
 ## Linia wydań — TA GAŁĄŹ: `main` (kanał latest, jUPWR 1.1.x, jamovi 28.11)
 - Tu trafiają nowe funkcje i nowy upstream. Stable to `release/1.0` (1.0.x,
   jamovi 28.2) — tylko poprawki, w katalogu `jamovi-upwr-stable` (ten katalog to `jamovi-upwr-latest`).
-- Poprawkę błędu, który występuje też w stable, przenieś na `release/1.0`
-  przez `git cherry-pick -x`; poprawki ze stable przychodzą tu tak samo
-  (`release-check.sh` wypisuje nieprzeniesione).
+- Poprawki robimy tylko tu (decyzja 2026-10-18: latest z czasem zastąpi stable).
+  Na `release/1.0` przenosimy (`git cherry-pick -x`) wyłącznie błędy KRYTYCZNE
+  (utrata/zepsucie danych, awaria aplikacji, błędne wyniki na zajęciach);
+  poprawki ze stable przychodzą tu jak dotąd (`release-check.sh` wypisuje nieprzeniesione).
 - Submoduły jmv, plots, i18n śledzą tu gałąź `main` w swoich repozytoriach.
 - `legacy/win81` to osobna, zamrożona linia (Windows 8.1).
 - Pełne zasady, układ katalogów i checklista wydania: `packaging/CHANNELS.md`.

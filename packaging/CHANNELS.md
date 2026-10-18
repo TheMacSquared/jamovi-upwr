@@ -7,7 +7,7 @@ Ten plik jest identyczny na wszystkich aktywnych gałęziach. Zmiany wprowadzaj 
 
 | Kanał | Gałąź | jUPWR | jamovi | Submoduły jmv/plots/i18n | Co tu trafia |
 |---|---|---|---|---|---|
-| stable | `release/1.0` | 1.0.x | 28.2 | `release/1.0` | tylko poprawki błędów |
+| stable | `release/1.0` | 1.0.x | 28.2 | `release/1.0` | tylko poprawki błędów krytycznych |
 | latest | `main` | 1.1.x | 28.11 | `main` | nowe funkcje, nowy upstream, poprawki |
 | legacy | `legacy/win81` | 1.0.4 | 28.2 | (stan z gałęzi) | zamrożona; Windows 8.1, osobny Electron i R; bez przenoszenia poprawek w żadną stronę (`packaging/30-legacy-win81.md`) |
 
@@ -107,8 +107,10 @@ Obrazy różnią się tagiem (`jupwr/jupwr:<wersja>`), więc build nie nadpisuje
 ## Przenoszenie poprawek
 
 - Nowa funkcja: tylko `main`.
-- Poprawka błędu: commit na linii, na której błąd znaleziono, potem od razu
-  `git cherry-pick -x <sha>` na drugą aktywną linię. `-x` zostawia w opisie
+- Poprawka błędu: tylko `main` (decyzja 2026-10-18: latest z czasem zastąpi stable).
+  Na `release/1.0` przenosi się `git cherry-pick -x <sha>` wyłącznie błędy krytyczne
+  (utrata lub zepsucie danych, awaria aplikacji, błędne wyniki). Poprawka zrobiona
+  na stable idzie na `main` tak samo. `-x` zostawia w opisie
   „(cherry picked from commit …)”, po którym `release-check.sh` rozpoznaje przeniesienie.
 - Commit, który z założenia dotyczy tylko stable (np. `.gitmodules`, wersja 1.0.x,
   wpis CHANGELOG wydania 1.0.x), dostaje w opisie linię `Tylko-stable: <powód>`.
