@@ -661,6 +661,13 @@ Etap 1 — wykresy wektorowe.
        każdym merge'u.
     C) akceptować czcionkę zastępczą — zero pracy, wykresy różnią się od PNG
        i motywów wykładowych.
+    TEST 2026-10-18 (Docker, obraz 1.1.1): bez zmian `fc-match "IBM Plex Sans"`
+    → DejaVu Sans, `svg()` rysuje DejaVu. Po skopiowaniu
+    `/usr/lib/jamovi/fonts/*.ttf` do `/usr/local/share/fonts/jupwr/` + `fc-cache -f`
+    cairo rysuje IBM Plex Sans/Mono z polskimi znakami, glify jako krzywe
+    (0 elementów `<text>` w SVG). Wariant A w Dockerze = dwie linie
+    w `docker/jamovi-Dockerfile` (przy `COPY … /usr/lib/jamovi/fonts/`).
+    Nie sprawdzone: cairo w R na macOS i Windows (do testu natywnie).
 1b. Pilot na jEksplor (9 wykresów): wygląd w aplikacji, eksport .docx/.odt,
     rozmiar .omv, wydajność przy N ~ 10 000 (ECDF, punkty na boxplocie).
 1c. Zakres:
