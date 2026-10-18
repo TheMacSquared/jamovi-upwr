@@ -796,9 +796,13 @@ Trzy przeglądy (builder `conditionsbuilder.ts`, widget `recodedvarwidget.ts`,
 serwer `transform.py`/`compute/nodes.py`/`.omv`), kluczowe potwierdzone skryptami
 w obrazie Dockera. Ciche błędne wyniki / utrata reguł:
 1. ~~przecinek dziesiętny („125,5" zapisywane jako tekst)~~ — ZROBIONE 2026-10-18:
-   `isCommaNumber` w `formatValue` (jak arkusz, `tableview.ts _applyEdit`),
-   liczby w polach wg `decSymbol` z ustawień (`VariableModel.settings`
-   ustawiane w `VariableEditor.init`, cache `setFormula` z symbolem).
+   ŚCIŚLE wg `decSymbol` z ustawień (decyzja dydaktyczna: zapis wynika
+   z ustawień — inaczej niż arkusz, który przyjmuje oba): `formatValue`
+   zamienia przecinek tylko przy ustawionym przecinku, `wrongDecimal`
+   wykrywa ułamek z drugim symbolem → pole `.invalid` z podpowiedzią,
+   `_commit` nic nie zapisuje (nie cichy tekst). `VariableModel.settings`
+   ustawiane w `VariableEditor.init`, cache `setFormula` z symbolem.
+   Spójność w całej aplikacji (arkusz, schowek) świadomie NIE — kod upstreamu.
 2. reguła `== NA` wyświetlana jako puste pole i kasowana przy następnej edycji
    (`displayValue` 'NA' → '', `termsToText` pomija pusty człon).
 3. wartość `"M" or "K"` przechodzi dosłownie (`isQuoted` patrzy tylko na

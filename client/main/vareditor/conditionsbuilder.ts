@@ -47,10 +47,19 @@ function isNumeric(text: string): boolean {
     return /^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(text.trim());
 }
 
-// a decimal comma, as the spreadsheet accepts it whatever the setting
-// (tableview.ts _applyEdit): "125,5" is the number 125.5
 function isCommaNumber(text: string): boolean {
     return /^[-+]?(\d+,\d+|,\d+)$/.test(text.trim());
+}
+
+// numbers are typed with the decimal symbol of the settings, strictly (unlike
+// the spreadsheet, which takes either): with a comma "125,5" is the number
+// 125.5; a fraction written with the other symbol is refused rather than
+// silently saved as text, which would match nothing
+export function wrongDecimal(value: string, decSymbol: string): boolean {
+    let t = value.trim();
+    if (decSymbol === ',')
+        return /^[-+]?(\d+\.\d*|\.\d+)([eE][-+]?\d+)?$/.test(t);
+    return isCommaNumber(t);
 }
 
 function isQuoted(text: string): boolean {
@@ -116,11 +125,11 @@ function splitTopLevel(text: string, seps: string[]): { parts: string[], seps: s
     return { parts, seps: found };
 }
 
-export function formatValue(value: string, columnNames: string[]): string {
+export function formatValue(value: string, columnNames: string[], decSymbol = '.'): string {
     let t = value.trim();
     if (t === '')
         return 'NA';
-    if (isCommaNumber(t))
+    if (decSymbol === ',' && isCommaNumber(t))
         return t.replace(',', '.');
     if (t === 'NA' || isNumeric(t) || isQuoted(t))
         return t;
@@ -134,7 +143,7 @@ export function formatValue(value: string, columnNames: string[]): string {
 // the quotes are dropped only when formatValue would put them back, so
 // that "b" (text) does not come back as the column b, "NA" as a missing
 // value or "3" as a number; numbers are shown with the decimal symbol of
-// the settings (formatValue reads either back)
+// the settings
 function displayValue(value: string, columnNames: string[], decSymbol = '.'): string {
     let t = value.trim();
     if (t === 'NA')
@@ -144,7 +153,7 @@ function displayValue(value: string, columnNames: string[], decSymbol = '.'): st
     if (isQuoted(t)) {
         let inner = t.slice(1, -1);
         if (inner.indexOf('"') === -1 && inner.indexOf("'") === -1
-                && formatValue(inner, columnNames)[0] === '"')
+                && formatValue(inner, columnNames, decSymbol)[0] === '"')
             return inner;
     }
     return t;
@@ -156,7 +165,7 @@ function displayValue(value: string, columnNames: string[], decSymbol = '.'): st
 // comes back in double quotes, which means the same.
 function roundTrips(value: string, columnNames: string[], decSymbol = '.'): boolean {
     let t = value.trim();
-    let back = formatValue(displayValue(t, columnNames, decSymbol), columnNames);
+    let back = formatValue(displayValue(t, columnNames, decSymbol), columnNames, decSymbol);
     if (back === t)
         return true;
     return isQuoted(t) && isQuoted(back) && t.slice(1, -1) === back.slice(1, -1);
@@ -165,18 +174,18 @@ function roundTrips(value: string, columnNames: string[], decSymbol = '.'): bool
 // serialise a list of terms joined by `joins`; returns '' when nothing in the
 // list is complete enough to contribute. `wrap` parenthesises a multi-term
 // result, which is what makes an explicit group override precedence.
-function termsToText(terms: Term[], joins: Join[], columnNames: string[], wrap: boolean): string {
+function termsToText(terms: Term[], joins: Join[], columnNames: string[], wrap: boolean, decSymbol: string): string {
     let pieces: string[] = [];
     let count = 0;
     for (let i = 0; i < terms.length; i++) {
         let term = terms[i];
         let text: string;
         if (isGroup(term))
-            text = termsToText(term.terms, term.joins, columnNames, true);
+            text = termsToText(term.terms, term.joins, columnNames, true, decSymbol);
         else if (term.variable === '' || term.value.trim() === '')
             text = '';
         else
-            text = quoteName(term.variable) + ' ' + term.op + ' ' + formatValue(term.value, columnNames);
+            text = quoteName(term.variable) + ' ' + term.op + ' ' + formatValue(term.value, columnNames, decSymbol);
         if (text === '')
             continue;
         if (count > 0)
@@ -190,17 +199,17 @@ function termsToText(terms: Term[], joins: Join[], columnNames: string[], wrap: 
     return (wrap && count > 1) ? '(' + text + ')' : text;
 }
 
-export function chainToFormula(chain: Chain, columnNames: string[]): string {
+export function chainToFormula(chain: Chain, columnNames: string[], decSymbol = '.'): string {
     let conds: string[] = [];
     let vals: string[] = [];
     for (let row of chain.rows) {
-        let cond = termsToText(row.clauses, row.joins, columnNames, false);
+        let cond = termsToText(row.clauses, row.joins, columnNames, false, decSymbol);
         if (cond === '')
             continue;
         conds.push(cond);
-        vals.push(formatValue(row.value, columnNames));
+        vals.push(formatValue(row.value, columnNames, decSymbol));
     }
-    let formula = formatValue(chain.elseValue, columnNames);
+    let formula = formatValue(chain.elseValue, columnNames, decSymbol);
     if (conds.length === 0)
         return chain.elseValue.trim() === '' ? '' : formula;
     for (let i = conds.length - 1; i >= 0; i--)
@@ -302,6 +311,15 @@ export function formulaToChain(formula: string, columnNames: string[] = [], decS
     }
 }
 
+function termsHaveWrongDecimal(terms: Term[], decSymbol: string): boolean {
+    return terms.some(t => isGroup(t) ? termsHaveWrongDecimal(t.terms, decSymbol) : wrongDecimal(t.value, decSymbol));
+}
+
+export function chainHasWrongDecimal(chain: Chain, decSymbol: string): boolean {
+    return wrongDecimal(chain.elseValue, decSymbol)
+        || chain.rows.some(r => wrongDecimal(r.value, decSymbol) || termsHaveWrongDecimal(r.clauses, decSymbol));
+}
+
 export class ConditionsBuilder extends HTMLElement {
 
     chain: Chain = { rows: [], elseValue: '' };
@@ -317,7 +335,7 @@ export class ConditionsBuilder extends HTMLElement {
     decSymbol: () => string;
     lastDecSymbol = '.';
 
-    // decSymbol: the decimal symbol of the settings, for showing numbers
+    // decSymbol: the decimal symbol of the settings, for typing and showing numbers
     constructor(columns: () => Column[], currentName: () => string, onChange: (formula: string) => void,
             decSymbol: () => string = () => '.') {
         super();
@@ -343,7 +361,7 @@ export class ConditionsBuilder extends HTMLElement {
         this.$elseRow = h('div', { class: 'row else-row' });
         this.$elseRow.append(h('span', { class: 'tag' }, _('else use')));
         this.$else = h('input', { type: 'text', class: 'value', placeholder: _('e.g. "other"') }) as HTMLInputElement;
-        this.$else.addEventListener('change', () => { this.chain.elseValue = this.$else.value; this._commit(); });
+        this.$else.addEventListener('change', () => { this.chain.elseValue = this.$else.value; this._check(this.$else); this._commit(); });
         this.$else.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') this.$else.blur(); });
         this.$elseRow.append(this.$else);
     }
@@ -389,8 +407,25 @@ export class ConditionsBuilder extends HTMLElement {
         this.render();
     }
 
+    // marks a value typed with the wrong decimal symbol
+    _check($input: HTMLInputElement) {
+        let decSymbol = this.decSymbol();
+        let wrong = wrongDecimal($input.value, decSymbol);
+        $input.classList.toggle('invalid', wrong);
+        if (wrong) {
+            let example = decSymbol === ',' ? '125,5' : '125.5';
+            $input.title = _('The decimal symbol in the settings is "{symbol}"; write numbers like {example}', { symbol: decSymbol, example });
+        }
+        else
+            $input.removeAttribute('title');
+    }
+
     _commit() {
-        let formula = chainToFormula(this.chain, this._columnNames());
+        // nothing is saved while a number has the wrong decimal symbol
+        let decSymbol = this.decSymbol();
+        if (chainHasWrongDecimal(this.chain, decSymbol))
+            return;
+        let formula = chainToFormula(this.chain, this._columnNames(), decSymbol);
         if (formula === this.lastFormula)
             return;
         this.lastFormula = formula;
@@ -403,6 +438,7 @@ export class ConditionsBuilder extends HTMLElement {
         this.chain.rows.forEach((row, ri) => this.$rows.append(this._renderRow(row, ri)));
         this.$rows.append(this.$elseRow);
         this.$else.value = this.chain.elseValue;
+        this._check(this.$else);
     }
 
     // renders one term list (a row body, or the inside of a group) with its
@@ -487,6 +523,7 @@ export class ConditionsBuilder extends HTMLElement {
             let listId = 'jmv-cond-levels-' + path + '-' + ti;
             let $val = h('input', { type: 'text', class: 'value', placeholder: _('value'), list: listId }) as HTMLInputElement;
             $val.value = clause.value;
+            this._check($val);
             let $list = h('datalist', { id: listId });
             let fillLevels = (col: Column | null) => {
                 $list.replaceChildren();
@@ -503,7 +540,7 @@ export class ConditionsBuilder extends HTMLElement {
                 this._commit();
             });
             $op.addEventListener('change', () => { clause.op = $op.value; this._commit(); });
-            $val.addEventListener('change', () => { clause.value = $val.value; this._commit(); });
+            $val.addEventListener('change', () => { clause.value = $val.value; this._check($val); this._commit(); });
             $val.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') $val.blur(); });
 
             if (terms.length > 1) {
@@ -542,7 +579,8 @@ export class ConditionsBuilder extends HTMLElement {
         $use.append(h('span', { class: 'tag' }, _('use')));
         let $useVal = h('input', { type: 'text', class: 'value', placeholder: _('e.g. "high"') }) as HTMLInputElement;
         $useVal.value = row.value;
-        $useVal.addEventListener('change', () => { row.value = $useVal.value; this._commit(); });
+        this._check($useVal);
+        $useVal.addEventListener('change', () => { row.value = $useVal.value; this._check($useVal); this._commit(); });
         $useVal.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') $useVal.blur(); });
         $use.append($useVal);
         let $rmRow = h('button', { class: 'remove-row', title: _('Remove rule') }, '×');

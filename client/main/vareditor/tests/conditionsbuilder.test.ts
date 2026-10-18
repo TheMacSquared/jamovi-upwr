@@ -128,16 +128,57 @@ describe('formulaToChain', () => {
     });
 });
 
-describe('decimal comma', () => {
+describe('decimal symbol', () => {
 
-    it('saves a number typed with a comma as a number', async () => {
+    it('with a comma in the settings saves "125,5" as a number', async () => {
         const { chainToFormula, formatValue } = await mod();
-        expect(formatValue('125,5', cols)).toBe('125.5');
-        expect(formatValue('-0,25', cols)).toBe('-0.25');
+        expect(formatValue('125,5', cols, ',')).toBe('125.5');
+        expect(formatValue('-0,25', cols, ',')).toBe('-0.25');
         expect(chainToFormula({ rows: [ {
             clauses: [ { variable: 'a', op: '<', value: '125,5' } ],
-            joins: [], value: '1,5' } ], elseValue: '0' }, cols))
+            joins: [], value: '1,5' } ], elseValue: '0' }, cols, ','))
             .toBe('IF(a < 125.5, 1.5, 0)');
+    });
+
+    it('refuses a fraction typed with the other symbol', async () => {
+        const { wrongDecimal } = await mod();
+        expect(wrongDecimal('125.5', ',')).toBe(true);
+        expect(wrongDecimal('.5', ',')).toBe(true);
+        expect(wrongDecimal('125,5', ',')).toBe(false);
+        expect(wrongDecimal('125,5', '.')).toBe(true);
+        expect(wrongDecimal('125.5', '.')).toBe(false);
+        // integers, text and quoted text are fine either way
+        for (const v of [ '125', '-3', 'abc', '"1,5"', '"1.5"', '1, 5', '' ]) {
+            expect(wrongDecimal(v, ',')).toBe(false);
+            expect(wrongDecimal(v, '.')).toBe(false);
+        }
+    });
+
+    it('does not save the rules while a number has the wrong symbol', async () => {
+        const { ConditionsBuilder } = await mod();
+        let symbol = ',';
+        let written: string[] = [];
+        const b = new ConditionsBuilder(() => [], () => '', (f) => written.push(f), () => symbol);
+        b.setFormula('IF(a < 2.5, "x", "y")');
+        (b.chain.rows[0].clauses[0] as any).value = '3.5';
+        b._commit();
+        expect(written).toEqual([]);
+        (b.chain.rows[0].clauses[0] as any).value = '3,5';
+        b._commit();
+        expect(written).toEqual([ 'IF(a < 3.5, "x", "y")' ]);
+    });
+
+    it('marks the field with the wrong symbol', async () => {
+        const { ConditionsBuilder } = await mod();
+        const b = new ConditionsBuilder(() => [], () => '', () => {}, () => ',');
+        const $input = document.createElement('input');
+        $input.value = '125.5';
+        b._check($input);
+        expect($input.classList.contains('invalid')).toBe(true);
+        expect($input.title).not.toBe('');
+        $input.value = '125,5';
+        b._check($input);
+        expect($input.classList.contains('invalid')).toBe(false);
     });
 
     it('shows numbers with the decimal symbol of the settings', async () => {
@@ -146,15 +187,17 @@ describe('decimal comma', () => {
         const comma = formulaToChain(formula, cols, ',')!;
         expect((comma.rows[0].clauses[0] as any).value).toBe('125,5');
         expect(comma.rows[0].value).toBe('1,5');
-        expect(chainToFormula(comma, cols)).toBe(formula);
+        expect(chainToFormula(comma, cols, ',')).toBe(formula);
         const dot = formulaToChain(formula, cols, '.')!;
         expect((dot.rows[0].clauses[0] as any).value).toBe('125.5');
+        expect(chainToFormula(dot, cols, '.')).toBe(formula);
     });
 
     it('keeps a quoted "1,5" as text', async () => {
         const { chainToFormula, formulaToChain } = await mod();
         const formula = 'IF(a == 1, "1,5", "x")';
-        expect(chainToFormula(formulaToChain(formula, cols, ',')!, cols)).toBe(formula);
+        expect(chainToFormula(formulaToChain(formula, cols, ',')!, cols, ',')).toBe(formula);
+        expect(chainToFormula(formulaToChain(formula, cols, '.')!, cols, '.')).toBe(formula);
     });
 
     it('reloads the same formula when the decimal symbol changes', async () => {

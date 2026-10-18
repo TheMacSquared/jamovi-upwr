@@ -20,10 +20,11 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   się razem z wybraną kategorią.
 - Zmienna przekształcona: reguła z tekstem „$source” w cudzysłowie jest
   rozpoznawana jako reguła (wcześniej traktowana jak stare przekształcenie).
-- Reguły zmiennej przekształconej przyjmują przecinek dziesiętny jak arkusz
-  („125,5” = 125.5; wcześniej zapisywane jako tekst, więc warunek nie działał
-  i wiersze były puste), a liczby w polach reguł pokazują symbol dziesiętny
-  z ustawień. Tekst „1,5” — w cudzysłowie.
+- Reguły zmiennej przekształconej: liczby wpisuje się i wyświetla z symbolem
+  dziesiętnym z ustawień (przy przecinku „125,5” = 125.5; wcześniej zapisywane
+  jako tekst, więc warunek nie działał i wiersze były puste). Liczba z drugim
+  symbolem jest odrzucana — pole na czerwono z podpowiedzią, reguły nie są
+  zapisywane, dopóki błąd nie zniknie. Tekst „1,5” — w cudzysłowie.
 - jperm 0.2.5: obszar odrzucenia i obserwowana statystyka w drugim kolorze
   palety zamiast stałej czerwieni.
 - jCI 0.3.5: wykres kafelkowy przedziału proporcji w kolorach palety

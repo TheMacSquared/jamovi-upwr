@@ -125,6 +125,11 @@
     max-width: 14em;
 }
 
+.jmv-conditions-builder input.value.invalid {
+    border-color: #C62828;
+    background: #FDECEA;
+}
+
 .jmv-conditions-builder .use {
     display: flex;
     flex-direction: row;
