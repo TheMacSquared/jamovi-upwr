@@ -332,10 +332,8 @@ export function firstWrongDecimal(chain: Chain, decSymbol: string): string | nul
     return wrongDecimal(chain.elseValue, decSymbol) ? chain.elseValue.trim() : null;
 }
 
-function wrongDecimalMessage(value: string, decSymbol: string): string {
-    let fixed = decSymbol === ',' ? value.replace('.', ',') : value.replace(',', '.');
-    return _('{value}: the decimal symbol in the settings is "{symbol}", write {fixed}. The rules are not saved until this is corrected.',
-        { value, symbol: decSymbol, fixed });
+function wrongDecimalMessage(): string {
+    return _('Invalid decimal symbol');
 }
 
 export class ConditionsBuilder extends HTMLElement {
@@ -431,7 +429,7 @@ export class ConditionsBuilder extends HTMLElement {
     validationMessage(): string {
         let decSymbol = this.decSymbol();
         let wrong = firstWrongDecimal(this.chain, decSymbol);
-        return wrong === null ? '' : wrongDecimalMessage(wrong, decSymbol);
+        return wrong === null ? '' : wrongDecimalMessage();
     }
 
     // marks a value typed with the wrong decimal symbol
@@ -440,7 +438,7 @@ export class ConditionsBuilder extends HTMLElement {
         let wrong = wrongDecimal($input.value, decSymbol);
         $input.classList.toggle('invalid', wrong);
         if (wrong)
-            $input.title = wrongDecimalMessage($input.value.trim(), decSymbol);
+            $input.title = wrongDecimalMessage();
         else
             $input.removeAttribute('title');
     }

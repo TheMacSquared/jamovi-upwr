@@ -23,8 +23,8 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - Reguły zmiennej przekształconej: liczby wpisuje się i wyświetla z symbolem
   dziesiętnym z ustawień (przy przecinku „125,5” = 125.5; wcześniej zapisywane
   jako tekst, więc warunek nie działał i wiersze były puste). Liczba z drugim
-  symbolem jest odrzucana — pole na czerwono i komunikat w wierszu błędów
-  (np. „125.5: symbol dziesiętny w ustawieniach to „,”, wpisz 125,5”); reguły nie są
+  symbolem jest odrzucana — pole na czerwono i komunikat „Nieprawidłowy symbol
+  dziesiętny” w wierszu błędów; reguły nie są
   zapisywane, dopóki błąd nie zniknie. Tekst „1,5” — w cudzysłowie.
 - jperm 0.2.5: obszar odrzucenia i obserwowana statystyka w drugim kolorze
   palety zamiast stałej czerwieni.
