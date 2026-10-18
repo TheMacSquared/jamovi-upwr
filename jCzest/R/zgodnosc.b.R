@@ -161,7 +161,7 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 "w Cohena = √(χ² / N); interpretacja wg progów Cohena: słaby 0.10, umiarkowany 0.30, silny 0.50.")
         },
 
-        .plot = function(image, ...) {
+        .plot = function(image, ggtheme, theme, ...) {
             st <- image$state
             if (is.null(st)) return(FALSE)
             df <- data.frame(
@@ -172,9 +172,9 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             df$kategoria <- factor(df$kategoria, levels = names(st$obs))
             df$typ <- factor(df$typ, levels = c("Obserwowane", "Oczekiwane"))
             p <- ggplot2::ggplot(df, ggplot2::aes(x = kategoria, y = n, fill = typ)) +
-                ggplot2::geom_col(position = ggplot2::position_dodge(width = 0.8), width = 0.7) +
+                ggplot2::geom_col(colour = theme$color[1], position = ggplot2::position_dodge(width = 0.8), width = 0.7) +
                 ggplot2::labs(x = st$var, y = "Liczność", fill = NULL) +
-                ggplot2::theme_minimal()
+                ggtheme + ggplot2::theme(legend.position = "bottom")
             print(p)
             TRUE
         }

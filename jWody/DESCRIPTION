@@ -1,7 +1,7 @@
 Package: jWody
 Type: Package
 Title: Hydrologia dla jamovi
-Version: 0.1.1
+Version: 0.1.2
 Author: jUPWR Team
 Maintainer: jUPWR Team <maciej.karczewski@upwr.edu.pl>
 Description: Kontrola dobowych i miesiecznych szeregow hydrologicznych,

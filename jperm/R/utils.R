@@ -131,6 +131,9 @@ buildPermPlot <- function(permDist, observed, hypothesis, ggtheme, theme, label 
         less     = df$stat <= observed
     )
 
+    # the rejection region and the observed value take the palette's second
+    # colour, so they stay distinct from the bars in every palette
+    pal2 <- jmvcore::colorPalette(2, theme$palette, 'fill')[2]
     p <- ggplot2::ggplot(df, ggplot2::aes(x = stat)) +
         ggplot2::geom_histogram(
             bins = 40,
@@ -142,14 +145,14 @@ buildPermPlot <- function(permDist, observed, hypothesis, ggtheme, theme, label 
             data = df[df$reject, , drop = FALSE],
             ggplot2::aes(x = stat),
             bins = 40,
-            fill = "firebrick",
+            fill = pal2,
             color = theme$color[1],
             alpha = 0.7
         ) +
         ggplot2::geom_vline(
             xintercept = observed,
             linetype = "dashed",
-            color = "red",
+            color = pal2,
             linewidth = 1.2
         ) +
         ggplot2::labs(

@@ -209,12 +209,19 @@ buildProportionIconPlot <- function(label, estimate, lower, upper, ciWidth, ggth
     grid$cat[grid$idx <= lo] <- "Sukces"
     grid$cat <- factor(grid$cat, levels = c("Sukces", "Przedział ufności", "Porażka"))
     acc <- accent(theme)
+    # neutral and in-between shades taken from the theme, so the dark variant
+    # gets dark tiles rather than light grey ones
+    panel <- if (length(theme$fill) >= 1) theme$fill[1] else "white"
+    ink <- if (length(theme$color) >= 1) theme$color[1] else "grey30"
+    neutral <- grDevices::colorRampPalette(c(panel, ink))(8)[2]
+    between <- grDevices::colorRampPalette(c(acc, neutral))(3)[2]
     ggplot2::ggplot(grid, ggplot2::aes(x = x, y = y, fill = cat)) +
-        ggplot2::geom_tile(colour = "white", linewidth = 1.5) +
-        ggplot2::scale_fill_manual(values = c("Sukces" = acc, "Przedział ufności" = "#E89090", "Porażka" = "#E0E0E0"), drop = FALSE) +
+        ggplot2::geom_tile(colour = panel, linewidth = 1.5) +
         ggplot2::coord_fixed() + ggplot2::scale_y_reverse() +
         ggplot2::labs(x = NULL, y = NULL, fill = NULL) +
         ggtheme +
+        # after ggtheme, whose palette scale would otherwise replace it
+        ggplot2::scale_fill_manual(values = c("Sukces" = acc, "Przedział ufności" = between, "Porażka" = neutral), drop = FALSE) +
         ggplot2::theme(axis.text = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank(),
                        axis.line = ggplot2::element_blank(), panel.grid = ggplot2::element_blank(),
                        panel.border = ggplot2::element_blank(), legend.position = "bottom",

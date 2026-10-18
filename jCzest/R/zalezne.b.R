@@ -207,24 +207,24 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 "bo to te same jednostki mierzone kilka razy."), level)
         },
 
-        .plot = function(image, ...) {
+        .plot = function(image, ggtheme, theme, ...) {
             st <- image$state
             if (is.null(st)) return(FALSE)
             df <- data.frame(pomiar = factor(st$vars, levels = st$vars),
                              udzial = st$prop, stringsAsFactors = FALSE)
             lab <- if (is.null(st$level)) "Udział" else sprintf("Udział kategorii „%s”", st$level)
             p <- ggplot2::ggplot(df, ggplot2::aes(x = pomiar, y = udzial, group = 1)) +
-                ggplot2::geom_col(width = 0.6, fill = "grey60") +
+                ggplot2::geom_col(width = 0.6, fill = theme$fill[2]) +
                 # linia laczy slupki, bo to TE SAME jednostki mierzone kilka razy —
                 # bez niej wykres wyglada jak porownanie niezaleznych grup
-                ggplot2::geom_line(colour = "grey25", linewidth = 0.7) +
-                ggplot2::geom_point(size = 2.6, colour = "grey25") +
+                ggplot2::geom_line(colour = theme$color[1], linewidth = 0.7) +
+                ggplot2::geom_point(size = 2.6, colour = theme$color[1]) +
                 ggplot2::geom_text(ggplot2::aes(label = sprintf("%.0f%%", 100 * udzial)),
-                                   vjust = -1.1, size = 3.6) +
+                                   vjust = -1.1, size = 3.6, colour = theme$color[1]) +
                 ggplot2::scale_y_continuous(labels = function(x) paste0(100 * x, "%"),
                                             limits = c(0, min(1, max(df$udzial) * 1.25 + 0.05))) +
                 ggplot2::labs(x = NULL, y = lab) +
-                ggplot2::theme_minimal()
+                ggtheme
             print(p)
             TRUE
         },

@@ -335,7 +335,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 "(liczba porównań: %d), p skorygowane metodą Holma."), ncol(tab), nrow(pw))
         },
 
-        .plot = function(image, ...) {
+        .plot = function(image, ggtheme, theme, ...) {
             st <- image$state
             if (is.null(st)) return(FALSE)
             tab <- st$tab
@@ -355,7 +355,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     df$val <- df$n; ylab <- "Liczność"
                 }
                 p <- ggplot2::ggplot(df, ggplot2::aes(x = w, y = val, fill = k)) +
-                    ggplot2::geom_col(position = ggplot2::position_dodge(width = 0.8), width = 0.7) +
+                    ggplot2::geom_col(colour = theme$color[1], position = ggplot2::position_dodge(width = 0.8), width = 0.7) +
                     ggplot2::labs(x = st$xlab, y = ylab, fill = st$fill)
             } else {
                 # mozaika: szerokość kolumny ~ liczebność brzegowa wiersza,
@@ -377,7 +377,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     ggplot2::scale_y_continuous(labels = function(x) paste0(100 * x, "%")) +
                     ggplot2::labs(x = st$xlab, y = "Udział w wierszu", fill = st$fill)
             }
-            print(p + ggplot2::theme_minimal())
+            print(p + ggtheme + ggplot2::theme(legend.position = "bottom"))
             TRUE
         }
     )

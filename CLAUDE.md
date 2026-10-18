@@ -10,7 +10,7 @@ Budowanie przez Docker: `docker compose --profile main build && docker compose -
 Aplikacja dostępna pod http://localhost:41337 po zbudowaniu (nie `127.0.0.1` — serwer
 przyjmuje tylko origin `localhost`, `JAMOVI_HOST_A` w `docker-compose.yaml`).
 
-## Linia wydań — TA GAŁĄŹ: `main` (kanał latest, jUPWR 1.1.x, jamovi 28.11)
+## Linia wydań — TA GAŁĄŹ: `main` (kanał latest, jUPWR 1.1.x, jamovi 28.13)
 - Tu trafiają nowe funkcje i nowy upstream. Stable to `release/1.0` (1.0.x,
   jamovi 28.2) — tylko poprawki, w katalogu `jamovi-upwr-stable` (ten katalog to `jamovi-upwr-latest`).
 - Poprawki robimy tylko tu (decyzja 2026-10-18: latest z czasem zastąpi stable).
@@ -755,7 +755,7 @@ Pozostaje:
   niedokończonej linii między fragmentami i dekoduje UTF-8 bez `stream: true`.
 
 
-### Zadanie 23: jCzest — wykresy bez motywu i palety aplikacji — DO ZROBIENIA
+### Zadanie 23: jCzest — wykresy bez motywu i palety aplikacji — ZROBIONE 2026-10-18 (jCzest 0.2.4)
 Zgłoszone 2026-10-18 (test 28.13): wykresy w analizach jCzest (tabela kontyngencji,
 także zgodność i zależne) mają domyślne kolory ggplot zamiast palety ustawionej
 w aplikacji. Przyczyna: `.plot = function(image, ...)` w `jCzest/R/tabela.b.R`,
@@ -767,3 +767,13 @@ sygnatura `function(image, ggtheme, theme, ...)`, `+ ggtheme` zamiast
 `fill` skala z palety aplikacji (jak w pozostałych modułach: `theme$palette` /
 `jmvcore::colorPalette`). Bump jCzest (patch), sprawdzić motyw jasny/ciemny
 i palety UPWr/CVD.
+Przegląd wszystkich modułów (2026-10-18) przy okazji: jperm 0.2.5 (obszar
+odrzucenia w drugim kolorze palety), jCI 0.3.5 (kafelki: `scale_fill_manual`
+stało PRZED `ggtheme` i było nadpisywane), jWody 0.1.2 (gradient przed
+`ggtheme` → błąd „Continuous value supplied to a discrete scale”, mapy się nie
+rysowały). PUŁAPKA: `ggtheme` niesie dyskretne skale `fill`/`colour` palety —
+każdą własną skalę kolorów (manual, gradient) dodawać PO `+ ggtheme`.
+Celowo bez zmian: szare linie odniesienia, `theme_void()` w diagramach jRISK.
+Otwarte (do decyzji): jPomiar i jWody mają kolory serii na sztywno (#32678c,
+#ae6030, #9b343e…) — nie idą za paletą; w ciemnym motywie granat na ciemnym
+panelu ma słaby kontrast.

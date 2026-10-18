@@ -53,6 +53,7 @@ hydroNotes <- function(name, options) {
 hydroPlot <- function(s, secondary, ggtheme) {
     if (is.null(s)) return(FALSE)
     name <- s$name
+    fillScale <- NULL
     if (name == "hydrocheck" && !secondary || name == "hydrolow" && !secondary) {
         d <- s$series
         plot <- ggplot2::ggplot(d, ggplot2::aes(x = date, y = value))
@@ -65,9 +66,11 @@ hydroPlot <- function(s, secondary, ggtheme) {
         d <- s$monthly
         d$year <- base::format(d$date, "%Y"); d$month <- as.integer(base::format(d$date, "%m"))
         d$z <- if (name == "hydrocheck") d$coverage else d$value
+        # added after ggtheme below: its discrete palette scale would replace
+        # this one and the continuous fill would then fail to draw
+        fillScale <- ggplot2::scale_fill_gradient(low = "#edf3f8", high = "#32678c", na.value = "#b6b6b6")
         plot <- ggplot2::ggplot(d, ggplot2::aes(x = month, y = year, fill = z))
         plot <- plot + ggplot2::geom_tile() + ggplot2::scale_x_continuous(breaks = 1:12) +
-            ggplot2::scale_fill_gradient(low = "#edf3f8", high = "#32678c", na.value = "#b6b6b6") +
             ggplot2::labs(x = "Miesiąc", y = "Rok", fill = if (name == "hydrocheck") "%" else s$unit)
     } else if (name == "hydroflow" && !secondary) {
         d <- s$fdc
@@ -94,7 +97,7 @@ hydroPlot <- function(s, secondary, ggtheme) {
             ggplot2::labs(caption = "Zielona: NQ; niebieska: SQ; czerwona: WQ")
         plot <- plot + ggplot2::labs(x = "Początek okresu", y = if (name == "hydrolow") "Deficyt wykrytych niżówek [m³]" else s$unit)
     }
-    plot <- plot + ggplot2::facet_wrap(~station, scales = "free_y") + ggtheme
+    plot <- plot + ggplot2::facet_wrap(~station, scales = "free_y") + ggtheme + fillScale
     print(plot)
     TRUE
 }

@@ -5,6 +5,22 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+- Upstream jamovi 28.13 (z 28.11): stan analiz z pliku .omv nie jest
+  przywracany (spreparowany plik mógł uruchomić kod R; analiza przelicza się
+  od nowa, a eksport czeka na przeliczenie), przecinek dziesiętny na osiach
+  wykresów i odświeżanie wykresów po zmianie symbolu, `RANK()` z brakami
+  danych, wklejanie w arkuszu, ścieżka folderów i typ pliku w oknie zapisu,
+  komunikat błędu nie zasłania wyników, kopiowanie wykresu jako LaTeX.
+- Wykresy jCzest 0.2.4 (tabela kontyngencji, zgodność, zależne) w motywie
+  i palecie ustawionych w aplikacji zamiast domyślnych kolorów ggplot.
+- jperm 0.2.5: obszar odrzucenia i obserwowana statystyka w drugim kolorze
+  palety zamiast stałej czerwieni.
+- jCI 0.3.5: wykres kafelkowy przedziału proporcji w kolorach palety
+  i motywu (wcześniej skala palety nadpisywała kolory, a „porażki” wychodziły
+  kolorowe; w ciemnym motywie białe ramki).
+- jWody 0.1.2 (moduł opcjonalny): mapa kompletności i mapa rok × miesiąc znów
+  się rysują (wcześniej błąd „Continuous value supplied to a discrete scale”).
+
 - Zmienna przekształcona w starym pliku, której przekształcenie jest wspólne
   z innymi kolumnami: edycja reguł albo poziomu pomiaru tworzy kolumnie własne
   przekształcenie zamiast zmieniać przy okazji pozostałe kolumny.
