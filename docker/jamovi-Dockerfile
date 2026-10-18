@@ -346,6 +346,11 @@ COPY --from=server  /usr/lib/jamovi/ /usr/lib/jamovi/
 # systemfonts::add_fonts() rather than installed system wide, so that the
 # Docker image and the native packages behave the same way
 COPY $JAMOVI_ROOT/platform/fonts/ /usr/lib/jamovi/fonts/
+# ...and also made known to fontconfig: vector plots (Image mode: vector) go
+# through grDevices::svg (cairo), which does not see systemfonts' local fonts
+RUN mkdir -p /usr/local/share/fonts/jupwr \
+    && cp /usr/lib/jamovi/fonts/*.ttf /usr/local/share/fonts/jupwr/ \
+    && fc-cache -f
 
 ENV LD_LIBRARY_PATH $R_HOME/lib
 ENV JAMOVI_HOME /usr/lib/jamovi

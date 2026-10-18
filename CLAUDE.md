@@ -665,9 +665,22 @@ Etap 1 — wykresy wektorowe.
     → DejaVu Sans, `svg()` rysuje DejaVu. Po skopiowaniu
     `/usr/lib/jamovi/fonts/*.ttf` do `/usr/local/share/fonts/jupwr/` + `fc-cache -f`
     cairo rysuje IBM Plex Sans/Mono z polskimi znakami, glify jako krzywe
-    (0 elementów `<text>` w SVG). Wariant A w Dockerze = dwie linie
-    w `docker/jamovi-Dockerfile` (przy `COPY … /usr/lib/jamovi/fonts/`).
-    Nie sprawdzone: cairo w R na macOS i Windows (do testu natywnie).
+    (0 elementów `<text>` w SVG). Wariant A w Dockerze WDROŻONY
+    (`docker/jamovi-Dockerfile`, RUN po `COPY … /usr/lib/jamovi/fonts/`).
+    macOS (2026-10-18): w jUPWR.app `svg()` NIE DZIAŁA — „failed to load cairo
+    DLL”: `grDevices/libs/cairo.so` z R CRAN linkuje `/opt/X11/lib/lib{Xrender,
+    SM,ICE,X11,Xext}` (XQuartz), a `55-relocate.sh` sprawdza tylko ścieżki
+    Homebrew/R.framework. Upstream jamovi.app pakuje libX11, libXrender, libSM,
+    libICE, libXext, libxcb, libXau do `R.framework/.../Resources/lib`
+    i przepina ścieżki. Test z tymi bibliotekami (DYLD_FALLBACK_LIBRARY_PATH)
+    + `FONTCONFIG_FILE` z `<include>` configu R i `<dir>` z fontami jUPWR:
+    cairo rysuje IBM Plex Sans/Mono jak w Dockerze. Do zrobienia przed pilotem
+    vector: (1) pakowanie bibliotek X11 w buildzie macOS i `/opt/X11` w kontroli
+    absolutnych zależności, (2) fontconfig wskazujący `Resources/jamovi/fonts`
+    (np. jmvcore ustawia `FONTCONFIG_FILE` na wygenerowany config przed
+    pierwszym `svg()`; skompilowana ścieżka configu w R CRAN to
+    `/Library/Frameworks/R.framework/...`, której w .app nie ma).
+    Windows: nie sprawdzone (do testu natywnie).
 1b. Pilot na jEksplor (9 wykresów): wygląd w aplikacji, eksport .docx/.odt,
     rozmiar .omv, wydajność przy N ~ 10 000 (ECDF, punkty na boxplocie).
 1c. Zakres:
