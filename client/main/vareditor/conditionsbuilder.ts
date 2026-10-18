@@ -43,12 +43,14 @@ export interface Chain {
 
 const OPERATORS = ['==', '!=', '<', '<=', '>', '>='];
 
+// only what the server reads as a number: no leading zero ("01" is a code,
+// kept as text), no exponent and no trailing point (read as a column name)
 function isNumeric(text: string): boolean {
-    return /^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(text.trim());
+    return /^[-+]?((0|[1-9]\d*)(\.\d+)?|\.\d+)$/.test(text.trim());
 }
 
 function isCommaNumber(text: string): boolean {
-    return /^[-+]?(\d+,\d+|,\d+)$/.test(text.trim());
+    return /^[-+]?((0|[1-9]\d*),\d+|,\d+)$/.test(text.trim());
 }
 
 // numbers are typed with the decimal symbol of the settings, strictly (unlike
@@ -62,9 +64,24 @@ export function wrongDecimal(value: string, decSymbol: string): boolean {
     return isCommaNumber(t);
 }
 
+// one quoted text: the server ends it at the first matching quote, so
+// "M" or "K" is not one (it used to pass verbatim and match every row)
 function isQuoted(text: string): boolean {
     let t = text.trim();
-    return t.length >= 2 && ((t[0] === '"' && t[t.length - 1] === '"') || (t[0] === "'" && t[t.length - 1] === "'"));
+    let q = t[0];
+    return t.length >= 2 && (q === '"' || q === "'") && t[t.length - 1] === q
+        && t.slice(1, -1).indexOf(q) === -1;
+}
+
+// a value that starts with a quote but is not one quoted text, or a text
+// with both kinds of quotes (which no quoting can hold)
+export function badQuotes(value: string): boolean {
+    let t = value.trim();
+    if (t === '' || isQuoted(t))
+        return false;
+    if (t[0] === '"' || t[0] === "'")
+        return true;
+    return t.indexOf('"') !== -1 && t.indexOf("'") !== -1;
 }
 
 function quoteName(name: string): string {
@@ -137,7 +154,8 @@ export function formatValue(value: string, columnNames: string[], decSymbol = '.
         return quoteName(t);
     if (t[0] === '`' && t[t.length - 1] === '`')
         return t;
-    return '"' + t.replace(/"/g, '\\"') + '"';
+    // the server takes quoted text literally, without escapes
+    return t.indexOf('"') === -1 ? '"' + t + '"' : "'" + t + "'";
 }
 
 // the quotes are dropped only when formatValue would put them back, so
@@ -152,8 +170,8 @@ function displayValue(value: string, columnNames: string[], decSymbol = '.'): st
         return t.replace('.', ',');
     if (isQuoted(t)) {
         let inner = t.slice(1, -1);
-        if (inner.indexOf('"') === -1 && inner.indexOf("'") === -1
-                && formatValue(inner, columnNames, decSymbol)[0] === '"')
+        let back = formatValue(inner, columnNames, decSymbol);
+        if (isQuoted(back) && back.slice(1, -1) === inner)
             return inner;
     }
     return t;
@@ -225,7 +243,9 @@ function parseClause(text: string, columnNames: string[], decSymbol = '.'): Clau
         return null;
     if ( ! roundTrips(m[3], columnNames, decSymbol))
         return null;
-    return { variable: unquoteName(m[1]), op: m[2], value: displayValue(m[3], columnNames, decSymbol) };
+    // a comparison with NA shows NA (an empty value would drop the clause)
+    let value = m[3].trim() === 'NA' ? 'NA' : displayValue(m[3], columnNames, decSymbol);
+    return { variable: unquoteName(m[1]), op: m[2], value };
 }
 
 // strip one layer of redundant wrapping parentheses, e.g. "(a == 1 or b == 2)"
@@ -297,13 +317,12 @@ export function formulaToChain(formula: string, columnNames: string[] = [], decS
             text = args[2].trim();
         }
         else {
-            if (rows.length === 0)
-                return null;
+            // (an else value alone, with no rules, is fine too)
             let cond = parseCondition(text, columnNames);
             if (cond !== null)
                 return null; // a bare comparison is a formula, not an else value
-            if (/[()]/.test(text))
-                return null;
+            // function calls and expressions do not round-trip; a quoted
+            // text may well contain parentheses
             if ( ! roundTrips(text, columnNames, decSymbol))
                 return null;
             return { rows, elseValue: displayValue(text, columnNames, decSymbol) };
@@ -311,29 +330,36 @@ export function formulaToChain(formula: string, columnNames: string[] = [], decS
     }
 }
 
-function termsWrongDecimal(terms: Term[], decSymbol: string): string | null {
-    for (let t of terms) {
-        let found = isGroup(t) ? termsWrongDecimal(t.terms, decSymbol) : (wrongDecimal(t.value, decSymbol) ? t.value.trim() : null);
-        if (found !== null)
-            return found;
-    }
-    return null;
-}
-
-// the first value in the rules typed with the wrong decimal symbol, or null
-export function firstWrongDecimal(chain: Chain, decSymbol: string): string | null {
-    for (let r of chain.rows) {
-        let found = termsWrongDecimal(r.clauses, decSymbol);
-        if (found === null && wrongDecimal(r.value, decSymbol))
-            found = r.value.trim();
-        if (found !== null)
-            return found;
-    }
-    return wrongDecimal(chain.elseValue, decSymbol) ? chain.elseValue.trim() : null;
-}
-
 function wrongDecimalMessage(): string {
     return _('Invalid decimal symbol');
+}
+
+// why a value cannot be saved, or ''
+function valueProblem(value: string, decSymbol: string): string {
+    if (wrongDecimal(value, decSymbol))
+        return wrongDecimalMessage();
+    if (badQuotes(value))
+        return _('Invalid quotation marks');
+    return '';
+}
+
+function termsProblem(terms: Term[], decSymbol: string): string {
+    for (let t of terms) {
+        let problem = isGroup(t) ? termsProblem(t.terms, decSymbol) : valueProblem(t.value, decSymbol);
+        if (problem !== '')
+            return problem;
+    }
+    return '';
+}
+
+// why the rules cannot be saved (the first problem found), or ''
+export function chainProblem(chain: Chain, decSymbol: string): string {
+    for (let r of chain.rows) {
+        let problem = termsProblem(r.clauses, decSymbol) || valueProblem(r.value, decSymbol);
+        if (problem !== '')
+            return problem;
+    }
+    return valueProblem(chain.elseValue, decSymbol);
 }
 
 export class ConditionsBuilder extends HTMLElement {
@@ -427,27 +453,24 @@ export class ConditionsBuilder extends HTMLElement {
 
     // why the rules cannot be saved, or '' (shown by the host)
     validationMessage(): string {
-        let decSymbol = this.decSymbol();
-        let wrong = firstWrongDecimal(this.chain, decSymbol);
-        return wrong === null ? '' : wrongDecimalMessage();
+        return chainProblem(this.chain, this.decSymbol());
     }
 
-    // marks a value typed with the wrong decimal symbol
+    // marks a value that cannot be saved
     _check($input: HTMLInputElement) {
-        let decSymbol = this.decSymbol();
-        let wrong = wrongDecimal($input.value, decSymbol);
-        $input.classList.toggle('invalid', wrong);
-        if (wrong)
-            $input.title = wrongDecimalMessage();
+        let problem = valueProblem($input.value, this.decSymbol());
+        $input.classList.toggle('invalid', problem !== '');
+        if (problem !== '')
+            $input.title = problem;
         else
             $input.removeAttribute('title');
     }
 
     _commit() {
         this.onValidity();
-        // nothing is saved while a number has the wrong decimal symbol
+        // nothing is saved while a value is invalid
         let decSymbol = this.decSymbol();
-        if (firstWrongDecimal(this.chain, decSymbol) !== null)
+        if (chainProblem(this.chain, decSymbol) !== '')
             return;
         let formula = chainToFormula(this.chain, this._columnNames(), decSymbol);
         if (formula === this.lastFormula)

@@ -367,8 +367,15 @@ class RecodedVarWidget extends HTMLElement {
         }
     }
 
+    // jUPWR: several variables with different rules are selected. The builder
+    // can show none of them, and writing would give them all the same new
+    // rules (wiping their own), so it is locked until one is picked.
+    _isMixed(): boolean {
+        return (this.model.get('ids') || []).length > 1 && this.model.get('transform') === null;
+    }
+
     _applyFormula(formula: string) {
-        if (this._applying)
+        if (this._applying || this._isMixed())
             return;
 
         this._ensureParent();
@@ -436,6 +443,23 @@ class RecodedVarWidget extends HTMLElement {
     // source-relative fragments; those cannot be shown as rules, so the builder
     // falls back to its "cannot be shown as conditions" warning.
     _loadFromTransform() {
+        let mixed = this._isMixed();
+        this.classList.toggle('mixed', mixed);
+        this.builder.$addRow.disabled = mixed;
+        this.$measureList.disabled = mixed;
+        if (mixed) {
+            this._applying = true;
+            try {
+                this.builder.setUnrepresentable('<mixed>');
+                this.builder.classList.remove('not-representable');
+            }
+            finally {
+                this._applying = false;
+            }
+            this._updateErrorMessage();
+            return;
+        }
+
         let transformId = this.model.get('transform');
         let transform = (transformId !== null && transformId !== 0)
             ? this.model.dataset.getTransformById(transformId)
@@ -508,6 +532,8 @@ class RecodedVarWidget extends HTMLElement {
         this.measureList.addEventListener('selected-measure-type', (event: CustomEvent<MeasureType>) => {
             let measureType = event.detail;
             dropdown.hide();
+            if (this._isMixed())
+                return;
 
             // show the choice straight away; the reload below confirms it
             this.$measureList.value = measureType;
@@ -616,7 +642,11 @@ class RecodedVarWidget extends HTMLElement {
 
         // a rule the builder refuses to save comes first: the transform
         // still holds the previous rules, so its own message is stale
-        let errorMsg = this.builder ? this.builder.validationMessage() : '';
+        let errorMsg = '';
+        if (this.builder && this._isMixed())
+            errorMsg = _('The selected variables have different rules; edit them one at a time.');
+        else if (this.builder)
+            errorMsg = this.builder.validationMessage();
         if (errorMsg === '')
             errorMsg = this.model.get('formulaMessage') ?? '';
         if (errorMsg === '') {

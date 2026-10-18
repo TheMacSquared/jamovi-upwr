@@ -289,3 +289,9 @@
 .jmv-variable-editor-main[data-type='recoded'] .jmv-variable-editor-widget-footer > .status-box > .status {
     font-size: 11px;
 }
+
+/* jUPWR: several variables with different rules selected -- locked */
+.jmv-variable-recoded-widget.mixed .jmv-conditions-builder {
+    pointer-events: none;
+    opacity: 0.5;
+}

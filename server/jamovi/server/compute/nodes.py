@@ -550,10 +550,10 @@ class Call(ast.Call, Node):
         source = self.args[0]
         if self.func.id in ('_RULES', '_RULES_NOM', '_RULES_ORD'):
             # jUPWR: rules -- the whole IF chain is the only argument
-            return self._rule_levels(row_count, [ 0 ])
+            return self._rule_levels(row_count, filt, [ 0 ])
         if ((self.func.id == '_RECODE_ORD' or self.func.id == '_RECODE_NOM')
                 and source.measure_type == MeasureType.CONTINUOUS):
-            return self._rule_levels(row_count, arg_level_indices[1:])
+            return self._rule_levels(row_count, filt, arg_level_indices[1:])
 
         level_use = OrderedDict()
 
@@ -577,8 +577,29 @@ class Call(ast.Call, Node):
 
         return enumerate(levels)
 
-    def _rule_levels(self, row_count, label_args):
-        values = self.fvalues(row_count, False)
+    # jUPWR: the values an IF chain can give, in the order of its rules
+    # (texts and numbers alike); anything else with levels (e.g. a column
+    # passed through) contributes its own levels at that point
+    def _rule_constants(self, node, row_count, filt, out):
+        if isinstance(node, Call) and node.func.id == 'IF' and len(node.args) == 3:
+            self._rule_constants(node.args[1], row_count, filt, out)
+            self._rule_constants(node.args[2], row_count, filt, out)
+        elif isinstance(node, Constant):
+            if node.value is not None and not isinstance(node.value, bool):
+                out.append(node.value)
+        elif (isinstance(node, UnaryOp) and isinstance(node.op, ast.USub)
+                and isinstance(node.operand, Constant)
+                and isinstance(node.operand.value, (int, float))
+                and not isinstance(node.operand.value, bool)):
+            out.append(-node.operand.value)
+        elif node.has_levels:
+            for level in node.get_levels(row_count, filt):
+                out.append(level[1])
+
+    def _rule_levels(self, row_count, filt, label_args):
+        # jUPWR: with the same filter as the cells, or values from column
+        # functions (Z, VMEAN, ...) do not match the levels
+        values = self.fvalues(row_count, filt)
         values = [ v for v in values if not is_missing(v) ]
         # jUPWR: a category passed through from a column arrives as a
         # (code, label) tuple; it is its label that ends up in the cell
@@ -588,20 +609,21 @@ class Call(ast.Call, Node):
             levels = sorted(set(values))
             levels = map(lambda x: convert(x, str), levels)
             return enumerate(levels)
-        # jUPWR: text labels keep the order of the recode rules (as with
-        # the automatic measure type); sorting them by code point put
-        # 'średnia' after 'wysoka'. Values passed through from a column
-        # follow, sorted numerically.
-        levels = [ ]
+        # jUPWR: levels keep the order of the recode rules (as with the
+        # automatic measure type), numbers among them too; sorting them by
+        # code point put 'średnia' after 'wysoka'. Values passed through
+        # from a column follow, sorted numerically.
+        present = set(texts) | set(convert(v, str) for v in values if not isinstance(v, str))
+        constants = [ ]
         for arg_i in label_args:
-            if arg_i >= len(self.args):
-                continue
-            arg = self.args[arg_i]
-            if not arg.has_levels:
-                continue
-            for level in arg.get_levels(row_count, False):
-                if level[1] in texts and level[1] not in levels:
-                    levels.append(level[1])
+            if arg_i < len(self.args):
+                self._rule_constants(self.args[arg_i], row_count, filt, constants)
+        levels = [ ]
+        for value in constants:
+            if not isinstance(value, str):
+                value = convert(value, str)
+            if value in present and value not in levels:
+                levels.append(value)
         numbers = sorted(set(v for v in values if not isinstance(v, str)))
         for value in sorted(texts) + [ convert(v, str) for v in numbers ]:
             if value not in levels:

@@ -169,12 +169,12 @@ describe('decimal symbol', () => {
     });
 
     it('explains in words which value is wrong', async () => {
-        const { ConditionsBuilder, firstWrongDecimal } = await mod();
-        const chain = { rows: [ { clauses: [ { variable: 'a', op: '<', value: '1,5' },
+        const { ConditionsBuilder, chainProblem } = await mod();
+        const chain = { rows: [ { clauses: [ { variable: 'a', op: '<', value: '1' },
                 { terms: [ { variable: 'b', op: '==', value: '2.5' } ], joins: [] } ],
-            joins: [ 'and' as const ], value: 'x' } ], elseValue: '3.5' };
-        expect(firstWrongDecimal(chain, ',')).toBe('2.5');
-        expect(firstWrongDecimal(chain, '.')).toBe('1,5');
+            joins: [ 'and' as const ], value: 'x' } ], elseValue: '3' };
+        expect(chainProblem(chain, ',')).not.toBe('');   // in a bracket, too
+        expect(chainProblem(chain, '.')).toBe('');
         let calls = 0;
         const b = new ConditionsBuilder(() => [], () => '', () => {}, () => ',');
         b.onValidity = () => calls++;
@@ -249,5 +249,68 @@ describe('ConditionsBuilder', () => {
         b._commit();
         expect(written).toEqual([ '"y"' ]);
         expect(b.setFormula('"y"')).toBe(true);
+    });
+});
+
+describe('audit 2026-10-18', () => {
+
+    it('keeps a comparison with NA', async () => {
+        const { chainToFormula, formulaToChain } = await mod();
+        const formula = 'IF(a == NA, "brak", "jest")';
+        const chain = formulaToChain(formula, cols)!;
+        expect((chain.rows[0].clauses[0] as any).value).toBe('NA');
+        expect(chainToFormula(chain, cols)).toBe(formula);
+    });
+
+    it('refuses "M" or "K" as a value instead of passing it on', async () => {
+        const { badQuotes, chainProblem, formatValue } = await mod();
+        expect(badQuotes('"M" or "K"')).toBe(true);
+        expect(badQuotes('"M')).toBe(true);
+        expect(badQuotes('"M"')).toBe(false);
+        expect(badQuotes("'M'")).toBe(false);
+        expect(badQuotes('M or K')).toBe(false);
+        expect(chainProblem({ rows: [ { clauses: [ { variable: 'a', op: '==', value: '"M" or "K"' } ],
+            joins: [], value: 'x' } ], elseValue: '' }, '.')).not.toBe('');
+        expect(formatValue('"M"', cols)).toBe('"M"');
+    });
+
+    it('quotes text with quotes or backslashes so the server reads it literally', async () => {
+        const { badQuotes, chainToFormula, formatValue, formulaToChain } = await mod();
+        expect(formatValue('say "hi"', cols)).toBe('\'say "hi"\'');
+        expect(formatValue("O'Brien", cols)).toBe('"O\'Brien"');
+        expect(formatValue('a\\b', cols)).toBe('"a\\b"');
+        expect(badQuotes('it\'s "x"')).toBe(true);    // both kinds: no quoting holds it
+        for (const formula of [ 'IF(a == 1, \'say "hi"\', "x")', 'IF(a == 1, "O\'Brien", "a\\b")' ]) {
+            const chain = formulaToChain(formula, cols)!;
+            expect(chain).not.toBeNull();
+            expect(chainToFormula(chain, cols)).toBe(formula);
+        }
+        expect(formulaToChain('IF(a == 1, \'say "hi"\', "x")', cols)!.rows[0].value).toBe('say "hi"');
+    });
+
+    it('reopens an else value with parentheses, and an else value alone', async () => {
+        const { chainToFormula, formulaToChain } = await mod();
+        const formula = 'IF(a > 1, "x", "inne (brak)")';
+        const chain = formulaToChain(formula, cols)!;
+        expect(chain.elseValue).toBe('inne (brak)');
+        expect(chainToFormula(chain, cols)).toBe(formula);
+        const alone = formulaToChain('"wszyscy"', cols)!;
+        expect(alone.rows).toEqual([]);
+        expect(alone.elseValue).toBe('wszyscy');
+        // still no function calls or expressions
+        expect(formulaToChain('IF(a > 1, "x", MEAN(b))', cols)).toBeNull();
+        expect(formulaToChain('a + b', cols)).toBeNull();
+    });
+
+    it('keeps codes with a leading zero and other non-numbers as text', async () => {
+        const { formatValue } = await mod();
+        expect(formatValue('01', cols)).toBe('"01"');
+        expect(formatValue('1e5', cols)).toBe('"1e5"');
+        expect(formatValue('1.', cols)).toBe('"1."');
+        expect(formatValue('0', cols)).toBe('0');
+        expect(formatValue('0.5', cols)).toBe('0.5');
+        expect(formatValue('-12', cols)).toBe('-12');
+        expect(formatValue('.5', cols)).toBe('.5');
+        expect(formatValue('01,5', cols, ',')).toBe('"01,5"');
     });
 });

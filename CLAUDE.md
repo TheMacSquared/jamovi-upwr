@@ -791,7 +791,7 @@ każdą własną skalę kolorów (manual, gradient) dodawać PO `+ ggtheme`.
 Celowo bez zmian: szare linie odniesienia, `theme_void()` w diagramach jRISK;
 kolory na sztywno w jPomiar i jWody (moduły wewnętrzne).
 
-### Zadanie 24: audyt zmiennej przekształconej (2026-10-18) — W TOKU
+### Zadanie 24: audyt zmiennej przekształconej (2026-10-18) — 1.1.2: 1–3, 5, 6, 8, 9, 11, 12 ZROBIONE
 Trzy przeglądy (builder `conditionsbuilder.ts`, widget `recodedvarwidget.ts`,
 serwer `transform.py`/`compute/nodes.py`/`.omv`), kluczowe potwierdzone skryptami
 w obrazie Dockera. Ciche błędne wyniki / utrata reguł:
@@ -804,28 +804,29 @@ w obrazie Dockera. Ciche błędne wyniki / utrata reguł:
    `_commit` nic nie zapisuje (nie cichy tekst). `VariableModel.settings`
    ustawiane w `VariableEditor.init`, cache `setFormula` z symbolem.
    Spójność w całej aplikacji (arkusz, schowek) świadomie NIE — kod upstreamu.
-2. reguła `== NA` wyświetlana jako puste pole i kasowana przy następnej edycji
-   (`displayValue` 'NA' → '', `termsToText` pomija pusty człon).
-3. wartość `"M" or "K"` przechodzi dosłownie (`isQuoted` patrzy tylko na
-   pierwszy i ostatni znak) → pasuje do każdego wiersza.
-4. tekst równy nazwie kolumny (np. „A" przy domyślnych nazwach, własna nazwa
-   zmiennej) zapisuje się jako odwołanie do kolumny; model `Clause` nie
-   pamięta, czy wartość jest tekstem czy kolumną (średnie).
-5. edycja kilku zaznaczonych zmiennych o różnych regułach: pusty builder,
-   zmiana typu/reguły kasuje reguły wszystkich (`setColumn` → transform null).
-6. filtry ignorowane w regułach z funkcjami kolumnowymi (Z, VN, VMEAN):
-   `_rule_levels` (nodes.py ~553/580) woła `fvalues`/`get_levels` bez `filt`.
+~~2. `== NA`~~, ~~3. `"M" or "K"`~~, ~~5. kilka zmiennych~~, ~~6. filtry~~,
+~~8. poziomy porządkowe~~, ~~9. cudzysłów/ukośnik~~ — ZROBIONE 2026-10-18:
+2 — `parseClause` pokazuje „NA”; 3 — ścisły `isQuoted` (bez cudzysłowu
+w środku) + `badQuotes` → „Nieprawidłowy cudzysłów” (jak symbol dziesiętny:
+`chainProblem`/`valueProblem`, `_commit` nic nie zapisuje); 5 — `_isMixed`
+w widgecie (kilka id, `transform` null): builder zablokowany z komunikatem;
+6 — `_rule_levels(row_count, filt, …)` z tym samym filtrem co komórki;
+8 — `_rule_constants` zbiera wartości łańcucha IF w kolejności reguł, także
+liczby; 9 — `Parser.escape` (compute/parser.py) bierze tekst w cudzysłowie
+DOSŁOWNIE (escapuje `\` i `"` przed `ast.parse`; wcześniej `\b` = escape
+Pythona, a `'a"b'` łamało składnię), klient cytuje tekst z `"` apostrofami,
+`_QUOTED` w transform.py bez escape'ów. Pozostają (świadomie po 1.1.2):
+4. tekst równy nazwie kolumny zapisuje się jako odwołanie do kolumny; model
+   `Clause` nie pamięta, czy wartość jest tekstem czy kolumną (średnie).
 7. zmiana nazwy kolumny użytej w regule → „kolumna nie istnieje" (stare
    przekształcenie z `$source` to przeżywało; nic nie przepisuje nazw w formułach).
-8. poziomy porządkowe przy mieszanych liczbach i tekście w złej kolejności
-   (nodes.py 590–608 dopasowuje tylko teksty).
-9. cudzysłów/ukośnik wsteczny w tekście: parser serwera nie zna `\"` —
-   zniekształcenie albo błąd składni (`formatValue`).
 Widoczne na co dzień: 10. automatyczne nazwy „wiek - T1"/„? - T1"
 (`datasetcontroller._calc_column_name` + `_ensureParent`); 11. wartość „else"
-z nawiasem albo samo „else" bez reguł → nie otwiera się jako reguły;
-12. kody z zerem na początku („01") i `1e5` → błąd składni (`isNumeric`
-szerszy niż tokenizer serwera); 13. wydajność kwadratowa (20 reguł × 10 tys.
+z nawiasem albo samo „else" bez reguł → nie otwiera się jako reguły
+(ZROBIONE 2026-10-18: bez testu nawiasów, `roundTrips` wystarcza);
+12. kody z zerem na początku („01") i `1e5` → błąd składni (ZROBIONE
+2026-10-18: `isNumeric` = to, co serwer czyta jako liczbę; „01”, „1e5”,
+„1.” → tekst); 13. wydajność kwadratowa (20 reguł × 10 tys.
 wierszy = 3,3 s na edycję komórki).
 Drobniejsze: podwójne tworzenie przekształcenia przy szybkiej edycji
 i podwójne przerysowanie buildera; osierocone przekształcenia w pliku;

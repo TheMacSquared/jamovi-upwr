@@ -92,7 +92,13 @@ class Parser:
                     if q == '`':
                         term = ''.join(str[s + 1:e])
                     else:
-                        term = '"' + ''.join(str[s + 1:e]) + '"'
+                        # jUPWR: the text between the quotes is taken
+                        # literally; a backslash was read as a Python escape
+                        # ("a\b") and a double quote inside single quotes
+                        # ('say "hi"') ended the string early
+                        content = ''.join(str[s + 1:e])
+                        content = content.replace('\\', '\\\\').replace('"', '\\"')
+                        term = '"' + content + '"'
                     chunks.append(term)
                     q = ''
                     break

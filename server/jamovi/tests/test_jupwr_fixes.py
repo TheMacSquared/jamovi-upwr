@@ -127,7 +127,7 @@ def test_rule_levels_category_and_text(dataset_model: DataSetModel):
 @pytest.mark.parametrize('formula, rules', [
     ('IF(a == 1, "$source", "x")', True),       # the text "$source" is just text
     ("IF(a == 1, '$source', 'x')", True),
-    ('IF(a == 1, "say \\"$source\\"", "x")', True),
+    ('IF(a == 1, \'say "$source"\', "x")', True),
     ('IF(a == 1, "x", $source)', False),        # a real reference to the source
     ('$source', False),                         # an empty upstream transform
 ])
@@ -135,3 +135,49 @@ def test_is_rules_ignores_source_in_quoted_text(formula, rules):
     transform = Transform(None)
     transform.formula = [ formula ]
     assert transform.is_rules is rules
+
+
+def test_rule_levels_follow_rule_order_with_numbers(dataset_model: DataSetModel):
+    # an ordinal scale mixing numbers and text keeps the order of the rules
+    # (it used to list the texts first, then the numbers)
+    r = _rules_column(dataset_model,
+        '_RULES_ORD(IF(ROW() == 1, 3, IF(ROW() == 2, "średnio", 1)))', [ 1, 1, 1 ])
+    assert [ level[1] for level in r.levels ] == [ '3', 'średnio', '1' ]
+    assert [ r[i] for i in range(3) ] == [ '3', 'średnio', '1' ]
+
+
+def test_rule_levels_with_filter_and_column_function(dataset_model: DataSetModel):
+    # Z() is computed on the filtered rows for the cells; the levels must be
+    # too, or the cells hold values that are not among the levels
+    m = dataset_model
+    x = m.append_column('x')
+    x.change(data_type=DataType.DECIMAL, measure_type=MeasureType.CONTINUOUS)
+    m.set_row_count(4)
+    for i, v in enumerate([ 1.0, 2.0, 3.0, 1000.0 ]):
+        x.set_value(i, v)
+    f = m.insert_column(0)
+    f.column_type = ColumnType.FILTER
+    f.formula = 'x < 500'
+    f.parse_formula()
+    m.refresh_filter_state()
+    r = m.append_column('r')
+    r.column_type = ColumnType.COMPUTED
+    # with the filter Z = -1, 0, 1; without it 1, 2, 3 are all "pod"
+    r.formula = '_RULES_NOM(IF(Z(x) > 0.3, "nad", IF(Z(x) < -0.3, "pod", "środek")))'
+    r.parse_formula()
+    m._recalc_all()
+    cells = [ r[i] for i in range(3) ]
+    labels = [ level[1] for level in r.levels ]
+    assert cells == [ 'pod', 'środek', 'nad' ]
+    assert labels == [ 'nad', 'pod', 'środek' ]
+
+
+@pytest.mark.parametrize('formula, value', [
+    ('"a\\b"', 'a\\b'),                 # a backslash is just a character
+    ("'say \"hi\"'", 'say "hi"'),       # double quotes inside single quotes
+    ('"O\'Brien"', "O'Brien"),
+])
+def test_quoted_text_is_literal(formula, value):
+    from jamovi.server.compute.parser import Parser
+    node = Parser.parse(formula)
+    assert node.value == value

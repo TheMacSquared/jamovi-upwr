@@ -11,9 +11,10 @@ from .compute import FormulaStatus
 from ast import NodeVisitor
 
 
-# jUPWR: quoted text in a formula (with backslash escapes); a "$source" inside
-# it is just text, not a reference to the source column
-_QUOTED = re.compile(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'')
+# jUPWR: quoted text in a formula (taken literally up to the closing quote,
+# as the parser reads it); a "$source" inside it is just text, not a
+# reference to the source column
+_QUOTED = re.compile(r'"[^"]*"|\'[^\']*\'')
 
 
 class Transform:

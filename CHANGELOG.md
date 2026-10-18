@@ -26,6 +26,20 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   symbolem jest odrzucana — pole na czerwono i komunikat „Nieprawidłowy symbol
   dziesiętny” w wierszu błędów; reguły nie są
   zapisywane, dopóki błąd nie zniknie. Tekst „1,5” — w cudzysłowie.
+- Zmienna przekształcona — poprawki z audytu:
+  - reguła „== NA” nie znika przy następnej edycji;
+  - wartość w rodzaju `"M" or "K"` jest odrzucana („Nieprawidłowy cudzysłów”)
+    zamiast po cichu pasować do każdego wiersza;
+  - tekst z cudzysłowem lub ukośnikiem wstecznym zapisuje się dosłownie
+    (wcześniej zniekształcony albo błąd składni);
+  - kody z zerem na początku („01”), „1e5”, „1.” są tekstem, nie błędem składni;
+  - wartość „w przeciwnym razie” z nawiasem i samo „w przeciwnym razie” bez
+    reguł otwierają się jako reguły;
+  - zaznaczenie kilku zmiennych o różnych regułach blokuje edytor z komunikatem
+    (wcześniej edycja kasowała reguły wszystkich zaznaczonych);
+  - funkcje kolumnowe (Z, VMEAN…) w regułach przy aktywnym filtrze: poziomy
+    zgodne z wartościami w komórkach;
+  - poziomy porządkowe mieszające liczby i tekst w kolejności reguł.
 - jperm 0.2.5: obszar odrzucenia i obserwowana statystyka w drugim kolorze
   palety zamiast stałej czerwieni.
 - jCI 0.3.5: wykres kafelkowy przedziału proporcji w kolorach palety
