@@ -15,6 +15,15 @@ import interactionManager from '../../common/interactionmanager';
 
 let instanceID = 0;
 
+// jUPWR: older files can have several columns on one transform (picked from
+// the old transform list). A transform is shared when a column outside the
+// ones being edited uses it -- writing to it would change those columns too.
+export function isTransformShared(columns: Pick<Column, 'id' | 'transform'>[],
+        transformId: number, editedIds: number[]): boolean {
+    return columns.some((column) => column.transform === transformId
+        && ! editedIds.includes(column.id));
+}
+
 class RecodedVarWidget extends HTMLElement {
 
     model: VariableModel;
@@ -373,6 +382,11 @@ class RecodedVarWidget extends HTMLElement {
             return;
         }
 
+        if (this._isShared(transform)) {
+            this._createOwnTransform(formula, transform.measureType);
+            return;
+        }
+
         dataset.setTransforms([ { id: transform.id, values: { formula: [ formula ] } } ])
             .catch((error) => {
                 this._notifyEditProblem({
@@ -383,15 +397,22 @@ class RecodedVarWidget extends HTMLElement {
             });
     }
 
+    _isShared(transform: Transform): boolean {
+        return isTransformShared(this.model.dataset.get('columns') || [],
+            transform.id, this.model.get('ids') || []);
+    }
+
     // a transform owned by this variable alone; it is not meant to be picked
     // from the transform list, so it carries the variable's name and no suffix
-    _createOwnTransform(formula: string, measureType?: MeasureType) {
+    // (the server makes the name unique). A string array keeps an old
+    // multi-element formula intact when only the type is changed.
+    _createOwnTransform(formula: string | string[], measureType?: MeasureType) {
         let dataset = this.model.dataset;
         let values: Partial<Transform> = {
             name: this.model.get('name'),
             description: '',
             suffix: '',
-            formula: [ formula ],
+            formula: Array.isArray(formula) ? formula.slice() : [ formula ],
         };
         // jUPWR: new rules start as nominal (there is no 'Auto' to fall back on)
         values.measureType = measureType !== undefined ? measureType : MeasureType.NOMINAL;
@@ -500,6 +521,11 @@ class RecodedVarWidget extends HTMLElement {
 
             if (transform === undefined) {
                 this._createOwnTransform('', measureType);
+                return;
+            }
+
+            if (this._isShared(transform)) {
+                this._createOwnTransform(transform.formula, measureType);
                 return;
             }
 

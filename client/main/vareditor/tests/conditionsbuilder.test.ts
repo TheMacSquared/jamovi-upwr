@@ -106,6 +106,26 @@ describe('formulaToChain', () => {
         expect(chain!.rows[0].value).toBe('high');
         expect(chain!.elseValue).toBe('low');
     });
+
+    it('rejects an expression it would save as text', async () => {
+        const { formulaToChain } = await mod();
+        expect(formulaToChain('IF(a == 1, 2 + 3, 0)', cols)).toBeNull();
+        expect(formulaToChain('IF(a == 1, "x", b * 2)', cols)).toBeNull();
+        expect(formulaToChain('IF(a == 2 + 3, "x", "y")', cols)).toBeNull();
+    });
+
+    it('rejects a name that is not a column', async () => {
+        const { formulaToChain } = await mod();
+        expect(formulaToChain('IF(a == 1, zz, "y")', cols)).toBeNull();
+    });
+
+    it('accepts numbers, NA, columns and single-quoted text', async () => {
+        const { chainToFormula, formulaToChain } = await mod();
+        expect(chainToFormula(formulaToChain('IF(a == -1.5, b, NA)', cols)!, cols))
+            .toBe('IF(a == -1.5, b, NA)');
+        expect(chainToFormula(formulaToChain("IF(a == 1, 'x', 'y')", cols)!, cols))
+            .toBe('IF(a == 1, "x", "y")');
+    });
 });
 
 describe('ConditionsBuilder', () => {

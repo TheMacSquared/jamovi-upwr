@@ -139,6 +139,18 @@ function displayValue(value: string, columnNames: string[]): string {
     return t;
 }
 
+// a value the builder can show only if saving it writes the same thing back;
+// anything else (an expression such as 2 + 3, a function call, an unknown
+// name) would be turned into text on the next save. Text in single quotes
+// comes back in double quotes, which means the same.
+function roundTrips(value: string, columnNames: string[]): boolean {
+    let t = value.trim();
+    let back = formatValue(displayValue(t, columnNames), columnNames);
+    if (back === t)
+        return true;
+    return isQuoted(t) && isQuoted(back) && t.slice(1, -1) === back.slice(1, -1);
+}
+
 // serialise a list of terms joined by `joins`; returns '' when nothing in the
 // list is complete enough to contribute. `wrap` parenthesises a multi-term
 // result, which is what makes an explicit group override precedence.
@@ -190,6 +202,8 @@ function parseClause(text: string, columnNames: string[]): Clause | null {
     if (m === null)
         return null;
     if (m[1] === 'NA')
+        return null;
+    if ( ! roundTrips(m[3], columnNames))
         return null;
     return { variable: unquoteName(m[1]), op: m[2], value: displayValue(m[3], columnNames) };
 }
@@ -257,6 +271,8 @@ export function formulaToChain(formula: string, columnNames: string[] = []): Cha
             let cond = parseCondition(args[0], columnNames);
             if (cond === null)
                 return null;
+            if ( ! roundTrips(args[1], columnNames))
+                return null;
             rows.push({ clauses: cond.clauses, joins: cond.joins, value: displayValue(args[1], columnNames) });
             text = args[2].trim();
         }
@@ -267,6 +283,8 @@ export function formulaToChain(formula: string, columnNames: string[] = []): Cha
             if (cond !== null)
                 return null; // a bare comparison is a formula, not an else value
             if (/[()]/.test(text))
+                return null;
+            if ( ! roundTrips(text, columnNames))
                 return null;
             return { rows, elseValue: displayValue(text, columnNames) };
         }

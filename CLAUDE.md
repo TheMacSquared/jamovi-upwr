@@ -713,12 +713,11 @@ przekształceń (`setUnrepresentable`, `lastRepresentable`). Testy:
 `server/jamovi/tests/test_jupwr_fixes.py`, `client/main/vareditor/tests/
 conditionsbuilder.test.ts`.
 Pozostaje:
-- (P2) `recodedvarwidget._applyFormula` i zmiana poziomu pomiaru nadpisują
-  przekształcenie współdzielone przez inne kolumny (stare pliki) — przy
-  współdzieleniu tworzyć własne przekształcenie zmiennej.
-- (P2) builder zapisuje wyrażenie (`2 + 3`) w „użyj” i w wartości warunku
-  jako tekst — `formulaToChain` ma zwracać null dla wartości, której
-  `formatValue` nie odtworzy.
+- ~~(P2) `recodedvarwidget._applyFormula` i zmiana poziomu pomiaru nadpisują
+  przekształcenie współdzielone przez inne kolumny~~ — ZROBIONE 2026-10-18
+  (`isTransformShared`, kopia jako własne przekształcenie zmiennej; tylko latest).
+- ~~(P2) builder zapisuje wyrażenie (`2 + 3`) w „użyj” i w wartości warunku
+  jako tekst~~ — ZROBIONE 2026-10-18 (`roundTrips` w `formulaToChain`; tylko latest).
 - (marginalne) `transform.is_rules` szuka `$source` także w tekstach
   w cudzysłowie.
 - IF z kategorią kolumny nominalnej z kodami i liczbą całkowitą daje typ

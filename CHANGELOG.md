@@ -5,6 +5,13 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+- Zmienna przekształcona w starym pliku, której przekształcenie jest wspólne
+  z innymi kolumnami: edycja reguł albo poziomu pomiaru tworzy kolumnie własne
+  przekształcenie zamiast zmieniać przy okazji pozostałe kolumny.
+- Reguły zmiennej przekształconej: formuła z wyrażeniem (np. `2 + 3`, `b * 2`)
+  albo nazwą nieistniejącej kolumny pokazuje ostrzeżenie „nie da się pokazać jako
+  reguły” zamiast reguł, które przy zapisie zamieniłyby wyrażenie w tekst.
+
 ## 1.1.1 — 2026-10-14 (gałąź `test/upstream-28.11`)
 Poprawki zmiennej przekształconej i tabel wyników, fonty wykresów IBM Plex,
 jRISK 0.4.2; te same poprawki zmiennej przekształconej są w 1.0.8 (bez importu
