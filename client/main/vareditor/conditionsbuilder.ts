@@ -340,6 +340,10 @@ function valueProblem(value: string, decSymbol: string): string {
         return wrongDecimalMessage();
     if (badQuotes(value))
         return _('Invalid quotation marks');
+    // "M or K" would be saved as that one text and match nothing; a real
+    // text like that can still be typed in quotes
+    if ( ! isQuoted(value) && /\s(or|and)\s/i.test(value.trim()))
+        return _('Use a separate condition with or / and');
     return '';
 }
 

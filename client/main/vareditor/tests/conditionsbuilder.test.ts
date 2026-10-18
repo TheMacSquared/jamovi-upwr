@@ -274,6 +274,18 @@ describe('audit 2026-10-18', () => {
         expect(formatValue('"M"', cols)).toBe('"M"');
     });
 
+    it('refuses M or K without quotes too, but not in quotes', async () => {
+        const { chainProblem } = await mod();
+        const problem = (value: string) => chainProblem({ rows: [ { clauses: [
+            { variable: 'a', op: '==', value } ], joins: [], value: 'x' } ], elseValue: '' }, '.');
+        expect(problem('M or K')).not.toBe('');
+        expect(problem('M OR K')).not.toBe('');
+        expect(problem('wysoki and niski')).not.toBe('');
+        expect(problem('"M or K"')).toBe('');
+        expect(problem('Oregon')).toBe('');      // just letters, not the word
+        expect(problem('rock and roll'.replace(/ /g, '_'))).toBe('');
+    });
+
     it('quotes text with quotes or backslashes so the server reads it literally', async () => {
         const { badQuotes, chainToFormula, formatValue, formulaToChain } = await mod();
         expect(formatValue('say "hi"', cols)).toBe('\'say "hi"\'');

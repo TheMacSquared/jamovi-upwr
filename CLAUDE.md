@@ -808,7 +808,8 @@ w obrazie Dockera. Ciche błędne wyniki / utrata reguł:
 ~~8. poziomy porządkowe~~, ~~9. cudzysłów/ukośnik~~ — ZROBIONE 2026-10-18:
 2 — `parseClause` pokazuje „NA”; 3 — ścisły `isQuoted` (bez cudzysłowu
 w środku) + `badQuotes` → „Nieprawidłowy cudzysłów” (jak symbol dziesiętny:
-`chainProblem`/`valueProblem`, `_commit` nic nie zapisuje); 5 — `_isMixed`
+`chainProblem`/`valueProblem`, `_commit` nic nie zapisuje), a `M or K` bez
+cudzysłowów (słowo or/and w wartości) → „Użyj osobnego warunku z or / and”; 5 — `_isMixed`
 w widgecie (kilka id, `transform` null): builder zablokowany z komunikatem;
 6 — `_rule_levels(row_count, filt, …)` z tym samym filtrem co komórki;
 8 — `_rule_constants` zbiera wartości łańcucha IF w kolejności reguł, także

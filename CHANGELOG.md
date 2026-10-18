@@ -29,7 +29,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - Zmienna przekształcona — poprawki z audytu:
   - reguła „== NA” nie znika przy następnej edycji;
   - wartość w rodzaju `"M" or "K"` jest odrzucana („Nieprawidłowy cudzysłów”)
-    zamiast po cichu pasować do każdego wiersza;
+    zamiast po cichu pasować do każdego wiersza, a `M or K` bez cudzysłowów
+    — komunikatem „Użyj osobnego warunku z or / and” (wcześniej nie pasowało
+    do niczego);
   - tekst z cudzysłowem lub ukośnikiem wstecznym zapisuje się dosłownie
     (wcześniej zniekształcony albo błąd składni);
   - kody z zerem na początku („01”), „1e5”, „1.” są tekstem, nie błędem składni;
