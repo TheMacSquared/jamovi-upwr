@@ -3,7 +3,7 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
-## Niewydane
+## 1.1.2 — 2026-10-18 (linia latest, jamovi 28.13)
 
 - Upstream jamovi 28.13 (z 28.11): stan analiz z pliku .omv nie jest
   przywracany (spreparowany plik mógł uruchomić kod R; analiza przelicza się
@@ -49,7 +49,6 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   kolorowe; w ciemnym motywie białe ramki).
 - Moduły jRol, jPomiar i jWody są od teraz wewnętrzne: zamrożone, bez `.jmo`
   w wydaniu (Windows: `build.ps1 -InternalModules` buduje je na żądanie).
-
 - Zmienna przekształcona w starym pliku, której przekształcenie jest wspólne
   z innymi kolumnami: edycja reguł albo poziomu pomiaru tworzy kolumnie własne
   przekształcenie zamiast zmieniać przy okazji pozostałe kolumny.
