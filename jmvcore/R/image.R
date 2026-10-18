@@ -136,8 +136,9 @@ Image <- R6::R6Class("Image",
             decSymbol <- self$options$decSymbol
             currentDecSymbol <- getOption('OutDec', '.')
             if (decSymbol != '.' && currentDecSymbol != decSymbol) {
-                options(OutDec=decSymbol)
-                on.exit(options(OutDec=currentDecSymbol), add=TRUE)
+                # scales ignores OutDec, and has its own option
+                old <- options(OutDec=decSymbol, scales.decimal.mark=decSymbol)
+                on.exit(options(old), add=TRUE)
             }
 
             size <- self$size
@@ -272,7 +273,7 @@ Image <- R6::R6Class("Image",
             private$.width <- size$width
             private$.height <- size$height
 
-            if (element$image$path == '' || resized || 'theme' %in% oChanges || 'palette' %in% oChanges) {
+            if (element$image$path == '' || resized || 'theme' %in% oChanges || 'palette' %in% oChanges || 'decSymbol' %in% oChanges) {
                 private$.filePath <- NULL
             } else {
                 private$.filePath <- element$image$path
