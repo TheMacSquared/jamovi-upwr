@@ -5,6 +5,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+## 1.0.9 — 2026-10-18
+Poprawka bezpieczeństwa z jamovi 28.13.
+
 - Bezpieczeństwo (z jamovi 28.13): stan analiz zapisany w pliku .omv nie jest
   przywracany — spreparowany plik mógł przy otwarciu uruchomić dowolny kod R.
   Analiza z pliku pokazuje zapisane wyniki, ale przy pierwszej zmianie
