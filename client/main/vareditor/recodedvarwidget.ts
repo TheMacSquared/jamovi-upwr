@@ -97,7 +97,8 @@ class RecodedVarWidget extends HTMLElement {
         this.builder = new ConditionsBuilder(
             () => this.model.dataset.get('columns') || [],
             () => this.model.get('name'),
-            (formula) => this._applyFormula(formula));
+            (formula) => this._applyFormula(formula),
+            () => this.model.settings?.getSetting('decSymbol', '.') ?? '.');
         // the builder is always on here, so its add-rule button lives in the
         // top bar rather than being toggled with a mode
         $top.append(this.builder.$addRow);

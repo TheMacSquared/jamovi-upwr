@@ -790,3 +790,46 @@ ale jest modułem wewnętrznym — świadomie NIE naprawiany. PUŁAPKA: `ggtheme
 każdą własną skalę kolorów (manual, gradient) dodawać PO `+ ggtheme`.
 Celowo bez zmian: szare linie odniesienia, `theme_void()` w diagramach jRISK;
 kolory na sztywno w jPomiar i jWody (moduły wewnętrzne).
+
+### Zadanie 24: audyt zmiennej przekształconej (2026-10-18) — W TOKU
+Trzy przeglądy (builder `conditionsbuilder.ts`, widget `recodedvarwidget.ts`,
+serwer `transform.py`/`compute/nodes.py`/`.omv`), kluczowe potwierdzone skryptami
+w obrazie Dockera. Ciche błędne wyniki / utrata reguł:
+1. ~~przecinek dziesiętny („125,5" zapisywane jako tekst)~~ — ZROBIONE 2026-10-18:
+   `isCommaNumber` w `formatValue` (jak arkusz, `tableview.ts _applyEdit`),
+   liczby w polach wg `decSymbol` z ustawień (`VariableModel.settings`
+   ustawiane w `VariableEditor.init`, cache `setFormula` z symbolem).
+2. reguła `== NA` wyświetlana jako puste pole i kasowana przy następnej edycji
+   (`displayValue` 'NA' → '', `termsToText` pomija pusty człon).
+3. wartość `"M" or "K"` przechodzi dosłownie (`isQuoted` patrzy tylko na
+   pierwszy i ostatni znak) → pasuje do każdego wiersza.
+4. tekst równy nazwie kolumny (np. „A" przy domyślnych nazwach, własna nazwa
+   zmiennej) zapisuje się jako odwołanie do kolumny; model `Clause` nie
+   pamięta, czy wartość jest tekstem czy kolumną (średnie).
+5. edycja kilku zaznaczonych zmiennych o różnych regułach: pusty builder,
+   zmiana typu/reguły kasuje reguły wszystkich (`setColumn` → transform null).
+6. filtry ignorowane w regułach z funkcjami kolumnowymi (Z, VN, VMEAN):
+   `_rule_levels` (nodes.py ~553/580) woła `fvalues`/`get_levels` bez `filt`.
+7. zmiana nazwy kolumny użytej w regule → „kolumna nie istnieje" (stare
+   przekształcenie z `$source` to przeżywało; nic nie przepisuje nazw w formułach).
+8. poziomy porządkowe przy mieszanych liczbach i tekście w złej kolejności
+   (nodes.py 590–608 dopasowuje tylko teksty).
+9. cudzysłów/ukośnik wsteczny w tekście: parser serwera nie zna `\"` —
+   zniekształcenie albo błąd składni (`formatValue`).
+Widoczne na co dzień: 10. automatyczne nazwy „wiek - T1"/„? - T1"
+(`datasetcontroller._calc_column_name` + `_ensureParent`); 11. wartość „else"
+z nawiasem albo samo „else" bez reguł → nie otwiera się jako reguły;
+12. kody z zerem na początku („01") i `1e5` → błąd składni (`isNumeric`
+szerszy niż tokenizer serwera); 13. wydajność kwadratowa (20 reguł × 10 tys.
+wierszy = 3,3 s na edycję komórki).
+Drobniejsze: podwójne tworzenie przekształcenia przy szybkiej edycji
+i podwójne przerysowanie buildera; osierocone przekształcenia w pliku;
+Ctrl+Z pomija edycje reguł (semantyka upstreamu); stary plik bez kolumny
+źródłowej po zmianie typu liczy się z przypadkowej kolumny (`_ensureParent`
+tylko dla reguł); kolumny `NA`/`and`/`or`; możliwa pętla parentów;
+`_updateChannelList`/`_updateTransformColour` bez osłon; `_QUOTED` a backtick
+z apostrofem; `lastFormula` przenosi niedokończone wiersze między zmiennymi.
+Sprawdzone i poprawne: zapis/odczyt .omv, odwołania cykliczne, zależności,
+kolejność poziomów tekstowych, nawiasy i pierwszeństwo and/or, nazwy ze
+spacjami/polskimi literami.
+

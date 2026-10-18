@@ -47,6 +47,12 @@ function isNumeric(text: string): boolean {
     return /^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(text.trim());
 }
 
+// a decimal comma, as the spreadsheet accepts it whatever the setting
+// (tableview.ts _applyEdit): "125,5" is the number 125.5
+function isCommaNumber(text: string): boolean {
+    return /^[-+]?(\d+,\d+|,\d+)$/.test(text.trim());
+}
+
 function isQuoted(text: string): boolean {
     let t = text.trim();
     return t.length >= 2 && ((t[0] === '"' && t[t.length - 1] === '"') || (t[0] === "'" && t[t.length - 1] === "'"));
@@ -114,6 +120,8 @@ export function formatValue(value: string, columnNames: string[]): string {
     let t = value.trim();
     if (t === '')
         return 'NA';
+    if (isCommaNumber(t))
+        return t.replace(',', '.');
     if (t === 'NA' || isNumeric(t) || isQuoted(t))
         return t;
     if (columnNames.includes(t))
@@ -125,11 +133,14 @@ export function formatValue(value: string, columnNames: string[]): string {
 
 // the quotes are dropped only when formatValue would put them back, so
 // that "b" (text) does not come back as the column b, "NA" as a missing
-// value or "3" as a number
-function displayValue(value: string, columnNames: string[]): string {
+// value or "3" as a number; numbers are shown with the decimal symbol of
+// the settings (formatValue reads either back)
+function displayValue(value: string, columnNames: string[], decSymbol = '.'): string {
     let t = value.trim();
     if (t === 'NA')
         return '';
+    if (decSymbol === ',' && isNumeric(t))
+        return t.replace('.', ',');
     if (isQuoted(t)) {
         let inner = t.slice(1, -1);
         if (inner.indexOf('"') === -1 && inner.indexOf("'") === -1
@@ -143,9 +154,9 @@ function displayValue(value: string, columnNames: string[]): string {
 // anything else (an expression such as 2 + 3, a function call, an unknown
 // name) would be turned into text on the next save. Text in single quotes
 // comes back in double quotes, which means the same.
-function roundTrips(value: string, columnNames: string[]): boolean {
+function roundTrips(value: string, columnNames: string[], decSymbol = '.'): boolean {
     let t = value.trim();
-    let back = formatValue(displayValue(t, columnNames), columnNames);
+    let back = formatValue(displayValue(t, columnNames, decSymbol), columnNames);
     if (back === t)
         return true;
     return isQuoted(t) && isQuoted(back) && t.slice(1, -1) === back.slice(1, -1);
@@ -197,15 +208,15 @@ export function chainToFormula(chain: Chain, columnNames: string[]): string {
     return formula;
 }
 
-function parseClause(text: string, columnNames: string[]): Clause | null {
+function parseClause(text: string, columnNames: string[], decSymbol = '.'): Clause | null {
     let m = /^\s*(`[^`]+`|[A-Za-z_][A-Za-z0-9_.]*)\s*(==|!=|<=|>=|<|>)\s*(.+?)\s*$/.exec(text);
     if (m === null)
         return null;
     if (m[1] === 'NA')
         return null;
-    if ( ! roundTrips(m[3], columnNames))
+    if ( ! roundTrips(m[3], columnNames, decSymbol))
         return null;
-    return { variable: unquoteName(m[1]), op: m[2], value: displayValue(m[3], columnNames) };
+    return { variable: unquoteName(m[1]), op: m[2], value: displayValue(m[3], columnNames, decSymbol) };
 }
 
 // strip one layer of redundant wrapping parentheses, e.g. "(a == 1 or b == 2)"
@@ -231,13 +242,13 @@ function unwrap(text: string): string | null {
     return depth === 0 ? inner : null;
 }
 
-function parseCondition(text: string, columnNames: string[]): { clauses: Term[], joins: Join[] } | null {
+function parseCondition(text: string, columnNames: string[], decSymbol = '.'): { clauses: Term[], joins: Join[] } | null {
     let split = splitTopLevel(text, [' and ', ' or ']);
     let terms: Term[] = [];
     for (let part of split.parts) {
         let inner = unwrap(part);
         if (inner !== null) {
-            let sub = parseCondition(inner, columnNames);
+            let sub = parseCondition(inner, columnNames, decSymbol);
             if (sub === null)
                 return null;
             // a group of one is just the clause itself
@@ -247,7 +258,7 @@ function parseCondition(text: string, columnNames: string[]): { clauses: Term[],
                 terms.push({ terms: sub.clauses, joins: sub.joins });
             continue;
         }
-        let cl = parseClause(part, columnNames);
+        let cl = parseClause(part, columnNames, decSymbol);
         if (cl === null)
             return null;
         terms.push(cl);
@@ -257,7 +268,7 @@ function parseCondition(text: string, columnNames: string[]): { clauses: Term[],
 
 // returns null when the formula is not a plain IF chain; `columnNames` tells
 // a quoted text apart from a reference to a column of the same name
-export function formulaToChain(formula: string, columnNames: string[] = []): Chain | null {
+export function formulaToChain(formula: string, columnNames: string[] = [], decSymbol = '.'): Chain | null {
     let rows: Row[] = [];
     let text = formula.trim();
     if (text === '')
@@ -268,12 +279,12 @@ export function formulaToChain(formula: string, columnNames: string[] = []): Cha
             let args = splitTopLevel(inner, [',']).parts;
             if (args.length !== 3)
                 return null;
-            let cond = parseCondition(args[0], columnNames);
+            let cond = parseCondition(args[0], columnNames, decSymbol);
             if (cond === null)
                 return null;
-            if ( ! roundTrips(args[1], columnNames))
+            if ( ! roundTrips(args[1], columnNames, decSymbol))
                 return null;
-            rows.push({ clauses: cond.clauses, joins: cond.joins, value: displayValue(args[1], columnNames) });
+            rows.push({ clauses: cond.clauses, joins: cond.joins, value: displayValue(args[1], columnNames, decSymbol) });
             text = args[2].trim();
         }
         else {
@@ -284,9 +295,9 @@ export function formulaToChain(formula: string, columnNames: string[] = []): Cha
                 return null; // a bare comparison is a formula, not an else value
             if (/[()]/.test(text))
                 return null;
-            if ( ! roundTrips(text, columnNames))
+            if ( ! roundTrips(text, columnNames, decSymbol))
                 return null;
-            return { rows, elseValue: displayValue(text, columnNames) };
+            return { rows, elseValue: displayValue(text, columnNames, decSymbol) };
         }
     }
 }
@@ -303,12 +314,17 @@ export class ConditionsBuilder extends HTMLElement {
     $else: HTMLInputElement;
     lastFormula: string | null = null;
     lastRepresentable = true;
+    decSymbol: () => string;
+    lastDecSymbol = '.';
 
-    constructor(columns: () => Column[], currentName: () => string, onChange: (formula: string) => void) {
+    // decSymbol: the decimal symbol of the settings, for showing numbers
+    constructor(columns: () => Column[], currentName: () => string, onChange: (formula: string) => void,
+            decSymbol: () => string = () => '.') {
         super();
         this.columns = columns;
         this.currentName = currentName;
         this.onChange = onChange;
+        this.decSymbol = decSymbol;
         this.classList.add('jmv-conditions-builder');
         this.setAttribute('data-warning', _('The current formula cannot be shown as conditions; editing here will replace it.'));
 
@@ -343,9 +359,10 @@ export class ConditionsBuilder extends HTMLElement {
     // load a formula; returns false when it could not be represented as rows
     // (also on a reload of the same formula, which keeps the warning up)
     setFormula(formula: string): boolean {
-        if (formula === this.lastFormula)
+        let decSymbol = this.decSymbol();
+        if (formula === this.lastFormula && decSymbol === this.lastDecSymbol)
             return this.lastRepresentable;
-        let chain = formulaToChain(formula, this._columnNames());
+        let chain = formulaToChain(formula, this._columnNames(), decSymbol);
         if (chain === null) {
             this.setUnrepresentable(formula);
             return false;
@@ -354,6 +371,7 @@ export class ConditionsBuilder extends HTMLElement {
             chain.rows.push(this._emptyRow());
         this.chain = chain;
         this.lastFormula = formula;
+        this.lastDecSymbol = decSymbol;
         this.lastRepresentable = true;
         this.render();
         return true;

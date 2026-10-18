@@ -4,6 +4,7 @@
 import Notify from '../notification';
 import { EventMap } from '../../common/eventmap';
 import DataSetViewModel, { Column, ColumnType, DataType, MeasureType, VariableLevel } from '../dataset';
+import type Settings from '../settings';
 
 interface SelectedVariableLevel extends VariableLevel {
     others: SelectedVariableLevel[];
@@ -38,6 +39,9 @@ interface SelectedVariable {
 class VariableModel extends EventMap<SelectedVariable> {
 
     dataset: DataSetViewModel;
+    // jUPWR: app settings (the decimal symbol for the rules builder); set by
+    // VariableEditor.init, so absent while the editor is being built
+    settings?: Settings;
     original: Partial<SelectedVariable>;
     _hasChanged: { [key in keyof SelectedVariable]?: boolean}
     columns: Column[];

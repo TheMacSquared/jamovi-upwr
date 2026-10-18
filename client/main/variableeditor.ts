@@ -291,6 +291,7 @@ export class VariableEditor extends HTMLElement {
         this.model = dataset;
 
         this.setup();
+        this.editorModel.settings = controller.settings;
     }
 
     private _showTransformEditor(transformId: number) {

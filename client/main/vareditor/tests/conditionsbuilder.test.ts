@@ -128,6 +128,47 @@ describe('formulaToChain', () => {
     });
 });
 
+describe('decimal comma', () => {
+
+    it('saves a number typed with a comma as a number', async () => {
+        const { chainToFormula, formatValue } = await mod();
+        expect(formatValue('125,5', cols)).toBe('125.5');
+        expect(formatValue('-0,25', cols)).toBe('-0.25');
+        expect(chainToFormula({ rows: [ {
+            clauses: [ { variable: 'a', op: '<', value: '125,5' } ],
+            joins: [], value: '1,5' } ], elseValue: '0' }, cols))
+            .toBe('IF(a < 125.5, 1.5, 0)');
+    });
+
+    it('shows numbers with the decimal symbol of the settings', async () => {
+        const { chainToFormula, formulaToChain } = await mod();
+        const formula = 'IF(a < 125.5, 1.5, "brak")';
+        const comma = formulaToChain(formula, cols, ',')!;
+        expect((comma.rows[0].clauses[0] as any).value).toBe('125,5');
+        expect(comma.rows[0].value).toBe('1,5');
+        expect(chainToFormula(comma, cols)).toBe(formula);
+        const dot = formulaToChain(formula, cols, '.')!;
+        expect((dot.rows[0].clauses[0] as any).value).toBe('125.5');
+    });
+
+    it('keeps a quoted "1,5" as text', async () => {
+        const { chainToFormula, formulaToChain } = await mod();
+        const formula = 'IF(a == 1, "1,5", "x")';
+        expect(chainToFormula(formulaToChain(formula, cols, ',')!, cols)).toBe(formula);
+    });
+
+    it('reloads the same formula when the decimal symbol changes', async () => {
+        const { ConditionsBuilder } = await mod();
+        let symbol = '.';
+        const b = new ConditionsBuilder(() => [], () => '', () => {}, () => symbol);
+        b.setFormula('IF(a < 2.5, "x", "y")');
+        expect((b.chain.rows[0].clauses[0] as any).value).toBe('2.5');
+        symbol = ',';
+        b.setFormula('IF(a < 2.5, "x", "y")');
+        expect((b.chain.rows[0].clauses[0] as any).value).toBe('2,5');
+    });
+});
+
 describe('ConditionsBuilder', () => {
 
     it('keeps reporting an unrepresentable formula on reload', async () => {
