@@ -127,12 +127,17 @@ for d in */jamovi/0000.yaml; do
         || bad "$m: rozjazd wersji — 0000.yaml=$vy, DESCRIPTION=$vd (jmc użyje $vy)"
 done
 
+# moduły wewnętrzne: zamrożone, poza wydaniem — bez .jmo i bez wiersza macierzy
+# (packaging/MODULES.md; Windows: build.ps1 -InternalModules)
+INTERNAL=" jRol jPomiar jWody "
+
 # moduły opcjonalne = katalogi z jamovi/0000.yaml spoza listy wbudowanych
 case "$(uname -s)" in Darwin) PLAT="macos-arm64";; MINGW*|MSYS*|CYGWIN*) PLAT="win64";; *) PLAT="linux";; esac
 for d in */jamovi/0000.yaml; do
     m="${d%%/*}"
     [ -f "$m/DESCRIPTION" ] || continue
     echo " $MAC " | grep -q " $m " && continue
+    if echo "$INTERNAL" | grep -q " $m "; then echo "moduł wewnętrzny (poza wydaniem): $m"; continue; fi
     # jmc czyta wersję modułu wyłącznie z jamovi/0000.yaml (index.js:299-306);
     # DESCRIPTION jest tylko dla R CMD i musi się z nią zgadzać
     v="$(grep -m1 -oE '^version: *[0-9.]+' "$d" | grep -oE '[0-9.]+')"

@@ -164,15 +164,21 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   schemat Bernoulliego + zbiory danych Bananpol w bibliotece) jest modułem
   OPCJONALNYM: nie preinstalowany, budowany jako .jmo (macOS: 70-jmo-jrisk.sh,
   Windows: build.ps1 krok 4e), instalowany przez Moduły → Sideload
-- jRol 0.1.0 (doświadczalnictwo rolnicze) jest modułem OPCJONALNYM jak jRISK
-  (macOS: 72-jmo-jrol.sh, Windows: build.ps1 krok 4g)
+- MODUŁY WEWNĘTRZNE (decyzja 2026-10-18): jRol, jPomiar, jWody to moduły testowe
+  użytkownika, nigdzie niepublikowane — ZAMROŻONE i POZA WYDANIEM. Nie budować ich
+  .jmo przy wydaniu (`release-check.sh` pomija je — lista `INTERNAL`; Windows
+  `build.ps1` tylko z `-InternalModules`; macOS 72–74 tylko ręcznie), NIE naprawiać
+  w nich niczego przy okazji zmian w innych modułach (nawet znanych błędów, np.
+  mapa jWody: gradient przed `ggtheme`), nie bumpować. Opisy niżej są historyczne.
+- jRol 0.1.3 (doświadczalnictwo rolnicze) — WEWNĘTRZNY
+  (macOS: 72-jmo-jrol.sh, Windows: build.ps1 -InternalModules krok 4g)
 - jSpace 0.2.0 (statystyka danych kosmicznych: orbity TLE/SGP4 przez asteRisk,
   mapy punktowe/kartogramy i statystyki regionalne przez sf, statystyki rastrów
   przez terra, klasyfikacja k-NN/drzewo; 4 zbiory danych w bibliotece) jest
   modułem OPCJONALNYM jak jRISK, ale budowanym BEZ --skip-deps (jmc bundluje
   sf/terra/asteRisk do .jmo; macOS: 71-jmo-jspace.sh, Windows: build.ps1
   krok 4f); szczegóły w packaging/MODULES.md
-- jPomiar 0.3.0 (pomiary i niepewność, pilotaż międzykierunkowy; menu „Pomiary":
+- jPomiar 0.3.0 — WEWNĘTRZNY (pomiary i niepewność, pilotaż międzykierunkowy; menu „Pomiary":
   powtarzane pomiary z u_A, budżet niepewności typ A / wzorcowanie U/k /
   rozdzielczość d/√12, propagacja sumy/różnicy/iloczynu/ilorazu z korelacją,
   kowariancja i elipsy 2D: standardowa, rozrzutu χ², ufności średniej T²
@@ -186,7 +192,7 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   `addRow()` w `.run` (rows: 0) muszą mieć w `clearWith` KAŻDĄ opcję analizy
   (także `metody` i wykresy) — tabela niewyczyszczona wraca ze stanu,
   a `addRow` dopisuje wiersze drugi raz.
-- jWody 0.1.1 (hydrologia; menu „Hydrologia": kontrola szeregu, reżim
+- jWody 0.1.1 — WEWNĘTRZNY (hydrologia; menu „Hydrologia": kontrola szeregu, reżim
   i sezonowość, przepływy charakterystyczne, trendy MK/Sen/Pettitt, niżówki;
   daty jako tekst `RRRR-MM-DD`; zbiory w bibliotece) jest modułem OPCJONALNYM
   jak jRISK (macOS: 74-jmo-jwody.sh, Windows: build.ps1 krok 4i, Linux:
@@ -769,11 +775,9 @@ sygnatura `function(image, ggtheme, theme, ...)`, `+ ggtheme` zamiast
 i palety UPWr/CVD.
 Przegląd wszystkich modułów (2026-10-18) przy okazji: jperm 0.2.5 (obszar
 odrzucenia w drugim kolorze palety), jCI 0.3.5 (kafelki: `scale_fill_manual`
-stało PRZED `ggtheme` i było nadpisywane), jWody 0.1.2 (gradient przed
-`ggtheme` → błąd „Continuous value supplied to a discrete scale”, mapy się nie
-rysowały). PUŁAPKA: `ggtheme` niesie dyskretne skale `fill`/`colour` palety —
+stało PRZED `ggtheme` i było nadpisywane). jWody ma ten sam błąd (gradient przed
+`ggtheme` → „Continuous value supplied to a discrete scale”, mapy się nie rysują),
+ale jest modułem wewnętrznym — świadomie NIE naprawiany. PUŁAPKA: `ggtheme` niesie dyskretne skale `fill`/`colour` palety —
 każdą własną skalę kolorów (manual, gradient) dodawać PO `+ ggtheme`.
-Celowo bez zmian: szare linie odniesienia, `theme_void()` w diagramach jRISK.
-Otwarte (do decyzji): jPomiar i jWody mają kolory serii na sztywno (#32678c,
-#ae6030, #9b343e…) — nie idą za paletą; w ciemnym motywie granat na ciemnym
-panelu ma słaby kontrast.
+Celowo bez zmian: szare linie odniesienia, `theme_void()` w diagramach jRISK;
+kolory na sztywno w jPomiar i jWody (moduły wewnętrzne).

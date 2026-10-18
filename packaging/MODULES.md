@@ -22,15 +22,20 @@ Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 | `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem — tylko testowanie: statystyka, p, różnica i d Cohena jako punkty (przedziały ufności i wykres estymacyjny są w jCI); zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.4.2 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.4.2 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.2 |
-| `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.1.2 |
-| `jPomiar/` | jPomiar | powtarzane pomiary, budżet niepewności, propagacja z korelacją, kowariancja i elipsy 2D; pilotaż międzykierunkowy | **opcjonalny — `.jmo` (sideload)** | 0.2.0 |
-| `jWody/` | jWody | hydrologia: kontrola szeregu, reżim, przepływy, trendy i niżówki | **opcjonalny — `.jmo` (sideload)** | 0.1.1 |
+| `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | wewnętrzny — poza wydaniem (zamrożony) | 0.1.3 |
+| `jPomiar/` | jPomiar | powtarzane pomiary, budżet niepewności, propagacja z korelacją, kowariancja i elipsy 2D; pilotaż międzykierunkowy | wewnętrzny — poza wydaniem (zamrożony) | 0.3.0 |
+| `jWody/` | jWody | hydrologia: kontrola szeregu, reżim, przepływy, trendy i niżówki | wewnętrzny — poza wydaniem (zamrożony) | 0.1.1 |
 
 Zasada: **wbudowane** są moduły używane w większości kursów statystyki; moduł obsługujący
 jeden kurs jest **opcjonalny** i trafia do studentów jako plik `.jmo` (Moduły → Sideload).
 Dzięki temu poprawka w takim module nie wymaga reinstalacji aplikacji.
-`jPomiar` jest opcjonalnym pilotażem międzykierunkowym; preinstalacja wymaga
-potwierdzenia wykorzystania w większości kursów.
+**Wewnętrzne** (od 2026-10-18: jRol, jPomiar, jWody) to moduły testowe, nigdzie
+niepublikowane i zamrożone: nie trafiają do wydań, nie budujemy ich `.jmo` przy wydaniu
+(`release-check.sh` je pomija — lista `INTERNAL`) i nie naprawiamy ich przy okazji zmian
+w innych modułach. Kod zostaje w repo; `.jmo` można zbudować na żądanie: macOS
+`72-jmo-jrol.sh`, `73-jmo-jpomiar.sh`, `74-jmo-jwody.sh`, Windows
+`build.ps1 -InternalModules`, Linux `build-jpomiar-docker.sh` / `build-jwody-docker.sh`.
+Ich macierze niżej są historyczne.
 
 Gdzie jest zdefiniowana lista wbudowanych (musi być identyczna w trzech miejscach):
 `docker/jamovi-Dockerfile` (bloki `COPY`+`jmc --install`), `packaging/scripts/macos/20-modules.sh`
@@ -139,7 +144,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 | 0.8.5 | 28.1 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 0.8.0 | 28.1 | 0.2.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 
-### jRol
+### jRol (wewnętrzny — macierz historyczna, poza wydaniem od 2026-10-18)
 
 | jUPWR | jamovi | jRol | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
@@ -160,7 +165,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 | 0.9.4 | 28.2 | 0.1.0 | ✅ 2026-09-03 | ✅ 2026-09-03 |
 | 0.9.2.2 | 28.2 | 0.1.0 | ⬜ do zbudowania | ⬜ do zbudowania |
 
-### jPomiar
+### jPomiar (wewnętrzny — macierz historyczna, poza wydaniem od 2026-10-18)
 
 | jUPWR | jamovi | jPomiar | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
@@ -176,7 +181,7 @@ integracyjne wykonane lokalnie na Linux x64 / R 4.6.0 (`packaging/scripts/test-j
 Docker sprawdzony przy wydaniu 1.0.7 (2026-10-11).
 Ćwiczenia i założenia: [`jPomiar/README.md`](../jPomiar/README.md).
 
-### jWody
+### jWody (wewnętrzny — macierz historyczna, poza wydaniem od 2026-10-18)
 
 | jUPWR | jamovi | jWody | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|

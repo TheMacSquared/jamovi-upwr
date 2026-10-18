@@ -18,8 +18,8 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - jCI 0.3.5: wykres kafelkowy przedziału proporcji w kolorach palety
   i motywu (wcześniej skala palety nadpisywała kolory, a „porażki” wychodziły
   kolorowe; w ciemnym motywie białe ramki).
-- jWody 0.1.2 (moduł opcjonalny): mapa kompletności i mapa rok × miesiąc znów
-  się rysują (wcześniej błąd „Continuous value supplied to a discrete scale”).
+- Moduły jRol, jPomiar i jWody są od teraz wewnętrzne: zamrożone, bez `.jmo`
+  w wydaniu (Windows: `build.ps1 -InternalModules` buduje je na żądanie).
 
 - Zmienna przekształcona w starym pliku, której przekształcenie jest wspólne
   z innymi kolumnami: edycja reguł albo poziomu pomiaru tworzy kolumnie własne

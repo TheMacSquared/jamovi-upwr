@@ -19,6 +19,12 @@
 #   * engine/Makefile.in  (blok Windows: nazwy boost layout=system, -std=gnu++17,
 #                          zmienne BOOST_LIBDIR/NANOMSG_DIR/PROTOBUF_DIR, $(EXTRA_LIBS))
 # Patche do plikow POBIERANYCH/VENDOROWANYCH (nanomsg, formatio) aplikuje sam skrypt.
+#
+# -InternalModules: dodatkowo .jmo modulow WEWNETRZNYCH (jRol, jPomiar, jWody, kroki
+# 4g-4i). Sa zamrozone i poza wydaniem (packaging/MODULES.md), wiec domyslnie,
+# takze z release.ps1, sie ich nie buduje.
+
+param([switch]$InternalModules)
 
 $ErrorActionPreference = "Stop"
 
@@ -52,7 +58,7 @@ $ElectronVer= "43.4.1"
 $PbsUrl     = "https://github.com/astral-sh/python-build-standalone/releases/download/20250612/cpython-3.12.11+20250612-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
 $NanomsgUrl = "https://github.com/nanomsg/nanomsg/archive/refs/tags/1.2.tar.gz"
 $CranRepo   = "https://packagemanager.posit.co/cran/latest"
-$Modules    = @('jmv','plots','jperm','jCI','jdistrACTION','jDane','jANOVA','jTestyT','jCzest','jEksplor','jRegr')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f, jRol 4g, jPomiar 4h, jWody 4i
+$Modules    = @('jmv','plots','jperm','jCI','jdistrACTION','jDane','jANOVA','jTestyT','jCzest','jEksplor','jRegr')   # opcjonalne (.jmo): jRISK 4e, jSpace 4f; wewnetrzne (-InternalModules): jRol 4g, jPomiar 4h, jWody 4i
 
 $ProgressPreference = 'SilentlyContinue'
 function Step($m){ Write-Host "`n==> $m" -ForegroundColor Cyan }
@@ -274,7 +280,9 @@ Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jSpace"), '--jmo', $JmoS,
 if (-not (Test-Path $JmoS)) { throw "jSpace: plik .jmo nie powstal" }
 Info "jSpace .jmo OK ($JmoS)"
 
-# 4g. jRol jako modul OPCJONALNY — doswiadczalnictwo rolnicze (jeden kurs); .jmo do
+if ($InternalModules) {
+
+# 4g. jRol jako modul WEWNETRZNY (poza wydaniem) — doswiadczalnictwo rolnicze (jeden kurs); .jmo do
 #     sideloadu, --skip-deps (mvtnorm i car sa w base\R).
 # wersja modulu: jmc czyta ja wylacznie z jamovi/0000.yaml (index.js:299-306)
 $JrolVer = ((Select-String -Path (Join-Path $RepoRoot "jRol\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
@@ -286,7 +294,7 @@ Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jRol"), '--jmo', $JmoR,
 if (-not (Test-Path $JmoR)) { throw "jRol: plik .jmo nie powstal" }
 Info "jRol .jmo OK ($JmoR)"
 
-# 4h. jPomiar jako modul OPCJONALNY — pomiary i niepewnosc; zaleznosci w base\R.
+# 4h. jPomiar jako modul WEWNETRZNY (poza wydaniem) — pomiary i niepewnosc; zaleznosci w base\R.
 $JpomiarVer = ((Select-String -Path (Join-Path $RepoRoot "jPomiar\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
 $JpomiarDesc = ((Select-String -Path (Join-Path $RepoRoot "jPomiar\DESCRIPTION") -Pattern "^Version:\s*([0-9.]+)").Matches.Groups[1].Value)
 if ($JpomiarVer -ne $JpomiarDesc) { throw "jPomiar: wersje 0000.yaml i DESCRIPTION roznia sie" }
@@ -298,7 +306,7 @@ Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jPomiar"), '--jmo', $JmoP,
 if (-not (Test-Path $JmoP)) { throw "jPomiar: plik .jmo nie powstal" }
 Info "jPomiar .jmo OK ($JmoP)"
 
-# 4i. jWody jako modul OPCJONALNY — hydrologia; zaleznosci w base\R.
+# 4i. jWody jako modul WEWNETRZNY (poza wydaniem) — hydrologia; zaleznosci w base\R.
 $JwodyVer = ((Select-String -Path (Join-Path $RepoRoot "jWody\jamovi\0000.yaml") -Pattern "^version:\s*([0-9.]+)").Matches.Groups[1].Value)
 $JwodyDesc = ((Select-String -Path (Join-Path $RepoRoot "jWody\DESCRIPTION") -Pattern "^Version:\s*([0-9.]+)").Matches.Groups[1].Value)
 if ($JwodyVer -ne $JwodyDesc) { throw "jWody: wersje 0000.yaml i DESCRIPTION roznia sie" }
@@ -309,6 +317,8 @@ Invoke-Jmc @($jmc, '--build', (Join-Path $RepoRoot "jWody"), '--jmo', $JmoW,
              '--assume-app-version', $JamoviVer, '--skip-deps') "jWody .jmo"
 if (-not (Test-Path $JmoW)) { throw "jWody: plik .jmo nie powstal" }
 Info "jWody .jmo OK ($JmoW)"
+
+} else { Info "pomijam moduly wewnetrzne jRol, jPomiar, jWody (build.ps1 -InternalModules)" }
 
 
 }
