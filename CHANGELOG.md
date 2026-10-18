@@ -5,6 +5,11 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+- Bezpieczeństwo (z jamovi 28.13): stan analiz zapisany w pliku .omv nie jest
+  przywracany — spreparowany plik mógł przy otwarciu uruchomić dowolny kod R.
+  Analiza z pliku pokazuje zapisane wyniki, ale przy pierwszej zmianie
+  przelicza się od nowa, a eksport wykresu czeka na to przeliczenie.
+
 ## 1.0.8 — 2026-10-13
 Poprawki zmiennej przekształconej (reguły „jeżeli … użyj …”) i jRISK 0.4.1.
 
