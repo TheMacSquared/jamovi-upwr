@@ -364,11 +364,13 @@ jupwrRegisterFonts <- function() {
         return(invisible(FALSE))
     jupwrFontState$registered <- TRUE
 
-    if ( ! requireNamespace('systemfonts', quietly=TRUE))
-        return(invisible(FALSE))
-
     dir <- jupwrFontsDir()
     if (is.null(dir))
+        return(invisible(FALSE))
+
+    jupwrFontconfig(dir)
+
+    if ( ! requireNamespace('systemfonts', quietly=TRUE))
         return(invisible(FALSE))
 
     files <- list.files(dir, pattern='[.](ttf|otf|ttc)$', full.names=TRUE)
@@ -379,6 +381,45 @@ jupwrRegisterFonts <- function() {
                    error=function(e) FALSE)
 
     invisible(ok)
+}
+
+#' Point fontconfig at the bundled fonts (macOS)
+#'
+#' The cairo device behind svg() (Image mode: vector) finds fonts through
+#' fontconfig, which does not see the fonts added to systemfonts. In the macOS
+#' app the configuration compiled into R (under /Library/Frameworks) does not
+#' exist either, so a configuration including R's own one plus the font
+#' directory is written and set before cairo first looks up a font. The
+#' Docker image installs the fonts for fontconfig instead; an existing
+#' FONTCONFIG_FILE is left alone.
+#'
+#' @param dir the directory holding the bundled fonts
+#' @return the path of the configuration written, or NULL
+jupwrFontconfig <- function(dir) {
+
+    if (Sys.info()[['sysname']] != 'Darwin' || nzchar(Sys.getenv('FONTCONFIG_FILE')))
+        return(invisible(NULL))
+
+    rConf <- file.path(R.home(), 'fontconfig', 'fonts', 'fonts.conf')
+    conf <- file.path(tempdir(), 'jupwr-fonts.conf')
+    lines <- c(
+        '<?xml version="1.0"?>',
+        '<!DOCTYPE fontconfig SYSTEM "fonts.dtd">',
+        '<fontconfig>',
+        if (file.exists(rConf))
+            sprintf('  <include ignore_missing="yes">%s</include>', htmlEscape(rConf))
+        else
+            c('  <dir>/System/Library/Fonts</dir>', '  <dir>/Library/Fonts</dir>',
+              '  <dir>~/Library/Fonts</dir>', '  <cachedir>~/.fontconfig</cachedir>'),
+        sprintf('  <dir>%s</dir>', htmlEscape(normalizePath(dir))),
+        '</fontconfig>')
+
+    ok <- tryCatch({ writeLines(lines, conf); TRUE }, error=function(e) FALSE)
+    if ( ! ok)
+        return(invisible(NULL))
+
+    Sys.setenv(FONTCONFIG_FILE=conf)
+    invisible(conf)
 }
 
 #' Resolve the lecture-note fonts, falling back to the generic families

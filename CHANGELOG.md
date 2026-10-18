@@ -11,6 +11,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 - Reguły zmiennej przekształconej: formuła z wyrażeniem (np. `2 + 3`, `b * 2`)
   albo nazwą nieistniejącej kolumny pokazuje ostrzeżenie „nie da się pokazać jako
   reguły” zamiast reguł, które przy zapisie zamieniłyby wyrażenie w tekst.
+- Przygotowanie wykresów wektorowych (SVG przez cairo, jeszcze nieużywane przez
+  żaden wykres): jmvcore 28.3.2 kieruje fontconfig na fonty jUPWR (macOS),
+  Docker instaluje je w fontconfig, a build macOS wbudowuje biblioteki X11
+  z Homebrew — wcześniej `svg()` w jUPWR.app padało bez XQuartz.
 
 ## 1.1.1 — 2026-10-14 (gałąź `test/upstream-28.11`)
 Poprawki zmiennej przekształconej i tabel wyników, fonty wykresów IBM Plex,

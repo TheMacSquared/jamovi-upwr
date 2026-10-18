@@ -480,6 +480,8 @@ Analysis <- R6::R6Class('Analysis',
                 }
 
                 if (vector) {
+                    # jUPWR: lets cairo find the bundled fonts (macOS)
+                    jupwrRegisterFonts()
                     grDevices::svg(
                         filename=fullPath,
                         width=width/ppi,

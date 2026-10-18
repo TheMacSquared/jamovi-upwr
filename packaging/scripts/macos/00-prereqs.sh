@@ -5,6 +5,9 @@
 
 log "Instalacja pakietów Homebrew..."
 brew install boost nanomsg pkg-config protobuf create-dmg python@3.12
+# biblioteki X11 dla cairo.so z R (svg(), wykresy wektorowe) — wbudowywane
+# w 55-relocate.sh zamiast XQuartz z /opt/X11
+brew install libx11 libxrender libxext libsm libice
 
 log "Weryfikacja toolchainu:"
 fail=0

@@ -674,13 +674,18 @@ Etap 1 — wykresy wektorowe.
     libICE, libXext, libxcb, libXau do `R.framework/.../Resources/lib`
     i przepina ścieżki. Test z tymi bibliotekami (DYLD_FALLBACK_LIBRARY_PATH)
     + `FONTCONFIG_FILE` z `<include>` configu R i `<dir>` z fontami jUPWR:
-    cairo rysuje IBM Plex Sans/Mono jak w Dockerze. Do zrobienia przed pilotem
-    vector: (1) pakowanie bibliotek X11 w buildzie macOS i `/opt/X11` w kontroli
-    absolutnych zależności, (2) fontconfig wskazujący `Resources/jamovi/fonts`
-    (np. jmvcore ustawia `FONTCONFIG_FILE` na wygenerowany config przed
-    pierwszym `svg()`; skompilowana ścieżka configu w R CRAN to
-    `/Library/Frameworks/R.framework/...`, której w .app nie ma).
-    Windows: nie sprawdzone (do testu natywnie).
+    cairo rysuje IBM Plex Sans/Mono jak w Dockerze. WDROŻONE 2026-10-18:
+    (1) `00-prereqs.sh` instaluje libx11/libxrender/libxext/libsm/libice
+    z Homebrew, `55-relocate.sh` wbudowuje je (z libxcb/libXau/libXdmcp) TYLKO
+    dla `grDevices/libs/cairo.so` i kontroluje, że cairo.so nie wskazuje
+    `/opt/X11` (R_X11.so, R_de.so, tcltk, rgl zostają z XQuartz — jamovi ich
+    nie ładuje); (2) jmvcore 28.3.2 `jupwrFontconfig()` (themes.R): na macOS,
+    gdy brak `FONTCONFIG_FILE`, zapisuje w tempdir config z `<include>` configu R
+    i `<dir>` fontów jUPWR; wołane z `jupwrRegisterFonts()` i w gałęzi vector
+    w `analysis.R` przed `svg()` (cairo czyta fontconfig leniwie, przy pierwszym
+    tekście). Sprawdzone w zbudowanej jUPWR.app bez XQuartz: `svg()` + motyw
+    jUPWR = IBM Plex. Nie sprawdzone: Image mode: vector w silniku (brak
+    jeszcze takiego wykresu — pilot jEksplor) i Windows (do testu natywnie).
 1b. Pilot na jEksplor (9 wykresów): wygląd w aplikacji, eksport .docx/.odt,
     rozmiar .omv, wydajność przy N ~ 10 000 (ECDF, punkty na boxplocie).
 1c. Zakres:

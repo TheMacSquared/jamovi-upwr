@@ -86,6 +86,21 @@ rsync -a --delete \
     "$R_RES_SRC/" "$JRES/R/"
 log "R wbudowane ($(du -sh "$JRES/R" | cut -f1))"
 
+# X11 libraries for R's cairo device (svg(), Image mode: vector). R from CRAN
+# links them from XQuartz (/opt/X11), which a clean Mac does not have; the
+# Homebrew builds (00-prereqs.sh) are bundled instead. Only cairo.so is
+# handled: R_X11.so, R_de.so, tcltk and rgl are never loaded by jamovi.
+CAIRO_SO="$JRES/R/library/grDevices/libs/cairo.so"
+[ -f "$CAIRO_SO" ] || die "Brak $CAIRO_SO"
+while IFS= read -r dep; do
+    leaf="${dep##*/}"
+    src="/opt/homebrew/lib/$leaf"
+    [ -f "$src" ] || die "Brak $src (brew install libx11 libxrender libxext libsm libice)"
+    cp -L "$src" "$LIBS/$leaf"; chmod u+w "$LIBS/$leaf"
+    collect "$src"
+done < <(otool -L "$CAIRO_SO" | tail -n +2 | awk '{print $1}' | grep '^/opt/X11/')
+log "Biblioteki X11 dla cairo wbudowane"
+
 # ---------------------------------------------------------------------------
 # 4. install names Mach-O — wszystkie zależności wewnątrz bundla
 # ---------------------------------------------------------------------------
@@ -121,6 +136,7 @@ while IFS= read -r macho; do
             /opt/homebrew/*) target="$LIBS/$leaf" ;;
             /Library/Frameworks/R.framework/*) target="$LIBS/$leaf" ;;
             libRInside.dylib) target="$LIBS/$leaf" ;;
+            /opt/X11/*) [ "$macho" = "$CAIRO_SO" ] || continue; target="$LIBS/$leaf" ;;
             *) continue ;;
         esac
         [ -e "$target" ] || die "Brak wbudowanej biblioteki dla $dep (oczekiwano: $target)"
@@ -161,6 +177,9 @@ while IFS= read -r macho; do
         | grep -E '^(/opt/homebrew/|/Library/Frameworks/R\.framework/)' \
         >> "$absolute_refs" || true
 done < "$MACHO_LIST"
+# cairo.so must not fall back to XQuartz (the other X11 users are not needed)
+otool -L "$CAIRO_SO" | tail -n +2 | awk '{print $1}' | grep '^/opt/X11/' \
+    >> "$absolute_refs" || true
 [ ! -s "$absolute_refs" ] || {
     sed -n '1,20p' "$absolute_refs" >&2
     die "Pozostaly absolutne zaleznosci Homebrew/R.framework"
