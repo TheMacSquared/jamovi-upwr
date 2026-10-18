@@ -103,6 +103,7 @@ class RecodedVarWidget extends HTMLElement {
         // top bar rather than being toggled with a mode
         $top.append(this.builder.$addRow);
         this.append(this.builder);
+        this.builder.onValidity = () => this._updateErrorMessage();
 
         this._updateChannelList();
         this._setupMeasureList();
@@ -613,7 +614,11 @@ class RecodedVarWidget extends HTMLElement {
     _updateErrorMessage() {
         this.$errorMessage.classList.remove('show');
 
-        let errorMsg = this.model.get('formulaMessage');
+        // a rule the builder refuses to save comes first: the transform
+        // still holds the previous rules, so its own message is stale
+        let errorMsg = this.builder ? this.builder.validationMessage() : '';
+        if (errorMsg === '')
+            errorMsg = this.model.get('formulaMessage') ?? '';
         if (errorMsg === '') {
             let transformId = this.model.get('transform');
             if (transformId !== null && transformId !== 0) {

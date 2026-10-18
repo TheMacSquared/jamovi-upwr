@@ -799,7 +799,8 @@ w obrazie Dockera. Ciche błędne wyniki / utrata reguł:
    ŚCIŚLE wg `decSymbol` z ustawień (decyzja dydaktyczna: zapis wynika
    z ustawień — inaczej niż arkusz, który przyjmuje oba): `formatValue`
    zamienia przecinek tylko przy ustawionym przecinku, `wrongDecimal`
-   wykrywa ułamek z drugim symbolem → pole `.invalid` z podpowiedzią,
+   wykrywa ułamek z drugim symbolem → pole `.invalid` i komunikat słowny
+   w `$errorMessage` widgetu (`validationMessage`, `onValidity`),
    `_commit` nic nie zapisuje (nie cichy tekst). `VariableModel.settings`
    ustawiane w `VariableEditor.init`, cache `setFormula` z symbolem.
    Spójność w całej aplikacji (arkusz, schowek) świadomie NIE — kod upstreamu.

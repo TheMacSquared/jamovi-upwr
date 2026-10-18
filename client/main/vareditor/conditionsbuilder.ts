@@ -311,13 +311,31 @@ export function formulaToChain(formula: string, columnNames: string[] = [], decS
     }
 }
 
-function termsHaveWrongDecimal(terms: Term[], decSymbol: string): boolean {
-    return terms.some(t => isGroup(t) ? termsHaveWrongDecimal(t.terms, decSymbol) : wrongDecimal(t.value, decSymbol));
+function termsWrongDecimal(terms: Term[], decSymbol: string): string | null {
+    for (let t of terms) {
+        let found = isGroup(t) ? termsWrongDecimal(t.terms, decSymbol) : (wrongDecimal(t.value, decSymbol) ? t.value.trim() : null);
+        if (found !== null)
+            return found;
+    }
+    return null;
 }
 
-export function chainHasWrongDecimal(chain: Chain, decSymbol: string): boolean {
-    return wrongDecimal(chain.elseValue, decSymbol)
-        || chain.rows.some(r => wrongDecimal(r.value, decSymbol) || termsHaveWrongDecimal(r.clauses, decSymbol));
+// the first value in the rules typed with the wrong decimal symbol, or null
+export function firstWrongDecimal(chain: Chain, decSymbol: string): string | null {
+    for (let r of chain.rows) {
+        let found = termsWrongDecimal(r.clauses, decSymbol);
+        if (found === null && wrongDecimal(r.value, decSymbol))
+            found = r.value.trim();
+        if (found !== null)
+            return found;
+    }
+    return wrongDecimal(chain.elseValue, decSymbol) ? chain.elseValue.trim() : null;
+}
+
+function wrongDecimalMessage(value: string, decSymbol: string): string {
+    let fixed = decSymbol === ',' ? value.replace('.', ',') : value.replace(',', '.');
+    return _('{value}: the decimal symbol in the settings is "{symbol}", write {fixed}. The rules are not saved until this is corrected.',
+        { value, symbol: decSymbol, fixed });
 }
 
 export class ConditionsBuilder extends HTMLElement {
@@ -334,6 +352,8 @@ export class ConditionsBuilder extends HTMLElement {
     lastRepresentable = true;
     decSymbol: () => string;
     lastDecSymbol = '.';
+    // called whenever validationMessage() may have changed
+    onValidity: () => void = () => {};
 
     // decSymbol: the decimal symbol of the settings, for typing and showing numbers
     constructor(columns: () => Column[], currentName: () => string, onChange: (formula: string) => void,
@@ -407,23 +427,29 @@ export class ConditionsBuilder extends HTMLElement {
         this.render();
     }
 
+    // why the rules cannot be saved, or '' (shown by the host)
+    validationMessage(): string {
+        let decSymbol = this.decSymbol();
+        let wrong = firstWrongDecimal(this.chain, decSymbol);
+        return wrong === null ? '' : wrongDecimalMessage(wrong, decSymbol);
+    }
+
     // marks a value typed with the wrong decimal symbol
     _check($input: HTMLInputElement) {
         let decSymbol = this.decSymbol();
         let wrong = wrongDecimal($input.value, decSymbol);
         $input.classList.toggle('invalid', wrong);
-        if (wrong) {
-            let example = decSymbol === ',' ? '125,5' : '125.5';
-            $input.title = _('The decimal symbol in the settings is "{symbol}"; write numbers like {example}', { symbol: decSymbol, example });
-        }
+        if (wrong)
+            $input.title = wrongDecimalMessage($input.value.trim(), decSymbol);
         else
             $input.removeAttribute('title');
     }
 
     _commit() {
+        this.onValidity();
         // nothing is saved while a number has the wrong decimal symbol
         let decSymbol = this.decSymbol();
-        if (chainHasWrongDecimal(this.chain, decSymbol))
+        if (firstWrongDecimal(this.chain, decSymbol) !== null)
             return;
         let formula = chainToFormula(this.chain, this._columnNames(), decSymbol);
         if (formula === this.lastFormula)
@@ -439,6 +465,7 @@ export class ConditionsBuilder extends HTMLElement {
         this.$rows.append(this.$elseRow);
         this.$else.value = this.chain.elseValue;
         this._check(this.$else);
+        this.onValidity();
     }
 
     // renders one term list (a row body, or the inside of a group) with its

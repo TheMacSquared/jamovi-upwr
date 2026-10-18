@@ -168,6 +168,24 @@ describe('decimal symbol', () => {
         expect(written).toEqual([ 'IF(a < 3.5, "x", "y")' ]);
     });
 
+    it('explains in words which value is wrong', async () => {
+        const { ConditionsBuilder, firstWrongDecimal } = await mod();
+        const chain = { rows: [ { clauses: [ { variable: 'a', op: '<', value: '1,5' },
+                { terms: [ { variable: 'b', op: '==', value: '2.5' } ], joins: [] } ],
+            joins: [ 'and' as const ], value: 'x' } ], elseValue: '3.5' };
+        expect(firstWrongDecimal(chain, ',')).toBe('2.5');
+        expect(firstWrongDecimal(chain, '.')).toBe('1,5');
+        let calls = 0;
+        const b = new ConditionsBuilder(() => [], () => '', () => {}, () => ',');
+        b.onValidity = () => calls++;
+        b.setFormula('IF(a < 2.5, "x", "y")');
+        expect(b.validationMessage()).toBe('');
+        (b.chain.rows[0].clauses[0] as any).value = '3.5';
+        b._commit();
+        expect(b.validationMessage()).not.toBe('');
+        expect(calls).toBeGreaterThan(0);
+    });
+
     it('marks the field with the wrong symbol', async () => {
         const { ConditionsBuilder } = await mod();
         const b = new ConditionsBuilder(() => [], () => '', () => {}, () => ',');
