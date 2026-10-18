@@ -83,7 +83,7 @@ for key in $(git config -f .gitmodules --name-only --get-regexp '^submodule\..*\
 done
 
 # na main: commity z najnowszej release/* bez odpowiednika (ten sam patch albo cherry-pick -x)
-# i bez linii „Tylko-stable:” (commity zmieniające tylko CHANGELOG.md pomijane)
+# i bez linii „Tylko-stable:” (commity zmieniające tylko pliki wydania linii pomijane)
 if [ "$BRANCH" = main ] && [ -n "$RELEASES" ]; then
     rel="origin/release/$(echo "$RELEASES" | tail -1)"
     # znacznik bywa ze skróconym hashem (cherry-pick -x po skróconym sha) — rozwijamy do pełnego
@@ -93,8 +93,11 @@ if [ "$BRANCH" = main ] && [ -n "$RELEASES" ]; then
     for c in $(git cherry HEAD "$rel" | awk '$1 == "+" {print $2}'); do
         body="$(git log -1 --format=%B "$c")"
         echo "$body" | grep -q '^Tylko-stable:' && continue
-        # sam CHANGELOG.md: każda linia ma własne wpisy wersji, nie przenosi się ich
-        [ "$(git diff-tree --no-commit-id --name-only -r "$c")" = CHANGELOG.md ] && continue
+        # same pliki wydania (CHANGELOG, wersja jUPWR, macierz MODULES.md): każda linia
+        # ma własne wpisy i numery wersji, nie przenosi się ich
+        [ -z "$(git diff-tree --no-commit-id --name-only -r "$c" | grep -vxE \
+            'CHANGELOG\.md|client/common/jupwr\.ts|docker-compose\.yaml|packaging/MODULES\.md|packaging/scripts/windows/jUPWR\.nsi')" ] \
+            && continue
         echo "$picked" | grep -qx "$c" && continue
         # kierunek main -> stable: commit ze stable sam jest cherry-pickiem commita z main
         # (patch-id się różni, gdy przy przenoszeniu rozwiązano konflikt)

@@ -112,8 +112,10 @@ Obrazy różnią się tagiem (`jupwr/jupwr:<wersja>`), więc build nie nadpisuje
   (utrata lub zepsucie danych, awaria aplikacji, błędne wyniki). Poprawka zrobiona
   na stable idzie na `main` tak samo. `-x` zostawia w opisie
   „(cherry picked from commit …)”, po którym `release-check.sh` rozpoznaje przeniesienie.
-- Commit, który z założenia dotyczy tylko stable (np. `.gitmodules`, wersja 1.0.x,
-  wpis CHANGELOG wydania 1.0.x), dostaje w opisie linię `Tylko-stable: <powód>`.
+- Commit, który z założenia dotyczy tylko stable (np. `.gitmodules`), dostaje
+  w opisie linię `Tylko-stable: <powód>`. Commity zmieniające wyłącznie pliki
+  wydania (CHANGELOG.md, wersja jUPWR w `jupwr.ts`/`docker-compose.yaml`/`jUPWR.nsi`,
+  `packaging/MODULES.md`) `release-check.sh` pomija sam.
 - Hurtowa synchronizacja stable → main (gdy poprawek jest dużo): zwykły
   `git merge release/1.0` na `main`. Nigdy force push na `main` ani `release/*`.
 - Zmiana w submodule (jmv, plots, i18n): commit w submodule na jego gałęzi tej samej
