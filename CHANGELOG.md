@@ -13,6 +13,13 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   komunikat błędu nie zasłania wyników, kopiowanie wykresu jako LaTeX.
 - Wykresy jCzest 0.2.4 (tabela kontyngencji, zgodność, zależne) w motywie
   i palecie ustawionych w aplikacji zamiast domyślnych kolorów ggplot.
+- jCzest „Próby zależne”: wybór kategorii „wystąpiło” (udziały, wykres, opis
+  metod); domyślnie druga kategoria, więc przy „tak/nie” wykres pokazuje
+  udział „tak” (wcześniej zawsze pierwsza alfabetycznie, czyli „nie”).
+  Statystyki McNemara i Q Cochrana bez zmian; w porównaniach par OR odwraca
+  się razem z wybraną kategorią.
+- Zmienna przekształcona: reguła z tekstem „$source” w cudzysłowie jest
+  rozpoznawana jako reguła (wcześniej traktowana jak stare przekształcenie).
 - jperm 0.2.5: obszar odrzucenia i obserwowana statystyka w drugim kolorze
   palety zamiast stałej czerwieni.
 - jCI 0.3.5: wykres kafelkowy przedziału proporcji w kolorach palety

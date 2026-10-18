@@ -96,7 +96,7 @@ test_that("wykres udzialow dziala dla obu metod", {
     expect_equal(st$vars, c("p1", "p2", "p3"))
     expect_equal(length(st$prop), 3)
     expect_true(all(st$prop >= 0 & st$prop <= 1))
-    expect_equal(st$level, levels(trzy$p1)[1])   # pierwszy poziom alfabetycznie
+    expect_equal(st$level, levels(trzy$p1)[2])   # domyslnie druga kategoria („tak”)
 
     r2 <- jCzest:::zalezne(data = pary, vars = c("przed", "po"), counts = "n", plot = TRUE)
     expect_false(is.null(r2$plot$state))
@@ -137,4 +137,33 @@ test_that("przypadki brzegowe nie wywalaja analizy", {
     # braki danych
     braki <- trzy; braki$p1[1:5] <- NA
     expect_error(jCzest:::zalezne(data = braki, vars = c("p1", "p2", "p3")), NA)
+})
+
+test_that("kategoria „wystąpiło” steruje udzialami, wykresem i opisem metod", {
+    # domyslnie druga kategoria: przy (nie, tak) udzialy dotycza „tak”
+    d2 <- jCzest:::zalezne(data = pary, vars = c("przed", "po"), counts = "n",
+                           plot = TRUE, metody = TRUE)
+    expect_equal(d2$plot$state$level, "tak")
+    expect_equal(d2$plot$state$prop, c((40 + 25) / 100, (40 + 10) / 100))
+    expect_match(d2$metody$content, "„tak”")
+
+    # jawny wybor odwraca udzialy (dopelnienie do 1), statystyka bez zmian
+    e2 <- jCzest:::zalezne(data = pary, vars = c("przed", "po"), counts = "n",
+                           plot = TRUE, event = "nie")
+    expect_equal(e2$plot$state$level, "nie")
+    expect_equal(e2$plot$state$prop, 1 - d2$plot$state$prop)
+    expect_equal(e2$tests$asDF$stat[1], d2$tests$asDF$stat[1])
+
+    # Q Cochrana: udzialy wybranej kategorii, Q niezalezne od wyboru
+    q1 <- jCzest:::zalezne(data = trzy, vars = c("p1", "p2", "p3"), plot = TRUE, event = "tak")
+    q2 <- jCzest:::zalezne(data = trzy, vars = c("p1", "p2", "p3"), plot = TRUE, event = "nie")
+    expect_equal(q1$plot$state$prop, vapply(trzy, function(x) mean(x == "tak"), numeric(1)),
+                 ignore_attr = TRUE)
+    expect_equal(q2$plot$state$prop, 1 - q1$plot$state$prop)
+    expect_equal(q1$tests$asDF$stat[1], q2$tests$asDF$stat[1])
+
+    # kategoria spoza poziomow = jak pusta (druga)
+    x2 <- jCzest:::zalezne(data = pary, vars = c("przed", "po"), counts = "n",
+                           plot = TRUE, event = "brak")
+    expect_equal(x2$plot$state$level, "tak")
 })

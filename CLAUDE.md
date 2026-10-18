@@ -563,10 +563,11 @@ Priorytet 2: `stripmean`, `ridge`, `dens` — te same argumenty, rzadsze użycie
 
 PUŁAPKA: dla zmiennych BINARNYCH tryb szeroki wymaga dodatkowego pytania, która
 kategoria jest „zdarzeniem" (inaczej wykres nie wie, czy rysować udział „tak", czy
-„nie"). Dla zmiennych ciągłych problem nie występuje. Ten sam problem dotyczy
-wykresu w jCzest `zalezne` — rysuje udział PIERWSZEJ kategorii alfabetycznie,
-co przy „tak/nie" daje „nie"; oś jest jawnie opisana, ale historia czyta się
-odwrotnie. Rozważyć wspólne rozwiązanie (wybór poziomu) dla obu miejsc.
+„nie"). Dla zmiennych ciągłych problem nie występuje. W jCzest `zalezne`
+ROZWIĄZANE 2026-10-18 (jCzest 0.2.4): opcja Level `event` bez `variable`,
+zmienną selektora ustawia `jamovi/js/zalezne.js` na pierwszy pomiar,
+domyślnie druga kategoria (`defaultLevelIndex: 1`, w R `.eventLevel`) —
+wzór do powtórzenia w trybie szerokim scatr.
 
 Bez sensu: `scat`, `hexbin`, `bubble`, `heatmap` (z natury x–y), `mosaic`,
 `stackbar`, `waffle`, `treemap`, `pareto`, `wordcloud` (liczności kategorii),
@@ -749,16 +750,24 @@ Pozostaje:
   (`isTransformShared`, kopia jako własne przekształcenie zmiennej; tylko latest).
 - ~~(P2) builder zapisuje wyrażenie (`2 + 3`) w „użyj” i w wartości warunku
   jako tekst~~ — ZROBIONE 2026-10-18 (`roundTrips` w `formulaToChain`; tylko latest).
-- (marginalne) `transform.is_rules` szuka `$source` także w tekstach
-  w cudzysłowie.
+- ~~(marginalne) `transform.is_rules` szuka `$source` także w tekstach
+  w cudzysłowie~~ — ZROBIONE 2026-10-18 (`_QUOTED` w `transform.py`).
 - IF z kategorią kolumny nominalnej z kodami i liczbą całkowitą daje typ
   całkowity i kody zamiast etykiet (wnioskowanie typu IF, nie `_rule_levels`).
+  Ocena 2026-10-18: zmiana wnioskowania typu w `compute/nodes.py` dotyka
+  wszystkich formuł — nie jako drobna poprawka, osobno z testami.
 - Zgłosić do jamovi (upstream, PÓŹNIEJ): `read_dataset` bez .omv/.omt
   i `import_from` zerujący wiersze przed odczytem źródła (błąd czytania
   dowolnego pliku nadal czyści dane); `Analysis.set_svg` używa
   `self.dataset.instance_path` (jest w `Project`; padają upstreamowe testy
   SVG w `test_analyses.py`); `client/main/utils/jsonlines.ts` nie buforuje
   niedokończonej linii między fragmentami i dekoduje UTF-8 bez `stream: true`.
+  Padające testy klienta upstreamu (28.13, także u nich; nie poprawiamy
+  lokalnie): `resultsview/test/svg.test.ts` — cykl importów `element.ts` →
+  `create.ts` (`AnalysisStatus` używany w runtime) → `table.ts` → `element.ts`;
+  `common/tests/formatio.test.ts` (eksport HTML z SVG dubluje `<rect>`);
+  `common/tests/htmlelementcreator.test.ts` (marked 18 sam dekoduje encje
+  liczbowe `&#8212;` przed ponownym kodowaniem w `richMarkdown`).
 
 
 ### Zadanie 23: jCzest — wykresy bez motywu i palety aplikacji — ZROBIONE 2026-10-18 (jCzest 0.2.4)

@@ -50,6 +50,13 @@ options:
       type: Bool
       default: false
 
+    # kategoria „wystąpiło": kodowanie 0/1, udziały i wykres; pusta = druga
+    # kategoria (jak „zdarzenie" w jRegr). Zmienną selektora ustawia js/zalezne.js
+    # na pierwszy pomiar (Level wskazuje jedną zmienną, a pomiarów jest kilka)
+    - name: event
+      title: Kategoria „wystąpiło”
+      type: Level
+
     # --- zaawansowane ---
     - name: exact
       title: Dokładny test (dwumianowy na parach)

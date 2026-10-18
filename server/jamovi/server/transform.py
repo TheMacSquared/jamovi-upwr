@@ -11,6 +11,11 @@ from .compute import FormulaStatus
 from ast import NodeVisitor
 
 
+# jUPWR: quoted text in a formula (with backslash escapes); a "$source" inside
+# it is just text, not a reference to the source column
+_QUOTED = re.compile(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'')
+
+
 class Transform:
 
     def __init__(self, dataset):
@@ -127,7 +132,7 @@ class Transform:
         # element and never refers to $source; upstream transforms are
         # source-relative fragments (and a lone '$source' when empty)
         return (len(self._formula) == 1
-                and '$source' not in self._formula[0])
+                and '$source' not in _QUOTED.sub('', self._formula[0]))
 
     def produce_formula(self, parent):
         if self.is_rules:

@@ -96,7 +96,9 @@ test_that("bledne proporcje i przypadki brzegowe nie wywalaja analizy", {
     # zla liczba wag
     res <- jCzest:::zgodnosc(data = cztery, var = "kat", ratio = c(1, 2))
     expect_equal(nrow(res$tests$asDF), 0)
-    expect_match(txt(res), "Proporcje oczekiwane")
+    # the note itself, not txt(): the text output wraps it to the width of the
+    # (empty) table, so "Proporcje oczekiwane" is split across lines there
+    expect_match(res$tests$notes$r$note, "Proporcje oczekiwane")
 
     # ujemna waga
     expect_error(jCzest:::zgodnosc(data = cztery, var = "kat", ratio = c(1, 1, 1, -1)), NA)

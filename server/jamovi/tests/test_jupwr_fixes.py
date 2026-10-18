@@ -1,5 +1,6 @@
 """jUPWR: regression tests for the 2026-10 audit fixes (1: import from
-.omv, 4: rule levels with categories from a column)"""
+.omv, 4: rule levels with categories from a column, is_rules and quoted
+text)"""
 
 from os import path
 
@@ -10,6 +11,7 @@ from jamovi.server.instance import Instance
 from jamovi.server.session import Session
 from jamovi.server.datasetmodel import DataSetModel
 from jamovi.server.dataset import ColumnType, DataType, MeasureType
+from jamovi.server.transform import Transform
 
 
 class FakeComs:
@@ -120,3 +122,16 @@ def test_rule_levels_category_and_text(dataset_model: DataSetModel):
     assert r.formula_message == ''
     assert [ level[1] for level in r.levels ] == [ 'kot', 'pies', 'inny' ]
     assert [ r[i] for i in range(3) ] == [ 'pies', 'kot', 'inny' ]
+
+
+@pytest.mark.parametrize('formula, rules', [
+    ('IF(a == 1, "$source", "x")', True),       # the text "$source" is just text
+    ("IF(a == 1, '$source', 'x')", True),
+    ('IF(a == 1, "say \\"$source\\"", "x")', True),
+    ('IF(a == 1, "x", $source)', False),        # a real reference to the source
+    ('$source', False),                         # an empty upstream transform
+])
+def test_is_rules_ignores_source_in_quoted_text(formula, rules):
+    transform = Transform(None)
+    transform.formula = [ formula ]
+    assert transform.is_rules is rules

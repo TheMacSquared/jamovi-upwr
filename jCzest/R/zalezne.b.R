@@ -31,15 +31,21 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             private$.buildPairCols(levels(v), o$vars)
         },
 
-        #' Kodowanie 0/1: PIERWSZY poziom = 1 („wystąpiło"), pozostałe = 0.
-        #' Konwencja spójna z testem zgodności, gdzie też testujemy pierwszy poziom.
-        .binary = function(vars) {
+        #' Kategoria „wystąpiło": wybrana w panelu (opcja event), a gdy pusta albo
+        #' spoza poziomów — druga (jak „zdarzenie" w jRegr: przy tak/nie to „tak").
+        .eventLevel = function(lv) {
+            e <- self$options$event
+            if (!is.null(e) && length(e) == 1 && e %in% lv) e else lv[min(2, length(lv))]
+        },
+
+        #' Kodowanie 0/1: kategoria „wystąpiło" = 1, druga = 0.
+        .binary = function(vars, event) {
             d <- lapply(vars, function(v) {
                 x <- self$data[[v]]
                 if (!is.factor(x)) x <- factor(x)
                 lv <- levels(x)
                 if (length(lv) != 2) return(NULL)
-                as.integer(x == lv[1])
+                as.integer(x == (if (event %in% lv) event else lv[2]))
             })
             if (any(vapply(d, is.null, logical(1)))) return(NULL)
             m <- do.call(cbind, d)
@@ -69,20 +75,22 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 return()
             }
             private$.buildPairCols(rownames(tab), vars)
+            ev <- private$.eventLevel(rownames(tab))
+            i <- match(ev, rownames(tab))
             m <- private$.metody
             m$add("Dane", "Dwa pomiary tych samych jednostek: pierwszy „%s”, drugi „%s”; jednostka = wiersz arkusza; N = %s par kompletnych.",
                   vars[1], vars[2], format(sum(tab), big.mark = " "))
             m$addIf(optNonEmpty(o$counts), "Dane", "Dane zagregowane: liczności par z kolumny „%s”.", o$counts)
-            m$add("Dane", "Kategoria traktowana jako „wystąpiło”: „%s” (pierwsza alfabetycznie) — jej dotyczą udziały i wykres.",
-                  rownames(tab)[1])
+            m$add("Dane", "Kategoria traktowana jako „wystąpiło”: „%s” (wybór w panelu, domyślnie druga) — jej dotyczą udziały i wykres.",
+                  ev)
             m$addIf(o$table, "Dane", "Tabela par: wiersze = „%s”, kolumny = „%s”; przekątna = pary zgodne; brzegi = liczność (udział %%).",
                     vars[1], vars[2])
             private$.fillPairs(tab, vars)
             # przy DWOCH pomiarach udzialy sa juz brzegami tabeli par — osobna
             # tabela powtarzalaby te same liczby, wiec zostaje tylko stan wykresu
             self$results$marg$setVisible(FALSE)
-            private$.fillMarg(stats::setNames(c(sum(tab[1, ]), sum(tab[, 1])), vars),
-                              sum(tab), rownames(tab)[1])
+            private$.fillMarg(stats::setNames(c(sum(tab[i, ]), sum(tab[, i])), vars),
+                              sum(tab), ev)
 
             mc <- mcnemar(tab, correct = isTRUE(o$corr))
             lab <- if (isTRUE(o$corr)) "McNemar (z poprawką ciągłości)" else "McNemar"
@@ -113,7 +121,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     m$add("Testy", "Dokładny test dwumianowy: b ~ Bin(b + c, ½), p dwustronne.")
                 }
             }
-            private$.describePlot(rownames(tab)[1])
+            private$.describePlot(ev)
 
             # warunek stosowalności: przybliżenie χ² wymaga dość par niezgodnych
             a <- checkMcnemar(tab)
@@ -130,7 +138,8 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         .runCochran = function(vars) {
             o <- self$options
             t <- self$results$tests
-            m <- private$.binary(vars)
+            ev <- private$.eventLevel(levels(factor(self$data[[vars[1]]])))
+            m <- private$.binary(vars, ev)
             if (is.null(m)) {
                 t$setNote("b", "Q Cochrana wymaga, żeby każdy pomiar miał dokładnie 2 kategorie.")
                 return()
@@ -141,11 +150,10 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             q <- cochranQ(m)
             if (is.null(q)) { t$setNote("n", "Brak kompletnych obserwacji."); return() }
             md <- private$.metody
-            lv1 <- levels(factor(self$data[[vars[1]]]))[1]
             md$add("Dane", "Liczba pomiarów: %d — %s; te same jednostki, jednostka = wiersz arkusza; N = %d (jednostki bez braków).",
                    length(vars), jmvcore::metodyCyt(vars), q$n)
-            md$add("Dane", "Kategoria traktowana jako „wystąpiło”: „%s” (pierwsza alfabetycznie w pierwszym pomiarze) — jej dotyczą udziały i wykres.",
-                   lv1)
+            md$add("Dane", "Kategoria traktowana jako „wystąpiło”: „%s” (wybór w panelu, domyślnie druga w pierwszym pomiarze) — jej dotyczą udziały i wykres.",
+                   ev)
             md$add("Testy", "Trzy i więcej pomiarów → Q Cochrana, df = k − 1 = %d (dla k = 2 równoważne testowi McNemara).",
                    q$df)
 
@@ -158,8 +166,8 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 t$setNote("n", sprintf("N = %d, k = %d.", q$n, length(vars)))
             }
 
-            private$.fillMarg(stats::setNames(q$props * q$n, vars), q$n, lv1)
-            private$.describePlot(lv1)
+            private$.fillMarg(stats::setNames(q$props * q$n, vars), q$n, ev)
+            private$.describePlot(ev)
 
             # OR jest miara dla PARY pomiarow, wiec przy k >= 3 nie ma jednej
             # wartosci — chowamy kolumny w tabeli testow i podajemy OR osobno

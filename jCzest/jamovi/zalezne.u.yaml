@@ -46,6 +46,13 @@ children:
                 name: table
               - type: CheckBox
                 name: props
+          - type: Label
+            label: Udziały i wykres dla kategorii
+            children:
+              - type: LevelSelector
+                name: event
+                defaultLevelIndex: 1
+                enable: (vars)
       - type: LayoutBox
         cell:
           column: 1

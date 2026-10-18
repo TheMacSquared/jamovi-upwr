@@ -13,6 +13,7 @@ items:
         - counts
         - corr
         - exact
+        - event
       columns:
         - name: test
           title: ''
