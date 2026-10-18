@@ -171,7 +171,7 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   modułem OPCJONALNYM jak jRISK, ale budowanym BEZ --skip-deps (jmc bundluje
   sf/terra/asteRisk do .jmo; macOS: 71-jmo-jspace.sh, Windows: build.ps1
   krok 4f); szczegóły w packaging/MODULES.md
-- jPomiar 0.2.0 (pomiary i niepewność, pilotaż międzykierunkowy; menu „Pomiary":
+- jPomiar 0.3.0 (pomiary i niepewność, pilotaż międzykierunkowy; menu „Pomiary":
   powtarzane pomiary z u_A, budżet niepewności typ A / wzorcowanie U/k /
   rozdzielczość d/√12, propagacja sumy/różnicy/iloczynu/ilorazu z korelacją,
   kowariancja i elipsy 2D: standardowa, rozrzutu χ², ufności średniej T²
@@ -185,6 +185,12 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   `addRow()` w `.run` (rows: 0) muszą mieć w `clearWith` KAŻDĄ opcję analizy
   (także `metody` i wykresy) — tabela niewyczyszczona wraca ze stanu,
   a `addRow` dopisuje wiersze drugi raz.
+- jWody 0.1.1 (hydrologia; menu „Hydrologia": kontrola szeregu, reżim
+  i sezonowość, przepływy charakterystyczne, trendy MK/Sen/Pettitt, niżówki;
+  daty jako tekst `RRRR-MM-DD`; zbiory w bibliotece) jest modułem OPCJONALNYM
+  jak jRISK (macOS: 74-jmo-jwody.sh, Windows: build.ps1 krok 4i, Linux:
+  packaging/scripts/build-jwody-docker.sh); testy: `packaging/scripts/test-jwody.sh`,
+  metody i walidacja w `jWody/README.md`
 - zakładka „Wykresy" podzielona na kategorie dydaktyczne wg zastosowań
   (wzór: r-graph-gallery.com). Mechanizm: `menuGroup` w `plots/jamovi/*.a.yaml`
   → jedno menu na wstążce (client/main/ribbon/plotstab.ts, stała kolejność);
@@ -363,7 +369,7 @@ w bibliotece jRol (`jRol/data`, `data-raw/datasets.R`): oats (Yates, split-plot)
 pszenica_latin (syntetyczny kwadrat łaciński) — przeniesione z jDane.
 Testy: `jRol/tests/testthat` (silnik vs aov/TukeyHSD/multcomp + integracyjne).
 
-### Zadanie 9: Eksploracja — rozszerzenia statystyk opisowych (wariant B)
+### Zadanie 9: Eksploracja — rozszerzenia statystyk opisowych (wariant B) — ZREALIZOWANE w jEksplor (mapa drogowa, etap 3; bez łodygi-liści)
 Pliki `jmv/jamovi/descriptives.{a,u,r}.yaml`, `jmv/R/descriptives.b.R`: nowe
 checkboxy: średnia geometryczna/harmoniczna/ucięta/winsoryzowana; odchylenie
 przeciętne, MAD, odchylenie ćwiartkowe, V_Q, typowy obszar zmienności; skośność
@@ -468,7 +474,7 @@ zdanie z tym, co niezbędne do odczytania tabeli; objaśnienia metod przenieść
 dokumentacji/handoutu. Sprawdzić też długość podtytułów wykresów (obcinane przy
 długich nazwach zmiennych/poziomów).
 
-### Zadanie 17: jCzest — częstości jUPWR zamiast analiz częstości jmv (wzór jANOVA)
+### Zadanie 17: jCzest — częstości jUPWR zamiast analiz częstości jmv (wzór jANOVA) — ZREALIZOWANE (0.2.3; wszystkie 6 punktów „do dodania”, bez warstw i Mantela-Haenszela)
 Katalog `jCzest/` (wbudowany, menuGroup „Częstości"). Diagnoza kategorii jmv
 (2026-09-03): problem odwrotny niż w ANOVIE — panel nie jest przeładowany, tylko
 PUSTY. `contTables` ma 40 opcji, wszystkie w zwiniętych sekcjach; po wrzuceniu
