@@ -867,3 +867,39 @@ Cytowanie (PÓŹNIEJ, zweryfikować w bazie literatury przed wpisaniem): Gigeren
 i Hoffrage (1995, Psychological Review — częstości naturalne), Hoffrage i in.
 (2000, Science — komunikowanie informacji statystycznej), fact boxes Harding
 Center — do opisu metod / `00refs.yaml` jRISK (por. zadanie 20).
+
+### Zadanie 26: jRISK — RD i RR w „Zdarzenia i warunkowanie" — DO ZROBIENIA
+Zgłoszone 2026-10-21 (lista 2, zad. 7c: buty antypoślizgowe a poślizgnięcia,
+RD i RR „w butach względem bez butów"). `eventtables` liczy P(B | A), ale nie
+P(B | Aᶜ), RD ani RR — student liczy je ręcznie albo w jCzest. W jCzest
+(`twoByTwo`, `tabela.b.R`) kierunek zależy od KOLEJNOŚCI poziomów (zdarzenie =
+pierwsza kolumna, po imporcie alfabetycznie „nie" przed „tak"): domyślnie
+wychodzi RR = 0,80 dla BRAKU poślizgnięcia zamiast 0,31; RD = −0,19 zgadza się
+tylko przypadkiem (RD zdarzenia przeciwnego przy zamienionych grupach). Wynik
+wzorcowy dopiero po przestawieniu „tak" na pierwsze miejsce w obu zmiennych.
+W jRISK kierunek jest jednoznaczny, bo A (`levelA`, ekspozycja) i B (`levelB`,
+zdarzenie) to wybrane poziomy — przy tej opcji trzeba to wprost wykorzystać.
+Do zrobienia (`jRISK/jamovi/eventtables.{a,u,r}.yaml`, `R/eventtables.b.R`):
+- nowa opcja (np. `showRiskMeasures`, default false) i tabela „Porównanie
+  ryzyk": P(B | A), P(B | Aᶜ), RD = P(B | A) − P(B | Aᶜ), RR = P(B | A) / P(B | Aᶜ)
+  z kolumnami Wzór/Wartość jak w `probTable` (konwencja modułu); ewentualnie
+  OR i NNT/NNH = 1/|RD| (do decyzji — zad. 7d pyta o „zapobiegnięte
+  poślizgnięcia na osobę", czyli wprost RD);
+- przypadki brzegowe: P(B | Aᶜ) = 0 → RR nieokreślone (nota), puste A lub Aᶜ;
+- przedziały ufności raczej NIE (estymacja jest w jCzest/jCI; jRISK to
+  rachunek prawdopodobieństwa) — do potwierdzenia;
+- „Opis zastosowanych metod" jeśli jRISK go dostanie; w nocie/tytule
+  jednoznacznie „A względem Aᶜ, zdarzenie B";
+- nazwy w panelu (zgłoszone 2026-10-21): „Zdarzenie A"/„Zdarzenie B" →
+  „Ekspozycja"/„Zdarzenie" (`eventtables.a.yaml` `title` varA/levelA/varB/levelB,
+  `.u.yaml` `label` 12 i 19). PUŁAPKA: ta sama analiza służy metrykom detektora
+  (A = stan rzeczywisty, B = alarm, nota w `detectorTable`) i rachunkowi zdarzeń
+  (P(A ∩ B), P(A ∪ B)), gdzie „ekspozycja" nie pasuje — rozważyć etykiety
+  z symbolem, np. „A — ekspozycja / warunek" i „B — zdarzenie", a symbole A, B
+  zostawić we wzorach i nagłówkach tabel (`labA`, kolumna „B: …"); nota
+  detektora do uzgodnienia z nowymi nazwami;
+- warstwy („Podziel według", zad. 7b — rozbicie na miejsca pracy) poza
+  zakresem, dalej filtr.
+Bump jRISK patch (razem z zadaniem 25 → 0.4.3), `.jmo`, MODULES.md; na liście
+zadań (`analiza-ryzyka/listy`, zad. 2.7 i `jrisk-pokrycie-zadan.md`) zmienić
+wskazanie z jCzest na `eventtables`.
