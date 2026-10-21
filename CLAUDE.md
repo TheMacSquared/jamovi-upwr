@@ -840,3 +840,30 @@ Sprawdzone i poprawne: zapis/odczyt .omv, odwołania cykliczne, zależności,
 kolejność poziomów tekstowych, nawiasy i pierwszeństwo and/or, nazwy ze
 spacjami/polskimi literami.
 
+
+### Zadanie 25: jRISK — częstości naturalne w „Zdarzenia i warunkowanie" — DO ZROBIENIA
+Zgłoszone 2026-10-21 (lista 2, zad. 2 z analizy ryzyka): tabela „Częstości
+naturalne (na 1000 przypadków)" pokazuje 16 incydentów, a P(B) = 0,0165 daje 16,5.
+Przyczyna (`jRISK/R/eventtables.b.R`, blok `showNaturalFreq`): każda komórka
+i każda suma osobno przez `round()`. R zaokrągla połówki do parzystej
+(4,5 → 4, 16,5 → 16, ale 895,5 → 896), a kolumny `type: number` dostają cyfry
+znaczące („12.00", „88.0"), więc liczby zaokrąglone wyglądają na dokładne.
+Sumy brzegowe zaokrąglane niezależnie od komórek mogą się rozjechać (12 + 4 ≠ 17).
+Praktyka dziedzinowa (komunikowanie ryzyka, Gigerenzer): częstości naturalne
+są liczbami CAŁKOWITYMI; podstawę (100/1000/10 000/…) dobiera się tak, by
+wyszły dokładnie, a zaokrągla się tylko w ostateczności.
+Naprawa (do decyzji szczegółów):
+- automatyczny dobór najmniejszej podstawy 10^k (≥ 1000?), przy której
+  wszystkie komórki są całkowite (w zadaniu N = 20 000 → na 10 000: 120, 45,
+  165, 880, 8955, 9835), ewentualnie opcja wyboru podstawy; tytuł tabeli
+  ustawiany z kodu,
+- gdy całkowite się nie da (limit podstawy): zaokrąglać tylko komórki łączne
+  (połówki w górę, nie `round()`), sumy jako sumy zaokrąglonych komórek,
+  nota „wartości zaokrąglone"; wartości < 1 jako „< 1",
+- kolumny `type: integer` (bez „12.00"),
+- spójnie z drzewem częstości (`treePlot`), jeśli pokazuje skalę na 1000.
+Bump jRISK 0.4.2 → 0.4.3, przebudowa `.jmo` (moduł opcjonalny), MODULES.md.
+Cytowanie (PÓŹNIEJ, zweryfikować w bazie literatury przed wpisaniem): Gigerenzer
+i Hoffrage (1995, Psychological Review — częstości naturalne), Hoffrage i in.
+(2000, Science — komunikowanie informacji statystycznej), fact boxes Harding
+Center — do opisu metod / `00refs.yaml` jRISK (por. zadanie 20).
