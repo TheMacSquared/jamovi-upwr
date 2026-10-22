@@ -31,12 +31,17 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   - wykres słupkowy w „Częściach całości” (dawniej „Skumulowany wykres
     słupkowy”): liczebności obok siebie, proporcje obok siebie albo proporcje
     w stosie (100%); oś proporcji w procentach (też na wykresie mozaikowym);
+  - wykresy skrzypcowy, pudełkowy, raincloud i paskowy: tryb „Kilka
+    zmiennych” — kolumny w formacie szerokim (np. przed, po, po pół roku)
+    obok siebie, w skrzypcowym i pudełkowym także ze zmienną grupującą;
+    braki usuwane osobno w każdej kolumnie (z notą o liczbie obserwacji),
+    „Wyklucz przypadki” zostawia tylko osoby z kompletem pomiarów;
   - histogram: przedziały domknięte lewostronnie, w trybie automatycznym
     z okrągłą szerokością i granicami na jej wielokrotnościach (np. 0–25,
     25–50); w trybie ręcznym nowa opcja „Początek przedziałów”.
 - Znak UPWr na starcie w prawym górnym rogu panelu wyników, skalowany z jego
   szerokością (wcześniej zachodził na bibliografię w wąskim oknie).
-- Wersje modułów: scatr 2.9.8, jANOVA 0.5.2, jCI 0.3.6, jCzest 0.2.5,
+- Wersje modułów: scatr 2.9.9, jANOVA 0.5.2, jCI 0.3.6, jCzest 0.2.5,
   jDane 0.8.2, jEksplor 0.1.5, jRegr 0.1.5, jTestyT 0.4.4, jdistrACTION 1.3.4,
   jperm 0.2.6; moduły opcjonalne jRISK 0.4.3 i jSpace 0.3.3 (do przebudowy
   `.jmo`).

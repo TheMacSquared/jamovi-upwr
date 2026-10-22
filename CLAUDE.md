@@ -589,9 +589,21 @@ STAN 2026-10-22: format szeroki obsługują nowe wykresy kategorii Profile —
 `meanprofile` (średnie kilku kolumn na osi X z SE/CI; pokrywa punkt
 `jmvline` — profil średnich), `dumbbell` i `slope` (dwa pomiary przed–po).
 `parcoord` jest UKRYTY w menu (nieczytelny), więc jego rola „najlepszego
-wykresu przed–po” przeszła na `slope`. Zostaje: rozkłady kilku pomiarów
-(`jmvbox`, `violin`, `raincloud`) i słupki kilku kolumn jakościowych
-(`jmvbar`, z wyborem kategorii „zdarzenie”), potem priorytet 2.
+wykresu przed–po” przeszła na `slope`.
+ETAP 1–2 ZROBIONE 2026-10-22 (scatr 2.9.9): `violin`, `jmvbox`, `raincloud`,
+`stripmean` mają opcję `mode` (long = jedna zmienna, domyślnie / wide =
+kilka zmiennych) i pole `vars`; `violin` i `jmvbox` także `wideGroup`
+(kolor w obrębie kolumny). Wspólne `wideToLong()` i `insertWideCountsNotice()`
+w `plots/R/utils.R`: braki usuwane osobno w każdej kolumnie (decyzja),
+„Wyklucz przypadki” (`naOmit`) = tylko wiersze kompletne we wszystkich
+kolumnach; nota z liczbą obserwacji, gdy kolumny różnią się licznością.
+W `violin`/`jmvbox` `.groupVars()` podstawia kolumny pod group1, a `wideGroup`
+pod group2. Składnia `jmvbox`: `tidyr::pivot_longer` w `generateDataPrepCode`.
+Bez linii łączących tę samą osobę (decyzja; tę rolę pełni `slope`). PUŁAPKA:
+wrappery scatr rozwiązują argumenty przez NSE — `vars = cols` szuka kolumny
+„cols”; w testach podawać wektor wprost. Testy: `tests/testthat/testwide.R`.
+Zostaje: etap 3 — `jmvbar` dla kilku kolumn jakościowych (wybór kategorii
+„zdarzenie”, wzór jCzest `zalezne`), etap 4 — `ridge`, `dens`.
 
 ### Zadanie 19: „Opis zastosowanych metod" — dynamiczne podsumowanie per analiza (ZREALIZOWANE: jCzest 0.2.0, jTestyT 0.3.0, jANOVA 0.4.0)
 Diagnoza (2026-09-04): noty pod tabelami i teksty UI w przebudowanych modułach
