@@ -9,6 +9,7 @@ import { Modules } from '../modules';
 import Settings from '../settings';
 import { RibbonModel } from '../ribbon';
 import Store from '../store';
+import { JUPWR_HIDDEN_ANALYSES } from '../../common/jupwr';
 
 //import Store from '../store';
 
@@ -122,6 +123,8 @@ class PlotsTab extends RibbonTab {
             let isNew = module.new;
             for (let analysis of module.analyses) {
                 if (analysis.category !== 'plots')
+                    continue;
+                if (JUPWR_HIDDEN_ANALYSES.has(`${analysis.ns}::${analysis.name}`))
                     continue;
 
                 let groupName = analysis.menuGroup;

@@ -46,6 +46,10 @@ export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
     'jmv::corrMatrix',
     'jmv::linReg',
     'jmv::logRegBin',
+    // Plots tab (scatr): the parallel coordinates plot is hard to read in the
+    // basic course; the means profile and the slope chart cover its uses
+    // (decision 2026-10-22). The analysis stays, so saved files still open.
+    'scatr::parcoord',
 ]);
 
 // Upstream analyses kept in the menu but listed after the jUPWR ones in the

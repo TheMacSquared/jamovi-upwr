@@ -209,7 +209,10 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   (jmvbar, lollipop, wordcloud, circbar), Profiles→Profile (radar,
   parcoord, meanprofile, dumbbell, slope; decyzja 2026-10-22: profile na
   wielu zmiennych to nie ranking; meanprofile = profil średnich z SE/CI,
-  dumbbell i slope = dwa pomiary w formacie szerokim, przed–po),
+  dumbbell i slope = dwa pomiary w formacie szerokim, przed–po; parcoord
+  UKRYTY w menu (`scatr::parcoord` w `JUPWR_HIDDEN_ANALYSES`, filtrowane też
+  w plotstab.ts) — nieczytelny w kursie podstawowym, kod zostaje dla starych
+  .omv; radar ma przełącznik `facet` = osobny radar dla każdej grupy),
   Correlation→Zależności (scat, bubble, heatmap, corrgram, hexbin),
   Evolution→Trendy (jmvline, area), Composition→Części całości
   (stackbar, waffle, treemap, mosaic; mozaika przeniesiona z Zależności
