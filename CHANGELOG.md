@@ -3,6 +3,44 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.2.0 — NIEWYDANE (linia latest, jamovi 28.13)
+
+- Daty i godziny w zmiennych obliczanych: `TIMEDIFF(start, koniec, unit='min')`
+  liczy czas, który upłynął (s, min, h, d; przy samych godzinach koniec
+  wcześniejszy niż początek to następny dzień), do tego `TIMEVALUE`, `TIME`,
+  `DATETIMEVALUE` oraz `YEAR`, `MONTH`, `DAY`, `WEEKDAY` (poniedziałek = 1),
+  `HOUR`, `MINUTE`. Rozpoznawane bez podawania formatu: `8:15`, `08:15:30`,
+  `2026-10-22`, `22.10.2026` (dzień przed miesiącem), data z godziną.
+  `DATEVALUE` bez formatu przyjmuje też zapis polski; nierozpoznany wpis daje
+  brak danych zamiast błędu. Opisy po polsku w pasku formuł („Data / czas”).
+- Bibliografia: pakiety R cytowane wtedy, gdy analiza naprawdę ich użyła
+  (np. car przy SS typu II/III i teście Levene'a, emmeans przy porównaniach,
+  boot przy przedziale bootstrapowym, ggplot2 przy wykresie) — w jANOVA, jCI,
+  jCzest, jEksplor, jRegr, jTestyT, jperm, jdistrACTION, jRISK, jSpace
+  i w zakładce Wykresy. Zbiór otwarty z biblioteki (jDane, jSpace) dopisuje
+  swoje źródła, z pakietem R, z którego pochodzi (np. AER dla CASchools).
+  Eksport i kopiowanie mają tę samą bibliografię co widok (wcześniej bez jUPWR).
+- Zakładka Wykresy:
+  - nowa kategoria „Profile”: radar, profil średnich (średnie kilku zmiennych
+    z błędem standardowym lub 95% CI, opcjonalnie standaryzowane), wykres
+    hantlowy i wykres nachylenia (dwa pomiary, np. przed i po);
+  - radar: opcja „Osobny radar dla każdej grupy”;
+  - wykres współrzędnych równoległych ukryty w menu (stare pliki się otwierają);
+  - wykres mozaikowy przeniesiony z „Zależności” do „Części całości”;
+  - wykres słupkowy w „Rankingu” bez stosu (grupy zawsze obok siebie);
+  - wykres słupkowy w „Częściach całości” (dawniej „Skumulowany wykres
+    słupkowy”): liczebności obok siebie, proporcje obok siebie albo proporcje
+    w stosie (100%); oś proporcji w procentach (też na wykresie mozaikowym);
+  - histogram: przedziały domknięte lewostronnie, w trybie automatycznym
+    z okrągłą szerokością i granicami na jej wielokrotnościach (np. 0–25,
+    25–50); w trybie ręcznym nowa opcja „Początek przedziałów”.
+- Znak UPWr na starcie w prawym górnym rogu panelu wyników, skalowany z jego
+  szerokością (wcześniej zachodził na bibliografię w wąskim oknie).
+- Wersje modułów: scatr 2.9.8, jANOVA 0.5.2, jCI 0.3.6, jCzest 0.2.5,
+  jDane 0.8.2, jEksplor 0.1.5, jRegr 0.1.5, jTestyT 0.4.4, jdistrACTION 1.3.4,
+  jperm 0.2.6; moduły opcjonalne jRISK 0.4.3 i jSpace 0.3.3 (do przebudowy
+  `.jmo`).
+
 ## 1.1.2 — 2026-10-18 (linia latest, jamovi 28.13)
 
 - Upstream jamovi 28.13 (z 28.11): stan analiz z pliku .omv nie jest

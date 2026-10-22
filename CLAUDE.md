@@ -548,7 +548,7 @@ Ukrywanie jmv w `JUPWR_HIDDEN_ANALYSES`: `jmv::contTables`, `jmv::contTablesPair
 w .a.yaml jmv, czyli camelCase). Grupa „Częstości" w `groupOrder`
 (`client/main/ribbon/analysetab.ts`) w miejscu dzisiejszego `Frequencies: 70`.
 
-### Zadanie 18: wykresy — tryb „szeroki" (kilka zmiennych) w scatr
+### Zadanie 18: wykresy — tryb „szeroki" (kilka zmiennych) w scatr — CZĘŚCIOWO (2026-10-22: kategoria Profile)
 Diagnoza (2026-09-04): z 26 wykresów w `plots/` tylko trzy przyjmują kilka zmiennych
 naraz (`parcoord`, `radar`, `corrgram` — pole `vars`); reszta wymaga jednej zmiennej
 plus grupującej, czyli formatu DŁUGIEGO. Danych z powtórzonymi pomiarami w formacie
@@ -585,6 +585,13 @@ udokumentować: `parcoord` (najlepszy wykres przed-po: każda linia to jednostka
 
 UWAGA: `plots/` to submoduł (fork scatr) — zmiany idą osobnym commitem w submodule
 i bumpem wskaźnika w superprojekcie.
+STAN 2026-10-22: format szeroki obsługują nowe wykresy kategorii Profile —
+`meanprofile` (średnie kilku kolumn na osi X z SE/CI; pokrywa punkt
+`jmvline` — profil średnich), `dumbbell` i `slope` (dwa pomiary przed–po).
+`parcoord` jest UKRYTY w menu (nieczytelny), więc jego rola „najlepszego
+wykresu przed–po” przeszła na `slope`. Zostaje: rozkłady kilku pomiarów
+(`jmvbox`, `violin`, `raincloud`) i słupki kilku kolumn jakościowych
+(`jmvbar`, z wyborem kategorii „zdarzenie”), potem priorytet 2.
 
 ### Zadanie 19: „Opis zastosowanych metod" — dynamiczne podsumowanie per analiza (ZREALIZOWANE: jCzest 0.2.0, jTestyT 0.3.0, jANOVA 0.4.0)
 Diagnoza (2026-09-04): noty pod tabelami i teksty UI w przebudowanych modułach
@@ -620,7 +627,7 @@ Etykiet opcji z `.a.yaml` nie da się odczytać w R (kompilator wycina `title`),
 więc nazwy metod trzeba pisać w `.b.R`. Kolejne moduły po akceptacji pilotażu:
 jTestyT, jANOVA, jRol, jCI.
 
-### Zadanie 20: bibliografia — cytowania pakietów R używanych przez analizy (PO 1.0.0)
+### Zadanie 20: bibliografia — cytowania pakietów R używanych przez analizy (PO 1.0.0) — ZROBIONE 2026-10-22 (pakiety bez literatury metod + zbiory danych)
 Dziś bibliografia ma trzy stałe pozycje (jUPWR, jamovi, R — `client/main/
 references.ts`). Dodać cytowania pakietów, na których faktycznie opierają się
 analizy jUPWR: mechanizm upstreamu to `refs:` przy elemencie wyniku w `.r.yaml`
@@ -633,6 +640,29 @@ nortest jako źródło przybliżeń p (jEksplor, bez zależności), ARTool/Wobbr
 2011 i Johansen 1980 jako literatura metod (jANOVA), Newcombe 1998 i
 Bonett-Wright 2000 (jCI). Cytować tylko wtedy, gdy dana tabela/wykres
 naprawdę z pakietu korzysta (refs na elemencie, nie na całej analizie).
+STAN 2026-10-22 (decyzje: pakiety bez literatury metod — wariant A3;
+cytowanie warunkowe; polski APA; zbiory danych — wariant B2):
+- Wspólne wpisy pakietów w `packaging/refs.yaml` (źródło prawdy: pakiet jako
+  oprogramowanie, autorzy z rolą „aut” z DESCRIPTION, rok wydania CRAN,
+  wersja z migawki CRAN 2026-05-11); każdy moduł ma KOPIĘ potrzebnych kluczy
+  w `jamovi/00refs.yaml` (11 modułów + scatr) — przy bumpie pakietu zmieniać
+  w obu miejscach. jmvcore pomija bez komunikatu klucz nieobecny w 00refs.
+- Warunkowość: refs zbiera się tylko z WIDOCZNYCH elementów, więc statyczne
+  `refs:` na elemencie, którego widoczność = użycie pakietu; `setRefs()`
+  w `.b.R` tam, gdzie użycie zależy od opcji w zawsze widocznej tabeli
+  (typ SS w jANOVA, metoda przedziału w jCI, metoda klasyfikacji w jSpace,
+  separacja w jRegr). ggplot2 na każdym Image. Pakietów pomocniczych
+  (jmvcore, R6, dplyr, rlang, scales) nie cytujemy.
+- Zbiory z biblioteki: pole `documentation.citations` (format jak 00refs)
+  obok tekstowego `references`; klient (`client/main/datasetdocs.ts`,
+  wspólne z oknem „O zbiorze”) rozpoznaje zbiór po ścieżce
+  `{{Examples}}/<moduł>/<plik>` i dopisuje pozycje po jUPWR/jamovi/R.
+  Eksport/schowek (`resultspanel._hydrateAll`) bierze tę samą listę,
+  duplikaty usuwa po treści, nie po kluczu.
+- Ograniczenia: zbiór zapisany jako własny .omv traci cytowanie (poza jDane,
+  rozpoznawanym po tytule); pozycje jmv (angielskie) i nasze (polskie) tego
+  samego pakietu pojawiają się dwa razy; literatura metod (Wobbrock,
+  Johansen, Newcombe, Bonett-Wright) — nie dodana.
 
 
 ### Zadanie 21: nowe elementy wyników jamovi 28.4+ (Text, Svg, vector, File) — PLAN, DECYZJE OTWARTE
@@ -776,6 +806,10 @@ Pozostaje:
   `common/tests/formatio.test.ts` (eksport HTML z SVG dubluje `<rect>`);
   `common/tests/htmlelementcreator.test.ts` (marked 18 sam dekoduje encje
   liczbowe `&#8212;` przed ponownym kodowaniem w `richMarkdown`).
+- Testy składni scatr (`expect_plot_equivalent`, 14 testów: jmvbar, jmvhist
+  i in.) padają na rozjeździe kolorów (`colour`) między kodem składni
+  (`getSyntaxThemeColors`) a wykresem renderowanym z motywem jUPWR — stan
+  sprzed 2026-10-22, nie regresja; do zdiagnozowania osobno.
 
 
 ### Zadanie 23: jCzest — wykresy bez motywu i palety aplikacji — ZROBIONE 2026-10-18 (jCzest 0.2.4)
