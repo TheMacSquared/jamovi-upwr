@@ -132,6 +132,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 at$addRow(rowKey = r$term, values = list(source = r$source, ss = r$ss, df = r$df,
                     ms = r$ms, F = r$F, p = r$p, eta = r$eta, partEta = r$partEta, omega = r$omega))
             }
+            if (opts$ss != "1") at$setRefs("car")   # type I uses stats::anova
             # typ SS przenosi sie do opisu metod; zostaje ostrzezenie, bez ktorego tabela myli
             if (!balanced && opts$ss == "1")
                 at$setNote("unbal", "Układ niezrównoważony: przy typie I wynik zależy od kolejności czynników.")
@@ -206,6 +207,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                         cmp <- tryCatch(artMainEffectComparisons(d, dep, factors, f, artMethod, alpha), error = function(e) e)
                         if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
                         private$.fillComparison(mt, pt, cmp, artMethod, alpha, "art")
+                        mt$setRefs(phRefs(artMethod)); pt$setRefs(phRefs(artMethod))
                         mt$setNote("cld", "Ta sama litera = brak istotnej różnicy (a = najniższa średnia ranga).")
                     }
                 }
@@ -232,6 +234,8 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     next
                 }
                 private$.fillComparison(mt, pt, cmp, method, alpha, "means")
+                mt$setRefs(phRefs(method, emm = !welchOneFactor))
+                if (!is.null(cmp$pairs)) pt$setRefs(phRefs(method, emm = !welchOneFactor))
                 if (welchFactorial)
                     mt$setNote("welch", "Porównania przy nierównych wariancjach (Welch) są dostępne tylko dla jednego czynnika.")
                 m <- cmp$means

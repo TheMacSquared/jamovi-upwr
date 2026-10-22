@@ -65,6 +65,7 @@ items:
     - name: plot
       title: ''
       type: Image
+      refs: ggplot2
       visible: (showPlot)
       width: 650
       height: 450

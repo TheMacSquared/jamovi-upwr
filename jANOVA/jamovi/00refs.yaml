@@ -1,0 +1,41 @@
+---
+refs:
+    afex:
+        type: 'software'
+        author: Singmann, H., Bolker, B., Westfall, J., Aust, F. i Ben-Shachar, M. S.
+        year: 2025
+        title: 'afex: Analysis of Factorial Experiments'
+        publisher: '(wersja 1.5-1) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=afex'
+        url: https://CRAN.R-project.org/package=afex
+
+    car:
+        type: 'software'
+        author: Fox, J., Weisberg, S. i Price, B.
+        year: 2026
+        title: 'car: Companion to Applied Regression'
+        publisher: '(wersja 3.1-5) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=car'
+        url: https://CRAN.R-project.org/package=car
+
+    emmeans:
+        type: 'software'
+        author: Lenth, R. V. i Piaskowski, J.
+        year: 2026
+        title: 'emmeans: Estimated Marginal Means, aka Least-Squares Means'
+        publisher: '(wersja 2.0.3) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=emmeans'
+        url: https://CRAN.R-project.org/package=emmeans
+
+    ggplot2:
+        type: 'software'
+        author: Wickham, H., Chang, W., Henry, L., Pedersen, T. L., Takahashi, K., Wilke, C., Woo, K., Yutani, H., Dunnington, D. i van den Brand, T.
+        year: 2026
+        title: 'ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics'
+        publisher: '(wersja 4.0.3) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=ggplot2'
+        url: https://CRAN.R-project.org/package=ggplot2
+
+    mvtnorm:
+        type: 'software'
+        author: Genz, A., Bretz, F., Miwa, T., Mi, X. i Hothorn, T.
+        year: 2026
+        title: 'mvtnorm: Multivariate Normal and t Distributions'
+        publisher: '(wersja 1.3-7) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=mvtnorm'
+        url: https://CRAN.R-project.org/package=mvtnorm

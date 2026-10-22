@@ -69,7 +69,7 @@ export const R = {
 export function referenceAsHTML(ref: IReference): string {
 
     let pub = ref.publisher;
-    if (pub.endsWith(ref.url)) {
+    if (ref.url && pub.endsWith(ref.url)) {
         let noUrl = pub.substring(0, pub.length - ref.url.length);
         pub = `${ noUrl }<a href="${ ref.url }" target="_blank">${ ref.url }</a>`;
     }
@@ -110,6 +110,7 @@ export class References extends HTMLElement {
     _root: ShadowRoot;
     _body: HTMLDivElement;
     _analyses: Analyses;
+    _datasetRefs: IReference[];
     _refs: IReferenceDetails[];
     _modules: Set<string>;
     _numbers: { [module: string]: { [name: string]: number } };
@@ -119,6 +120,7 @@ export class References extends HTMLElement {
         super();
 
         this._analyses = null;
+        this._datasetRefs = [ ];
         this._refs = [ ];
         this._modules = new Set<string>();
         this._numbers = null;
@@ -156,9 +158,18 @@ export class References extends HTMLElement {
         this._analyses = analyses;
     }
 
+    // jUPWR: citations of the data set opened from a module library
+    setDatasetRefs(refs: IReference[]) {
+        this._datasetRefs = refs;
+    }
+
+    datasetRefs() {
+        return this._datasetRefs;
+    }
+
     getAllNumbers() {
         if ( ! this._numbers) {
-            let numbers = { jupwr: { }, jmv: { }, R: { } };
+            let numbers = { jupwr: { }, jmv: { }, R: { }, dataset: { } };
             for (let module of this._modules)
                 numbers[module] = { };
             for (let i = 0; i < this._refs.length; i++) {
@@ -251,6 +262,9 @@ export class References extends HTMLElement {
         refs.push(this.resolve('jupwr', jupwr));
         refs.push(this.resolve('jmv', jmv));
         refs.push(this.resolve('R', R));
+
+        for (let ref of this._datasetRefs)
+            refs.push(this.resolve('dataset', ref));
 
         for (let analysis of this._analyses) {
             modules.add(analysis.ns);

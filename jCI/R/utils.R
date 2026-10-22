@@ -153,6 +153,8 @@ ciNote <- function(table, o, method, classicLabel, fallback = FALSE) {
     txt <- if (isBoot(method)) sprintf("%g%% CI: %s, B = %s.", o$ciWidth, bootLabel(method), format(o$nBoot, big.mark = " "))
            else sprintf("%g%% CI: %s.", o$ciWidth, classicLabel)
     table$setNote("ci", txt)
+    # cite the boot package only when the interval in this table comes from it
+    table$setRefs(if (isBoot(method)) "boot" else character())
     if (isTRUE(fallback)) table$setNote("fb", sprintf("Nie udało się wyznaczyć przedziału metodą %s — użyto empirycznych kwantyli percentylowych.", bootLabel(method)))
 }
 

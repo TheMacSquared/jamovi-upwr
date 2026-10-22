@@ -180,6 +180,7 @@ items:
       width: 520
       height: 400
       renderFun: .plot
+      refs: ggplot2
       clearWith: *cw
 
     - name: roc
@@ -189,6 +190,7 @@ items:
       width: 440
       height: 440
       renderFun: .rocPlot
+      refs: ggplot2
       clearWith: *cw
 
     - name: predictOV

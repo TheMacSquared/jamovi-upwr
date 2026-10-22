@@ -60,6 +60,7 @@ items:
         width: 520
         height: 400
         renderFun: .barPlot
+        refs: ggplot2
 
     - name: mosaics
       title: Wykresy mozaikowe
@@ -72,6 +73,7 @@ items:
         width: 520
         height: 420
         renderFun: .mosaicPlot
+        refs: ggplot2
 
     - name: metody
       title: Zastosowane metody

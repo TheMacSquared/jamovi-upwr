@@ -196,6 +196,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                             subject = subject, within = within, between = between, ssType = o$ss), error = function(e) e)
                         if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
                         private$.fillComparison(mt, pt, cmp, method, alpha, "art")
+                        mt$setRefs(phRefs(method)); pt$setRefs(phRefs(method))
                         mt$setNote("cld", "Ta sama litera = brak istotnej różnicy (a = najniższa średnia ranga).")
                     }
                 }
@@ -217,6 +218,8 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     mt$setNote("err", paste("Nie można policzyć średnich:", conditionMessage(cmp))); next
                 }
                 private$.fillComparison(mt, pt, cmp, method, alpha, "means")
+                mt$setRefs(phRefs(method))
+                if (!is.null(cmp$pairs)) pt$setRefs(phRefs(method))
                 m <- cmp$means
                 if (length(term) == 2) {
                     st <- list(means = data.frame(xf = m[[term[1]]], gf = m[[term[2]]], mean = m$mean, se = m$se,
@@ -253,7 +256,10 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     sm <- subjectMeans(d, dep, subject, between)
                     for (r in homogeneityTable(sm[[dep]], cellsFactor(sm, between))) ht$addRow(rowKey = r$test, values = r)
                     ht$setNote("cells", "Na średnich jednostek, między grupami międzyobiektowymi.")
-                } else ht$setNote("na", "Test Levene'a wymaga czynnika międzyobiektowego.")
+                } else {
+                    ht$setNote("na", "Test Levene'a wymaga czynnika międzyobiektowego.")
+                    ht$setRefs(character())   # no test computed, so no car
+                }
             }
             resid <- tryCatch(as.numeric(stats::residuals(res$fit$lm)), error = function(e) NULL)
             if (isTRUE(o$norm)) {

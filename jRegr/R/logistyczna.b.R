@@ -23,6 +23,8 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                 warning = function(w) { fitWarnings <<- c(fitWarnings, conditionMessage(w)); invokeRestart("muffleWarning") })
             null <- stats::glm(.y ~ 1, data = d, family = stats::binomial())
             separated <- logisticSeparation(fit)
+            # lpSolve is cited only when its separation check produced the note under the table
+            ct$setRefs(if (isTRUE(separated)) "lpSolve" else character())
             reliable <- isFALSE(separated) && isTRUE(fit$converged)
             if (isTRUE(separated)) {
                 note <- "Separacja całkowita lub quasi-całkowita: skończone oszacowania MNW nie istnieją dla części współczynników; b i OR są przybliżeniami numerycznymi. Nie podano SE, testów Walda ani przedziałów OR."

@@ -47,6 +47,7 @@ items:
       width: 420
       height: 400
       renderFun: .ciPlot
+      refs: ggplot2
       clearWith: *cw
 
     - name: bootPlot
@@ -56,6 +57,7 @@ items:
       width: 480
       height: 340
       renderFun: .bootPlot
+      refs: [ggplot2, boot]
       clearWith: *cw
 
     - name: metody

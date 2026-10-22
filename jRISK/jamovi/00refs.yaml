@@ -1,0 +1,17 @@
+---
+refs:
+    ggplot2:
+        type: 'software'
+        author: Wickham, H., Chang, W., Henry, L., Pedersen, T. L., Takahashi, K., Wilke, C., Woo, K., Yutani, H., Dunnington, D. i van den Brand, T.
+        year: 2026
+        title: 'ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics'
+        publisher: '(wersja 4.0.3) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=ggplot2'
+        url: https://CRAN.R-project.org/package=ggplot2
+
+    survival:
+        type: 'software'
+        author: Therneau, T. M.
+        year: 2026
+        title: 'survival: Survival Analysis'
+        publisher: '(wersja 3.8-6) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=survival'
+        url: https://CRAN.R-project.org/package=survival

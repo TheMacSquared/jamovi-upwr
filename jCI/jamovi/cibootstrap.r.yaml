@@ -59,6 +59,7 @@ items:
       type: Table
       rows: 0
       visible: (showConvergence)
+      refs: boot
       clearWith:
         - dep
         - seed
@@ -89,6 +90,7 @@ items:
       width: 520
       height: 380
       renderFun: .convPlot
+      refs: [ggplot2, boot]
       clearWith:
         - dep
         - seed

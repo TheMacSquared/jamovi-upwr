@@ -1,7 +1,7 @@
 ---
 title: Zbiory danych do zajęć (UPWr)
 name: jDane
-version: 0.8.1
+version: 0.8.2
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -77,6 +77,21 @@ datasets:
           Feng, Q. i Horrace, W. C. (2012). Alternative technical efficiency
           measures: Skew, bias and scale. Journal of Applied Econometrics, 27(2),
           253–268.
+      citations:
+        - type: 'article'
+          author: 'Feng, Q. i Horrace, W. C.'
+          year: 2012
+          title: 'Alternative technical efficiency measures: Skew, bias and scale'
+          publisher: 'Journal of Applied Econometrics'
+          volume: 27
+          issue: 2
+          pages: '253–268'
+        - type: 'software'
+          author: 'Croissant, Y., Millo, G. i Tappe, K.'
+          year: 2025
+          title: 'plm: Linear Models for Panel Data'
+          publisher: '(wersja 2.6-7) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=plm'
+          url: 'https://CRAN.R-project.org/package=plm'
       provenance:
         package: plm
         version: "2.6-7"
@@ -134,6 +149,21 @@ datasets:
         - >-
           Horst, A. M., Hill, A. P. i Gorman, K. B. (2020). palmerpenguins: Palmer
           Archipelago (Antarctica) penguin data. R package.
+      citations:
+        - type: 'article'
+          author: 'Gorman, K. B., Williams, T. D. i Fraser, W. R.'
+          year: 2014
+          title: 'Ecological sexual dimorphism and environmental variability within a community of Antarctic penguins (genus Pygoscelis)'
+          publisher: 'PLoS ONE'
+          volume: 9
+          issue: 3
+          pages: 'e90081'
+        - type: 'software'
+          author: 'Horst, A. M., Hill, A. P. i Gorman, K. B.'
+          year: 2022
+          title: 'palmerpenguins: Palmer Archipelago (Antarctica) Penguin Data'
+          publisher: '(wersja 0.1.1) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=palmerpenguins'
+          url: 'https://CRAN.R-project.org/package=palmerpenguins'
       provenance:
         package: palmerpenguins
         version: "0.1.1"
@@ -180,6 +210,20 @@ datasets:
           Crampton, E. W. (1947). The growth of the odontoblast of the incisor
           teeth as a criterion of vitamin C intake of the guinea pig. The Journal
           of Nutrition, 33(5), 491–504.
+      citations:
+        - type: 'book'
+          author: 'Bliss, C. I.'
+          year: 1952
+          title: 'The Statistics of Bioassay'
+          publisher: 'New York: Academic Press'
+        - type: 'article'
+          author: 'Crampton, E. W.'
+          year: 1947
+          title: 'The growth of the odontoblast of the incisor teeth as a criterion of vitamin C intake of the guinea pig'
+          publisher: 'The Journal of Nutrition'
+          volume: 33
+          issue: 5
+          pages: '491–504'
       provenance:
         package: jmv
         version: "2.8.0"
@@ -247,6 +291,18 @@ datasets:
         - >-
           Hosmer, D. W. i Lemeshow, S. (1989). Applied Logistic Regression. New
           York: Wiley.
+      citations:
+        - type: 'book'
+          author: 'Hosmer, D. W. i Lemeshow, S.'
+          year: 1989
+          title: 'Applied Logistic Regression'
+          publisher: 'New York: Wiley'
+        - type: 'software'
+          author: 'Ripley, B. i Venables, B.'
+          year: 2026
+          title: 'MASS: Support Functions and Datasets for Venables and Ripley''s MASS'
+          publisher: '(wersja 7.3-66) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=MASS'
+          url: 'https://CRAN.R-project.org/package=MASS'
       provenance:
         package: MASS
         version: "7.3-66"
@@ -319,6 +375,18 @@ datasets:
         - >-
           Stock, J. H. i Watson, M. W. (2007). Introduction to Econometrics,
           wyd. 2. Boston: Addison Wesley.
+      citations:
+        - type: 'book'
+          author: 'Stock, J. H. i Watson, M. W.'
+          year: 2007
+          title: 'Introduction to Econometrics (wyd. 2)'
+          publisher: 'Boston: Addison Wesley'
+        - type: 'software'
+          author: 'Kleiber, C. i Zeileis, A.'
+          year: 2026
+          title: 'AER: Applied Econometrics with R'
+          publisher: '(wersja 1.2-17) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=AER'
+          url: 'https://CRAN.R-project.org/package=AER'
       provenance:
         package: AER
         version: "1.2-17"
@@ -381,6 +449,26 @@ datasets:
         - >-
           Greene, W. H. (2003). Econometric Analysis, wyd. 5. Upper Saddle River:
           Prentice Hall.
+      citations:
+        - type: 'article'
+          author: 'Fair, R. C.'
+          year: 1978
+          title: 'A theory of extramarital affairs'
+          publisher: 'Journal of Political Economy'
+          volume: 86
+          issue: 1
+          pages: '45–61'
+        - type: 'book'
+          author: 'Greene, W. H.'
+          year: 2003
+          title: 'Econometric Analysis (wyd. 5)'
+          publisher: 'Upper Saddle River: Prentice Hall'
+        - type: 'software'
+          author: 'Kleiber, C. i Zeileis, A.'
+          year: 2026
+          title: 'AER: Applied Econometrics with R'
+          publisher: '(wersja 1.2-17) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=AER'
+          url: 'https://CRAN.R-project.org/package=AER'
       provenance:
         package: AER
         version: "1.2-17"
@@ -428,6 +516,18 @@ datasets:
         - >-
           Fox, J. i Weisberg, S. (2019). An R Companion to Applied Regression,
           wyd. 3. Thousand Oaks: Sage.
+      citations:
+        - type: 'book'
+          author: 'Fox, J. i Weisberg, S.'
+          year: 2019
+          title: 'An R Companion to Applied Regression (wyd. 3)'
+          publisher: 'Thousand Oaks: Sage'
+        - type: 'software'
+          author: 'Fox, J., Weisberg, S. i Price, B.'
+          year: 2026
+          title: 'carData: Companion to Applied Regression Data Sets'
+          publisher: '(wersja 3.0-6) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=carData'
+          url: 'https://CRAN.R-project.org/package=carData'
       provenance:
         package: carData
         version: "3.0-6"
@@ -504,6 +604,26 @@ datasets:
         - >-
           Stock, J. H. i Watson, M. W. (2007). Introduction to Econometrics,
           wyd. 2. Boston: Addison Wesley.
+      citations:
+        - type: 'article'
+          author: 'Hamermesh, D. S. i Parker, A. M.'
+          year: 2005
+          title: 'Beauty in the classroom: Instructors'' pulchritude and putative pedagogical productivity'
+          publisher: 'Economics of Education Review'
+          volume: 24
+          issue: 4
+          pages: '369–376'
+        - type: 'book'
+          author: 'Stock, J. H. i Watson, M. W.'
+          year: 2007
+          title: 'Introduction to Econometrics (wyd. 2)'
+          publisher: 'Boston: Addison Wesley'
+        - type: 'software'
+          author: 'Kleiber, C. i Zeileis, A.'
+          year: 2026
+          title: 'AER: Applied Econometrics with R'
+          publisher: '(wersja 1.2-17) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=AER'
+          url: 'https://CRAN.R-project.org/package=AER'
       provenance:
         package: AER
         version: "1.2-17"
@@ -640,6 +760,24 @@ datasets:
         - >-
           Çetinkaya-Rundel, M. i Hardin, J. (2021). Introduction to Modern
           Statistics. OpenIntro.
+      citations:
+        - type: 'dataset'
+          author: 'Data Science Learning Community'
+          year: 2024
+          title: 'Tidy Tuesday: A weekly social data project (tydzień 2018-09-04)'
+          publisher: 'Pobrano z https://github.com/rfordatascience/tidytuesday/tree/main/data/2018/2018-09-04'
+          url: 'https://github.com/rfordatascience/tidytuesday/tree/main/data/2018/2018-09-04'
+        - type: 'software'
+          author: 'Çetinkaya-Rundel, M., Diez, D., Bray, A., Kim, A. Y., Baumer, B., Ismay, C., Paterno, N. i Barr, C.'
+          year: 2026
+          title: 'openintro: Datasets and Supplemental Functions from ''OpenIntro'' Textbooks and Labs'
+          publisher: '(wersja 2.5.1) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=openintro'
+          url: 'https://CRAN.R-project.org/package=openintro'
+        - type: 'book'
+          author: 'Çetinkaya-Rundel, M. i Hardin, J.'
+          year: 2021
+          title: 'Introduction to Modern Statistics'
+          publisher: 'OpenIntro'
       provenance:
         package: openintro
         version: "2.5.1"
@@ -729,6 +867,28 @@ datasets:
           Gosling, S. D., Rentfrow, P. J. i Swann, W. B., Jr. (2003). A very brief
           measure of the Big-Five personality domains. Journal of Research in
           Personality, 37, 504–528.
+      citations:
+        - type: 'article'
+          author: 'Jones, P. J., Mair, P., Simon, T. i in.'
+          year: 2020
+          title: 'Network trees: A method for recursively partitioning covariance structures'
+          publisher: 'Psychometrika'
+          volume: 85
+          pages: '926–945'
+          url: 'https://doi.org/10.1007/s11336-020-09731-4'
+        - type: 'article'
+          author: 'Gosling, S. D., Rentfrow, P. J. i Swann, W. B., Jr.'
+          year: 2003
+          title: 'A very brief measure of the Big-Five personality domains'
+          publisher: 'Journal of Research in Personality'
+          volume: 37
+          pages: '504–528'
+        - type: 'software'
+          author: 'Friendly, M., Fox, J. i Monette, G.'
+          year: 2026
+          title: 'heplots: Visualizing Hypothesis Tests in Multivariate Linear Models'
+          publisher: '(wersja 1.8.6) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=heplots'
+          url: 'https://CRAN.R-project.org/package=heplots'
       provenance:
         package: heplots
         version: "1.8.6"
@@ -821,6 +981,13 @@ datasets:
         - >-
           Rasgaitis, C. (2022). Music & Mental Health Survey Results [zbiór
           danych]. Kaggle. https://www.kaggle.com/datasets/catherinerasgaitis/mxmh-survey-results
+      citations:
+        - type: 'dataset'
+          author: 'Rasgaitis, C.'
+          year: 2022
+          title: 'Music & Mental Health Survey Results'
+          publisher: '[Zbiór danych]. Kaggle. Pobrano z https://www.kaggle.com/datasets/catherinerasgaitis/mxmh-survey-results'
+          url: 'https://www.kaggle.com/datasets/catherinerasgaitis/mxmh-survey-results'
       provenance:
         package: Kaggle
         version: "wersja 1 z 2022-11-21"

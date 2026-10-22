@@ -7,6 +7,7 @@ items:
     - name: regiony
       title: Statystyki wedlug panstw
       type: Table
+      refs: sf
       rows: -1
       visible: (pokazRegiony)
       clearWith:
@@ -60,6 +61,7 @@ items:
     - name: mapa
       title: Mapa punktowa
       type: Image
+      refs: [ggplot2, sf]
       width: 700
       height: 480
       renderFun: .mapaPlot
@@ -73,6 +75,7 @@ items:
     - name: mapaKart
       title: Kartogram
       type: Image
+      refs: [ggplot2, sf]
       visible: (kartogram)
       width: 700
       height: 480

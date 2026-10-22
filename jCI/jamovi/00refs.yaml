@@ -1,0 +1,17 @@
+---
+refs:
+    boot:
+        type: 'software'
+        author: Canty, A. i Ripley, B.
+        year: 2025
+        title: 'boot: Bootstrap Functions'
+        publisher: '(wersja 1.3-32) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=boot'
+        url: https://CRAN.R-project.org/package=boot
+
+    ggplot2:
+        type: 'software'
+        author: Wickham, H., Chang, W., Henry, L., Pedersen, T. L., Takahashi, K., Wilke, C., Woo, K., Yutani, H., Dunnington, D. i van den Brand, T.
+        year: 2026
+        title: 'ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics'
+        publisher: '(wersja 4.0.3) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=ggplot2'
+        url: https://CRAN.R-project.org/package=ggplot2

@@ -45,6 +45,7 @@ items:
     - name: dataCounts
       title: Dane czasu życia
       type: Table
+      refs: survival
       rows: 0
       visible: (mode:data)
       columns:
@@ -120,6 +121,7 @@ items:
     - name: dataAtTable
       title: Charakterystyki dopasowanych modeli
       type: Table
+      refs: survival
       rows: 0
       visible: (mode:data)
       columns:
@@ -146,6 +148,7 @@ items:
     - name: plotR
       title: Funkcja niezawodności R(t)
       type: Image
+      refs: ggplot2
       width: 500
       height: 400
       renderFun: .plotR
@@ -154,6 +157,7 @@ items:
     - name: plotH
       title: Intensywność uszkodzeń h(t)
       type: Image
+      refs: ggplot2
       width: 500
       height: 400
       renderFun: .plotH
@@ -162,6 +166,7 @@ items:
     - name: plotF
       title: Gęstość f(t)
       type: Image
+      refs: ggplot2
       width: 500
       height: 400
       renderFun: .plotF
@@ -170,6 +175,7 @@ items:
     - name: kmPlot
       title: Kaplan–Meier i dopasowane modele
       type: Image
+      refs: [ggplot2, survival]
       width: 560
       height: 420
       renderFun: .plotKM
@@ -178,6 +184,7 @@ items:
     - name: hazPlot
       title: Intensywności uszkodzeń dopasowanych modeli
       type: Image
+      refs: ggplot2
       width: 560
       height: 420
       renderFun: .plotHaz

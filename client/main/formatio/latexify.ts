@@ -111,7 +111,7 @@ export function createBibTex(references?: Array<IReference>): string {
     for (const currRef of references) {
         ref2Tex.push('@' + currRef['type'].replace('software', 'misc') + '{' + currRef['name']);
         // handle authors
-        const splAuthor = currRef['authors']['complete'].split(/,|&/).map(s => s.trim()).filter(s => s !== '');
+        const splAuthor = currRef['authors']['complete'].split(/,|&|\si\s/).map(s => s.trim()).filter(s => s !== '');
         if (splAuthor.length === 1) {
             ref2Tex.push('  author = \"{' + splAuthor[0] + '}\"');
         }

@@ -38,6 +38,11 @@ satclassifyClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                 zbior = "Testowy", n = length(testY)))
 
             metoda <- self$options$metoda
+            # cite the package that fitted the classifier
+            pakiet <- if (metoda == "knn") "class" else "rpart"
+            self$results$macierz$setRefs(pakiet)
+            self$results$miary$setRefs(pakiet)
+            self$results$granicaPlot$setRefs(c("ggplot2", pakiet))
             if (metoda == "knn") {
                 # k-NN works on distances: standardize with training
                 # parameters, apply the same scaling to the test set

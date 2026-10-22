@@ -7,6 +7,7 @@ items:
     - name: elementy
       title: Elementy orbitalne (z TLE)
       type: Table
+      refs: asteRisk
       rows: -1
       clearWith:
         - zrodlo
@@ -27,6 +28,7 @@ items:
     - name: staty
       title: Statystyki opisowe propagowanej orbity
       type: Table
+      refs: asteRisk
       rows: -1
       visible: (pokazStaty)
       clearWith:
@@ -59,6 +61,7 @@ items:
     - name: mapa
       title: Trasa naziemna
       type: Image
+      refs: [ggplot2, asteRisk, sf]
       visible: (pokazMape)
       width: 700
       height: 420
@@ -74,6 +77,7 @@ items:
     - name: profil
       title: Profil wysokosci orbity
       type: Image
+      refs: [ggplot2, asteRisk]
       visible: (pokazProfil)
       width: 650
       height: 350

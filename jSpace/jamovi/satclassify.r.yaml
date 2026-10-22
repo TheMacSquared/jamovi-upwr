@@ -65,6 +65,7 @@ items:
     - name: reguly
       title: Drzewo decyzyjne
       type: Preformatted
+      refs: rpart
       visible: (metoda:drzewo)
       clearWith:
         - klasa
@@ -76,6 +77,7 @@ items:
     - name: granicaPlot
       title: Granica decyzyjna (2 pierwsze predyktory)
       type: Image
+      refs: ggplot2
       visible: (granica)
       width: 650
       height: 500

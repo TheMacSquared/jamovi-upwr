@@ -158,6 +158,7 @@ items:
         width: 520
         height: 380
         renderFun: .histPlot
+        refs: ggplot2
 
     - name: box
       title: Wykresy pudełkowe
@@ -170,6 +171,7 @@ items:
         width: 520
         height: 380
         renderFun: .boxPlot
+        refs: ggplot2
 
     - name: qq
       title: Wykresy Q-Q
@@ -182,6 +184,7 @@ items:
         width: 420
         height: 380
         renderFun: .qqPlot
+        refs: ggplot2
 
     - name: ecdf
       title: Dystrybuanty empiryczne
@@ -194,6 +197,7 @@ items:
         width: 520
         height: 380
         renderFun: .ecdfPlot
+        refs: ggplot2
 
     - name: lorenz
       title: Krzywe Lorenza
@@ -206,6 +210,7 @@ items:
         width: 420
         height: 420
         renderFun: .lorenzPlot
+        refs: ggplot2
 
     - name: metody
       title: Zastosowane metody

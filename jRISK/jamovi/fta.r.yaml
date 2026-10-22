@@ -66,6 +66,7 @@ items:
     - name: diagram
       title: Diagram drzewa błędów
       type: Image
+      refs: ggplot2
       width: 640
       height: 420
       renderFun: .plotTree

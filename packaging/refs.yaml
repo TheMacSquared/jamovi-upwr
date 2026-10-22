@@ -1,0 +1,125 @@
+---
+# Package citations shared by jUPWR modules (copy the needed keys into
+# <module>/jamovi/00refs.yaml). Rule: the package as software, authors with
+# the "aut" role from DESCRIPTION, year of the CRAN release, version from the
+# CRAN snapshot used by the build (2026-05-11).
+refs:
+    afex:
+        type: 'software'
+        author: Singmann, H., Bolker, B., Westfall, J., Aust, F. i Ben-Shachar, M. S.
+        year: 2025
+        title: 'afex: Analysis of Factorial Experiments'
+        publisher: '(wersja 1.5-1) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=afex'
+        url: https://CRAN.R-project.org/package=afex
+
+    asteRisk:
+        type: 'software'
+        author: Ayala, R., Ayala, D., Ruiz, D., Hernandez, P. i Selles Vidal, L.
+        year: 2025
+        title: 'asteRisk: Computation of Satellite Position'
+        publisher: '(wersja 1.4.5) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=asteRisk'
+        url: https://CRAN.R-project.org/package=asteRisk
+
+    boot:
+        type: 'software'
+        author: Canty, A. i Ripley, B.
+        year: 2025
+        title: 'boot: Bootstrap Functions'
+        publisher: '(wersja 1.3-32) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=boot'
+        url: https://CRAN.R-project.org/package=boot
+
+    car:
+        type: 'software'
+        author: Fox, J., Weisberg, S. i Price, B.
+        year: 2026
+        title: 'car: Companion to Applied Regression'
+        publisher: '(wersja 3.1-5) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=car'
+        url: https://CRAN.R-project.org/package=car
+
+    class:
+        type: 'software'
+        author: Ripley, B.
+        year: 2025
+        title: 'class: Functions for Classification'
+        publisher: '(wersja 7.3-23) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=class'
+        url: https://CRAN.R-project.org/package=class
+
+    emmeans:
+        type: 'software'
+        author: Lenth, R. V. i Piaskowski, J.
+        year: 2026
+        title: 'emmeans: Estimated Marginal Means, aka Least-Squares Means'
+        publisher: '(wersja 2.0.3) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=emmeans'
+        url: https://CRAN.R-project.org/package=emmeans
+
+    ggplot2:
+        type: 'software'
+        author: Wickham, H., Chang, W., Henry, L., Pedersen, T. L., Takahashi, K., Wilke, C., Woo, K., Yutani, H., Dunnington, D. i van den Brand, T.
+        year: 2026
+        title: 'ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics'
+        publisher: '(wersja 4.0.3) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=ggplot2'
+        url: https://CRAN.R-project.org/package=ggplot2
+
+    ggridges:
+        type: 'software'
+        author: Wilke, C. O.
+        year: 2025
+        title: 'ggridges: Ridgeline Plots in ''ggplot2'''
+        publisher: '(wersja 0.5.7) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=ggridges'
+        url: https://CRAN.R-project.org/package=ggridges
+
+    hexbin:
+        type: 'software'
+        author: Carr, D., Lewin-Koh, N., Maechler, M. i Sarkar, D.
+        year: 2026
+        title: 'hexbin: Hexagonal Binning Routines'
+        publisher: '(wersja 1.28.6) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=hexbin'
+        url: https://CRAN.R-project.org/package=hexbin
+
+    lpSolve:
+        type: 'software'
+        author: Berkelaar, M.
+        year: 2024
+        title: 'lpSolve: Interface to ''Lp_solve'' v. 5.5 to Solve Linear/Integer Programs'
+        publisher: '(wersja 5.6.23) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=lpSolve'
+        url: https://CRAN.R-project.org/package=lpSolve
+
+    mvtnorm:
+        type: 'software'
+        author: Genz, A., Bretz, F., Miwa, T., Mi, X. i Hothorn, T.
+        year: 2026
+        title: 'mvtnorm: Multivariate Normal and t Distributions'
+        publisher: '(wersja 1.3-7) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=mvtnorm'
+        url: https://CRAN.R-project.org/package=mvtnorm
+
+    rpart:
+        type: 'software'
+        author: Therneau, T. i Atkinson, B.
+        year: 2026
+        title: 'rpart: Recursive Partitioning and Regression Trees'
+        publisher: '(wersja 4.1.27) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=rpart'
+        url: https://CRAN.R-project.org/package=rpart
+
+    sf:
+        type: 'software'
+        author: Pebesma, E.
+        year: 2026
+        title: 'sf: Simple Features for R'
+        publisher: '(wersja 1.1-1) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=sf'
+        url: https://CRAN.R-project.org/package=sf
+
+    survival:
+        type: 'software'
+        author: Therneau, T. M.
+        year: 2026
+        title: 'survival: Survival Analysis'
+        publisher: '(wersja 3.8-6) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=survival'
+        url: https://CRAN.R-project.org/package=survival
+
+    terra:
+        type: 'software'
+        author: Hijmans, R. J., Brown, A. i Barbosa, M.
+        year: 2026
+        title: 'terra: Spatial Data Analysis'
+        publisher: '(wersja 1.9-27) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=terra'
+        url: https://CRAN.R-project.org/package=terra

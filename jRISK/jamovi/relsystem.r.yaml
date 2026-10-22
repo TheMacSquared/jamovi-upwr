@@ -92,6 +92,7 @@ items:
     - name: diagram
       title: Schemat blokowy
       type: Image
+      refs: ggplot2
       width: 620
       height: 340
       renderFun: .plotDiagram

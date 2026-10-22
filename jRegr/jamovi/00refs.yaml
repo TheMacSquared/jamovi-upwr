@@ -1,0 +1,25 @@
+---
+refs:
+    car:
+        type: 'software'
+        author: Fox, J., Weisberg, S. i Price, B.
+        year: 2026
+        title: 'car: Companion to Applied Regression'
+        publisher: '(wersja 3.1-5) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=car'
+        url: https://CRAN.R-project.org/package=car
+
+    ggplot2:
+        type: 'software'
+        author: Wickham, H., Chang, W., Henry, L., Pedersen, T. L., Takahashi, K., Wilke, C., Woo, K., Yutani, H., Dunnington, D. i van den Brand, T.
+        year: 2026
+        title: 'ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics'
+        publisher: '(wersja 4.0.3) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=ggplot2'
+        url: https://CRAN.R-project.org/package=ggplot2
+
+    lpSolve:
+        type: 'software'
+        author: Berkelaar, M.
+        year: 2024
+        title: 'lpSolve: Interface to ''Lp_solve'' v. 5.5 to Solve Linear/Integer Programs'
+        publisher: '(wersja 5.6.23) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=lpSolve'
+        url: https://CRAN.R-project.org/package=lpSolve

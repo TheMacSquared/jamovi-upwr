@@ -59,6 +59,7 @@ items:
       width: 520
       height: 380
       renderFun: .histPlot
+      refs: ggplot2
       clearWith: *cw
 
     - name: ogive
@@ -68,6 +69,7 @@ items:
       width: 520
       height: 380
       renderFun: .ogivePlot
+      refs: ggplot2
       clearWith: *cw
 
     - name: metody

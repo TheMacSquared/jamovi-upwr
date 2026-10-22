@@ -89,6 +89,7 @@ items:
       type: Table
       rows: 0
       visible: (anova)
+      refs: car
       clearWith: *cw
       columns:
         - name: term
@@ -131,6 +132,7 @@ items:
       type: Table
       rows: 1
       visible: (durbin)
+      refs: car
       clearWith: *cw
       columns:
         - name: r
@@ -188,6 +190,7 @@ items:
       width: 520
       height: 400
       renderFun: .plot
+      refs: ggplot2
       clearWith: *cw
 
     - name: resPlot
@@ -197,6 +200,7 @@ items:
       width: 520
       height: 380
       renderFun: .resPlot
+      refs: ggplot2
       clearWith: *cw
 
     - name: qq
@@ -206,6 +210,7 @@ items:
       width: 420
       height: 380
       renderFun: .qqPlot
+      refs: ggplot2
       clearWith: *cw
 
     - name: predictOV

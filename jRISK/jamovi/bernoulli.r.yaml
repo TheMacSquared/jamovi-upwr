@@ -32,6 +32,7 @@ items:
     - name: runPlot
       title: Częstość skumulowana sukcesów
       type: Image
+      refs: ggplot2
       width: 560
       height: 400
       renderFun: .plotRun

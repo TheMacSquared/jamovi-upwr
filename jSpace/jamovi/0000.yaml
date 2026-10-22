@@ -1,7 +1,7 @@
 ---
 title: Statystyka danych kosmicznych
 name: jSpace
-version: 0.3.2
+version: 0.3.3
 jms: '1.0'
 authors:
   - jUPWR Team
@@ -94,6 +94,18 @@ datasets:
         - >-
           Vallado, D. A. (2013). Fundamentals of Astrodynamics and Applications (4th ed.).
           Microcosm Press.
+      citations:
+        - type: 'dataset'
+          author: 'Kelso, T. S.'
+          year: 'b.d.'
+          title: 'CelesTrak: Current GP Element Sets'
+          publisher: '[Zbiór danych]. Pobrano 26.08.2026 z https://celestrak.org/NORAD/elements/'
+          url: 'https://celestrak.org/NORAD/elements/'
+        - type: 'book'
+          author: 'Vallado, D. A.'
+          year: 2013
+          title: 'Fundamentals of Astrodynamics and Applications (wyd. 4)'
+          publisher: 'Hawthorne: Microcosm Press'
       provenance:
         package: CelesTrak
         dataset: GP element sets (TLE), snapshot 2026-08-26
@@ -146,6 +158,13 @@ datasets:
         miast za Natural Earth (populated places, domena publiczna).
       references:
         - Natural Earth. Populated Places. https://www.naturalearthdata.com/
+      citations:
+        - type: 'dataset'
+          author: 'Natural Earth'
+          year: 'b.d.'
+          title: 'Populated Places'
+          publisher: '[Zbiór danych]. Pobrano z https://www.naturalearthdata.com/'
+          url: 'https://www.naturalearthdata.com/'
       provenance:
         package: jSpace
         dataset: data-raw/stacje.R
@@ -192,6 +211,13 @@ datasets:
         - >-
           Srinivasan, A. (1993). Statlog (Landsat Satellite) [Dataset]. UCI Machine
           Learning Repository. https://doi.org/10.24432/C55887
+      citations:
+        - type: 'dataset'
+          author: 'Srinivasan, A.'
+          year: 1993
+          title: 'Statlog (Landsat Satellite)'
+          publisher: '[Zbiór danych]. UCI Machine Learning Repository. https://doi.org/10.24432/C55887'
+          url: 'https://doi.org/10.24432/C55887'
       provenance:
         package: UCI Machine Learning Repository
         dataset: Statlog (Landsat Satellite)

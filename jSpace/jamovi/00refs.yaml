@@ -1,0 +1,49 @@
+---
+refs:
+    asteRisk:
+        type: 'software'
+        author: Ayala, R., Ayala, D., Ruiz, D., Hernandez, P. i Selles Vidal, L.
+        year: 2025
+        title: 'asteRisk: Computation of Satellite Position'
+        publisher: '(wersja 1.4.5) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=asteRisk'
+        url: https://CRAN.R-project.org/package=asteRisk
+
+    class:
+        type: 'software'
+        author: Ripley, B.
+        year: 2025
+        title: 'class: Functions for Classification'
+        publisher: '(wersja 7.3-23) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=class'
+        url: https://CRAN.R-project.org/package=class
+
+    ggplot2:
+        type: 'software'
+        author: Wickham, H., Chang, W., Henry, L., Pedersen, T. L., Takahashi, K., Wilke, C., Woo, K., Yutani, H., Dunnington, D. i van den Brand, T.
+        year: 2026
+        title: 'ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics'
+        publisher: '(wersja 4.0.3) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=ggplot2'
+        url: https://CRAN.R-project.org/package=ggplot2
+
+    rpart:
+        type: 'software'
+        author: Therneau, T. i Atkinson, B.
+        year: 2026
+        title: 'rpart: Recursive Partitioning and Regression Trees'
+        publisher: '(wersja 4.1.27) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=rpart'
+        url: https://CRAN.R-project.org/package=rpart
+
+    sf:
+        type: 'software'
+        author: Pebesma, E.
+        year: 2026
+        title: 'sf: Simple Features for R'
+        publisher: '(wersja 1.1-1) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=sf'
+        url: https://CRAN.R-project.org/package=sf
+
+    terra:
+        type: 'software'
+        author: Hijmans, R. J., Brown, A. i Barbosa, M.
+        year: 2026
+        title: 'terra: Spatial Data Analysis'
+        publisher: '(wersja 1.9-27) [Pakiet R]. Pobrano z https://CRAN.R-project.org/package=terra'
+        url: https://CRAN.R-project.org/package=terra

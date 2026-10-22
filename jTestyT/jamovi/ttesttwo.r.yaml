@@ -95,6 +95,7 @@ items:
       title: Jednorodność wariancji (Levene)
       type: Table
       visible: (homog)
+      refs: car
       rows: 0
       clearWith: *cw
       columns:
@@ -128,6 +129,7 @@ items:
         width: 520
         height: 400
         renderFun: .plot
+        refs: ggplot2
 
     - name: qq
       title: Wykresy Q-Q
@@ -140,6 +142,7 @@ items:
         width: 380
         height: 340
         renderFun: .qq
+        refs: ggplot2
 
     - name: metody
       title: Zastosowane metody

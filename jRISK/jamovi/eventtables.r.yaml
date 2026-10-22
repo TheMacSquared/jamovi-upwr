@@ -75,6 +75,7 @@ items:
     - name: treePlot
       title: Drzewo częstości
       type: Image
+      refs: ggplot2
       width: 640
       height: 460
       renderFun: .plotTree

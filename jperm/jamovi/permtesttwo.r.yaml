@@ -47,6 +47,7 @@ items:
         width: 520
         height: 380
         renderFun: .permPlot
+        refs: ggplot2
 
     - name: metody
       title: Zastosowane metody

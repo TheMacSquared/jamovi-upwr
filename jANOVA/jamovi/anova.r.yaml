@@ -159,6 +159,7 @@ items:
     - name: art
       title: ART — ANOVA na wyrównanych rangach
       type: Table
+      refs: car
       visible: (nonpar)
       rows: 0
       clearWith: *cw
@@ -335,6 +336,7 @@ items:
     - name: contrasts
       title: Kontrasty
       type: Array
+      refs: emmeans
       visible: (contrastType:deviation || contrastType:simple || contrastType:simpleLast || contrastType:difference || contrastType:helmert || contrastType:repeated || contrastType:polynomial)
       clearWith:
         - dep
@@ -397,6 +399,7 @@ items:
     - name: homog
       title: Jednorodność wariancji
       type: Table
+      refs: car
       visible: (homog)
       rows: 0
       clearWith: *cw
@@ -456,6 +459,7 @@ items:
         width: 500
         height: 380
         renderFun: .meansPlot
+        refs: ggplot2
 
     - name: plotInteraction
       title: Wykres interakcji
@@ -464,6 +468,7 @@ items:
       width: 500
       height: 380
       renderFun: .interactionPlot
+      refs: [ggplot2, emmeans]
       clearWith: *cw
 
     - name: qq
@@ -473,6 +478,7 @@ items:
       width: 400
       height: 350
       renderFun: .qqPlot
+      refs: ggplot2
       clearWith: *cw
 
     - name: residPlot
@@ -482,6 +488,7 @@ items:
       width: 450
       height: 350
       renderFun: .residPlot
+      refs: ggplot2
       clearWith: *cw
 
     - name: residsOV

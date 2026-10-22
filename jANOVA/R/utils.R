@@ -47,6 +47,13 @@ phEffectiveMethod <- function(method, welchOneFactor) {
     }
 }
 
+# Packages behind a comparison table (bibliography): emmeans for model-based
+# marginal means (not for separate-variance group means), mvtnorm for the
+# multivariate t of Dunnett-type tests.
+phRefs <- function(method, emm = TRUE) {
+    c(if (emm) "emmeans", if (method %in% c("dunnett", "dunnettWelch")) "mvtnorm")
+}
+
 # ---------------------------------------------------------------------------
 # Model and ANOVA table
 # ---------------------------------------------------------------------------

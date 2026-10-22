@@ -1,63 +1,9 @@
 'use strict';
 
-import * as yaml from 'js-yaml';
-
 import ActionHub from './actionhub';
 import { h, url } from '../common/htmlelementcreator';
 import type Instance from './instance';
-
-interface VariableDocumentation {
-    name: string;
-    description: string;
-}
-
-interface DatasetLicense {
-    name: string;
-    notice: string;
-    url?: string;
-    // ids of the full license texts shipped with the program (client/public/assets/licenses/<id>.txt)
-    texts?: string[];
-}
-
-interface DatasetDocumentation {
-    summary: string;
-    details?: string;
-    variables?: VariableDocumentation[];
-    source?: string;
-    license?: DatasetLicense;
-    references?: string[];
-    provenance?: {
-        package?: string;
-        version?: string;
-        dataset?: string;
-        url?: string;
-        note?: string;
-        extraUrl?: string;
-        extraUrlLabel?: string;
-    };
-    changes?: string[];
-    changesDate?: string;
-}
-
-interface DatasetDefinition {
-    name: string;
-    path: string;
-    documentation?: DatasetDocumentation;
-}
-
-interface ModuleDefinition {
-    datasets?: DatasetDefinition[];
-}
-
-const JDANE_LIBRARY_PATH = /^\{\{Examples\}\}\/jDane\/([^/]+)$/;
-const JDANE_INSTALLED_PATH = /(?:^|\/)modules\/jDane\/data\/([^/]+)$/;
-
-function datasetPathFromInstancePath(filePath: string): string | null {
-    const normalisedPath = (filePath || '').replace(/\\/g, '/');
-    const match = JDANE_LIBRARY_PATH.exec(normalisedPath)
-        || JDANE_INSTALLED_PATH.exec(normalisedPath);
-    return match?.[1] || null;
-}
+import { findDataset, type DatasetDefinition } from './datasetdocs';
 
 class DatasetInfo extends HTMLElement {
     private instance: Instance;
@@ -107,31 +53,20 @@ class DatasetInfo extends HTMLElement {
     }
 
     private async updateForDataset() {
-        try {
-            const response = await fetch('../modules/jDane');
-            if ( ! response.ok)
-                throw new Error(`Unable to load jDane metadata (${response.status})`);
-
-            const module = yaml.load(await response.text()) as ModuleDefinition;
-            const datasetPath = datasetPathFromInstancePath(this.instance.attributes.path);
-            const datasetTitle = this.instance.attributes.title;
-            const dataset = module.datasets?.find(item =>
-                (datasetPath !== null && item.path === datasetPath)
-                || (datasetTitle !== '' && item.name === datasetTitle));
-            if (dataset?.documentation) {
-                this.activeDataset = dataset;
-                this.render(dataset);
-                ActionHub.get('datasetInfo').set('enabled', true);
-            }
-            else {
-                console.info('No jDane documentation for data set', {
-                    path: this.instance.attributes.path,
-                    title: datasetTitle,
-                });
-            }
+        const found = await findDataset(this.instance);
+        if (found !== null) {
+            this.activeDataset = found.dataset;
+            this.render(found.dataset);
+            ActionHub.get('datasetInfo').set('enabled', true);
         }
-        catch (error) {
-            console.warn('Unable to load data set documentation', error);
+        else {
+            this.activeDataset = null;
+            this.hide();
+            ActionHub.get('datasetInfo').set('enabled', false);
+            console.info('No documentation for data set', {
+                path: this.instance.attributes.path,
+                title: this.instance.attributes.title,
+            });
         }
     }
 

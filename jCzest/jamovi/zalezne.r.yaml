@@ -67,6 +67,7 @@ items:
       width: 500
       height: 380
       renderFun: .plot
+      refs: ggplot2
       visible: (plot)
       clearWith: *cw
 

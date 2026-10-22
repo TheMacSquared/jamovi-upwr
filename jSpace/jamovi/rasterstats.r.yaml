@@ -7,6 +7,7 @@ items:
     - name: staty
       title: Statystyki opisowe rastra
       type: Table
+      refs: terra
       rows: 1
       clearWith:
         - zrodlo
@@ -42,6 +43,7 @@ items:
     - name: progTab
       title: Komorki powyzej progu
       type: Table
+      refs: terra
       rows: 1
       visible: (pokazProg)
       clearWith:
@@ -65,6 +67,7 @@ items:
     - name: histogram
       title: Rozklad wartosci komorek
       type: Image
+      refs: [ggplot2, terra]
       visible: (pokazHist)
       width: 600
       height: 400
@@ -81,6 +84,7 @@ items:
     - name: mapa
       title: Mapa rastra
       type: Image
+      refs: [ggplot2, terra]
       visible: (pokazMape)
       width: 650
       height: 500

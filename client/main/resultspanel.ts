@@ -24,6 +24,9 @@ import { References } from './references';
 import { IReference } from './references';
 import { R } from './references';
 import { jmv } from './references';
+import { jupwr } from './references';
+import { referenceAsHTML } from './references';
+import { findDataset, datasetReferences } from './datasetdocs';
 
 import { hydrate, IElement } from './formatio/hydrate';
 
@@ -181,6 +184,15 @@ class ResultsPanel extends EventDistributor {
         this.model.settings().on('change:resultsFontSize', () => this._updateAll());
         this.model.settings().on('change:refsMode', () => this._updateRefsMode());
         this.model.on('change:editState', () => this._updateEditState());
+        this.model.on('change:path change:title', () => this._updateDatasetRefs());
+        this._updateDatasetRefs();
+    }
+
+    // jUPWR: cite the data set when it comes from a module library
+    async _updateDatasetRefs() {
+        const refs = datasetReferences(await findDataset(this.model));
+        this._refsTable.setDatasetRefs(refs);
+        this._updateRefs();
     }
 
     _updateRefsMode() {
@@ -837,7 +849,7 @@ class ResultsPanel extends EventDistributor {
             references.push(...analysis.references);
         }
         else {
-            references.push(R, jmv);
+            references.push(jupwr, jmv, R, ...this._refsTable.datasetRefs());
             let first = true;
             for (const analysis of this.model.analyses()) {
                 const element = hydrate(analysis.results, { values: analysis.options.getValues(), top: first, analysisId: analysis.id, verbatimHtml });
@@ -850,8 +862,16 @@ class ResultsPanel extends EventDistributor {
             }
         }
 
-        // remove duplicate references
-        references = Object.values(Object.fromEntries(references.map(ref => [ref.name, ref])));
+        // remove duplicate references (the same entry may come from several
+        // modules, and different entries may share a key, e.g. jmv and jANOVA)
+        const seen = new Set<string>();
+        references = references.filter((ref) => {
+            const text = referenceAsHTML(ref);
+            if (seen.has(text))
+                return false;
+            seen.add(text);
+            return true;
+        });
 
         return { items, references };
     }
