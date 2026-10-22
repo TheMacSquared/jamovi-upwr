@@ -10,7 +10,7 @@ Budowanie przez Docker: `docker compose --profile main build && docker compose -
 Aplikacja dostępna pod http://localhost:41337 po zbudowaniu (nie `127.0.0.1` — serwer
 przyjmuje tylko origin `localhost`, `JAMOVI_HOST_A` w `docker-compose.yaml`).
 
-## Linia wydań — TA GAŁĄŹ: `main` (kanał latest, jUPWR 1.1.x, jamovi 28.13)
+## Linia wydań — TA GAŁĄŹ: `main` (kanał latest, jUPWR 1.2.x, jamovi 28.13)
 - Tu trafiają nowe funkcje i nowy upstream. Stable to `release/1.0` (1.0.x,
   jamovi 28.2) — tylko poprawki, w katalogu `jamovi-upwr-stable` (ten katalog to `jamovi-upwr-latest`).
 - Poprawki robimy tylko tu (decyzja 2026-10-18: latest z czasem zastąpi stable).

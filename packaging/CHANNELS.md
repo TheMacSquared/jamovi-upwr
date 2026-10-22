@@ -8,7 +8,7 @@ Ten plik jest identyczny na wszystkich aktywnych gałęziach. Zmiany wprowadzaj 
 | Kanał | Gałąź | jUPWR | jamovi | Submoduły jmv/plots/i18n | Co tu trafia |
 |---|---|---|---|---|---|
 | stable | `release/1.0` | 1.0.x | 28.2 | `release/1.0` | tylko poprawki błędów krytycznych |
-| latest | `main` | 1.1.x | 28.13 | `main` | nowe funkcje, nowy upstream, poprawki |
+| latest | `main` | 1.2.x | 28.13 | `main` | nowe funkcje, nowy upstream, poprawki |
 | legacy | `legacy/win81` | 1.0.4 | 28.2 | (stan z gałęzi) | zamrożona; Windows 8.1, osobny Electron i R; bez przenoszenia poprawek w żadną stronę (`packaging/30-legacy-win81.md`) |
 
 Kanał to etykieta, gałąź to nazwa stała. Gdy latest dojrzeje do wydania dla studentów:

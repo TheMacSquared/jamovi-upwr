@@ -3,7 +3,7 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
-## 1.2.0 — NIEWYDANE (linia latest, jamovi 28.13)
+## 1.2.0 — 2026-10-22 (linia latest, jamovi 28.13)
 
 - Daty i godziny w zmiennych obliczanych: `TIMEDIFF(start, koniec, unit='min')`
   liczy czas, który upłynął (s, min, h, d; przy samych godzinach koniec
