@@ -223,14 +223,18 @@ $jmc = Join-Path $RepoRoot "jamovi-compiler\index.js"
 # przywracamy pliki bajt w bajt, zeby `git status` pokazywal tylko swiadome zmiany.
 # Bajty (a nie Get-Content/Set-Content), bo skrypt bywa uruchamiany pod Windows
 # PowerShell 5.1, gdzie `-Encoding UTF8` dopisuje BOM i psuje pliki.
-# Tak samo <modul>\R\00jmv.R (index.js:552-561, tylko jmv): jmc odtwarza w nim cytowania
-# z pakietow R zainstalowanych NA TEJ MASZYNIE, wiec tresc zalezy od hosta
-# (odpowiednik src_guard w packaging/scripts/macos/lib.sh).
+# Tak samo <modul>\R\00jmv.R (index.js:552-561, kazdy modul z jamovi/00refs.yaml): jmc
+# odtwarza w nim cytowania z pakietow R zainstalowanych NA TEJ MASZYNIE, wiec tresc
+# zalezy od hosta (odpowiednik src_guard w packaging/scripts/macos/lib.sh).
+# Pliki, ktorych przed buildem nie bylo, jmc tworzy od zera — te usuwamy w finally,
+# zeby nie zostaly niesledzone w `git status`.
 $YamlBackup = @{}
+$YamlCreated = @()
 foreach ($m in ($Modules + @('jRISK','jSpace','jRol','jPomiar','jWody'))) {   # + kazdy modul opcjonalny z krokow 4e-4i
     foreach ($rel in "jamovi\0000.yaml", "R\00jmv.R") {
         $y = Join-Path $RepoRoot "$m\$rel"
         if (Test-Path $y) { $YamlBackup[$y] = [System.IO.File]::ReadAllBytes($y) }
+        else { $YamlCreated += $y }
     }
 }
 
@@ -328,6 +332,11 @@ finally {
         [System.IO.File]::WriteAllBytes($kv.Key, $kv.Value)
     }
     Info "przywrocono zrodlowe 0000.yaml i 00jmv.R ($($YamlBackup.Count) plikow)"
+    $removed = 0
+    foreach ($y in $YamlCreated) {
+        if (Test-Path $y) { Remove-Item -LiteralPath $y -Force; $removed++ }
+    }
+    if ($removed -gt 0) { Info "usunieto pliki utworzone przez jmc ($removed)" }
 }
 
 # ---------------------------------------------------------------------------
