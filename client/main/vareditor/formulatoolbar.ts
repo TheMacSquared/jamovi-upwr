@@ -138,9 +138,21 @@ function allFunctions(functionsContent) : Descriptions {
         { name: 'VALUE', label: 'VALUE( <i>text</i> )', content: _('Converts text to a number (if possible).') }
     ]);
 
+    // jUPWR: date and time functions (see server compute/functions.py);
+    // times and dates are recognised without a format
     addGroup('Date / Time', [
-        { name: 'DATEVALUE', label: 'DATEVALUE( <i>value, format=\'%Y-%m-%d\'</i> )', content: _('Parses a date, and converts it to the number of days since the 1st of January, 1970.') },
-        { name: 'DATE', label: 'DATE( <i>value, format=\'%Y-%m-%d\'</i> )', content: _('Takes a number representing the number of days since the 1st of January 1970, and produces a formatted date.') }
+        { name: 'TIMEDIFF', label: 'TIMEDIFF( <i>start, end</i>, unit=\'min\' )', content: _('The time elapsed from start to end, in unit: \'s\', \'min\', \'h\' or \'d\'. Accepts times (8:15), dates (22.10.2026, 2026-10-22) or both (2026-10-22 08:15). With times only, an end earlier than the start is on the next day.') },
+        { name: 'TIMEVALUE', label: 'TIMEVALUE( <i>value</i>, unit=\'min\' )', content: _('Converts a time (8:15, 08:15:30) to the time since midnight, in unit: \'s\', \'min\', \'h\' or \'d\'.') },
+        { name: 'TIME', label: 'TIME( <i>number</i>, unit=\'min\' )', content: _('Converts a number of units (by default minutes) to a time as text, e.g. 495 to 08:15.') },
+        { name: 'DATEVALUE', label: 'DATEVALUE( <i>value, format</i> )', content: _('Converts a date (22.10.2026, 2026-10-22) to the number of days since the 1st of January, 1970. The format (e.g. \'%d/%m/%Y\') is only needed for other notations.') },
+        { name: 'DATETIMEVALUE', label: 'DATETIMEVALUE( <i>value</i> )', content: _('Converts a date with a time (2026-10-22 08:15) to the number of days since the 1st of January, 1970, with the time as a fraction of a day.') },
+        { name: 'DATE', label: 'DATE( <i>value, format=\'%Y-%m-%d\'</i> )', content: _('Takes a number representing the number of days since the 1st of January 1970, and produces a formatted date.') },
+        { name: 'YEAR', label: 'YEAR( <i>date</i> )', content: _('The year of a date.') },
+        { name: 'MONTH', label: 'MONTH( <i>date</i> )', content: _('The month of a date (1-12).') },
+        { name: 'DAY', label: 'DAY( <i>date</i> )', content: _('The day of the month of a date.') },
+        { name: 'WEEKDAY', label: 'WEEKDAY( <i>date</i> )', content: _('The day of the week of a date: 1 = Monday, 7 = Sunday.') },
+        { name: 'HOUR', label: 'HOUR( <i>time</i> )', content: _('The hour of a time or of a date with a time.') },
+        { name: 'MINUTE', label: 'MINUTE( <i>time</i> )', content: _('The minute of a time or of a date with a time.') }
     ]);
 
     addGroup('Reference', [

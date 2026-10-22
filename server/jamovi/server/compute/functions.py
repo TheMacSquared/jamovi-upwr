@@ -1,9 +1,11 @@
 
 import random
 import math
+import re
 from numbers import Number as num
 import statistics as stats
 from datetime import datetime
+from datetime import timedelta
 from datetime import timezone
 
 from numpy import quantile
@@ -394,10 +396,169 @@ def FILTER(index, x, *conds: int):
     return x
 
 
+# jUPWR: dates and times written as text. Recognised without a format:
+# times 8:15, 08:15:30; dates 2026-10-22, 22.10.2026, 22-10-2026, 22/10/2026
+# (day before month, never the US order); a date followed by a time
+# (2026-10-22 08:15, 2026-10-22T08:15:00). Everything is wall-clock time,
+# without time zones or daylight saving. Unrecognised values give missing.
+
+_TIME = r'(\d{1,2}):(\d{2})(?::(\d{2}(?:\.\d+)?))?'
+_DATE_ISO = r'(\d{4})-(\d{1,2})-(\d{1,2})'
+# \5: the same separator twice (groups 1-3 are the ISO date)
+_DATE_DMY = r'(\d{1,2})([./-])(\d{1,2})\5(\d{4})'
+_TIME_RE = re.compile(_TIME + r'$')
+_DATE_RE = re.compile(r'(?:' + _DATE_ISO + r'|' + _DATE_DMY + r')(?:[ T]+' + _TIME + r')?$')
+_EPOCH = datetime(1970, 1, 1)
+_UNITS = { 's': 1, 'min': 60, 'h': 3600, 'd': 86400 }
+
+
+def _clock(h, m, s):
+    h, m = int(h), int(m)
+    s = float(s) if s else 0.0
+    if h > 23 or m > 59 or s >= 60:
+        raise ValueError()
+    return timedelta(hours=h, minutes=m, seconds=s)
+
+
+def _parse_time(x):
+    """returns (datetime, has_date), or None when x is not a date/time"""
+    x = x.strip() if isinstance(x, str) else ''
+    try:
+        match = _TIME_RE.match(x)
+        if match:
+            return (_EPOCH + _clock(*match.groups()), False)
+        match = _DATE_RE.match(x)
+        if match:
+            g = match.groups()
+            if g[0] is not None:
+                d = datetime(int(g[0]), int(g[1]), int(g[2]))
+            else:
+                d = datetime(int(g[6]), int(g[5]), int(g[3]))
+            if g[7] is not None:
+                d += _clock(g[7], g[8], g[9])
+            return (d, True)
+    except (ValueError, OverflowError):
+        pass
+    return None
+
+
+def _seconds(d):
+    return (d - _EPOCH).total_seconds()
+
+
 @row_wise
 @returns(DataType.INTEGER, MeasureType.CONTINUOUS)
-def DATEVALUE(_, x: str, fmt: str = '%Y-%m-%d'):
-    return int(datetime.strptime(x, fmt).replace(tzinfo=timezone.utc).timestamp() // 60 // 60 // 24)
+def DATEVALUE(_, x: str, fmt: str = ''):
+    if fmt != '':
+        try:
+            return int(datetime.strptime(x, fmt).replace(tzinfo=timezone.utc).timestamp() // 60 // 60 // 24)
+        except ValueError:
+            return -2147483648
+    parsed = _parse_time(x)
+    if parsed is None or not parsed[1]:
+        return -2147483648
+    return int(_seconds(parsed[0]) // 86400)
+
+
+@row_wise
+@returns(DataType.DECIMAL, MeasureType.CONTINUOUS)
+def DATETIMEVALUE(_, x: str):
+    parsed = _parse_time(x)
+    if parsed is None or not parsed[1]:
+        return NaN
+    return _seconds(parsed[0]) / 86400
+
+
+@row_wise
+@returns(DataType.DECIMAL, MeasureType.CONTINUOUS)
+def TIMEVALUE(_, x: str, *, unit: str = 'min'):
+    parsed = _parse_time(x)
+    if parsed is None or unit not in _UNITS:
+        return NaN
+    return (_seconds(parsed[0]) % 86400) / _UNITS[unit]
+
+
+@row_wise
+@returns(DataType.DECIMAL, MeasureType.CONTINUOUS)
+def TIMEDIFF(_, start: str, end: str, *, unit: str = 'min'):
+    t1 = _parse_time(start)
+    t2 = _parse_time(end)
+    if t1 is None or t2 is None or unit not in _UNITS:
+        return NaN
+    if t1[1] != t2[1]:
+        # a time of day against a date: not comparable
+        return NaN
+    diff = _seconds(t2[0]) - _seconds(t1[0])
+    if not t1[1] and diff < 0:
+        # times of day only: the end is on the next day
+        diff += 86400
+    return diff / _UNITS[unit]
+
+
+def _date_part(x, part):
+    parsed = _parse_time(x)
+    if parsed is None or not parsed[1]:
+        return -2147483648
+    return part(parsed[0])
+
+
+def _time_part(x, part):
+    parsed = _parse_time(x)
+    if parsed is None:
+        return -2147483648
+    return part(parsed[0])
+
+
+@row_wise
+@returns(DataType.INTEGER, MeasureType.CONTINUOUS)
+def YEAR(_, x: str):
+    return _date_part(x, lambda d: d.year)
+
+
+@row_wise
+@returns(DataType.INTEGER, MeasureType.ORDINAL)
+def MONTH(_, x: str):
+    return _date_part(x, lambda d: d.month)
+
+
+@row_wise
+@returns(DataType.INTEGER, MeasureType.CONTINUOUS)
+def DAY(_, x: str):
+    return _date_part(x, lambda d: d.day)
+
+
+@row_wise
+@returns(DataType.INTEGER, MeasureType.ORDINAL)
+def WEEKDAY(_, x: str):
+    # ISO: Monday = 1, Sunday = 7
+    return _date_part(x, lambda d: d.isoweekday())
+
+
+@row_wise
+@returns(DataType.INTEGER, MeasureType.CONTINUOUS)
+def HOUR(_, x: str):
+    return _time_part(x, lambda d: d.hour)
+
+
+@row_wise
+@returns(DataType.INTEGER, MeasureType.CONTINUOUS)
+def MINUTE(_, x: str):
+    return _time_part(x, lambda d: d.minute)
+
+
+@row_wise
+@returns(DataType.TEXT, MeasureType.ORDINAL)
+def TIME(_, x: float, *, unit: str = 'min'):
+    if math.isnan(x) or unit not in _UNITS:
+        return ''
+    total = round(x * _UNITS[unit])
+    sign = '-' if total < 0 else ''
+    total = abs(total)
+    hours, rest = divmod(total, 3600)
+    minutes, seconds = divmod(rest, 60)
+    if seconds:
+        return '{}{:02d}:{:02d}:{:02d}'.format(sign, hours, minutes, seconds)
+    return '{}{:02d}:{:02d}'.format(sign, hours, minutes)
 
 
 @row_wise
