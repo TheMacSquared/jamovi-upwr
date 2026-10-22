@@ -8,9 +8,9 @@ class jamoviIcon {
 
     constructor(version: string) {
         this.el = htmlTrusted(`<div class="icon-info-box">
-            <div class="icon-version" style="flex-direction: column; align-items: center; gap: 16px;">
-                <img src="${upwrLogo}" style="height: 80px;" alt="UPWr">
-                <div class="version-text">jUPWR ${JUPWR_VERSION} <span style="font-size: 0.8em; color: #BBBBBB;">(jamovi <span id="version"></span>)</span></div>
+            <div class="icon-version">
+                <img class="icon-logo" src="${upwrLogo}" alt="UPWr">
+                <div class="version-text">jUPWR ${JUPWR_VERSION} <span class="version-jamovi">(jamovi <span id="version"></span>)</span></div>
             </div>
         </div>`);
         this.el.querySelector('#version').textContent = this.cleanVersion(version);

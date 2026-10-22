@@ -8,8 +8,11 @@
     opacity: 1;
     visibility: visible;
     position: absolute;
-    bottom: 40px;
-    inset-inline-end: 60px;
+    /* jUPWR: top right, beside the "Results" heading and above the
+       bibliography; scales with the panel, leaving room for the heading */
+    top: 16px;
+    inset-inline-end: clamp(12px, 4%, 40px);
+    width: min(260px, calc(100% - 180px));
     z-index: 200;
 }
 
@@ -17,10 +20,12 @@
     display: flex;
     color: #AAAAAA;
     align-items: center;
+    flex-direction: column;
+    gap: 8px;
     margin: auto;
-    width: 250px;
+    width: 100%;
     z-index: 200;
-    font-size: 16px;
+    font-size: 14px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
@@ -32,6 +37,18 @@
     margin-inline-end: 12px;
 }
 
+.icon-info-box .icon-version .icon-logo {
+    width: 100%;
+    max-height: 64px;
+    object-fit: contain;
+}
+
 .icon-info-box .icon-version .version-text {
     margin-inline-start: 6px;
+    text-align: center;
+}
+
+.icon-info-box .icon-version .version-jamovi {
+    font-size: 0.8em;
+    color: #BBBBBB;
 }
