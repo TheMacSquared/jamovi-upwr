@@ -37,6 +37,22 @@ items:
           title: Wartość
           type: number
 
+    - name: riskTable
+      title: Porównanie ryzyk
+      type: Table
+      rows: 0
+      visible: (showRisk)
+      columns:
+        - name: quantity
+          title: ""
+          type: text
+        - name: formula
+          title: Wzór
+          type: text
+        - name: value
+          title: Wartość
+          type: number
+
     - name: detectorTable
       title: Metryki detektora
       type: Table
@@ -54,7 +70,7 @@ items:
           type: number
 
     - name: freqTable
-      title: Częstości naturalne (na 1000 przypadków)
+      title: Częstości naturalne
       type: Table
       rows: 3
       visible: (showNaturalFreq)
@@ -64,13 +80,13 @@ items:
           type: text
         - name: b
           title: B
-          type: number
+          type: integer
         - name: notb
           title: Bᶜ
-          type: number
+          type: integer
         - name: total
           title: Suma
-          type: number
+          type: integer
 
     - name: treePlot
       title: Drzewo częstości

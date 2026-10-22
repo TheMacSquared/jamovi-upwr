@@ -622,3 +622,26 @@ riskCoherence <- function(phi, n) {
   list(monotone = monotone, relevant = relevant,
        coherent = monotone && all(relevant))
 }
+
+# natural frequencies of a 2x2 table (cells: AB, AnotB, notAB, notAnotB):
+# the smallest base 10^k (1000 ... maxBase) giving whole numbers in every
+# cell; otherwise base 1000 with cells rounded half up and margins summed
+# from the rounded cells, so the table stays additive
+riskNaturalFreq <- function(cells, n, maxBase = 1e5) {
+  whole <- function(x) all(abs(x - round(x)) < 1e-9)
+  base <- 1000
+  while (base <= maxBase) {
+    if (whole(cells * base / n))
+      return(list(base = base, cells = round(cells * base / n), rounded = FALSE))
+    base <- base * 10
+  }
+  list(base = 1000, cells = floor(cells * 1000 / n + 0.5), rounded = TRUE)
+}
+
+# risk comparison of B between A and its complement
+riskCompare <- function(nAB, nAnB, nnAB, nnAnB) {
+  pBgA <- if (nAB + nAnB > 0) nAB / (nAB + nAnB) else NA
+  pBgnA <- if (nnAB + nnAnB > 0) nnAB / (nnAB + nnAnB) else NA
+  list(pBgA = pBgA, pBgnA = pBgnA, rd = pBgA - pBgnA,
+       rr = if (!is.na(pBgnA) && pBgnA > 0) pBgA / pBgnA else NA)
+}

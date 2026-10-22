@@ -90,3 +90,25 @@ test_that("diagram gets the common cause box at the system exit", {
   expect_equal(nrow(lay2$boxes), nrow(lay$boxes) + 1)
   expect_gt(lay2$boxes$x[nrow(lay2$boxes)], max(lay$boxes$x))
 })
+
+test_that("natural frequencies: smallest exact base, otherwise additive rounding", {
+  nf <- riskNaturalFreq(c(240, 1760, 90, 17910), 20000)
+  expect_equal(nf$base, 10000)
+  expect_equal(nf$cells, c(120, 880, 45, 8955))
+  expect_false(nf$rounded)
+  expect_equal(riskNaturalFreq(c(11, 119, 19, 51), 200)$base, 1000)
+  nf <- riskNaturalFreq(c(5, 10, 7, 15), 37)
+  expect_true(nf$rounded)
+  expect_equal(nf$base, 1000)
+  expect_equal(nf$cells, floor(c(5, 10, 7, 15) * 1000 / 37 + 0.5))
+  # half up, not to even
+  expect_equal(riskNaturalFreq(c(1, 1, 1, 197), 400, maxBase = 1000)$cells, c(3, 3, 3, 493))
+})
+
+test_that("risk comparison: RD and RR of B between A and its complement", {
+  rc <- riskCompare(11, 119, 19, 51)
+  expect_equal(rc$rd, 11 / 130 - 19 / 70, tolerance = 1e-12)
+  expect_equal(rc$rr, (11 / 130) / (19 / 70), tolerance = 1e-12)
+  expect_true(is.na(riskCompare(1, 9, 0, 10)$rr))
+  expect_true(is.na(riskCompare(0, 0, 1, 9)$rd))
+})

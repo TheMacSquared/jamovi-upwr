@@ -51,6 +51,26 @@ test_that("eventtables takes aggregated counts (exercises 1.2, 3.1, 3.2, 3.4)", 
   expect_equal(det$value[det$quantity == "PPV"], 90 / 288, tolerance = 1e-12)
 })
 
+test_that("eventtables: natural frequencies on an exact base (exercise 2.2)", {
+  d <- cells("zmiana", "incydent", c(240, 1760, 90, 17910))
+  res <- jRISK::eventtables(data = d, varA = "zmiana", levelA = "tak",
+                            varB = "incydent", levelB = "tak",
+                            countVar = "licznosc", showNaturalFreq = TRUE)
+  ft <- res$freqTable$asDF
+  expect_equal(ft$b, c(120, 45, 165))
+  expect_equal(ft$total[3], 10000)
+  expect_match(res$freqTable$title, "10 000")
+})
+
+test_that("eventtables: RD and RR, shoes vs no shoes (exercise 2.7)", {
+  d <- readSet("bananpol_wypadki")
+  res <- jRISK::eventtables(data = d, varA = "buty_antyposlizgowe", levelA = "tak",
+                            varB = "poslizgniecie", levelB = "tak", showRisk = TRUE)
+  rt <- res$riskTable$asDF
+  expect_equal(round(rt$value[rt$quantity == "Iloraz ryzyk (RR)"], 2), 0.31)
+  expect_equal(round(rt$value[rt$quantity == "Różnica ryzyk (RD)"], 2), -0.19)
+})
+
 test_that("eventtables honours jamovi data weights", {
   d <- cells("awaria", "alarm", c(95, 5, 495, 9405))
   attr(d, "jmv-weights") <- d$licznosc

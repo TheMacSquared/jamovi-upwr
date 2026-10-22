@@ -906,7 +906,7 @@ kolejność poziomów tekstowych, nawiasy i pierwszeństwo and/or, nazwy ze
 spacjami/polskimi literami.
 
 
-### Zadanie 25: jRISK — częstości naturalne w „Zdarzenia i warunkowanie" — DO ZROBIENIA
+### Zadanie 25: jRISK — częstości naturalne w „Zdarzenia i warunkowanie" — ZROBIONE 2026-10-22 (jRISK 0.4.4)
 Zgłoszone 2026-10-21 (lista 2, zad. 2 z analizy ryzyka): tabela „Częstości
 naturalne (na 1000 przypadków)" pokazuje 16 incydentów, a P(B) = 0,0165 daje 16,5.
 Przyczyna (`jRISK/R/eventtables.b.R`, blok `showNaturalFreq`): każda komórka
@@ -932,8 +932,15 @@ Cytowanie (PÓŹNIEJ, zweryfikować w bazie literatury przed wpisaniem): Gigeren
 i Hoffrage (1995, Psychological Review — częstości naturalne), Hoffrage i in.
 (2000, Science — komunikowanie informacji statystycznej), fact boxes Harding
 Center — do opisu metod / `00refs.yaml` jRISK (por. zadanie 20).
+STAN 2026-10-22: `riskNaturalFreq` (`R/utils.R`): najmniejsza podstawa 10^k
+od 1000 do 100 000 z całkowitymi komórkami, inaczej 1000 z zaokrągleniem
+połówek w górę i sumami z zaokrąglonych komórek (nota); tytuł z kodu
+(„na 1000”, „na 10 000”), kolumny `integer`. Bez „< 1” (kolumny liczbowe).
+Drzewo częstości bez zmian (pokazuje liczności surowe). Cytowania — dalej
+PÓŹNIEJ. PUŁAPKA: jmvcore przesłania `format()` (bez `big.mark`) — w .b.R
+używać `formatC` albo `base::format`.
 
-### Zadanie 26: jRISK — RD i RR w „Zdarzenia i warunkowanie" — DO ZROBIENIA
+### Zadanie 26: jRISK — RD i RR w „Zdarzenia i warunkowanie" — ZROBIONE 2026-10-22 (jRISK 0.4.4)
 Zgłoszone 2026-10-21 (lista 2, zad. 7c: buty antypoślizgowe a poślizgnięcia,
 RD i RR „w butach względem bez butów"). `eventtables` liczy P(B | A), ale nie
 P(B | Aᶜ), RD ani RR — student liczy je ręcznie albo w jCzest. W jCzest
@@ -968,3 +975,11 @@ Do zrobienia (`jRISK/jamovi/eventtables.{a,u,r}.yaml`, `R/eventtables.b.R`):
 Bump jRISK patch (razem z zadaniem 25 → 0.4.3), `.jmo`, MODULES.md; na liście
 zadań (`analiza-ryzyka/listy`, zad. 2.7 i `jrisk-pokrycie-zadan.md`) zmienić
 wskazanie z jCzest na `eventtables`.
+STAN 2026-10-22: opcja `showRisk` („Porównanie ryzyk (RD, RR)”), tabela
+`riskTable` (P(B | A), P(B | Aᶜ), RD, RR ze wzorami; `riskCompare` w utils),
+bez OR, NNT i CI; noty dla pustej grupy i P(B | Aᶜ) = 0. Etykiety panelu:
+„A — ekspozycja / warunek”, „B — zdarzenie”; symbole A/B we wzorach bez
+zmian. Testy: `tests/testthat/test-utils-03.R`, `test-analyses-03.R`
+(Bananpol: RR 0,31, RD −0,19). Do zrobienia poza repo: lista 2.7
+i `jrisk-pokrycie-zadan.md` (wskazanie na `eventtables`), klucz zad. 2.2
+(częstości na 10 000).

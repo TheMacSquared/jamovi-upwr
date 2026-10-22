@@ -46,9 +46,17 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   przy x ≤ 0) nie zamienia już wiersza w brak danych.
 - Znak UPWr na starcie w prawym górnym rogu panelu wyników, skalowany z jego
   szerokością (wcześniej zachodził na bibliografię w wąskim oknie).
+- jRISK, „Zdarzenia i warunkowanie”: częstości naturalne na najmniejszej
+  podstawie (1000, 10 000, 100 000), przy której wychodzą liczby całkowite
+  bez zaokrąglania (wcześniej zawsze na 1000, z zaokrąglaniem połówek do
+  parzystej, np. 16,5 → 16); gdy się nie da — na 1000 z zaokrągleniem
+  połówek w górę, sumy z zaokrąglonych komórek i notą. Nowa tabela
+  „Porównanie ryzyk”: P(B | A), P(B | Aᶜ), różnica ryzyk (RD) i iloraz
+  ryzyk (RR). W panelu A opisane jako „ekspozycja / warunek”, B jako
+  „zdarzenie”.
 - Wersje modułów: scatr 2.9.9, jANOVA 0.5.2, jCI 0.3.6, jCzest 0.2.5,
   jDane 0.8.2, jEksplor 0.1.5, jRegr 0.1.5, jTestyT 0.4.4, jdistrACTION 1.3.4,
-  jperm 0.2.6; moduły opcjonalne jRISK 0.4.3 i jSpace 0.3.3 (do przebudowy
+  jperm 0.2.6; moduły opcjonalne jRISK 0.4.4 i jSpace 0.3.3 (do przebudowy
   `.jmo`).
 
 ## 1.1.2 — 2026-10-18 (linia latest, jamovi 28.13)

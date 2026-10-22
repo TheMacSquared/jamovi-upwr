@@ -113,19 +113,39 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           "Interpretacja: A = stan rzeczywisty (np. awaria), B = alarm/wynik testu.")
       }
 
+      if (self$options$showRisk) {
+        riskTable <- self$results$riskTable
+        rc <- riskCompare(nAB, nAnB, nnAB, nnAnB)
+        riskTable$addRow(rowKey = "pbga", values = list(
+          quantity = "P(B | A)", formula = "n(A ∩ B)/n(A)", value = rc$pBgA))
+        riskTable$addRow(rowKey = "pbgna", values = list(
+          quantity = "P(B | Aᶜ)", formula = "n(Aᶜ ∩ B)/n(Aᶜ)", value = rc$pBgnA))
+        riskTable$addRow(rowKey = "rd", values = list(
+          quantity = "Różnica ryzyk (RD)", formula = "P(B | A) − P(B | Aᶜ)", value = rc$rd))
+        riskTable$addRow(rowKey = "rr", values = list(
+          quantity = "Iloraz ryzyk (RR)", formula = "P(B | A) / P(B | Aᶜ)", value = rc$rr))
+        if (is.na(rc$pBgA) || is.na(rc$pBgnA))
+          riskTable$setNote("undef", "Brak obserwacji w A albo w Aᶜ — porównania nie da się policzyć.")
+        else if (rc$pBgnA == 0)
+          riskTable$setNote("undef", "P(B | Aᶜ) = 0 — iloraz ryzyk jest nieokreślony.")
+      }
+
       if (self$options$showNaturalFreq) {
         freqTable <- self$results$freqTable
-        s <- 1000 / n
+        nf <- riskNaturalFreq(c(nAB, nAnB, nnAB, nnAnB), n)
+        f <- nf$cells
+        freqTable$setTitle(sprintf("Częstości naturalne (na %s przypadków)",
+                                   formatC(nf$base, format = "d", big.mark = if (nf$base >= 1e4) " " else "")))
         freqTable$getColumn("b")$setTitle(paste("B: ", varB, " = ", levB, sep = ""))
         freqTable$setRow(rowNo = 1, values = list(
-          rowLabel = labA, b = round(nAB * s), notb = round(nAnB * s),
-          total = round((nAB + nAnB) * s)))
+          rowLabel = labA, b = f[1], notb = f[2], total = f[1] + f[2]))
         freqTable$setRow(rowNo = 2, values = list(
-          rowLabel = labNotA, b = round(nnAB * s), notb = round(nnAnB * s),
-          total = round((nnAB + nnAnB) * s)))
+          rowLabel = labNotA, b = f[3], notb = f[4], total = f[3] + f[4]))
         freqTable$setRow(rowNo = 3, values = list(
-          rowLabel = "Suma", b = round((nAB + nnAB) * s),
-          notb = round((nAnB + nnAnB) * s), total = 1000))
+          rowLabel = "Suma", b = f[1] + f[3], notb = f[2] + f[4], total = sum(f)))
+        if (nf$rounded)
+          freqTable$setNote("round",
+            "Wartości zaokrąglone do liczb całkowitych; sumy są sumami zaokrąglonych komórek.")
       }
 
       self$results$treePlot$setState(list(

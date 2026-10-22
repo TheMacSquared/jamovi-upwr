@@ -9,14 +9,14 @@ children:
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Zdarzenie A
+        label: A — ekspozycja / warunek
         children:
           - type: VariablesListBox
             name: varA
             maxItemCount: 1
             isTarget: true
       - type: TargetLayoutBox
-        label: Zdarzenie B
+        label: B — zdarzenie
         children:
           - type: VariablesListBox
             name: varB
@@ -40,6 +40,8 @@ children:
     children:
       - type: CheckBox
         name: showConditional
+      - type: CheckBox
+        name: showRisk
       - type: CheckBox
         name: showDetector
       - type: CheckBox
