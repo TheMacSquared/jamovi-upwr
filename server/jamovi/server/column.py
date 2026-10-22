@@ -21,6 +21,7 @@ from .compute import Messages
 from .compute import FValues
 from .compute import convert
 from .compute import is_missing
+from .compute import get_missing
 
 from .i18n import _
 
@@ -590,9 +591,26 @@ class Column:
 
         self._child.clear_levels()
 
+        # jUPWR: the levels are found from the values of every row; compute
+        # those once and use them for both the levels and the cells (it was
+        # two passes over all the rows, each evaluating the formula)
+        values = None
+        if self._node is not None and self._node.has_levels and not self.is_filter:
+            values = [ ]
+            for row_no in range(self.row_count):
+                try:
+                    values.append(self._node.fvalue(row_no, self.row_count, self.uses_column_formula))
+                except Exception as e:
+                    values.append(get_missing())
+                    self._parent._log.exception(e)
+
         if self._node is not None and self._node.has_levels:
-            for level in self._node.get_levels(self.row_count, self.uses_column_formula):
-                self._child.append_level(level[0], level[1])
+            self._node._precomputed = values
+            try:
+                for level in self._node.get_levels(self.row_count, self.uses_column_formula):
+                    self._child.append_level(level[0], level[1])
+            finally:
+                self._node._precomputed = None
 
         if self.data_type is DataType.DECIMAL:
             ul_type = float
@@ -615,6 +633,8 @@ class Column:
                         v = self._node.fvalue(row_no, self.row_count, False)
                     elif self.uses_column_formula and self._parent.is_row_filtered(row_no):
                         v = NaN
+                    elif values is not None:
+                        v = values[row_no]
                     else:
                         v = self._node.fvalue(row_no, self.row_count, self.uses_column_formula)
                     v = convert(v, ul_type)

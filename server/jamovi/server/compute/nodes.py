@@ -113,6 +113,10 @@ class Node:
         return False
 
     def fvalues(self, row_count, filt):
+        # jUPWR: values already computed for every row (see Column.recalc)
+        precomputed = getattr(self, '_precomputed', None)
+        if precomputed is not None:
+            return precomputed
         return FValues(self, row_count, filt)
 
     @property
@@ -392,6 +396,20 @@ class Call(ast.Call, Node):
                 value = self.args[0].fvalue(dest_index, row_count, False)
             else:
                 value = NaN
+        elif self._function.__name__ == 'IF' and len(self.keywords) == 0:
+            # jUPWR: a lazy IF -- the condition first, then only the branch
+            # it chooses (as IF() in functions.py does with all three
+            # computed); a chain of rules no longer evaluates every rule for
+            # every row, and an error in the other branch no longer makes
+            # the row missing
+            cond = self.args[0].fvalue(index, row_count, filt)
+            cond = convert(cond, self._arg_types[0])
+            if is_missing(cond, True):
+                value = -2147483648
+            elif cond:
+                value = self.args[1].fvalue(index, row_count, filt) if len(self.args) > 1 else 1
+            else:
+                value = self.args[2].fvalue(index, row_count, filt) if len(self.args) > 2 else -2147483648
         elif self._function.meta.is_column_wise:
             if self._cached_value is None:
                 group_by = None

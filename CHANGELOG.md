@@ -39,6 +39,11 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
   - histogram: przedziały domknięte lewostronnie, w trybie automatycznym
     z okrągłą szerokością i granicami na jej wielokrotnościach (np. 0–25,
     25–50); w trybie ręcznym nowa opcja „Początek przedziałów”.
+- Zmienne obliczane i przekształcone szybciej przeliczają się po edycji
+  komórki (np. 20 reguł na 10 000 wierszy: ok. 0,3 s zamiast 0,9 s):
+  IF liczy tylko wybraną gałąź, a kolumna jest liczona jednym przejściem.
+  Przy okazji błąd w niewybranej gałęzi IF (np. `IF(x > 0, LN(x), 0)`
+  przy x ≤ 0) nie zamienia już wiersza w brak danych.
 - Znak UPWr na starcie w prawym górnym rogu panelu wyników, skalowany z jego
   szerokością (wcześniej zachodził na bibliografię w wąskim oknie).
 - Wersje modułów: scatr 2.9.9, jANOVA 0.5.2, jCI 0.3.6, jCzest 0.2.5,

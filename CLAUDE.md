@@ -881,8 +881,19 @@ z nawiasem albo samo „else" bez reguł → nie otwiera się jako reguły
 (ZROBIONE 2026-10-18: bez testu nawiasów, `roundTrips` wystarcza);
 12. kody z zerem na początku („01") i `1e5` → błąd składni (ZROBIONE
 2026-10-18: `isNumeric` = to, co serwer czyta jako liczbę; „01”, „1e5”,
-„1.” → tekst); 13. wydajność kwadratowa (20 reguł × 10 tys.
-wierszy = 3,3 s na edycję komórki).
+„1.” → tekst); 13. wydajność (20 reguł × 10 tys. wierszy) — ZROBIONE
+2026-10-22: pomiar w Dockerze pokazał koszt LINIOWY, nie kwadratowy
+(0,89 s na przeliczenie kolumny; 3,3 s z audytu to pełna ścieżka z klientem,
+niezmierzona). Przyczyny: IF liczył obie gałęzie (cały łańcuch reguł na
+każdy wiersz) i `Column.recalc` przechodził wiersze dwa razy (poziomy +
+komórki). Poprawki: leniwe IF w `Call.fvalue` (`compute/nodes.py`, jak
+specjalny przypadek OFFSET) i jedno przejście (`column.py`: wartości raz,
+poziomy z nich przez `Node._precomputed`) → 0,29 s (~3×). Wyniki 20 formuł
+× (bez filtra / z filtrem / po edycji) identyczne bajt w bajt. JEDYNA zmiana
+zachowania: błąd w niewybranej gałęzi IF (np. `IF(x > 0, LN(x), 0)` przy
+x ≤ 0) nie robi już z wiersza braku. Testy: `tests/test_jupwr_recalc.py`.
+PUŁAPKA testów: `DataSetModel` w testach ma `NullLog` bez `exception()` —
+wiersz z błędem formuły wywraca test; podstawić `logging.getLogger`.
 Drobniejsze: podwójne tworzenie przekształcenia przy szybkiej edycji
 i podwójne przerysowanie buildera; osierocone przekształcenia w pliku;
 Ctrl+Z pomija edycje reguł (semantyka upstreamu); stary plik bez kolumny
