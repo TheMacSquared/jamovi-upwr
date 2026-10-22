@@ -82,7 +82,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.2.0 | 28.13 | 0.4.3 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.2.0 | 28.13 | 0.4.3 | ✅ 2026-10-22 | ⬜ do zbudowania |
 | 1.1.2 | 28.13 | 0.4.2 | ✅ 2026-10-18 | ✅ 2026-10-18 |
 | 1.1.1 | 28.11 | 0.4.2 | ✅ 2026-10-14 | ✅ (odnotowane 2026-10-18) |
 | 1.1.1 | 28.11 | 0.4.1 | ✅ 2026-10-13 | ✅ 2026-10-13 |
@@ -121,7 +121,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.2.0 | 28.13 | 0.3.3 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.2.0 | 28.13 | 0.3.3 | ✅ 2026-10-22 | ⬜ do zbudowania |
 | 1.1.2 | 28.13 | 0.3.2 | ✅ 2026-10-18 | ✅ 2026-10-18 |
 | 1.1.1 | 28.11 | 0.3.2 | ✅ 2026-10-13 | ✅ 2026-10-13 |
 | 1.1.0 | 28.11 | 0.3.2 | ✅ 2026-10-12 | ✅ 2026-10-12 |

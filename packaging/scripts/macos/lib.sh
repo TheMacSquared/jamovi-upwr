@@ -66,7 +66,7 @@ pip_nanomsg_fresh() {
 # --- ochrona plików źródłowych przed nadpisaniem przez jmc ------------------
 # jmc zapisuje część plików z powrotem do drzewa ŹRÓDŁOWEGO, nie do payloadu:
 #   * <moduł>/jamovi/0000.yaml  (index.js:576-593, indexPath = <srcDir>/jamovi)
-#   * <moduł>/R/00jmv.R         (index.js:552-561, tylko jmv)
+#   * <moduł>/R/00jmv.R         (index.js:552-561, każdy moduł z jamovi/00refs.yaml)
 # Przy regeneracji 0000.yaml: --patch-version podmienia `version` na wersję
 # aplikacji, yaml.dump zmienia zawijanie i cudzysłowy, a pola nieobecne
 # w źródle dostają wartości domyślne — m.in. menuTitle = title, i tak właśnie
@@ -74,6 +74,8 @@ pip_nanomsg_fresh() {
 # z pakietów R ZAINSTALOWANYCH NA TEJ MASZYNIE, więc jego treść zależy od hosta.
 # Jedno i drugie to artefakt builda, nie zmiana w kodzie — przywracamy bajt
 # w bajt. Odpowiednik $YamlBackup + finally z packaging/scripts/windows/build.ps1.
+# Pliki, których przed buildem nie było (00jmv.R w modułach z nowym 00refs.yaml),
+# jmc tworzy od zera — te usuwamy, żeby nie zostały nieśledzone w `git status`.
 #
 # UWAGA — celowo NIE obejmujemy plików `.h.R` ani `.u.yaml` w submodule `plots`.
 # Tam jmc nie tyle brudzi, co aktualizuje: dopisuje do `.u.yaml` kontrolki dla
@@ -90,9 +92,19 @@ src_restore() {
         cp -p "$f" "$REPO_ROOT/$rel"
         n=$((n + 1))
     done < <(find "$SRC_GUARD_DIR" -type f)
+    local d=0
+    if [ -f "$SRC_GUARD_DIR.new" ]; then
+        while IFS= read -r rel; do
+            [ -f "$REPO_ROOT/$rel" ] || continue
+            rm -f "$REPO_ROOT/$rel"
+            d=$((d + 1))
+        done < "$SRC_GUARD_DIR.new"
+        rm -f "$SRC_GUARD_DIR.new"
+    fi
     rm -rf "$SRC_GUARD_DIR"
     SRC_GUARD_DIR=""
     [ "$n" -eq 0 ] || log "przywrócono pliki źródłowe nadpisane przez jmc ($n)"
+    [ "$d" -eq 0 ] || log "usunięto pliki utworzone przez jmc ($d)"
 }
 
 # src_guard <moduł> [<moduł> ...] — zdejmij kopie PRZED wywołaniem jmc.
@@ -102,7 +114,10 @@ src_guard() {
     local m rel
     for m in "$@"; do
         for rel in "$m/jamovi/0000.yaml" "$m/R/00jmv.R"; do
-            [ -f "$REPO_ROOT/$rel" ] || continue
+            if [ ! -f "$REPO_ROOT/$rel" ]; then
+                echo "$rel" >> "$SRC_GUARD_DIR.new"
+                continue
+            fi
             mkdir -p "$SRC_GUARD_DIR/$(dirname "$rel")"
             cp -p "$REPO_ROOT/$rel" "$SRC_GUARD_DIR/$rel"
         done
