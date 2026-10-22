@@ -35,6 +35,10 @@
     background-image: url("../../assets/analysis-plots-ranking.svg");
 }
 
+.jmv-ribbon-button[data-name="profiles"] .jmv-ribbon-button-icon {
+    background-image: url("../../assets/analysis-plots-profiles.svg");
+}
+
 .jmv-ribbon-button[data-name="correlation"] .jmv-ribbon-button-icon {
     background-image: url("../../assets/analysis-plots-correlation.svg");
 }

@@ -156,7 +156,7 @@ class PlotsTab extends RibbonTab {
 
         // fixed didactic ordering of the plot categories; groups not listed
         // here (from third-party modules) sort in just before 'Other'
-        const groupOrder = [ 'Distribution', 'Comparison', 'Ranking', 'Correlation', 'Evolution', 'Composition', 'Other' ];
+        const groupOrder = [ 'Distribution', 'Comparison', 'Ranking', 'Profiles', 'Correlation', 'Evolution', 'Composition', 'Other' ];
         let groupNames = Object.keys(menus).sort((a, b) => {
             let ai = groupOrder.indexOf(a);
             let bi = groupOrder.indexOf(b);

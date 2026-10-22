@@ -206,10 +206,15 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   Kategorie (klucz EN → nazwa PL) i wykresy (nazwy analiz w scatr):
   Distribution→Rozkład (jmvhist, dens, qq, raincloud, ridge),
   Comparison→Porównania (jmvbox, violin, stripmean), Ranking→Ranking
-  (jmvbar, lollipop, radar, parcoord, wordcloud, circbar),
-  Correlation→Zależności (scat, bubble, heatmap, corrgram, mosaic, hexbin),
+  (jmvbar, lollipop, wordcloud, circbar), Profiles→Profile (radar,
+  parcoord, meanprofile, dumbbell, slope; decyzja 2026-10-22: profile na
+  wielu zmiennych to nie ranking; meanprofile = profil średnich z SE/CI,
+  dumbbell i slope = dwa pomiary w formacie szerokim, przed–po),
+  Correlation→Zależności (scat, bubble, heatmap, corrgram, hexbin),
   Evolution→Trendy (jmvline, area), Composition→Części całości
-  (stackbar, waffle, treemap), Other→Inne (pareto; tu też lądują wykresy
+  (stackbar, waffle, treemap, mosaic; mozaika przeniesiona z Zależności
+  2026-10-22 — zmienne jakościowe, ta sama informacja co stackbar),
+  Other→Inne (pareto; tu też lądują wykresy
   z modułów zewnętrznych z menuGroup '.'/'More'/'Other plots').
   Wykresy o własnej geometrii w czystym R (bez zależności): treemap
   (squarify), wordcloud (spirala + AABB), radar (kartezjańska geometria,
