@@ -39,9 +39,9 @@ options:
       default: 5
 
     - name: width
-      title: Szerokość klasy
+      title: Szerokość klasy (0 = automatyczna)
       type: Number
-      default: 1
+      default: 0
 
     - name: startAuto
       title: Początek pierwszej klasy = minimum

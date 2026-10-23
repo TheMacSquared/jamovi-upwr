@@ -35,7 +35,7 @@ skewKurt <- function(x) {
 # Gini coefficient for non-negative values (NA otherwise); Lorenz curve points
 gini <- function(x) {
     if (length(x) < 2 || any(x < 0) || sum(x) == 0) return(NA_real_)
-    s <- sort(x); n <- length(s)
+    s <- as.numeric(sort(x)); n <- length(s)  # doubles: integer columns overflow in seq_len(n) * s
     2 * sum(seq_len(n) * s) / (n * sum(s)) - (n + 1) / n
 }
 lorenz <- function(x) {
@@ -185,10 +185,12 @@ lorenzPlot <- function(d, label, ggtheme, theme) {
 # ---------------------------------------------------------------------------
 
 #' Class boundaries: left-closed intervals [a, b), the last one closed [a, b].
-#' method: "sturges" (k = ceiling(log2 n + 1)), "count" (k given), "width" (h given)
-classBreaks <- function(x, method = "sturges", k = 5, h = 1, start = NULL) {
+#' method: "sturges" (k = ceiling(log2 n + 1)), "count" (k given), "width" (h given;
+#' h = 0 means a round width near range / Sturges k)
+classBreaks <- function(x, method = "sturges", k = 5, h = 0, start = NULL) {
     n <- length(x); lo <- if (is.null(start)) min(x) else start; hi <- max(x)
     if (method == "width") {
+        if (is.finite(h) && h == 0) h <- niceWidth((hi - lo) / ceiling(log2(n) + 1))
         if (!is.finite(h) || h <= 0) return(NULL)
         k <- max(1, ceiling((hi - lo) / h)); if (lo + k * h <= hi) k <- k + 1
     } else {
@@ -197,6 +199,14 @@ classBreaks <- function(x, method = "sturges", k = 5, h = 1, start = NULL) {
         h <- if (hi > lo) (hi - lo) / k else 1
     }
     list(breaks = lo + h * (0:k), h = h, k = k)
+}
+
+#' Rounds a width to the nearest (on the log scale) of 1, 2, 2.5, 5, 10 x 10^k
+#' (same rule as the automatic histogram width in scatr)
+niceWidth <- function(h) {
+    if (!is.finite(h) || h <= 0) return(1)
+    mag <- 10^floor(log10(h)); steps <- c(1, 2, 2.5, 5, 10)
+    steps[which.min(abs(log(h / mag) - log(steps)))] * mag
 }
 
 #' Frequency table for the classes: counts, shares, cumulative, midpoints
