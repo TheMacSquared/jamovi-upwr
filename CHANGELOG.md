@@ -3,6 +3,21 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.2.1 — 2026-10-23 (linia latest, jamovi 28.13)
+
+- Szereg rozdzielczy (Eksploracja): domyślna szerokość klasy dobierana
+  automatycznie do zakresu danych (okrągła liczba: 1, 2, 2,5 lub 5 × 10ⁿ,
+  blisko liczby klas z reguły Sturgesa); wcześniej domyślne 1 przy dużym
+  zakresie dawało miliony klas i bardzo długie liczenie. Wpisanie szerokości
+  dającej ponad 200 klas kończy się komunikatem zamiast liczenia.
+- Zmienne ilościowe: współczynnik Giniego liczy się także dla zmiennych
+  całkowitych z dużą liczbą obserwacji (wcześniej brak wyniku).
+- Wykresy, „Części całości” → wykres słupkowy rysuje się już przy samej
+  zmiennej X: w stosie (100%) jako jeden słupek podzielony na kategorie,
+  liczebności i proporcje jako słupek na kategorię (proporcje = udział
+  w całości). Ze zmienną segmentów bez zmian.
+- Moduły: jEksplor 0.1.6, scatr 2.9.10.
+
 ## 1.2.0 — 2026-10-22 (linia latest, jamovi 28.13)
 
 - Daty i godziny w zmiennych obliczanych: `TIMEDIFF(start, koniec, unit='min')`
