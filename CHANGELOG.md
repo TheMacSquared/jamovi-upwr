@@ -5,6 +5,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## 1.2.1 — 2026-10-23 (linia latest, jamovi 28.13)
 
+Stan buildów (2026-10-23): Docker (`jupwr/jupwr:1.2.1`) zbudowany i uruchomiony,
+Windows (instalator, portable .zip, .jmo jRISK i jSpace; `release-check.sh` bez
+ostrzeżeń) i macOS zbudowane.
+
 - Szereg rozdzielczy (Eksploracja): domyślna szerokość klasy dobierana
   automatycznie do zakresu danych (okrągła liczba: 1, 2, 2,5 lub 5 × 10ⁿ,
   blisko liczby klas z reguły Sturgesa); wcześniej domyślne 1 przy dużym
