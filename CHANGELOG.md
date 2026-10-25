@@ -75,8 +75,8 @@ ostrzeżeń) i macOS zbudowane.
   „zdarzenie”.
 - Wersje modułów: scatr 2.9.9, jANOVA 0.5.2, jCI 0.3.6, jCzest 0.2.5,
   jDane 0.8.2, jEksplor 0.1.5, jRegr 0.1.5, jTestyT 0.4.4, jdistrACTION 1.3.4,
-  jperm 0.2.6; moduły opcjonalne jRISK 0.4.4 i jSpace 0.3.3 (do przebudowy
-  `.jmo`).
+  jperm 0.2.6; moduły opcjonalne jRISK 0.4.4 i jSpace 0.3.3 (`.jmo`
+  zbudowane dla Windows i macOS).
 
 ## 1.1.2 — 2026-10-18 (linia latest, jamovi 28.13)
 
