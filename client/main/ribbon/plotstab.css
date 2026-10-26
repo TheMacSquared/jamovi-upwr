@@ -55,3 +55,20 @@
     background-image: url("../../assets/analysis-plots-more.svg");
 }
 
+
+/* jUPWR: the two distribution groups ("Rozkład ilościowe/jakościowe")
+   break into two lines, one word per line */
+.jmv-ribbon-button[data-name="distribution"] .jmv-ribbon-button-label,
+.jmv-ribbon-button[data-name="composition"] .jmv-ribbon-button-label {
+    white-space: normal;
+    width: min-content;
+    line-height: 1.15;
+}
+
+/* the buttons are centred in the ribbon: a top margin equal to the extra
+   line (label: 90% font x 1.15 line height) keeps their icons level with
+   the single-line buttons */
+.jmv-ribbon-button[data-name="distribution"],
+.jmv-ribbon-button[data-name="composition"] {
+    margin-top: 1.035em;
+}

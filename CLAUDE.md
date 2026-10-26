@@ -204,13 +204,15 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   tłumaczenia nazw grup w `plots/jamovi/i18n/pl.po`; ikony kategorii
   `client/assets/analysis-plots-<kategoria>.svg` + `plotstab.css`.
   Kategorie (klucz EN → nazwa PL) i wykresy (nazwy analiz w scatr):
-  Distribution→Rozkład – ilościowe (jmvhist, discbar, dens, qq, raincloud;
+  Distribution→Rozkład ilościowe (jmvhist, discbar, dens, qq, raincloud;
   ridge UKRYTY 2026-10-26 jak parcoord — `scatr::ridge`
   w `JUPWR_HIDDEN_ANALYSES`, tę samą rolę pełni dens z `densFacet`),
-  Composition→Rozkład – jakościowe (stackbar, waffle, treemap,
+  Composition→Rozkład jakościowe (stackbar, waffle, treemap,
   mosaic) — decyzja 2026-10-26: kryterium kategorii rozkładu to TYP
   zmiennej głównej (grupująca to dodatek), obie grupy obok siebie na
-  początku wstążki; discbar = zmienna dyskretna (całkowite): słupek/prążek
+  początku wstążki, nazwy łamane na dwie linie (`plotstab.css`: label
+  `width: min-content`, margines górny przycisku = dodatkowa linia, żeby
+  ikony były w jednym rzędzie); discbar = zmienna dyskretna (całkowite): słupek/prążek
   na każdą wartość, zera dla nieobecnych, liczność/udział (udział w grupie),
   grupy obok siebie albo panele, wartości niecałkowite → błąd z odesłaniem
   do histogramu. W jmvbar tryb „Kategorialne” UKRYTY (`options` ModeSelectora
