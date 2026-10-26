@@ -204,8 +204,10 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   tłumaczenia nazw grup w `plots/jamovi/i18n/pl.po`; ikony kategorii
   `client/assets/analysis-plots-<kategoria>.svg` + `plotstab.css`.
   Kategorie (klucz EN → nazwa PL) i wykresy (nazwy analiz w scatr):
-  Distribution→Rozkład – ilościowe (jmvhist, discbar, dens, qq, raincloud,
-  ridge), Composition→Rozkład – jakościowe (stackbar, waffle, treemap,
+  Distribution→Rozkład – ilościowe (jmvhist, discbar, dens, qq, raincloud;
+  ridge UKRYTY 2026-10-26 jak parcoord — `scatr::ridge`
+  w `JUPWR_HIDDEN_ANALYSES`, tę samą rolę pełni dens z `densFacet`),
+  Composition→Rozkład – jakościowe (stackbar, waffle, treemap,
   mosaic) — decyzja 2026-10-26: kryterium kategorii rozkładu to TYP
   zmiennej głównej (grupująca to dodatek), obie grupy obok siebie na
   początku wstążki; discbar = zmienna dyskretna (całkowite): słupek/prążek
@@ -611,7 +613,7 @@ Bez linii łączących tę samą osobę (decyzja; tę rolę pełni `slope`). PU�
 wrappery scatr rozwiązują argumenty przez NSE — `vars = cols` szuka kolumny
 „cols”; w testach podawać wektor wprost. Testy: `tests/testthat/testwide.R`.
 Zostaje: etap 3 — `jmvbar` dla kilku kolumn jakościowych (wybór kategorii
-„zdarzenie”, wzór jCzest `zalezne`), etap 4 — `ridge`, `dens`.
+„zdarzenie”, wzór jCzest `zalezne`), etap 4 — `dens` (`ridge` ukryty 2026-10-26).
 
 ### Zadanie 19: „Opis zastosowanych metod" — dynamiczne podsumowanie per analiza (ZREALIZOWANE: jCzest 0.2.0, jTestyT 0.3.0, jANOVA 0.4.0)
 Diagnoza (2026-09-04): noty pod tabelami i teksty UI w przebudowanych modułach

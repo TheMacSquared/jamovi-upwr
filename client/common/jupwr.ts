@@ -50,6 +50,9 @@ export const JUPWR_HIDDEN_ANALYSES: ReadonlySet<string> = new Set([
     // basic course; the means profile and the slope chart cover its uses
     // (decision 2026-10-22). The analysis stays, so saved files still open.
     'scatr::parcoord',
+    // the density plot split by group (densFacet) shows the same as the
+    // ridgeline plot (decision 2026-10-26)
+    'scatr::ridge',
 ]);
 
 // Upstream analyses kept in the menu but listed after the jUPWR ones in the
