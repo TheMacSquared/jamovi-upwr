@@ -204,7 +204,16 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   tłumaczenia nazw grup w `plots/jamovi/i18n/pl.po`; ikony kategorii
   `client/assets/analysis-plots-<kategoria>.svg` + `plotstab.css`.
   Kategorie (klucz EN → nazwa PL) i wykresy (nazwy analiz w scatr):
-  Distribution→Rozkład (jmvhist, dens, qq, raincloud, ridge),
+  Distribution→Rozkład – ilościowe (jmvhist, discbar, dens, qq, raincloud,
+  ridge), Composition→Rozkład – jakościowe (stackbar, waffle, treemap,
+  mosaic) — decyzja 2026-10-26: kryterium kategorii rozkładu to TYP
+  zmiennej głównej (grupująca to dodatek), obie grupy obok siebie na
+  początku wstążki; discbar = zmienna dyskretna (całkowite): słupek/prążek
+  na każdą wartość, zera dla nieobecnych, liczność/udział (udział w grupie),
+  grupy obok siebie albo panele, wartości niecałkowite → błąd z odesłaniem
+  do histogramu. W jmvbar tryb „Kategorialne” UKRYTY (`options` ModeSelectora
+  w `jmvbar.u.yaml`, domyślny tryb `continuous`; Content zostaje dla starych
+  .omv) — liczności jednej zmiennej jakościowej rysuje stackbar.
   Comparison→Porównania (jmvbox, violin, stripmean), Ranking→Ranking
   (jmvbar, lollipop, wordcloud, circbar), Profiles→Profile (radar,
   parcoord, meanprofile, dumbbell, slope; decyzja 2026-10-22: profile na
@@ -214,10 +223,9 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   w plotstab.ts) — nieczytelny w kursie podstawowym, kod zostaje dla starych
   .omv; radar ma przełącznik `facet` = osobny radar dla każdej grupy),
   Correlation→Zależności (scat, bubble, heatmap, corrgram, hexbin),
-  Evolution→Trendy (jmvline, area), Composition→Części całości
-  (stackbar, waffle, treemap, mosaic; mozaika przeniesiona z Zależności
-  2026-10-22 — zmienne jakościowe, ta sama informacja co stackbar),
-  Other→Inne (pareto; tu też lądują wykresy
+  Evolution→Trendy (jmvline, area) (mozaika przeniesiona z Zależności
+  2026-10-22 do Composition — zmienne jakościowe, ta sama informacja co
+  stackbar), Other→Inne (pareto; tu też lądują wykresy
   z modułów zewnętrznych z menuGroup '.'/'More'/'Other plots').
   Wykresy o własnej geometrii w czystym R (bez zależności): treemap
   (squarify), wordcloud (spirala + AABB), radar (kartezjańska geometria,
