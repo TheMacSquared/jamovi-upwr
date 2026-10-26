@@ -6,7 +6,7 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 ## 1.2.2 — 2026-10-26 (linia latest, jamovi 28.13)
 
 Stan buildów (2026-10-26): Docker (`jupwr/jupwr:1.2.2`) zbudowany i uruchomiony,
-macOS zbudowany (aplikacja, .jmo jRISK i jSpace); Windows do zbudowania.
+macOS i Windows zbudowane (aplikacja, .jmo jRISK i jSpace).
 
 - Wykresy, kategorie rozkładu podzielone według typu zmiennej: „Rozkład
   ilościowe” (dawny „Rozkład”) i „Rozkład jakościowe” (dawne „Części
