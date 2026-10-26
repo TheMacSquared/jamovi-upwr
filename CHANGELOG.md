@@ -3,6 +3,23 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.2.2 — 2026-10-26 (linia latest, jamovi 28.13)
+
+- Wykresy, kategorie rozkładu podzielone według typu zmiennej: „Rozkład
+  ilościowe” (dawny „Rozkład”) i „Rozkład jakościowe” (dawne „Części
+  całości”), obie na początku wstążki, nazwy w dwóch liniach.
+- Nowy wykres „Wykres słupkowy (zmienna dyskretna)” w rozkładzie
+  ilościowym, dla zmiennych o wartościach całkowitych: słupek albo prążek
+  na każdą wartość (wartości nieobecne = zero), liczebności albo proporcje
+  (w grupach: udział w obrębie grupy), grupy obok siebie albo w osobnych
+  panelach. Wartości niecałkowite → komunikat z odesłaniem do histogramu.
+- Wykres słupkowy (Ranking): tryb „Kategorialne” ukryty — liczebności
+  jednej zmiennej jakościowej rysuje wykres słupkowy w rozkładzie
+  jakościowym; domyślny tryb „Ciągła”. Stare pliki otwierają się bez zmian.
+- Wykres grzbietowy (ridgeline) ukryty w menu — to samo daje wykres
+  gęstości z rozdzieleniem na grupy; zapisane pliki nadal się otwierają.
+- Moduły: scatr 2.9.11.
+
 ## 1.2.1 — 2026-10-23 (linia latest, jamovi 28.13)
 
 Stan buildów (2026-10-23): Docker (`jupwr/jupwr:1.2.1`) zbudowany i uruchomiony,
