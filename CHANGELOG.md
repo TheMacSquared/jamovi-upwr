@@ -5,6 +5,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## 1.2.3 — 2026-10-27 (linia latest, jamovi 28.13)
 
+Stan buildów (2026-10-27): Docker (`jupwr/jupwr:1.2.3`) zbudowany,
+macOS i Windows zbudowane (aplikacja, .jmo jRISK i jSpace).
+
 - Nazwy zmiennych ze spacjami, nawiasami lub myślnikami (np. „trolo ew”,
   „wynik (cm)”) działają we wszystkich analizach:
   - Korelacja: przy trzech i więcej zmiennych z wykresem analiza kończyła
