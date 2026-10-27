@@ -15,6 +15,14 @@ optGet <- function(opts, name) if (exists(name, envir = opts)) opts[[name]] else
 
 bt <- function(x) paste0("`", x, "`")
 termLabel <- function(term) gsub(":", " × ", term, fixed = TRUE)
+# Row names of anova/car::Anova put non-syntactic names in backticks ("`a b`:c")
+unbt <- function(term) vapply(strsplit(term, ":", fixed = TRUE),
+    function(p) paste(sub("^`(.*)`$", "\\1", p), collapse = ":"), "")
+# afex parses variable names as R code, so repeated measures run on syntactic
+# aliases V1, V2, ... (original -> alias); aliasTerm() maps "V1:V2" back
+aliasNames <- function(vars) { u <- unique(vars); stats::setNames(paste0("V", seq_along(u)), u) }
+aliasTerm <- function(term, al) vapply(strsplit(term, ":", fixed = TRUE), function(p) {
+    o <- names(al)[match(p, al)]; paste(ifelse(is.na(o), p, o), collapse = ":") }, "")
 
 phMethodLabel <- function(method) {
     switch(method,
@@ -74,13 +82,13 @@ fitAnova <- function(d, dep, factors, blocks = NULL, covs = NULL,
 
     if (ssType == "1") {
         an <- stats::anova(fit)
-        tab <- data.frame(term = rownames(an), ss = an[["Sum Sq"]], df = an[["Df"]],
+        tab <- data.frame(term = unbt(rownames(an)), ss = an[["Sum Sq"]], df = an[["Df"]],
             ms = an[["Mean Sq"]], F = an[["F value"]], p = an[["Pr(>F)"]],
             stringsAsFactors = FALSE)
     } else {
         an <- car::Anova(fit, type = as.integer(ssType))
         an <- an[rownames(an) != "(Intercept)", , drop = FALSE]
-        tab <- data.frame(term = rownames(an), ss = an[["Sum Sq"]], df = an[["Df"]],
+        tab <- data.frame(term = unbt(rownames(an)), ss = an[["Sum Sq"]], df = an[["Df"]],
             ms = an[["Sum Sq"]] / an[["Df"]], F = an[["F value"]], p = an[["Pr(>F)"]],
             stringsAsFactors = FALSE)
     }
@@ -688,7 +696,7 @@ artTable <- function(d, dep, factors) {
         f <- stats::as.formula(paste(".r ~", paste(bt(factors), collapse = " * ")))
         fit <- stats::lm(f, data = dd, contrasts = ctr)
         an <- car::Anova(fit, type = 3)
-        key <- rownames(an)[vapply(rownames(an), function(r)
+        key <- rownames(an)[vapply(unbt(rownames(an)), function(r)
             setequal(strsplit(r, ":", fixed = TRUE)[[1]], strsplit(term, ":", fixed = TRUE)[[1]]), TRUE)][1]
         rows[[term]] <- data.frame(term = term, source = termLabel(term), F = an[key, "F value"],
             df1 = an[key, "Df"], df2 = an["Residuals", "Df"], p = an[key, "Pr(>F)"], stringsAsFactors = FALSE)

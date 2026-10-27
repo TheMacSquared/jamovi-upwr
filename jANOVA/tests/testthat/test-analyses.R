@@ -138,3 +138,15 @@ test_that("nonparametric with one factor hides the parametric comparisons", {
     r2 <- jANOVA:::anova(data = PlantGrowth, dep = "weight", factors = "group")
     expect_true(r2$means$visible && r2$plotMeans$visible)
 })
+
+test_that("variable names with spaces and brackets (afex runs on aliases)", {
+    data(oats, package = "MASS")
+    o <- data.frame(`plon (kg)` = as.numeric(oats$Y), `poletko nr` = interaction(oats$B, oats$V),
+                    `dawka N` = oats$N, `odmiana x` = oats$V, check.names = FALSE)
+    res <- jANOVA:::anovarm(data = o, dep = "plon (kg)", subject = "poletko nr", within = "dawka N", between = "odmiana x")
+    expect_equal(res$anova$asDF$source, c("odmiana x", "dawka N", "odmiana x × dawka N"))
+    expect_equal(res$means$get(key = "dawka N")$asDF$level, levels(oats$N))
+    tg <- ToothGrowth; tg$dose <- factor(tg$dose); names(tg) <- c("dł. zęba", "suplement x", "dawka (mg)")
+    res <- jANOVA:::anova(data = tg, dep = "dł. zęba", factors = c("suplement x", "dawka (mg)"))
+    expect_equal(res$anova$asDF$source[1:3], c("suplement x", "dawka (mg)", "suplement x × dawka (mg)"))
+})

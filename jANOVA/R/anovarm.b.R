@@ -96,7 +96,10 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 }
             }
 
-            res <- tryCatch(fitRm(d, dep, subject, within, between, covs, o$ss), error = function(e) e)
+            # afex needs syntactic names: model on aliases (dA, A()), labels from the originals
+            al <- aliasNames(vars); A <- function(x) unname(al[x])
+            dA <- d; names(dA) <- A(names(d))
+            res <- tryCatch(fitRm(dA, A(dep), A(subject), A(within), A(between), A(covs), o$ss), error = function(e) e)
             if (inherits(res, "error")) {
                 at$setNote("err", paste("Nie udało się dopasować modelu. Szczegóły:", conditionMessage(res))); return()
             }
@@ -116,7 +119,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             tb <- rmTable(res, o$spherCorr)
             for (i in seq_len(nrow(tb))) {
                 r <- tb[i, ]
-                at$addRow(rowKey = r$term, values = list(source = r$source, ss = r$ss, df1 = r$df1,
+                at$addRow(rowKey = r$term, values = list(source = termLabel(aliasTerm(r$term, al)), ss = r$ss, df1 = r$df1,
                     df2 = r$df2, mse = r$mse, F = r$F, p = r$p, ges = r$ges, pes = r$pes))
             }
             # poprawka zmienia df w tabeli, wiec zostaje jako jedno zdanie; reszta w opisie metod
@@ -131,7 +134,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 } else {
                     for (i in seq_len(nrow(sp))) {
                         r <- sp[i, ]
-                        st$addRow(rowKey = r$term, values = list(source = r$source, W = r$W, p = r$p, gg = r$gg, hf = r$hf))
+                        st$addRow(rowKey = r$term, values = list(source = termLabel(aliasTerm(r$term, al)), W = r$W, p = r$p, gg = r$gg, hf = r$hf))
                     }
                     st$setNote("eps", "p < α = naruszenie sferyczności.")
                 }
@@ -177,12 +180,12 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             }
             if (useART) {
                 artT <- self$results$art
-                at2 <- tryCatch(artTableRm(d, dep, subject, within, between, o$ss), error = function(e) e)
+                at2 <- tryCatch(artTableRm(dA, A(dep), A(subject), A(within), A(between), o$ss), error = function(e) e)
                 if (inherits(at2, "error")) artT$setNote("err", conditionMessage(at2))
                 else {
                     for (i in seq_len(nrow(at2))) {
                         r <- at2[i, ]
-                        artT$addRow(rowKey = r$term, values = list(source = r$source, F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
+                        artT$addRow(rowKey = r$term, values = list(source = termLabel(aliasTerm(r$term, al)), F = r$F, df1 = r$df1, df2 = r$df2, p = r$p))
                     }
                     md$add("Testy", paste(
                         "Nieparametrycznie (kilka czynników): Aligned Rank Transform (Wobbrock i in., 2011) — dla każdego efektu",
@@ -192,8 +195,8 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     if (method != "none") for (f in c(within, between)) {
                         mt <- self$results$artMeans$get(key = f)
                         pt <- self$results$artPairs$get(key = f)
-                        cmp <- tryCatch(artMainEffectComparisons(d, dep, c(within, between), f, method, alpha,
-                            subject = subject, within = within, between = between, ssType = o$ss), error = function(e) e)
+                        cmp <- tryCatch(artMainEffectComparisons(dA, A(dep), A(c(within, between)), A(f), method, alpha,
+                            subject = A(subject), within = A(within), between = A(between), ssType = o$ss), error = function(e) e)
                         if (inherits(cmp, "error")) { mt$setNote("err", conditionMessage(cmp)); next }
                         private$.fillComparison(mt, pt, cmp, method, alpha, "art")
                         mt$setRefs(phRefs(method)); pt$setRefs(phRefs(method))
@@ -212,8 +215,8 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 mt <- self$results$means$get(key = k)
                 pt <- self$results$pairs$get(key = k)
                 img <- self$results$plotMeans$get(key = k)
-                mse <- rmMseFor(res$an0, term)
-                cmp <- tryCatch(compareTerm(res$fit, term, method, alpha, control = NULL, mse = mse), error = function(e) e)
+                mse <- rmMseFor(res$an0, A(term))
+                cmp <- tryCatch(compareTerm(res$fit, A(term), method, alpha, control = NULL, mse = mse), error = function(e) e)
                 if (inherits(cmp, "error")) {
                     mt$setNote("err", paste("Nie można policzyć średnich:", conditionMessage(cmp))); next
                 }
@@ -222,7 +225,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 if (!is.null(cmp$pairs)) pt$setRefs(phRefs(method))
                 m <- cmp$means
                 if (length(term) == 2) {
-                    st <- list(means = data.frame(xf = m[[term[1]]], gf = m[[term[2]]], mean = m$mean, se = m$se,
+                    st <- list(means = data.frame(xf = m[[A(term[1])]], gf = m[[A(term[2])]], mean = m$mean, se = m$se,
                         lower = m$lower, upper = m$upper, letters = m$letters, stringsAsFactors = FALSE),
                         xLabel = term[1], groupLabel = term[2], dep = dep, alpha = alpha, errorBars = o$errorBars)
                 } else {
@@ -235,7 +238,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
 
             if (o$contrastType != "none") {
                 for (f in c(within, between)) {
-                    ct <- tryCatch(contrastTable(res$fit, f, o$contrastType), error = function(e) NULL)
+                    ct <- tryCatch(contrastTable(res$fit, A(f), o$contrastType), error = function(e) NULL)
                     tab <- self$results$contrasts$get(key = f)
                     tab$setTitle(paste("Kontrasty:", f))
                     if (is.null(ct)) next
@@ -272,11 +275,11 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (!is.null(resid)) self$results$qq$setState(list(resid = resid))
             all <- c(within, between)
             if (length(all) >= 2) {
-                tm <- tryCatch(termMeans(res$fit, all[1:2], alpha), error = function(e) NULL)
+                tm <- tryCatch(termMeans(res$fit, A(all[1:2]), alpha), error = function(e) NULL)
                 if (!is.null(tm)) {
                     m <- tm$means
                     self$results$plotInteraction$setState(list(
-                        means = data.frame(A = m[[all[1]]], B = m[[all[2]]], mean = m$mean, stringsAsFactors = FALSE),
+                        means = data.frame(A = m[[A(all[1])]], B = m[[A(all[2])]], mean = m$mean, stringsAsFactors = FALSE),
                         A = all[1], B = all[2], dep = dep))
                 }
             }

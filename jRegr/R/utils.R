@@ -79,11 +79,16 @@ regressionFrame <- function(data, dep, covs, factors, refLevels = list(), depFac
 bt <- function(x) paste0("`", x, "`")
 regressionFormula <- function(dep, covs, factors) stats::as.formula(paste(bt(dep), "~", if (length(c(covs, factors))) paste(bt(c(covs, factors)), collapse = " + ") else "1"))
 
+#' Term name as R writes it in coefficient and ANOVA row names (backticks for non-syntactic names)
+termKey <- function(v) deparse(as.name(v), backtick = TRUE)
+#' ANOVA row name back to the variable name
+termName <- function(tm) sub("^`(.*)`$", "\\1", tm)
+
 #' Human labels for the coefficient rows: covariate name, or "factor: level (vs reference)"
 coefLabels <- function(d, covs, factors) {
     lab <- c("(Intercept)" = "Wyraz wolny")
-    for (v in covs) lab[[v]] <- v
-    for (v in factors) { lv <- levels(d[[v]]); for (l in lv[-1]) lab[[paste0(v, l)]] <- sprintf("%s: %s (vs %s)", v, l, lv[1]) }
+    for (v in covs) lab[[termKey(v)]] <- v
+    for (v in factors) { lv <- levels(d[[v]]); for (l in lv[-1]) lab[[paste0(termKey(v), l)]] <- sprintf("%s: %s (vs %s)", v, l, lv[1]) }
     lab
 }
 

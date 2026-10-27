@@ -69,7 +69,7 @@ korelacjaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     t$addRow(rowKey = paste(vars[i], kk), values = vals)
                 }
                 t$setNote("tri", "Dolny trójkąt macierzy; p pod współczynnikiem.")
-                dd <- as.data.frame(d); dd <- dd[stats::complete.cases(dd), , drop = FALSE]
+                dd <- data.frame(d, check.names = FALSE); dd <- dd[stats::complete.cases(dd), , drop = FALSE]
                 self$results$plotMatrix$setState(list(d = dd, coefs = coefs, method = o$method))
             }
         },

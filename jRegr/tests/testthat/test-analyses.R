@@ -78,3 +78,13 @@ test_that("logistic analysis reports aliasing and suppresses Wald inference unde
     expect_false(res$plot$visible)
     expect_match(res$metody$content, "pominięto")
 })
+
+test_that("variable names with spaces and brackets: matrix plot, regression labels", {
+    dn <- d; names(dn) <- c("wynik a (cm)", "wynik b-2", "c d")
+    res <- jRegr:::korelacja(data = dn, vars = names(dn), plot = TRUE)
+    p <- res$plotMatrix
+    expect_true(inherits(jRegr:::scatterMatrixPlot(p$state$d, p$state$coefs, "pearson", ggplot2::theme_gray(), list(color = "black")), "ggplot"))
+    res <- jRegr:::liniowa(data = dn, dep = "wynik a (cm)", covs = "wynik b-2", factors = NULL, refLevels = NULL)
+    expect_true("wynik b-2" %in% res$coef$asDF$term)
+    expect_false(any(grepl("`", res$anova$asDF$term)))
+})

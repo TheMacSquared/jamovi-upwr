@@ -58,7 +58,7 @@ liniowaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 if (is.null(an)) at$setNote("err", "Nie udało się policzyć tabeli ANOVA.")
                 else for (i in seq_len(nrow(an))) {
                     tm <- rownames(an)[i]
-                    at$addRow(rowKey = tm, values = list(term = if (tm == "Residuals") "Reszty" else tm, ss = an[i, "Sum Sq"], df = an[i, "Df"],
+                    at$addRow(rowKey = tm, values = list(term = if (tm == "Residuals") "Reszty" else termName(tm), ss = an[i, "Sum Sq"], df = an[i, "Df"],
                         ms = an[i, "Sum Sq"] / an[i, "Df"], F = if (tm == "Residuals") NA else an[i, "F value"], p = if (tm == "Residuals") NA else an[i, "Pr(>F)"]))
                 }
             }
