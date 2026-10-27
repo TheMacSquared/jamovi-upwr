@@ -3,6 +3,19 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.2.3 — 2026-10-27 (linia latest, jamovi 28.13)
+
+- Nazwy zmiennych ze spacjami, nawiasami lub myślnikami (np. „trolo ew”,
+  „wynik (cm)”) działają we wszystkich analizach:
+  - Korelacja: przy trzech i więcej zmiennych z wykresem analiza kończyła
+    się błędem „arguments imply differing number of rows” (macierz
+    rozrzutów).
+  - ANOVA powtórzonych pomiarów: model w ogóle się nie dopasowywał.
+  - ANOVA/ANCOVA i regresja liniowa/logistyczna: nazwy efektów
+    i współczynników pokazywały się w odwróconych apostrofach
+    (`` `grupa x` ``); kowarianta o takiej nazwie nie była rozpoznawana jako kowarianta.
+- Moduły: jRegr 0.1.6, jANOVA 0.5.3.
+
 ## 1.2.2 — 2026-10-26 (linia latest, jamovi 28.13)
 
 Stan buildów (2026-10-26): Docker (`jupwr/jupwr:1.2.2`) zbudowany i uruchomiony,
