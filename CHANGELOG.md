@@ -3,6 +3,19 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.2.4 — 2026-10-30 (linia latest, jamovi 28.13)
+
+- Warstwy (jak w starym jamovi) w dwóch analizach:
+  - Eksploracja → Zmienne jakościowe: pole „Warstwy” — osobna tabela
+    liczności dla każdego poziomu warstwy i tabela łączna; w podsumowaniu
+    wiersz na warstwę; wykresy słupkowy i mozaikowy w panelach wg warstwy.
+  - Częstości → Tabela kontyngencji: pole „Warstwy” — tabela liczności
+    z kolumną warstwy, testy, V Craméra, miary 2×2 i porządkowe, test trendu,
+    reszty i porównania par osobno w każdej warstwie oraz „Ogółem”;
+    ostrzeżenie o liczebnościach oczekiwanych sprawdzane w każdej warstwie;
+    wykres w panelach.
+- Moduły: jEksplor 0.1.7, jCzest 0.2.6.
+
 ## 1.2.3 — 2026-10-27 (linia latest, jamovi 28.13)
 
 Stan buildów (2026-10-27): Docker (`jupwr/jupwr:1.2.3`) zbudowany,
