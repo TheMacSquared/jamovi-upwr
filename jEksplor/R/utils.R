@@ -256,41 +256,80 @@ ogivePlot <- function(tab, label, ggtheme, theme) {
 # Zmienne jakościowe (qualitative variables)
 # ---------------------------------------------------------------------------
 
-barPlotQual <- function(d, var, groupVar, ggtheme, theme) {
+# panel titles "layer: level" for the layers of a qualitative plot
+layerLabels <- function(l, layerVar) factor(paste0(layerVar, ": ", l), levels = paste0(layerVar, ": ", levels(l)))
+
+barPlotQual <- function(d, var, groupVar, ggtheme, theme, layerVar = NULL) {
+    layered <- !is.null(layerVar)
     if (is.null(groupVar)) {
-        cnt <- as.data.frame(table(d$x)); names(cnt) <- c("level", "n")
+        cnt <- if (layered) as.data.frame(table(d$x, d$l)) else as.data.frame(table(d$x))
+        names(cnt) <- c("level", if (layered) "layer", "n")
+        if (layered) cnt$layer <- layerLabels(cnt$layer, layerVar)
         p <- ggplot2::ggplot(cnt, ggplot2::aes(x = level, y = n)) +
             ggplot2::geom_col(fill = theme$fill[2], colour = theme$color[1], width = 0.7)
     } else {
-        cnt <- as.data.frame(table(d$x, d$g)); names(cnt) <- c("level", "group", "n")
+        cnt <- if (layered) as.data.frame(table(d$x, d$g, d$l)) else as.data.frame(table(d$x, d$g))
+        names(cnt) <- c("level", "group", if (layered) "layer", "n")
+        if (layered) cnt$layer <- layerLabels(cnt$layer, layerVar)
         p <- ggplot2::ggplot(cnt, ggplot2::aes(x = level, y = n, fill = group)) +
             ggplot2::geom_col(colour = theme$color[1], position = ggplot2::position_dodge(width = 0.8), width = 0.7) +
             ggplot2::labs(fill = groupVar)
     }
+    if (layered) p <- p + ggplot2::facet_wrap(~ layer, ncol = min(nlevels(cnt$layer), 3))
     p <- p + ggplot2::labs(x = var, y = "Liczność") + ggplot2::scale_x_discrete(labels = jmvcore::wrapLabels) + ggtheme +
         ggplot2::theme(legend.position = "bottom")
     if (nlevels(d$x) > 3 || max(nchar(levels(d$x))) > 12) p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 15, hjust = 1))
     p
 }
 
-# width of each column ~ share of the level, vertical split ~ conditional distribution of the group
-mosaicPlotQual <- function(d, var, groupVar, ggtheme, theme) {
-    tab <- if (is.null(groupVar)) table(d$x) else table(d$x, d$g)
-    if (is.null(groupVar)) tab <- as.table(matrix(tab, ncol = 1, dimnames = list(names(tab), var)))
+# rectangles of one mosaic: width of each column ~ share of the level, vertical split ~ conditional distribution of the group
+mosaicRects <- function(x, g, var) {
+    tab <- if (is.null(g)) table(x) else table(x, g)
+    if (is.null(g)) tab <- as.table(matrix(tab, ncol = 1, dimnames = list(names(tab), var)))
     tot <- rowSums(tab); keep <- tot > 0; tab <- tab[keep, , drop = FALSE]; tot <- tot[keep]
+    if (length(tot) == 0) return(NULL)
     xr <- cumsum(c(0, tot / sum(tot)))
     rects <- do.call(rbind, lapply(seq_len(nrow(tab)), function(i) {
         yr <- cumsum(c(0, tab[i, ] / tot[i]))
-        data.frame(xmin = xr[i], xmax = xr[i + 1], ymin = yr[-length(yr)], ymax = yr[-1],
-                   level = rownames(tab)[i], fill = colnames(tab), stringsAsFactors = FALSE)
+        data.frame(xmin = unname(xr[i]), xmax = unname(xr[i + 1]), ymin = unname(yr[-length(yr)]), ymax = unname(yr[-1]),
+                   level = rownames(tab)[i], fill = factor(colnames(tab), levels = colnames(tab)), stringsAsFactors = FALSE)
     }))
-    mid <- (xr[-length(xr)] + xr[-1]) / 2
-    p <- ggplot2::ggplot(rects) +
-        ggplot2::geom_rect(ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill), colour = "white", linewidth = 0.6) +
-        ggplot2::scale_x_continuous(breaks = mid, labels = jmvcore::wrapLabels(rownames(tab)), expand = c(0, 0)) +
-        ggplot2::scale_y_continuous(labels = function(v) paste0(round(100 * v), "%"), expand = c(0, 0)) +
-        ggplot2::labs(x = var, y = if (is.null(groupVar)) "Udział" else sprintf("Udział „%s” w kategorii", groupVar), fill = groupVar) +
+    list(rects = rects, labels = data.frame(mid = (xr[-length(xr)] + xr[-1]) / 2, label = rownames(tab), stringsAsFactors = FALSE))
+}
+
+mosaicPlotQual <- function(d, var, groupVar, ggtheme, theme, layerVar = NULL) {
+    yTitle <- if (is.null(groupVar)) "Udział" else sprintf("Udział „%s” w kategorii", groupVar)
+    if (is.null(layerVar)) {
+        mr <- mosaicRects(d$x, d$g, var)
+        p <- ggplot2::ggplot(mr$rects) +
+            ggplot2::geom_rect(ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill), colour = "white", linewidth = 0.6) +
+            ggplot2::scale_x_continuous(breaks = mr$labels$mid, labels = jmvcore::wrapLabels(mr$labels$label), expand = c(0, 0))
+    } else {
+        # columns differ between layers, so category names are drawn under each panel instead of as a shared axis
+        parts <- lapply(levels(d$l), function(l) {
+            sel <- !is.na(d$l) & d$l == l
+            mr <- mosaicRects(d$x[sel], if (is.null(groupVar)) NULL else d$g[sel], var)
+            if (is.null(mr)) return(NULL)
+            mr$rects$layer <- l; mr$labels$layer <- l; mr
+        })
+        parts <- Filter(Negate(is.null), parts)
+        rects <- do.call(rbind, lapply(parts, `[[`, "rects")); labs <- do.call(rbind, lapply(parts, `[[`, "labels"))
+        rects$layer <- layerLabels(factor(rects$layer, levels = levels(d$l)), layerVar)
+        labs$layer <- layerLabels(factor(labs$layer, levels = levels(d$l)), layerVar)
+        labs$label <- jmvcore::wrapLabels(labs$label)
+        p <- ggplot2::ggplot(rects) +
+            ggplot2::geom_rect(ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill), colour = "white", linewidth = 0.6) +
+            ggplot2::geom_text(data = labs, ggplot2::aes(x = mid, y = -0.02, label = label), vjust = 1, size = 3.2,
+                               colour = theme$color[1], lineheight = 0.9) +
+            ggplot2::facet_wrap(~ layer, ncol = min(nlevels(rects$layer), 3)) +
+            ggplot2::scale_x_continuous(breaks = NULL, expand = c(0, 0)) +
+            ggplot2::coord_cartesian(ylim = c(0, 1), clip = "off")
+    }
+    p <- p + ggplot2::scale_y_continuous(labels = function(v) paste0(round(100 * v), "%"), expand = c(0, 0)) +
+        ggplot2::labs(x = var, y = yTitle, fill = groupVar) +
         ggtheme + ggplot2::theme(legend.position = "bottom")
+    if (!is.null(layerVar)) p <- p + ggplot2::theme(axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 28)),
+                                                    panel.spacing.y = ggplot2::unit(3, "lines"))
     if (is.null(groupVar)) p <- p + ggplot2::guides(fill = "none")
     p
 }

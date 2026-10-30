@@ -21,6 +21,13 @@ children:
             name: splitBy
             isTarget: true
             maxItemCount: 1
+      - type: TargetLayoutBox
+        label: Warstwy
+        children:
+          - type: VariablesListBox
+            name: layer
+            isTarget: true
+            maxItemCount: 1
   - type: LayoutBox
     margin: large
     stretchFactor: 1

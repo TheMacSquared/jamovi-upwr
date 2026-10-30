@@ -501,7 +501,7 @@ zdanie z tym, co niezbędne do odczytania tabeli; objaśnienia metod przenieść
 dokumentacji/handoutu. Sprawdzić też długość podtytułów wykresów (obcinane przy
 długich nazwach zmiennych/poziomów).
 
-### Zadanie 17: jCzest — częstości jUPWR zamiast analiz częstości jmv (wzór jANOVA) — ZREALIZOWANE (0.2.3; wszystkie 6 punktów „do dodania”, bez warstw i Mantela-Haenszela)
+### Zadanie 17: jCzest — częstości jUPWR zamiast analiz częstości jmv (wzór jANOVA) — ZREALIZOWANE (0.2.3; wszystkie 6 punktów „do dodania”, bez Mantela-Haenszela; warstwy w `tabela` od 0.2.6 — testy i miary osobno w każdej warstwie + „Ogółem”, wykres w panelach; tak samo „Warstwy” w jEksplor `jakosciowe` 0.1.7 — osobna tabela na warstwę + łączna)
 Katalog `jCzest/` (wbudowany, menuGroup „Częstości"). Diagnoza kategorii jmv
 (2026-09-03): problem odwrotny niż w ANOVIE — panel nie jest przeładowany, tylko
 PUSTY. `contTables` ma 40 opcji, wszystkie w zwiniętych sekcjach; po wrzuceniu

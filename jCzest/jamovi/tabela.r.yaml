@@ -12,6 +12,7 @@ items:
         - rows
         - cols
         - counts
+        - layer
         - pc
         - exp
       columns: []
@@ -24,11 +25,17 @@ items:
         - rows
         - cols
         - counts
+        - layer
         - chiSq
         - chiSqCorr
         - likeRat
         - fisher
       columns:
+        - name: layer
+          title: Warstwa
+          type: text
+          combineBelow: true
+          visible: (layer)
         - name: test
           title: ''
           type: text
@@ -52,9 +59,15 @@ items:
         - rows
         - cols
         - counts
+        - layer
         - effSizeCI
         - ciWidth
       columns:
+        - name: layer
+          title: Warstwa
+          type: text
+          combineBelow: true
+          visible: (layer)
         - name: measure
           title: ''
           type: text
@@ -82,9 +95,15 @@ items:
         - rows
         - cols
         - counts
+        - layer
         - compare
         - ciWidth
       columns:
+        - name: layer
+          title: Warstwa
+          type: text
+          combineBelow: true
+          visible: (layer)
         - name: measure
           title: ''
           type: text
@@ -107,7 +126,13 @@ items:
         - rows
         - cols
         - counts
+        - layer
       columns:
+        - name: layer
+          title: Warstwa
+          type: text
+          combineBelow: true
+          visible: (layer)
         - name: measure
           title: ''
           type: text
@@ -124,7 +149,13 @@ items:
         - rows
         - cols
         - counts
+        - layer
       columns:
+        - name: layer
+          title: Warstwa
+          type: text
+          combineBelow: true
+          visible: (layer)
         - name: z
           title: z
           type: number
@@ -142,6 +173,7 @@ items:
         - rows
         - cols
         - counts
+        - layer
       columns: []
 
     - name: pairwise
@@ -153,7 +185,13 @@ items:
         - rows
         - cols
         - counts
+        - layer
       columns:
+        - name: layer
+          title: Warstwa
+          type: text
+          combineBelow: true
+          visible: (layer)
         - name: g1
           title: ''
           type: text
@@ -183,6 +221,7 @@ items:
         - rows
         - cols
         - counts
+        - layer
         - plot
         - pc
 

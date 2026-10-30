@@ -73,4 +73,18 @@ test_that("zmienne jakosciowe: simple and grouped tables, summary, plots", {
     g <- jEksplor:::jakosciowe(data = q, vars = "kolor", splitBy = "plec", pcRow = TRUE, pcTotal = TRUE)$freqs$get(key = "kolor")$asDF
     expect_equal(g$n_1, c(3L, 0L, 0L, 3L)); expect_equal(g$n_2, c(0L, 1L, 1L, 2L)); expect_equal(g$n_tot[4], 5L)
     expect_equal(g$pcCol_1[1], 100); expect_equal(g$pcRow_1[1], 100); expect_equal(g$pcTotal_2[2], 20)
+    # layers: one table per layer level plus all layers together, same categories in each
+    q$grupa <- factor(c("a", "a", "b", "b", "a", "b"))
+    r2 <- jEksplor:::jakosciowe(data = q, vars = "kolor", splitBy = "plec", layer = "grupa", bar = TRUE, mosaic = TRUE, metody = TRUE)
+    expect_equal(length(r2$freqs$items), 3L)
+    la <- r2$freqs$get(key = "kolor | a")$asDF; lb <- r2$freqs$get(key = "kolor | b")$asDF; lt <- r2$freqs$get(key = "kolor | .all")$asDF
+    expect_equal(la$level, c("czerwony", "niebieski", "zielony", "Razem"))
+    expect_equal(la$n_1, c(1L, 0L, 0L, 1L)); expect_equal(la$n_2, c(0L, 1L, 1L, 2L))
+    expect_equal(lb$n_1, c(2L, 0L, 0L, 2L)); expect_equal(lb$n_tot[4], 2L); expect_true(is.na(lb$pcCol_2[1]))
+    expect_equal(lt$n_tot, g$n_tot)
+    expect_true(grepl("warstwy według „grupa”", r2$metody$content))
+    r3 <- jEksplor:::jakosciowe(data = q, vars = "kolor", layer = "grupa")
+    sm <- r3$summary$asDF
+    expect_equal(sm$layer, c("a", "b", "Razem")); expect_equal(sm$n, c(3L, 2L, 5L)); expect_equal(sm$missing, c(0L, 1L, 1L))
+    expect_equal(r3$freqs$get(key = "kolor | b")$asDF$n, c(2L, 0L, 0L, 2L))
 })

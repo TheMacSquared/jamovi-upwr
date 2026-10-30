@@ -12,10 +12,16 @@ items:
       clearWith:
         - vars
         - splitBy
+        - layer
       columns:
         - name: var
           title: ''
           type: text
+          combineBelow: true
+        - name: layer
+          title: Warstwa
+          type: text
+          visible: (layer)
         - name: n
           title: N
           type: integer
@@ -38,6 +44,7 @@ items:
       clearWith: &cw
         - vars
         - splitBy
+        - layer
       template:
         title: ''
         type: Table
