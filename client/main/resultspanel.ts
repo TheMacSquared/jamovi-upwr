@@ -8,6 +8,7 @@ import { exportElem } from '../common/utils/formatio';
 import ContextMenu from './contextmenu';
 import Notify from './notification';
 import host from './host';
+import { confirmDeleteAllResults } from './utils/confirmdeleteall';
 import selectionLoop from '../common/selectionloop';
 import ContextMenuButton from './contextmenu/contextmenubutton';
 
@@ -1265,11 +1266,14 @@ class ResultsPanel extends EventDistributor {
             this.model.set('selectedAnalysis', analysis);
         }
         else if (event.op === 'remove') {
-            this.model.set('selectedAnalysis', null);
             if (event.address.length === 0) {
+                if ( ! await confirmDeleteAllResults())
+                    return;
+                this.model.set('selectedAnalysis', null);
                 this.model.deleteAll();
             }
             else {
+                this.model.set('selectedAnalysis', null);
                 let analysisId = this.resources[this._menuId].id;
                 let analysis = this.model.analyses().get(analysisId);
                 this.model.deleteAnalysis(analysis);

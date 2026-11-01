@@ -5,6 +5,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane — jamovi 28.17
 
+- „Wszystko → Usuń” wymaga potwierdzenia nieodwracalnego usunięcia analiz,
+  wyników, uwag i kolumn wynikowych. W Electronie domyślną odpowiedzią
+  jest „Anuluj”.
+
 - Zapis dokumentu używa unikalnego pliku tymczasowego, `fsync` i atomowej podmiany;
   błąd zapisu zachowuje poprzedni plik. Anulowanie czeka na wątek zapisujący.
 - Kopie odzyskiwania obejmują także nowe, niezapisane dokumenty i są dostępne

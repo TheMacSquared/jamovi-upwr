@@ -217,3 +217,11 @@ i oczekiwanym zachowaniem.
 - Wolumen `jupwr-recovery` przechowuje kopie Dockera; nie umieszczaj w nim danych
   testowych ani nie usuwaj kopii użytkownika podczas testów. Usługa `test`
   korzysta z osobnego katalogu `/tmp/jupwr-test-recovery`.
+
+### Zadanie 13: Potwierdzenie usunięcia wszystkich wyników
+- Pliki: `client/main/resultspanel.ts`, `client/main/utils/confirmdeleteall.ts`,
+  `client/main/utils/tests/confirmdeleteall.test.ts`, `i18n/src/pl.po`.
+- „Wszystko → Usuń” ostrzega o nieodwracalnym usunięciu analiz, wyników,
+  uwag i kolumn wynikowych; anulowanie pozostawia także bieżące zaznaczenie.
+- Electron: domyślny przycisk i Escape anulują; w przeglądarce natywne
+  potwierdzenie. Usuwanie pojedynczej analizy zachowuje dotychczasowe zachowanie.

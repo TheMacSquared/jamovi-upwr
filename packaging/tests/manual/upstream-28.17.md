@@ -299,6 +299,19 @@ aplikacja natywna używa własnego runtime. Zanotuj czasy; nie zakładaj wspóln
 limitu sekund dla różnych komputerów. Wyraźny regres względem poprzedniego
 builda wymaga wyjaśnienia.
 
+## Potwierdzenie „Wszystko → Usuń”
+
+- [ ] Na kopii dokumentu z dwiema analizami i uwagą wybierz „Wszystko → Usuń”.
+  Powinno pojawić się ostrzeżenie o nieodwracalnym usunięciu.
+- [ ] Wybierz „Anuluj”; sprawdź, że analizy, uwagi i zaznaczenie pozostały.
+- [ ] W Electronie powtórz i użyj Escape, a następnie Enter przy domyślnym
+  przycisku. Oba sposoby powinny anulować usuwanie.
+- [ ] Powtórz i potwierdź przyciskiem „Usuń wszystko” (w przeglądarce „OK”).
+  Analizy i uwagi powinny zniknąć; jeśli utworzono kolumny wynikowe analiz,
+  one też powinny zostać usunięte.
+- [ ] Sprawdź osobno Docker/przeglądarkę oraz faktycznie zbudowaną aplikację
+  Windows/macOS. Usunięcie pojedynczej analizy działa jak dotychczas.
+
 ## Protokół i decyzja
 
 Skopiuj tabelę dla każdej kombinacji builda i środowiska:
