@@ -110,50 +110,17 @@
     display: none;
 }
 
-/* line icons (assets/jupwr-line) drawn as masks in the label colour;
-   categories of other modules get the generic one */
+/* the categories' own colour icons (analysetab.css, plotstab.css), small,
+   beside the label; the line icons in assets/jupwr-line are kept as an
+   alternative */
 [data-ui-style="a"] .jmv-analyses-button > .jmv-ribbon-button-icon {
-    --jupwr-icon: url('../assets/jupwr-line/generic.svg');
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     padding: 0;
     margin-inline-end: 7px;
     flex-shrink: 0;
-    background-image: none !important;
-    background-color: var(--jupwr-text);
-    -webkit-mask: var(--jupwr-icon) center / contain no-repeat;
-    mask: var(--jupwr-icon) center / contain no-repeat;
+    background-size: contain;
 }
-
-[data-ui-style="a"] .jmv-analyses-button.menu-owner.active > .jmv-ribbon-button-icon,
-[data-ui-style="a"] .jmv-analyses-button.jmv-modules-menu-item > .jmv-ribbon-button-icon {
-    background-color: var(--jupwr-bordo);
-}
-
-[data-ui-style="a"] .jmv-analyses-button[data-name="exploration"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/exploration.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="rozkłady"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/distributions.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="distraction"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/distributions.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="przedziały ufności"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/intervals.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="przedzialy ufnosci"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/intervals.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="t-tests"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/ttests.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="anova"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/anova.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="regression"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/regression.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="frequencies"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/frequencies.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="factor"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/factor.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="testy permutacyjne"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/permutations.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="ryzyko"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/risk.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="kosmos"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/space.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="pomiary"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/measurement.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="modules"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/modules.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="distribution"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/plot-distribution.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="composition"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/plot-composition.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="comparison"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/plot-comparison.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="ranking"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/plot-ranking.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="profiles"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/plot-profiles.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="correlation"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/plot-correlation.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="evolution"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/plot-evolution.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="other"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/plot-other.svg'); }
-[data-ui-style="a"] .jmv-analyses-button[data-name="more"] > .jmv-ribbon-button-icon { --jupwr-icon: url('../assets/jupwr-line/plot-other.svg'); }
 
 [data-ui-style="a"] .jmv-analyses-button > .jmv-ribbon-button-label {
     margin: 0;

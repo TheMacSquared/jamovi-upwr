@@ -230,7 +230,7 @@ ryzyka dla starego.
 | ID | Co działa | Uwagi |
 |----|-----------|-------|
 | A1 | Zakładki jako przełącznik segmentowy; przycisk ustawień z ikoną suwaków; pośrodku paska nazwa zbioru i liczba wierszy („Długość zębów · 60 wierszy”) | Nazwa polska, gdy zbiór pochodzi z biblioteki z opisem; inaczej tytuł pliku |
-| A2 | Biała wstążka 52 px; kategorie jako ikona liniowa 16 px + podpis w „pigułce”; otwarta kategoria bordowa (ikona i tekst) na różowym tle; „Moduły” z obrysem i plusem | Własny zestaw 22 ikon (Analizy, Wykresy, moduły opcjonalne); kategorie modułów zewnętrznych dostają ikonę ogólną |
+| A2 | Biała wstążka 52 px; kategorie jako kolorowa ikona 24 px (te same co w wyglądzie klasycznym) + podpis w „pigułce”; otwarta kategoria bordowa na różowym tle; „Moduły” z obrysem | Wypróbowane też ikony liniowe czarno-białe (zbyt smutne) — zestaw 22 ikon zostaje w `assets/jupwr-line/` jako alternatywa (np. wersja dwukolorowa bordo + pomarańcz). Ikony Wykresów są blade (cienkie linie, jasne kolory) |
 | A3 | Dane, opcje i wyniki jako białe karty (12 px) na jasnoszarym tle. Nagłówki kart: „Dane · nazwa · 60 × 3 · filtry 0” + „O zbiorze”; „Wyniki” + „Kopiuj” (cały dokument) i „Eksportuj” (Plik → Eksportuj) | Panel opcji ma własny nagłówek (tytuł analizy i przycisk zwinięcia) |
 | A4 | Edytor w karcie danych: edytor zmiennej, filtry, zmienna wyliczona i przekształcona otwierają się pod nagłówkiem karty danych (wysokość 300 px), arkusz zsuwa się w dół, wyniki pozostają widoczne | To dzisiejsze edytory w węższym układzie, bez zwartego formularza z makiety (patrz 7.5) |
 | A7 | Pasek stanu jako stopka karty danych | |
