@@ -197,3 +197,11 @@ i oczekiwanym zachowaniem.
 - Poprzednia wersja jest zachowywana do odświeżenia rejestru; błąd lub anulowanie
   przywraca jej pliki i metadane. Gdy system uniemożliwi przywrócenie lub usunięcie
   kopii zapasowej, kopia pozostaje w ukrytym katalogu `.install-*/previous`.
+
+### Zadanie 11: Kolejki i kontrola obciążenia
+- Pliki: `server/jamovi/server/{clientconnection,engine,session}.py`,
+  `server/jamovi/server/utils/{websocketqueue,conf}.py`,
+  `server/jamovi/tests/test_backpressure.py`, `packaging/BACKEND.md`.
+- Jedna ograniczona kolejka wysyłania na połączenie, scalanie postępu oraz
+  bezpieczne rozłączenie przeciążonego klienta. Liczba R konfigurowalna;
+  anulowanie zwalnia zajęty proces i umożliwia następne obliczenia.

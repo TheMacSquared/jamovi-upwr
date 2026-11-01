@@ -322,6 +322,7 @@ class Engine:
             self._current_analysis.cancel()
         self._current_analysis = task
         helpers = set()
+        sent = False
 
         try:
             async with self._run_lock:
@@ -335,6 +336,7 @@ class Engine:
                 message = ComsMessage(id=self._message_id,
                                      payload=request.SerializeToString(),
                                      payloadType='AnalysisRequest')
+                sent = True
                 await self._send(message.SerializeToString())
                 self._message_id += 1
                 self._at_startup = False
@@ -353,6 +355,8 @@ class Engine:
                     done, pending = await wait(pending, return_when=FIRST_COMPLETED)
                     # Cancellation can race with the delivery of a final result.
                     if results_stream.done():
+                        if results_stream.cancelled():
+                            await self._interrupt()
                         break
                     if results_received in done:
                         helpers.discard(results_received)
@@ -385,6 +389,8 @@ class Engine:
                         break
         except CancelledError:
             results_stream.cancel()
+            if sent:
+                await self._interrupt()
             raise
         except Exception as e:
             log.exception(e)
@@ -400,6 +406,18 @@ class Engine:
             await gather(*helpers, return_exceptions=True)
             if self._current_analysis is task:
                 self._current_analysis = None
+
+    async def _interrupt(self):
+        # A cancelled R calculation may never return to the IPC loop. Reap the
+        # worker before admitting another calculation. Shutdown/restart already
+        # owns worker cleanup and must not start a replacement process.
+        ready = getattr(self._parent, '_ready', None)
+        stopping = self._process_stopping
+        if (self._process is not None
+                and not getattr(self._parent, '_stopping', False)
+                and (ready is None or ready.is_set())
+                and (stopping is None or not stopping.is_set())):
+            await self._recover()
 
     async def _recover(self):
         if self._restart_task is None or self._restart_task.done():

@@ -110,7 +110,9 @@ class Session(dict):
         if language != '':
             i18n.set_language(language)
 
-        self._scheduler = Scheduler(1, 3, self._analyses, self._modules)
+        workers = conf.positive_int('r_processes', 4)
+        init_slots = 1 if workers > 1 else 0
+        self._scheduler = Scheduler(init_slots, workers - init_slots, self._analyses, self._modules)
 
         task_queue_url = conf.get('task_queue_url')
         if task_queue_url is not None:

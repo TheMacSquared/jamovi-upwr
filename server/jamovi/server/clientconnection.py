@@ -17,7 +17,7 @@ from .jamovi_pb2 import InstanceResponse
 from jamovi.server.utils import conf
 from .i18n import _
 
-from asyncio import create_task
+from .utils.websocketqueue import WebSocketQueue
 import logging
 import socket
 
@@ -48,6 +48,10 @@ class ClientConnection:
         self._transactions = {}
         self._close_listeners = []
         self._instance_id = instance_id
+        self._outgoing = WebSocketQueue(
+            ws, conf.positive_int('websocket_queue_messages', 256),
+            conf.positive_int('websocket_queue_bytes', 64 * 1024 * 1024),
+            conf.positive_int('websocket_send_timeout', 30))
 
     async def on_message_async(self, m_bytes: bytes):
         message = ComsMessage()
@@ -128,7 +132,11 @@ class ClientConnection:
         m.progress = int(progress[0])
         m.progressTotal = int(progress[1])
 
-        create_task(self._ws.send_bytes(m.SerializeToString()))
+        key = (m.instanceId, m.id)
+        self._outgoing.send(
+            m.SerializeToString(),
+            progress_key=key if not complete and message is None and m.id else None,
+            final_key=key if complete and m.id else None)
 
     def send_error(self, message=None, cause=None, instance_id=None, response_to=None,
                    request_id=None):
@@ -158,7 +166,7 @@ class ClientConnection:
 
         m.status = MessageStatus.Value('ERROR')
 
-        create_task(self._ws.send_bytes(m.SerializeToString()))
+        self._outgoing.send(m.SerializeToString(), final_key=(m.instanceId, m.id))
 
     def add_close_listener(self, listener):
         self._close_listeners.append(listener)
@@ -173,6 +181,9 @@ class ClientConnection:
                 break
 
     def on_close(self, clean: bool):
+        clean = clean and not self._outgoing.failed
+        self._outgoing.close()
+        self._transactions.clear()
         log.debug('Websocket closed (instance %s, clean=%s)', self._instance_id, clean)
         ClientConnection.number_of_connections -= 1
         for listener in self._close_listeners:
@@ -212,5 +223,6 @@ async def client_connection_handler(request: web.Request, session) -> web.WebSoc
                 break
     finally:
         conn.on_close(is_clean_close(ws.close_code))
+        await conn._outgoing.wait_closed()
 
     return ws

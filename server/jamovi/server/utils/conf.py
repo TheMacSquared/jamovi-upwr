@@ -74,3 +74,10 @@ def init(app_home=None):
                 continue
             if k.startswith('JAMOVI_'):
                 config_values[k[7:].lower()] = environ[k]
+
+
+def positive_int(key, default):
+    value = int(get(key, default))
+    if value < 1:
+        raise ValueError(f'{key} must be a positive integer')
+    return value

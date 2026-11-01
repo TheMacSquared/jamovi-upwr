@@ -5,6 +5,11 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane — jamovi 28.17
 
+- Ograniczona liczbowo i bajtowo kolejka WebSocket z jednym nadawcą, scalaniem
+  postępu oraz zamknięciem przeciążonego połączenia umożliwiającym ponowne połączenie.
+- Konfigurowalna liczba procesów R (`JAMOVI_R_PROCESSES`) i kończenie zajętego
+  procesu po anulowaniu analizy, bez blokowania kolejnych obliczeń.
+
 - Aktualizacja modułu `.jmo` rozpakowuje i sprawdza nową paczkę przed podmianą
   plików. Błąd rozpakowania, walidacji lub podmiany zachowuje poprzednią wersję;
   instalator przywraca ją także po błędzie odświeżenia rejestru modułów.
