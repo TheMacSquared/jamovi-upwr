@@ -119,3 +119,29 @@ test_that("przypadki brzegowe nie wywalaja analizy", {
     braki <- data.frame(a = factor(c("x", "y", NA, "x")), b = factor(c("p", NA, "q", "q")))
     expect_error(jCzest:::tabela(data = braki, rows = "a", cols = "b"), NA)
 })
+
+test_that("warstwy: testy i miary osobno w kazdej warstwie oraz Ogolem", {
+    set.seed(3)
+    d <- duze; d$miasto <- factor(sample(c("wies", "miasto"), 300, TRUE)); d$miasto[1:5] <- NA
+    res <- jCzest:::tabela(data = d, rows = "plec", cols = "wybor", layer = "miasto",
+                           resid = TRUE, plot = "mosaic", metody = TRUE)
+    tests <- res$tests$asDF
+    expect_equal(tests$layer, c("miasto", "wies", "Ogółem"))
+    for (l in c("miasto", "wies")) {
+        s <- d[!is.na(d$miasto) & d$miasto == l, ]
+        ref <- suppressWarnings(chisq.test(table(s$plec, s$wybor), correct = FALSE))
+        expect_equal(tests$stat[tests$layer == l], unname(ref$statistic))
+    }
+    # Ogolem = obserwacje z warstwa (bez brakow w zmiennej warstwy)
+    s <- d[!is.na(d$miasto), ]
+    expect_equal(tests$stat[3], unname(suppressWarnings(chisq.test(table(s$plec, s$wybor), correct = FALSE))$statistic))
+    expect_equal(nrow(res$effsize$asDF), 3)
+    f <- res$freqs$asDF
+    expect_equal(sum(f$layer == "wies" & f$kind == "Liczność" & f$row == "Ogółem"), 1)
+    expect_equal(f$total[f$layer == "Ogółem" & f$row == "Ogółem" & f$kind == "Liczność"], 295)
+    expect_equal(nrow(res$resid$asDF), 6)
+    expect_true(grepl("Warstwy według „miasto”", res$metody$content))
+    expect_equal(names(res$plot$state$tabs), c("miasto", "wies"))
+    # bez warstw kolumna warstwy niewidoczna, wyniki jak wczesniej
+    expect_false(jCzest:::tabela(data = d, rows = "plec", cols = "wybor")$tests$getColumn("layer")$visible)
+})

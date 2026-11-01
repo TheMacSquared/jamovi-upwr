@@ -23,6 +23,13 @@ children:
             isTarget: true
             maxItemCount: 1
       - type: TargetLayoutBox
+        label: Warstwy
+        children:
+          - type: VariablesListBox
+            name: layer
+            isTarget: true
+            maxItemCount: 1
+      - type: TargetLayoutBox
         label: Liczności (opcjonalnie)
         children:
           - type: VariablesListBox

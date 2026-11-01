@@ -30,6 +30,16 @@ options:
         - factor
       default:
 
+    - name: layer
+      title: Warstwy
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default:
+
     - name: cum
       title: Liczności i procenty skumulowane
       type: Bool

@@ -39,6 +39,16 @@ options:
         - numeric
       default:
 
+    - name: layer
+      title: Warstwy
+      type: Variable
+      suggested:
+        - nominal
+        - ordinal
+      permitted:
+        - factor
+      default:
+
     - name: chiSq
       title: χ² niezależności
       type: Bool
