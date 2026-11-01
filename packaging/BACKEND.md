@@ -35,8 +35,16 @@ pracy. Zakończonej już podmiany nie cofa się po późniejszym anulowaniu.
 
 | Zmienna | Domyślnie | Znaczenie |
 |---|---|---|
-| `JAMOVI_RECOVERY_INTERVAL` | `120` | Odstęp kopii w sekundach; `0` wyłącza także kopię przy kończeniu sesji. |
+| `JAMOVI_RECOVERY_INTERVAL` | `300` | Domyślny odstęp kopii w sekundach dla profilu bez zapisanego wyboru. |
 | `JAMOVI_RECOVERY_PATH` | `recovery` w katalogu danych aplikacji | Katalog kopii; w Compose `/root/recovery`, na wolumenie `jupwr-recovery`. |
+
+Interwał można zmienić w **⋮ → Dokumenty → Kopie odzyskiwania**: wyłączone,
+co 1, 2, 5, 10 lub 15 minut. Domyślnie co 5 minut. Wybór jest zapamiętywany
+w profilu użytkownika i zaczyna działać bez restartu, także w innych otwartych
+oknach tej sesji. Zapisany wybór ma pierwszeństwo przed wartością domyślną
+z `JAMOVI_RECOVERY_INTERVAL`; niestandardowy interwał administratora jest
+wyświetlany w sekundach. Wyłączenie kopii wyłącza także kopię przy zamknięciu
+sesji, ale nie usuwa istniejących plików odzyskiwania.
 
 Kopie obejmują zmienione dokumenty i nowe dokumenty zawierające dane. Początkowy,
 pusty i nieedytowany arkusz nie tworzy kopii. Mechanizm wymaga uprawnień do

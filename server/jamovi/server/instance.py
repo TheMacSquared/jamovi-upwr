@@ -1727,6 +1727,8 @@ class Instance:
                 else:
                     continue
 
+                if name == 'recoveryInterval' and (type(value) is not int or value < 0):
+                    continue
                 if name == 'updateStatus':
                     self._session.request_update(value)
                 else:

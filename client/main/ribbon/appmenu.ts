@@ -41,6 +41,7 @@ export class AppMenuButton extends EventDistributor {
     $missingsInput: HTMLInputElement;
     $devModeCheck: HTMLInputElement;
     $languageList: HTMLSelectElement;
+    $recoveryIntervalList: HTMLSelectElement;
     model: RibbonModel;
     loop: FocusLoop;
 
@@ -259,6 +260,27 @@ export class AppMenuButton extends EventDistributor {
 
         $content.append(separator());
 
+        const documentsId = interactionManager.nextAriaId('label');
+        const $documents = h('div', { class: 'jmv-documents', role: 'group', 'aria-labelledby': documentsId });
+        $content.append($documents);
+        $documents.append(h('div', { id: documentsId, class: 'jmv-ribbon-appmenu-subheading' }, _('Documents')));
+        const recoveryId = interactionManager.nextAriaId('label');
+        const $recovery = appMenuItem(h('div', { id: recoveryId }, _('Recovery copies')));
+        $documents.append($recovery);
+        this.$recoveryIntervalList = h('select', { 'aria-labelledby': recoveryId },
+            selectOption('0', _('Disabled')),
+            selectOption('60', _('Every minute')),
+            selectOption('120', _('Every {n} minutes', { n: '2' })),
+            selectOption('300', _('Every {n} minutes', { n: '5' })),
+            selectOption('600', _('Every {n} minutes', { n: '10' })),
+            selectOption('900', _('Every {n} minutes', { n: '15' })));
+        $recovery.append(this.$recoveryIntervalList);
+        this.$recoveryIntervalList.addEventListener('click', event => event.stopPropagation());
+        this.$recoveryIntervalList.addEventListener('change', () => {
+            this.model.settings().setSetting('recoveryInterval', Number(this.$recoveryIntervalList.value));
+        });
+        $content.append(separator());
+
         let importId = interactionManager.nextAriaId('label');
         let $import = h('div', { class: 'jmv-results', role: 'group', 'aria-labelledby': importId });
         $content.append($import);
@@ -323,6 +345,7 @@ export class AppMenuButton extends EventDistributor {
         this.model.settings().on('change:refsMode',     () => this._updateUI());
         this.model.settings().on('change:resultsFontSize', () => this._updateUI());
         this.model.settings().on('change:selectedLanguage', () => this._updateUI());
+        this.model.settings().on('change:recoveryInterval', () => this._updateUI());
 
         let availableGroup = optGroup(_('Available'));
         let inDevelopmentGroup = optGroup(_('In development'));
@@ -453,6 +476,17 @@ export class AppMenuButton extends EventDistributor {
         this.$zoomLevel.innerText = zoom;
         let missings = settings.getSetting('missings', 'NA');
         this.$missingsInput.value = missings;
+
+        const interval = settings.getSetting('recoveryInterval', 300);
+        this.$recoveryIntervalList.querySelector('[data-custom-interval]')?.remove();
+        this.$recoveryIntervalList.value = String(interval);
+        if (this.$recoveryIntervalList.selectedIndex === -1) {
+            // Keep administrator-configured intervals visible without changing them.
+            const option = selectOption(String(interval), `${interval} s`);
+            option.dataset.customInterval = 'true';
+            this.$recoveryIntervalList.append(option);
+            this.$recoveryIntervalList.value = String(interval);
+        }
 
         let language = settings.getSetting('selectedLanguage', '');
         this.$languageList.value = language;

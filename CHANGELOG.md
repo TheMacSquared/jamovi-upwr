@@ -5,6 +5,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane — jamovi 28.17
 
+- Preferencje „Dokumenty → Kopie odzyskiwania” pozwalają wybrać interwał:
+  wyłączone, 1, 2, 5, 10 lub 15 minut. Domyślnie 5 minut; wybór jest
+  zapamiętywany w profilu i działa bez restartu.
+
 - „Wszystko → Usuń” wymaga potwierdzenia nieodwracalnego usunięcia analiz,
   wyników, uwag i kolumn wynikowych. W Electronie domyślną odpowiedzią
   jest „Anuluj”.

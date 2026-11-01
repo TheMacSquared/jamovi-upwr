@@ -110,9 +110,6 @@ class Session(dict):
         if language != '':
             i18n.set_language(language)
 
-        self._recovery_interval = int(conf.get('recovery_interval', 120))
-        if self._recovery_interval < 0:
-            raise ValueError('recovery_interval must be nonnegative')
         workers = conf.positive_int('r_processes', 4)
         init_slots = 1 if workers > 1 else 0
         self._scheduler = Scheduler(init_slots, workers - init_slots, self._analyses, self._modules)
@@ -185,6 +182,14 @@ class Session(dict):
         self._settings.apply({ 'main': settings })
         self.notify_global_changes()
 
+    @property
+    def _recovery_interval(self):
+        value = self._settings.group('main').get('recoveryInterval')
+        if type(value) is int and value >= 0:
+            return value
+        # A malformed saved preference must not disable recovery.
+        return int(conf.get('recovery_interval', 300))
+
     def _specify_defaults(self, settings):
         # until we deploy the windows updater and are happy with it,
         # we'll default autoUpdate to off -- macOS works well though.
@@ -194,6 +199,10 @@ class Session(dict):
         settings.group('main').specify_default('missings', 'NA')
         settings.group('main').specify_default('selectedLanguage', conf.get('lang', 'pl'))
         settings.group('main').specify_default('updateStatus', 'na')
+        interval = int(conf.get('recovery_interval', 300))
+        if interval < 0:
+            raise ValueError('recovery_interval must be nonnegative')
+        settings.group('main').specify_default('recoveryInterval', interval)
 
     async def create(self, instance_id=None):
 

@@ -52,6 +52,7 @@ interface SettingsData {
     selectedLanguage: string,
     zoom: number,
     resultsFontSize: number,
+    recoveryInterval: number,
     updateStatus: string,
     format: string,
     settingsRecieved: boolean,
@@ -80,6 +81,7 @@ class Settings extends EventMap<SettingsData> {
             selectedLanguage: 'pl',
             zoom: 100,
             resultsFontSize: 100,
+            recoveryInterval: 300,
             updateStatus: 'na',
             format: '{"t":"sf","n":3,"p":3}',
             settingsRecieved: false

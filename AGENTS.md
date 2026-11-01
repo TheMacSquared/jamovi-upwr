@@ -212,7 +212,7 @@ i oczekiwanym zachowaniem.
   `server/jamovi/tests/test_document_recovery.py`, `packaging/BACKEND.md`.
 - Unikalny plik tymczasowy, synchronizacja i atomowa podmiana dokumentu;
   anulowanie nie zwalnia danych, dopóki wątek zapisujący ich używa.
-- Kopie zmienionych i nowych dokumentów co 120 sekund oraz przy kończeniu
+- Kopie zmienionych i nowych dokumentów domyślnie co 5 minut oraz przy kończeniu
   sesji, oddzielne od zwykłego zapisu, dostępne przez `{{Recovery}}`.
 - Wolumen `jupwr-recovery` przechowuje kopie Dockera; nie umieszczaj w nim danych
   testowych ani nie usuwaj kopii użytkownika podczas testów. Usługa `test`
@@ -225,3 +225,11 @@ i oczekiwanym zachowaniem.
   uwag i kolumn wynikowych; anulowanie pozostawia także bieżące zaznaczenie.
 - Electron: domyślny przycisk i Escape anulują; w przeglądarce natywne
   potwierdzenie. Usuwanie pojedynczej analizy zachowuje dotychczasowe zachowanie.
+
+### Zadanie 14: Wybór interwału odzyskiwania w preferencjach
+- Pliki: `client/main/ribbon/appmenu.ts`, `client/main/settings.ts`,
+  `server/jamovi/server/{session,instance}.py`, testy preferencji w kliencie
+  i `server/jamovi/tests/test_recovery_preferences.py`.
+- „Dokumenty → Kopie odzyskiwania”: wyłączone, 1, 2, 5, 10, 15 minut,
+  domyślnie 5 minut. Ustawienie `recoveryInterval` jest zapisywane w profilu
+  i działa od razu; zmienna środowiskowa wyznacza domyślną wartość nowego profilu.
