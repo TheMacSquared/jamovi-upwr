@@ -5,11 +5,13 @@ d <- data.frame(x = c(2, 4, 4, 4, 5, 5, 7, 9, 12, 30, NA), y = c(10:20),
 
 test_that("core table in rows layout: N, missing, mean, median, quartiles, SD, min, max, V", {
     res <- jEksplor:::ilosciowe(data = d, vars = c("x", "y"))
+    expect_false(any(c("missing", "v") %in% names(res$desc$asDF)))
+    res <- jEksplor:::ilosciowe(data = d, vars = c("x", "y"), missing = TRUE, v = TRUE)
     t <- res$desc$asDF
     expect_equal(nrow(t), 2)
     expect_equal(t$n, c(10L, 11L)); expect_equal(t$missing, c(1L, 0L))
     expect_equal(t$mean[1], mean(d$x, na.rm = TRUE)); expect_equal(t$q1[1], unname(quantile(d$x, 0.25, na.rm = TRUE)))
-    expect_equal(t$v[2], 100 * sd(d$y) / mean(d$y))
+    expect_equal(t[["v"]][2], 100 * sd(d$y) / mean(d$y))
     expect_false(res$metody$visible)
     expect_false(res$norm$visible); expect_false(res$hist$visible)
 })
@@ -20,7 +22,7 @@ test_that("columns layout and split by", {
     t <- res$desc$asDF
     expect_equal(t$stat, c("N", "Średnia"))
     expect_equal(t[[2]], c(10, mean(d$x, na.rm = TRUE)))
-    sp <- jEksplor:::ilosciowe(data = d, vars = "x", splitBy = "g", sw = TRUE, gini = TRUE, metody = TRUE)
+    sp <- jEksplor:::ilosciowe(data = d, vars = "x", splitBy = "g", missing = TRUE, sw = TRUE, gini = TRUE, metody = TRUE)
     t <- sp$desc$asDF
     expect_equal(t$g_g, c("a", "b")); expect_equal(t$n, c(5L, 5L)); expect_equal(t$missing, c(0L, 1L))
     expect_equal(t$mean[1], mean(d$x[d$g == "a"]))
