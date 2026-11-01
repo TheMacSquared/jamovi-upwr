@@ -5,6 +5,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane — jamovi 28.17
 
+- Aktualizacja modułu `.jmo` rozpakowuje i sprawdza nową paczkę przed podmianą
+  plików. Błąd rozpakowania, walidacji lub podmiany zachowuje poprzednią wersję;
+  instalator przywraca ją także po błędzie odświeżenia rejestru modułów.
+
 - Instalowanie modułów `.jmo` przez przeciągnięcie do panelu „Transfer danych”
   używa instalatora modułów; plik nie trafia już do otwierania zbiorów danych.
 

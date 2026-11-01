@@ -188,3 +188,12 @@ i oczekiwanym zachowaniem.
   instalator co wybór pliku strzałką i zatrzymuje otwieranie go jako danych.
 - Kilka plików jest instalowanych kolejno; błąd pozostawia panel otwarty,
   a udana instalacja zamyka go i pokazuje powiadomienie.
+
+### Zadanie 10: Bezpieczna instalacja i aktualizacja modułów
+- Pliki: `server/jamovi/server/modules/modules.py`,
+  `server/jamovi/tests/test_module_installation.py`.
+- Rozpakowanie i walidacja struktury archiwum, metadanych, obecności deklarowanego
+  kodu R/danych i zgodności R/jamovi poprzedzają podmianę katalogu. Instalacje i odinstalowania są serializowane.
+- Poprzednia wersja jest zachowywana do odświeżenia rejestru; błąd lub anulowanie
+  przywraca jej pliki i metadane. Gdy system uniemożliwi przywrócenie lub usunięcie
+  kopii zapasowej, kopia pozostaje w ukrytym katalogu `.install-*/previous`.

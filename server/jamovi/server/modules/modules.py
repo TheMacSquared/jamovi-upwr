@@ -4,6 +4,10 @@ import os.path
 import logging
 import shutil
 import json
+import re
+import stat
+from tempfile import mkdtemp
+from asyncio import Lock
 from zipfile import ZipFile
 from collections import namedtuple
 from functools import lru_cache
@@ -203,6 +207,7 @@ class Modules:
         self._listeners = [ ]
         self._original: list | None = None
         self._read_task = None
+        self._install_lock = Lock()
 
     def get(self, name):
         for module in self._modules:
@@ -303,7 +308,7 @@ class Modules:
         modules = [ ]
 
         for entry in os.scandir(pth):
-            if entry.name == 'base':
+            if entry.name == 'base' or entry.name.startswith('.'):
                 continue
             if entry.is_dir() is False:
                 continue
@@ -385,29 +390,138 @@ class Modules:
         return False
 
     async def uninstall(self, name):
-        module_dir = os.path.join(Dirs.app_data_dir(), 'modules', name)
-        shutil.rmtree(module_dir)
-        await self._reread_installed()
-        self._notify_listeners({ 'type': 'modulesChanged' })
+        async with self._install_lock:
+            module_dir = os.path.join(Dirs.app_data_dir(), 'modules', name)
+            shutil.rmtree(module_dir)
+            await self._reread_installed()
+            self._notify_listeners({ 'type': 'modulesChanged' })
+
+    @staticmethod
+    def _archive_module_name(zip_file):
+        # Zip paths are portable: reject names which change meaning on Windows,
+        # and require every member to belong to the same module directory.
+        module_name = None
+        seen = set()
+        for member in zip_file.infolist():
+            name = member.filename
+            parts = name.rstrip('/').split('/')
+            if (member.orig_filename != name or '\\' in name or ':' in name
+                    or any(part in ('', '.', '..') or part.endswith(('.', ' ')) for part in parts)
+                    or stat.S_ISLNK(member.external_attr >> 16)):
+                raise ValueError('Invalid module archive path')
+            root = parts[0]
+            if (not re.fullmatch(r'[A-Za-z][A-Za-z0-9._-]*', root)
+                    or root.casefold() == 'base'):
+                raise ValueError('Invalid module directory name')
+            if module_name is None:
+                module_name = root
+            elif root != module_name:
+                raise ValueError('A module archive must contain one module directory')
+            key = os.path.normcase(name.rstrip('/'))
+            if key in seen:
+                raise ValueError('Duplicate module archive entry')
+            seen.add(key)
+        if module_name is None:
+            raise ValueError('Empty module archive')
+        return module_name
+
+    def _validate_candidate(self, module_path, module_name):
+        meta = self._read_module(module_path)
+        if meta.name != module_name:
+            raise ValueError('Module name does not match its directory')
+        if meta.incompatible:
+            raise ValueError('This module requires a different version of R')
+        # Compare zero-padded versions so 28.17 and 28.17.0.0 are equivalent.
+        required = (meta.min_app_version + [0] * 4)[:4]
+        current = ([int(part) for part in app_info.version.split('.')] + [0] * 4)[:4]
+        if required > current:
+            raise ValueError('This module requires a newer version of jamovi')
+        if meta.analyses:
+            package_dir = os.path.join(module_path, 'R', module_name)
+            for leaf in ('DESCRIPTION', 'NAMESPACE', 'Meta/package.rds',
+                         f'R/{module_name}.rdx', f'R/{module_name}.rdb'):
+                if not os.path.isfile(os.path.join(package_dir, leaf)):
+                    raise ValueError('Module archive is missing its installed R package')
+        for dataset in meta.datasets:
+            parts = dataset.path.split('/')
+            if (not parts or any(part in ('', '.', '..') for part in parts)
+                    or '\\' in dataset.path or ':' in dataset.path
+                    or not os.path.isfile(os.path.join(module_path, 'data', *parts))):
+                raise ValueError('Module archive is missing a declared dataset')
+        return meta
 
     async def install_from_file(self, path, update: bool = False):
+        async with self._install_lock:
+            await self._install_from_file(path, update)
 
-        with ZipFile(path) as zip_file:
-
-            module_dir = os.path.join(Dirs.app_data_dir(), 'modules')
-            module_name = zip_file.namelist()[0].split('/')[0]
+    async def _install_from_file(self, path, update):
+        module_dir = os.path.join(Dirs.app_data_dir(), 'modules')
+        os.makedirs(module_dir, exist_ok=True)
+        # Staging and backup stay on the destination filesystem for rename.
+        staging = mkdtemp(prefix='.install-', dir=module_dir)
+        backup = os.path.join(staging, 'previous')
+        module_path = None
+        published = False
+        previous_modules, previous_read = self._modules, self._read
+        try:
+            with ZipFile(path) as zip_file:
+                module_name = self._archive_module_name(zip_file)
+                incoming = os.path.join(staging, 'incoming')
+                zip_file.extractall(incoming)
+            candidate = os.path.join(incoming, module_name)
+            meta = self._validate_candidate(candidate, module_name)
             module_path = os.path.join(module_dir, module_name)
+            if os.path.lexists(module_path):
+                if os.path.islink(module_path) or not os.path.isdir(module_path):
+                    raise ValueError('Module destination is not a directory')
+                os.rename(module_path, backup)
+            os.rename(candidate, module_path)
+            published = True
+            await self._reread_installed()
+            # Directory scans tolerate unreadable modules. A missing candidate
+            # here is an installation failure and must still trigger rollback.
+            if not any(module.name == meta.name and module.version == meta.version
+                       and os.path.normcase(module.path) == os.path.normcase(module_path)
+                       for module in self._modules):
+                raise ValueError('Installed module could not be registered')
+        except BaseException:
+            # This also covers cancellation during a registry refresh.
+            self._modules, self._read = previous_modules, previous_read
+            try:
+                if published:
+                    os.rename(module_path, candidate)
+                if os.path.exists(backup):
+                    os.rename(backup, module_path)
+            except OSError:
+                log.exception('Unable to restore module; previous copy preserved at %s', backup)
+                raise
+            raise
+        else:
+            if os.path.exists(backup):
+                try:
+                    shutil.rmtree(backup)
+                except OSError:
+                    # A loaded DLL may be locked on Windows. Installation has
+                    # succeeded; preserve the backup for later cleanup.
+                    log.warning('Unable to remove old module backup: %s', backup,
+                                exc_info=True)
+        finally:
+            # If rollback or backup cleanup failed, never delete the last copy
+            # of the previous module. Hidden staging dirs are not modules.
+            if not os.path.exists(backup):
+                shutil.rmtree(staging, ignore_errors=True)
 
-            shutil.rmtree(module_path, ignore_errors=True)
-            zip_file.extractall(module_dir)
-
-        meta = self._read_module(module_path)
-
-        await self._reread_installed()
-
+        events = []
         if update:
-            self._notify_listeners({ 'type': 'moduleUpdated', 'data': { 'name': meta.name }})
-        self._notify_listeners({ 'type': 'modulesChanged' })
+            events.append({ 'type': 'moduleUpdated', 'data': { 'name': meta.name }})
+        events.append({ 'type': 'modulesChanged' })
+        for event in events:
+            try:
+                self._notify_listeners(event)
+            except Exception:
+                # Notification failures must not turn a committed install into
+                # an apparent failure, nor remove the successfully installed copy.
+                log.exception('Unable to notify listeners after module installation')
 
     @progress_stream
     async def install(self, progress, path: str):
