@@ -243,7 +243,16 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   w client/common/jupwr.ts (patrz sekcja Wersje); kolory interfejsu jako
   tokeny `--jupwr-*` w client/common/jupwr-colors.css (bordo, powierzchnie,
   ciepłe szarości karty opcji, linie, tekst), kolory wykresów osobno
-  w jmvcore/R/themes.R (gałąź spike/redesign)
+  w jmvcore/R/themes.R
+- dwa wyglądy interfejsu (od 2026-11-01, linia latest): ustawienie „Interface”
+  w szufladzie ustawień — Classic (jamovi bez zmian) albo Light (A).
+  Mechanizm: client/common/uistyle.ts (atrybut html[data-ui-style] w oknie
+  i w ramkach opcji/wyników), style A w client/{main,analysisui}/jupwr-ui-a.css,
+  nagłówki kart i edytor w karcie danych w client/main/uicards.ts.
+  ZASADA: wygląd Classic ma zostać identyczny z jamovi (sprawdzać zrzutami);
+  wyjątki: etykiety menu (JUPWR_MENU_LABELS) i podpowiedzi pisania w wynikach
+  (client/resultsview/jupwr-annotation.css). Stan i ograniczenia:
+  packaging/tests/manual/handoff-redesign-A-C.md, sekcja 7
 - jANOVA 0.3.0 (wbudowany) zastępuje w menu ANOVA analizy jmv (jednoczynnikowa,
   ANOVA, ANCOVA, powtórzonych pomiarów) — lista ukrytych w client/common/jupwr.ts
 
