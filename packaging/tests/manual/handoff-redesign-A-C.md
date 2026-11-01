@@ -221,9 +221,11 @@ tylko dużym kosztem) i jakie ograniczenia programu warto uwzględnić w kolejny
 W ustawieniach jest pozycja „Interface”: **Klasyczny** albo **Lekki (A)** (etykiety na razie
 po angielsku, tłumaczenia dojdą). Wybór zapisuje się i obejmuje całe okno, także panel opcji
 i wyniki. Wygląd klasyczny pozostaje bez zmian (sprawdzone porównaniem zrzutów piksel
-w piksel). Wariant A to osobny arkusz stylów z tokenami kolorów `--jupwr-*`, zbudowany
-wyłącznie z kolorów, które jUPWR już ma. Można testować nowy wygląd na zajęciach bez
-ryzyka dla starego.
+w piksel). Wariant A to osobny arkusz stylów zbudowany z kolorów, które jUPWR już ma,
+plus dwóch ciepłych szarości z makiety. Wszystkie kolory interfejsu są zebrane w jednym
+pliku `client/common/jupwr-colors.css` (tokeny `--jupwr-*`, z opisem roli każdego koloru);
+kolory wykresów są osobno, w `jmvcore/R/themes.R`. Można testować nowy wygląd na zajęciach
+bez ryzyka dla starego.
 
 ### 7.2. Wprowadzone (wariant A)
 

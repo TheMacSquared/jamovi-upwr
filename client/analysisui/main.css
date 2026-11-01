@@ -28,7 +28,9 @@
 @import "gridactionbutton.css";
 @import "fileselector.css";
 @import "colorpicker.css";
-/* jUPWR: interface styles; scoped by [data-ui-style], see common/uistyle.ts */
+/* jUPWR: colour tokens and the interface styles (scoped by
+   [data-ui-style], see common/uistyle.ts) */
+@import "../common/jupwr-colors.css";
 @import "jupwr-ui-a.css";
 
 * {

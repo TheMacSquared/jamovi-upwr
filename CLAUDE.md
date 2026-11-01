@@ -240,7 +240,10 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
   boxplot celowo tylko w Porównaniach (porównania między grupami),
   a rozkładową rolę boxplota pełni raincloud w Rozkładach.
 - branding jUPWR: nazwa, ikony (icns/ico/iconset), wersja dystrybucji
-  w client/common/jupwr.ts (patrz sekcja Wersje)
+  w client/common/jupwr.ts (patrz sekcja Wersje); kolory interfejsu jako
+  tokeny `--jupwr-*` w client/common/jupwr-colors.css (bordo, powierzchnie,
+  ciepłe szarości karty opcji, linie, tekst), kolory wykresów osobno
+  w jmvcore/R/themes.R (gałąź spike/redesign)
 - jANOVA 0.3.0 (wbudowany) zastępuje w menu ANOVA analizy jmv (jednoczynnikowa,
   ANOVA, ANCOVA, powtórzonych pomiarów) — lista ukrytych w client/common/jupwr.ts
 

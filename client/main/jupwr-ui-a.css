@@ -1,23 +1,9 @@
 /* jUPWR interface style A ("light"), chosen in the preferences
    (common/uistyle.ts). Everything is scoped by html[data-ui-style="a"], so
-   the classic style is the untouched jamovi CSS. Colours are the existing
-   jUPWR/jamovi ones, gathered as tokens. */
+   the classic style is the untouched jamovi CSS. Colours come from the
+   jUPWR colour tokens (common/jupwr-colors.css). */
 
 :root[data-ui-style="a"] {
-    --jupwr-bordo: #832034;
-    --jupwr-bordo-hover: #9A2A40;
-    --jupwr-bordo-tint: #ece0e3;
-    --jupwr-bordo-pale: #fcf6f7;
-    --jupwr-ground: #E6E6E6;
-    --jupwr-surface: #FFFFFF;
-    --jupwr-surface-alt: #F0F0F0;
-    --jupwr-line: #D0D0D0;
-    --jupwr-line-light: #E6E6E6;
-    /* warm grey of the options card (new in style A, from the mock-ups);
-       analysisui/jupwr-ui-a.css has the matching sunken shade */
-    --jupwr-warm-surface: #F4F2F1;
-    --jupwr-text: #333333;
-    --jupwr-text-muted: #555555;
     --jupwr-radius: 12px;
     --jupwr-radius-small: 6px;
     --jupwr-gap: 10px;

@@ -1,19 +1,9 @@
 /* jUPWR interface style A ("light") for the options panel, see
    main/jupwr-ui-a.css and common/uistyle.ts. Only colours, borders and
-   radii: the control layout comes from the modules' .u.yaml files. */
+   radii: the control layout comes from the modules' .u.yaml files. Colours
+   come from the jUPWR colour tokens (common/jupwr-colors.css). */
 
 :root[data-ui-style="a"] {
-    --jupwr-bordo: #832034;
-    --jupwr-bordo-tint: #ece0e3;
-    --jupwr-bordo-pale: #fcf6f7;
-    --jupwr-surface: #FFFFFF;
-    --jupwr-surface-alt: #F4F4F4;
-    /* warm greys of the options card (new in style A, from the mock-ups) */
-    --jupwr-warm-surface: #F4F2F1;
-    --jupwr-warm-sunken: #EAE6E4;
-    --jupwr-line: #D0D0D0;
-    --jupwr-text: #333333;
-    --jupwr-text-muted: #777777;
     --jupwr-radius-small: 6px;
 
     accent-color: var(--jupwr-bordo);
@@ -42,7 +32,7 @@
     font-size: 18px;
     margin: 0;
     border: 1px solid var(--jupwr-line);
-    color: var(--jupwr-text-muted);
+    color: var(--jupwr-text-faint);
 }
 
 [data-ui-style="a"] .silky-sp-back-button:hover {
