@@ -1,42 +1,52 @@
-
 import { ProgressStream } from './progressstream';
 
 export function parse(reader) {
-
     return new ProgressStream(async (setProgress) => {
-
-        const utf8Decoder = new TextDecoder('utf-8');
-
+        const decoder = new TextDecoder('utf-8', { fatal: true });
+        let buffer = '';
         let message;
-        for (;;) {
-            let { done, value } = await reader.read();
 
-            let pieces;
-            if (typeof(value) === 'string')
-                pieces = value.split('\n');
-            else if ( ! value)
-                pieces = [ ];
-            else
-                pieces = utf8Decoder.decode(value).split('\n');
+        function consume(line: string) {
+            if (line.trim() === '')
+                return;
+            message = JSON.parse(line);
+            setProgress(message);
+        }
 
-            // if the last piece is empty (in jsonlines this will often be the case)
-            // use the second last piece instead
-            let lastPiece = pieces[pieces.length - 1] || pieces[pieces.length - 2];
-            if (lastPiece) {
-                try {
-                    message = JSON.parse(lastPiece);
+        try {
+            for (;;) {
+                const { done, value } = await reader.read();
+                if (typeof value === 'string')
+                    buffer += decoder.decode() + value;
+                else if (value)
+                    buffer += decoder.decode(value, { stream: true });
+                if (done)
+                    buffer += decoder.decode();
+
+                const lines = buffer.split('\n');
+                buffer = lines.pop() ?? '';
+                for (const line of lines)
+                    consume(line);
+
+                if (done) {
+                    // A final newline is optional, but an incomplete final JSON
+                    // must fail rather than return an earlier progress as success.
+                    consume(buffer);
+                    return message;
                 }
-                catch(e) {
-                    message = null;
-                }
             }
-
-            if (done) {
-                return message;
+        }
+        catch (error) {
+            try {
+                await reader.cancel?.();
             }
-            else if (message) {
-                setProgress(message);
+            catch {
+                // Preserve the original parse/read error if cancellation fails.
             }
+            throw error;
+        }
+        finally {
+            reader.releaseLock?.();
         }
     });
 }

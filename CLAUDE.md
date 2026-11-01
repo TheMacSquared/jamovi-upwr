@@ -823,7 +823,9 @@ Pozostaje:
   dowolnego pliku nadal czyści dane); `Analysis.set_svg` używa
   `self.dataset.instance_path` (jest w `Project`; padają upstreamowe testy
   SVG w `test_analyses.py`); `client/main/utils/jsonlines.ts` nie buforuje
-  niedokończonej linii między fragmentami i dekoduje UTF-8 bez `stream: true`.
+  niedokończonej linii między fragmentami i dekoduje UTF-8 bez `stream: true`
+  — NAPRAWIONE lokalnie 2026-11-01 (bufor linii, strumieniowy UTF-8, błąd
+  dla uciętej odpowiedzi, `client/main/utils/tests/jsonlines.test.ts`).
   Padające testy klienta upstreamu (28.13, także u nich; nie poprawiamy
   lokalnie): `resultsview/test/svg.test.ts` — cykl importów `element.ts` →
   `create.ts` (`AnalysisStatus` używany w runtime) → `table.ts` → `element.ts`;

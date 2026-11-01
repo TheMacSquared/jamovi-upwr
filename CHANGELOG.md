@@ -5,6 +5,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane — jamovi 28.17
 
+- Parser odpowiedzi JSON Lines zachowuje niedokończone linie i znaki UTF-8
+  między fragmentami sieciowymi. Niepełna lub błędna odpowiedź kończy się
+  błędem zamiast zwrócić wcześniejszy komunikat postępu jako wynik.
+
 - Preferencje „Dokumenty → Kopie odzyskiwania” pozwalają wybrać interwał:
   wyłączone, 1, 2, 5, 10 lub 15 minut. Domyślnie 5 minut; wybór jest
   zapamiętywany w profilu i działa bez restartu.

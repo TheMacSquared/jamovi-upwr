@@ -233,3 +233,10 @@ i oczekiwanym zachowaniem.
 - „Dokumenty → Kopie odzyskiwania”: wyłączone, 1, 2, 5, 10, 15 minut,
   domyślnie 5 minut. Ustawienie `recoveryInterval` jest zapisywane w profilu
   i działa od razu; zmienna środowiskowa wyznacza domyślną wartość nowego profilu.
+
+### Zadanie 15: Odpowiedzi JSON Lines dzielone przez sieć
+- Pliki: `client/main/utils/jsonlines.ts`,
+  `client/main/utils/tests/jsonlines.test.ts`.
+- Buforuj niepełne linie i dekoduj UTF-8 strumieniowo; zwracaj ostatni poprawny
+  komunikat dopiero po poprawnym końcu odpowiedzi. Błędny/ucięty JSON i UTF-8
+  zgłaszają błąd, a reader jest zwalniany również przy niepowodzeniu.
