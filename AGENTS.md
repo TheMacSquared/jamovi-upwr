@@ -205,3 +205,15 @@ i oczekiwanym zachowaniem.
 - Jedna ograniczona kolejka wysyłania na połączenie, scalanie postępu oraz
   bezpieczne rozłączenie przeciążonego klienta. Liczba R konfigurowalna;
   anulowanie zwalnia zajęty proces i umożliwia następne obliczenia.
+
+### Zadanie 12: Zapis i odzyskiwanie dokumentów
+- Pliki: `server/jamovi/server/formatio/{__init__,omv}.py`,
+  `server/jamovi/server/{instance,session}.py`, `docker-compose.yaml`,
+  `server/jamovi/tests/test_document_recovery.py`, `packaging/BACKEND.md`.
+- Unikalny plik tymczasowy, synchronizacja i atomowa podmiana dokumentu;
+  anulowanie nie zwalnia danych, dopóki wątek zapisujący ich używa.
+- Kopie zmienionych i nowych dokumentów co 120 sekund oraz przy kończeniu
+  sesji, oddzielne od zwykłego zapisu, dostępne przez `{{Recovery}}`.
+- Wolumen `jupwr-recovery` przechowuje kopie Dockera; nie umieszczaj w nim danych
+  testowych ani nie usuwaj kopii użytkownika podczas testów. Usługa `test`
+  korzysta z osobnego katalogu `/tmp/jupwr-test-recovery`.

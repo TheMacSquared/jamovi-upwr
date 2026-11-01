@@ -10,6 +10,7 @@ import os
 import os.path
 import re
 import shutil
+from contextlib import ExitStack
 
 from .exceptions import FileCorruptError
 from .exceptions import FileFormatNotSupportedError
@@ -36,7 +37,12 @@ is_file = re.compile(r'^[0-9][0-9]+ .+/files/([^/]+)$')
 
 
 def write(project, path, prog_cb, html=None, is_template=False):
+    # Close all scratch streams before removing their directory, also on Windows.
+    with TemporaryDirectory(prefix='jamovi-omv-') as scratch, ExitStack() as files:
+        _write(project, path, prog_cb, html, is_template, scratch, files)
 
+
+def _write(project, path, prog_cb, html, is_template, scratch, files):
     data = project.get_dataset()
 
     with ZipFile(path, 'w', zipfile.ZIP_DEFLATED) as zip:
@@ -173,9 +179,9 @@ def write(project, path, prog_cb, html=None, is_template=False):
 
         if string_table_required:
             cursor = 0
-            string_file = NamedTemporaryFile(delete=False)
+            string_file = files.enter_context(NamedTemporaryFile(dir=scratch, delete=False))
 
-        temp_file = NamedTemporaryFile(delete=False)
+        temp_file = files.enter_context(NamedTemporaryFile(dir=scratch, delete=False))
         temp_file.truncate(required_bytes)
 
         for col_no in range(data.column_count):

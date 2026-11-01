@@ -110,6 +110,9 @@ class Session(dict):
         if language != '':
             i18n.set_language(language)
 
+        self._recovery_interval = int(conf.get('recovery_interval', 120))
+        if self._recovery_interval < 0:
+            raise ValueError('recovery_interval must be nonnegative')
         workers = conf.positive_int('r_processes', 4)
         init_slots = 1 if workers > 1 else 0
         self._scheduler = Scheduler(init_slots, workers - init_slots, self._analyses, self._modules)
@@ -432,6 +435,11 @@ class Session(dict):
                                       '(unclean=%s, virgin=%s)',
                                       id, no_conn_for, status.unclean, status.virgin)
 
+                            if self._recovery_interval:
+                                try:
+                                    await instance.recover()
+                                except Exception as e:
+                                    log.exception(e)
                             if AUTOSAVE:
                                 try:
                                     await instance.autosave()
@@ -445,6 +453,14 @@ class Session(dict):
                         # we've got a connection
                         session_no_connection_since = now
                         session_no_connection_unclean = False
+
+                    if (self._recovery_interval and instance.needs_recovery()
+                            and now - max(instance._last_recovered, instance._last_recovery_attempt)
+                            >= self._recovery_interval):
+                        try:
+                            await instance.recover()
+                        except Exception as e:
+                            log.exception(e)
 
                     idle_for = now - idle_since
                     if instance.needs_autosave():
@@ -563,6 +579,12 @@ class Session(dict):
             get_notif_task.cancel()
             await gather(get_notif_task, return_exceptions=True)
             try:
+                if self._recovery_interval:
+                    for instance in list(self.values()):
+                        try:
+                            await instance.recover()
+                        except Exception as e:
+                            log.exception(e)
                 await self._scheduler.close()
             finally:
                 try:

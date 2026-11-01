@@ -36,6 +36,9 @@ import posixpath
 import logging
 import asyncio
 import functools
+import threading
+import re
+from uuid import uuid4
 from typing import Callable
 from time import monotonic
 from urllib import parse
@@ -100,6 +103,11 @@ class Instance:
         self._no_connection_unclean_disconnect = False
         self._last_autosaved = now
         self._autosaving = False
+        self._save_lock = asyncio.Lock()
+        self._recovering = False
+        self._last_recovered = now
+        self._last_recovery_attempt = 0
+        self._recovery_file = None
         self._edit_started: float | None = None
 
         self._project.analyses.add_results_changed_listener(self._on_results)
@@ -173,6 +181,11 @@ class Instance:
             nor_path = os.path.normpath(path.replace('{{SessionTemp}}', session_temp, 1))
             if os.path.commonpath([session_temp, nor_path]) != session_temp:
                 raise PermissionError()
+        elif path.startswith('{{Recovery}}'):
+            root = os.path.realpath(self.recovery_directory())
+            nor_path = os.path.realpath(path.replace('{{Recovery}}', root, 1))
+            if os.path.commonpath([root, nor_path]) != root:
+                raise PermissionError()
         elif path.startswith('{{Documents}}'):
             nor_path = path.replace('{{Documents}}', Dirs.documents_dir())
         elif path.startswith('{{Downloads}}'):
@@ -238,6 +251,14 @@ class Instance:
 
     def _virtualise_path(self, path):
 
+        root = os.path.realpath(self.recovery_directory())
+        if not is_url(path) and os.path.isabs(path):
+            absolute = os.path.realpath(path)
+            try:
+                if os.path.commonpath([root, absolute]) == root:
+                    return '{{Recovery}}' + absolute[len(root):].replace('\\', '/')
+            except ValueError:
+                pass
         temp_path = self.temp_path()
         if path.startswith(temp_path):
             return path.replace(temp_path, '{{Temp}}')
@@ -612,6 +633,12 @@ class Instance:
                 if self._perms.browse.local is False:
                     raise PermissionError()
 
+                if os.path.isdir(self.recovery_directory()):
+                    entry = response.contents.add()
+                    entry.name = _('Recovery')
+                    entry.path = '{{Recovery}}'
+                    entry.type = jcoms.FSEntry.Type.Value('SPECIAL_FOLDER')
+
                 try:
                     if os.path.exists(Dirs.documents_dir()):
                         entry = response.contents.add()
@@ -795,6 +822,32 @@ class Instance:
 
         return self._file_sync_client
 
+
+    def recovery_directory(self):
+        return conf.get('recovery_path') or os.path.join(Dirs.app_data_dir(), 'recovery')
+
+    def needs_recovery(self):
+        return (self._perms.save.local and self._project.has_datasets
+                and (self._project.is_edited
+                     or (not self._project.path
+                         and any(data.row_count > 0 for data in self._project.datasets))))
+
+    async def recover(self):
+        if self._recovering or not self.needs_recovery():
+            return
+        self._recovering = True
+        self._last_recovery_attempt = monotonic()
+        try:
+            os.makedirs(self.recovery_directory(), exist_ok=True)
+            if self._recovery_file is None:
+                title = re.sub(r'[\\/:*?"<>|\x00-\x1f]', '_', self._project.title)[:60]
+                self._recovery_file = os.path.join(self.recovery_directory(),
+                                                  f'{title or "Untitled"} - {uuid4().hex}.omv')
+            async for _ in self._on_save_everything(self._recovery_file, None, True):
+                pass
+            self._last_recovered = monotonic()
+        finally:
+            self._recovering = False
 
     def needs_autosave(self) -> bool:
         return (self._project.is_edited
@@ -982,37 +1035,51 @@ class Instance:
                 file.write(content)
 
     async def _on_save_everything(self, path, content, is_export):
-
         yield 0
-
-        ioloop = asyncio.get_event_loop()
+        ioloop = asyncio.get_running_loop()
         events = asyncio.Queue(1)
+        cancelled = threading.Event()
 
         def add_to_event_queue(p):
             if events.full():
-                events.get_nowait()  # discard
+                events.get_nowait()
             events.put_nowait(p)
 
         def prog_cb(p):
+            if cancelled.is_set():
+                raise RuntimeError('Save cancelled')
             ioloop.call_soon_threadsafe(add_to_event_queue, p)
 
-        async with self._project.attach(read_only=True):
-            save_task = create_task(ioloop.run_in_executor(None, formatio.write, self._project, path, prog_cb, content))
-            retrieve_event_task = create_task(events.get())
-            pending = (retrieve_event_task, save_task)
+        async with self._save_lock, self._project.attach(read_only=True):
+            writer = ioloop.run_in_executor(
+                None, formatio.write, self._project, path, prog_cb, content, cancelled)
+            event = create_task(events.get())
+            try:
+                while True:
+                    done, _ = await wait((event, writer), return_when=asyncio.FIRST_COMPLETED)
+                    if writer in done:
+                        writer.result()
+                        break
+                    yield event.result()
+                    event = create_task(events.get())
+            finally:
+                cancelled.set()
 
-            while True:
-                done, pending = await wait(pending, return_when=asyncio.FIRST_COMPLETED)
-                if save_task in done:
-                    break
-                yield retrieve_event_task.result()
-                retrieve_event_task = create_task(events.get())
-                pending = (retrieve_event_task, save_task)
+                async def finish():
+                    event.cancel()
+                    await asyncio.gather(event, writer, return_exceptions=True)
 
-            for task in pending:
-                task.cancel()
-
-        save_task.result()  # throw if necessary
+                # Executor threads cannot be cancelled. Even repeated task
+                # cancellation must retain dataset locks until the writer exits.
+                cleanup = create_task(finish())
+                interrupted = False
+                while not cleanup.done():
+                    try:
+                        await asyncio.shield(cleanup)
+                    except asyncio.CancelledError:
+                        interrupted = True
+                if interrupted:
+                    raise asyncio.CancelledError()
 
 
     async def _on_save_part(self, path, part):
@@ -1039,6 +1106,7 @@ class Instance:
             options = { }
 
         is_example = path.startswith('{{Examples}}')
+        is_recovery = path.startswith('{{Recovery}}')
         is_session_temp = path.startswith('{{SessionTemp}}')
         if is_example or is_session_temp:
             is_temp = True  # don't add to recents, etc.
@@ -1107,6 +1175,9 @@ class Instance:
             else:
                 norm_path = self._normalise_path(path)
 
+            if norm_path and self._virtualise_path(norm_path).startswith('{{Recovery}}'):
+                is_recovery = True
+
             # opening replaces any data sets already here
             self._remove_all_datasets()
 
@@ -1126,6 +1197,9 @@ class Instance:
 
             self._sync_controllers()
 
+            if is_recovery:
+                self._project.path = ''
+                self._project.is_edited = True
             if file_sync is not None:
                 self._project.file_sync = file_sync
                 self._project.path = url
@@ -1168,7 +1242,7 @@ class Instance:
             raise
         else:
             # success
-            if path != '' and not is_temp:
+            if path != '' and not is_temp and not is_recovery:
                 self._add_to_recents(path, self._project.title)
             return result
         finally:

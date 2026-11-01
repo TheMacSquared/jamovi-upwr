@@ -4,6 +4,9 @@ import os.path
 import errno
 import re
 import importlib
+import logging
+import stat
+from tempfile import mkstemp
 
 from collections import OrderedDict
 
@@ -119,11 +122,13 @@ def _import(data, path, prog_cb, settings, ext):
         raise RuntimeError('Unrecognised file format')
 
 
-def write(project, path, prog_cb, content=None):
-    """Write a project to a file. Single-table formats write the first
-    data set."""
+def write(project, path, prog_cb, content=None, cancelled=None):
+    """Write beside the destination and publish only a complete, flushed file."""
+    path = os.fspath(path)
+    directory = os.path.dirname(os.path.abspath(path))
+    fd, temp_path = mkstemp(prefix='.' + os.path.basename(path) + '.', suffix='.tmp', dir=directory)
+    os.close(fd)
     try:
-        temp_path = path + '.tmp'
         ext = os.path.splitext(path)[1].lower()[1:]
         if ext == 'omv' or ext == 'omt':
             omv.write(project, temp_path, prog_cb, content, is_template=(ext == 'omt'))
@@ -131,13 +136,29 @@ def write(project, path, prog_cb, content=None):
             writers[ext][1](project.get_dataset(), temp_path, prog_cb)
         else:
             raise RuntimeError('Unrecognised file format')
+        if os.path.exists(path):
+            os.chmod(temp_path, stat.S_IMODE(os.stat(path).st_mode))
+        with open(temp_path, 'rb') as stream:
+            os.fsync(stream.fileno())
+        if cancelled is not None and cancelled.is_set():
+            raise RuntimeError('Save cancelled')
         os.replace(temp_path, path)
-    except Exception as e:
+        # The replace has committed. Directory flush is best-effort on filesystems
+        # which do not support it; never report a committed save as a failure.
+        if os.name != 'nt':
+            try:
+                fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY)
+                try:
+                    os.fsync(fd)
+                finally:
+                    os.close(fd)
+            except OSError:
+                logging.getLogger(__name__).warning('Unable to flush save directory', exc_info=True)
+    finally:
         try:
             os.remove(temp_path)
-        except Exception:
+        except FileNotFoundError:
             pass
-        raise e
 
 
 def is_supported(path):

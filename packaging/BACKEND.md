@@ -24,3 +24,34 @@ połączenia. Takie zamknięcie jest traktowane jak utrata połączenia, a nie
 Anulowanie wysłanego obliczenia kończy zajęty proces R i uruchamia jego następcę,
 zanim przyjmie następne obliczenie. Pozostałe procesy pracują dalej. Zamknięcie
 sesji i globalny restart sprzątają procesy bez uruchamiania zbędnych następców.
+
+## Zapis i odzyskiwanie
+
+Zapis `.omv` używa unikalnego pliku tymczasowego w tym samym katalogu, opróżnia
+bufory pliku przez `fsync` i dopiero wtedy podmienia docelowy plik. Błąd przed
+podmianą zachowuje poprzednią wersję. Dwa zapisy nie współdzielą pliku `.tmp`.
+Anulowany zapis nie zwalnia blokad danych, dopóki wątek zapisujący nie zakończy
+pracy. Zakończonej już podmiany nie cofa się po późniejszym anulowaniu.
+
+| Zmienna | Domyślnie | Znaczenie |
+|---|---|---|
+| `JAMOVI_RECOVERY_INTERVAL` | `120` | Odstęp kopii w sekundach; `0` wyłącza także kopię przy kończeniu sesji. |
+| `JAMOVI_RECOVERY_PATH` | `recovery` w katalogu danych aplikacji | Katalog kopii; w Compose `/root/recovery`, na wolumenie `jupwr-recovery`. |
+
+Kopie obejmują zmienione dokumenty i nowe dokumenty zawierające dane. Początkowy,
+pusty i nieedytowany arkusz nie tworzy kopii. Mechanizm wymaga uprawnień do
+lokalnego zapisu. Działa niezależnie od dotychczasowego autosave, które nadal
+może zapisywać otwarty wcześniej plik, jeśli administrator je włączył.
+
+Przy zamknięciu sesji powstaje jeszcze jedna kopia oczekujących zmian. Po awarii
+można odzyskać stan z ostatniej zakończonej kopii. Kopia nie zmienia ścieżki,
+tytułu ani oznaczenia niezapisanych zmian w otwartym dokumencie.
+
+Wybierz **Otwórz → Ten komputer**, przejdź do poziomu głównego (nad Dokumentami)
+i otwórz **Odzyskiwanie**. Pliki mają tytuł dokumentu i unikalny identyfikator.
+Otwarta kopia ma niezapisane zmiany i wymaga wybrania docelowego pliku przy zapisie.
+Kopie pozostają do ręcznego usunięcia; nie kasujemy ich przy otwarciu ani po
+przebudowie kontenera. Usunięcie wolumenu Dockera usuwa również kopie.
+
+Sprawdzone automatycznie w Dockerze/Linux. Zachowanie systemu plików i okien
+plikowych paczek Windows/macOS wymaga sprawdzenia na tych systemach.

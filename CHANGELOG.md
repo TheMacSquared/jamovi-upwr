@@ -5,6 +5,11 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane — jamovi 28.17
 
+- Zapis dokumentu używa unikalnego pliku tymczasowego, `fsync` i atomowej podmiany;
+  błąd zapisu zachowuje poprzedni plik. Anulowanie czeka na wątek zapisujący.
+- Kopie odzyskiwania obejmują także nowe, niezapisane dokumenty i są dostępne
+  w folderze „Odzyskiwanie”; w Dockerze przetrwają odtworzenie kontenera.
+
 - Ograniczona liczbowo i bajtowo kolejka WebSocket z jednym nadawcą, scalaniem
   postępu oraz zamknięciem przeciążonego połączenia umożliwiającym ponowne połączenie.
 - Konfigurowalna liczba procesów R (`JAMOVI_R_PROCESSES`) i kończenie zajętego

@@ -67,9 +67,11 @@ services:
         # i.e. 127.0.0.1:41337/?access_key=yourpasswordhere
         # or alternatively, remove the password requirement:
         JAMOVI_ACCESS_KEY: ''
+        JAMOVI_RECOVERY_PATH: /root/recovery
 
     volumes:
       - ${USERPROFILE:-${HOME}}/Documents:/root/Documents
+      - jupwr-recovery:/root/recovery
 
   jamovi-dev:
     <<: *base
@@ -87,6 +89,9 @@ services:
     <<: *base
     container_name: jamovi-tests
     profiles: [tests]
+    environment:
+      <<: *base_env
+      JAMOVI_RECOVERY_PATH: /tmp/jupwr-test-recovery
     command: ["exec /usr/bin/python3 -u -m pytest /usr/lib/jamovi/server/jamovi/tests"]
 
   vite:
@@ -127,3 +132,7 @@ services:
       ports:
         - '127.0.0.1:5173:5173'
         - '127.0.0.1:24678:24678'
+
+# Recovery copies survive container recreation without entering teaching modules.
+volumes:
+  jupwr-recovery:
