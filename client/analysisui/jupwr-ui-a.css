@@ -8,6 +8,9 @@
     --jupwr-bordo-pale: #fcf6f7;
     --jupwr-surface: #FFFFFF;
     --jupwr-surface-alt: #F4F4F4;
+    /* warm greys of the options card (new in style A, from the mock-ups) */
+    --jupwr-warm-surface: #F4F2F1;
+    --jupwr-warm-sunken: #EAE6E4;
     --jupwr-line: #D0D0D0;
     --jupwr-text: #333333;
     --jupwr-text-muted: #777777;
@@ -23,6 +26,7 @@
     padding-top: 8px;
     padding-bottom: 8px;
     background-image: none;
+    background-color: var(--jupwr-surface);
     border-bottom: 1px solid var(--jupwr-line);
 }
 
@@ -88,19 +92,30 @@
     padding: 3px 6px;
 }
 
-/* collapsed sections ("Założenia", "Zaawansowane") as light rows */
+/* the panel sits on a light grey (main/jupwr-ui-a.css, #main-options);
+   lists, fields and buttons stay white so they stand out from it */
+
+[data-ui-style="a"] .silky-option-list,
+[data-ui-style="a"] .silky-target-list,
+[data-ui-style="a"] .silky-variable-supplier,
+[data-ui-style="a"] .variablesupplier-button-box {
+    background-color: var(--jupwr-surface);
+}
+
+/* collapsed sections ("Założenia", "Zaawansowane") as sunken rounded rows */
 
 [data-ui-style="a"] .silky-options-collapse-button {
-    padding: 9px 4px;
+    padding: 10px 8px;
+    margin-top: 6px;
     border: none;
-    border-top: 1px solid var(--jupwr-line);
-    background-color: transparent;
+    border-radius: 8px;
+    background-color: var(--jupwr-warm-sunken);
     color: var(--jupwr-text);
     font-weight: 600;
 }
 
 [data-ui-style="a"] .silky-options-collapse-button:hover {
-    background-color: var(--jupwr-bordo-pale);
+    background-color: var(--jupwr-bordo-tint);
 }
 
 [data-ui-style="a"] .silky-options-collapse-icon {

@@ -13,6 +13,9 @@
     --jupwr-surface-alt: #F0F0F0;
     --jupwr-line: #D0D0D0;
     --jupwr-line-light: #E6E6E6;
+    /* warm grey of the options card (new in style A, from the mock-ups);
+       analysisui/jupwr-ui-a.css has the matching sunken shade */
+    --jupwr-warm-surface: #F4F2F1;
     --jupwr-text: #333333;
     --jupwr-text-muted: #555555;
     --jupwr-radius: 12px;
@@ -709,4 +712,10 @@
 /* "O zbiorze" is in the data card header, so not in the status bar too */
 [data-ui-style="a"] .jmv-statusbar-button[data-name="datasetinfo"] {
     display: none;
+}
+
+/* the options card on light grey, so the white lists and fields inside it
+   (analysisui/jupwr-ui-a.css) stand out */
+[data-ui-style="a"] #main-options {
+    background-color: var(--jupwr-warm-surface);
 }

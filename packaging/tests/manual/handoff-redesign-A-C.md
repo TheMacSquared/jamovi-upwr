@@ -235,7 +235,7 @@ ryzyka dla starego.
 | A4 | Edytor w karcie danych: edytor zmiennej, filtry, zmienna wyliczona i przekształcona otwierają się pod nagłówkiem karty danych (wysokość 300 px), arkusz zsuwa się w dół, wyniki pozostają widoczne | To dzisiejsze edytory w węższym układzie, bez zwartego formularza z makiety (patrz 7.5) |
 | A7 | Pasek stanu jako stopka karty danych | |
 | arkusz | Białe nagłówki kolumn, szare numery wierszy bez tła, cienkie linie, bordowa ramka zaznaczonej komórki | Tylko kolory i linie |
-| opcje | Cienkie zaokrąglone ramki list, bordowe checkboxy, „Założenia” i „Zaawansowane” jako lekkie wiersze zamiast szarych belek | Tylko wygląd, układ kontrolek bez zmian |
+| opcje | Karta opcji na ciepłej szarości (`#F4F2F1`), biały nagłówek, białe listy i pola z cienką zaokrągloną ramką, bordowe checkboxy, „Założenia” i „Zaawansowane” jako ciemniejsze zaokrąglone pola (`#EAE6E4`) | Całkiem biały panel męczył oczy i elementy się zlewały. Ciepłe szarości to JEDYNE nowe kolory (z makiety, za zgodą), tokeny `--jupwr-warm-*`. Tylko wygląd, układ kontrolek bez zmian |
 | wyniki | Białe tło; przy zaznaczonej analizie pozostałe przyblakłe zamiast szarego panelu | |
 | E1a, E1b | Menu: panel 12 px z cieniem, tytuł pogrubiony, podtytuł wyrównany pod tytułem, nagłówek podgrupy wersalikami z linią | |
 | E1d | Naprawione w OBU wyglądach: „Wielomianowa / wiele kategorii bez kolejności”, „Porządkowa / kategorie uporządkowane”, „Korelacja cząstkowa / przy kontroli innych zmiennych”, „Dwie kategorie / zmienna zależna dwupoziomowa” | Źródło: angielskie etykiety jmv („N Outcomes”), nadpisane w kliencie |
