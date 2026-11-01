@@ -15,7 +15,6 @@ aiohttp
 cryptography
 protobuf
 loguru
-certifi
+truststore
 pytest
 pytest_asyncio
-cryptography

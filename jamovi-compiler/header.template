@@ -9,6 +9,8 @@
                 if (typeof(option['default']) === 'undefined') {
                     if (option['type'] === 'Action')
                         return '\n            ' + option.name + ' = FALSE,';
+                    if (option['type'] === 'Color')
+                        return '\n            ' + option.name + ' = "#000000",';
                     return '\n            ' + option.name + ' = NULL,';
                 }
                 return '\n            ' + option.name + ' = ' + imports.sourcifyOption(option['default']) + ',';
@@ -198,6 +200,8 @@ if (results.items) {
         // yet direct R calls must be able to omit them (level auto-selected)
         else if (option['type'] === 'Level' || option['type'] === 'File')
             return '\n    ' + option.name + ' = NULL';
+        else if (option['type'] === 'Color')
+            return '\n    ' + option.name + ' = "#000000"';
         else
             return '\n    ' + option.name;
     }

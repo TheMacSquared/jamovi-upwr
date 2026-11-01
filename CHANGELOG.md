@@ -3,6 +3,19 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## Niewydane — jamovi 28.17
+
+- Scalenie upstreamu jamovi 28.14–28.17: poprawki undo/redo przy ukrytych
+  wierszach odfiltrowanych i usuwanych kolumnach wynikowych analiz, obsługa
+  postępu i anulowania operacji, proxy oraz systemowe certyfikaty TLS.
+- Typ opcji `Color` i kontrolka wyboru koloru w modułach; poprawki arkusza
+  i panelu wyników oraz aktualizacja tłumaczeń.
+- Zachowany podział analiz jUPWR: tabele częstości pozostają w analizach
+  jakościowych; zmiany upstreamu dotyczące częstości w `jmv::descriptives`
+  nie przywracają ich w panelu zmiennych ilościowych.
+- Numer dystrybucji pozostaje 1.2.3 do przygotowania kolejnego wydania;
+  artefakty 1.2.3 i ich macierz zgodności nadal dotyczą jamovi 28.13.
+
 ## 1.2.3 — 2026-10-27 (linia latest, jamovi 28.13)
 
 Stan buildów (2026-10-27): Docker (`jupwr/jupwr:1.2.3`) zbudowany,
