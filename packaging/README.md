@@ -25,6 +25,7 @@ i SmartScreen (Windows). Obejścia dla studentów: [`30-distribution.md`](30-dis
 - [`10-build-macos.md`](10-build-macos.md) — build macOS arm64 krok po kroku (przetestowany).
 - [`20-build-windows.md`](20-build-windows.md) — build Windows x64 (do walidacji).
 - [`30-distribution.md`](30-distribution.md) — wydanie studentom, obejścia ostrzeżeń, instrukcja instalacji.
+- [`tests/manual/upstream-28.17.md`](tests/manual/upstream-28.17.md) — plan testów ręcznych po merge 28.17, dane wzorcowe i protokół wyników.
 
 ## Skrypty (macOS)
 

@@ -5,6 +5,17 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane — jamovi 28.17
 
+- Obsługa analiz: poprawione tworzenie instancji przez WebSocket i odpowiedzi
+  na błędy żądań, propagowanie awarii silnika, kończenie przerwanych eksportów
+  oraz sprzątanie zadań i procesów R przy restarcie lub zamknięciu sesji.
+- Testy regresji obejmują wyścigi anulowania, nieudany start i restart silników,
+  timeout oraz odzyskiwanie po awarii prawdziwego procesu R w Dockerze.
+- Docker przekazuje sygnał zatrzymania bezpośrednio do serwera i daje mu czas
+  na zamknięcie procesów R przed zakończeniem kontenera.
+- Dane do testów ręcznych są wbudowane w obraz Dockera i dostępne jako pliki
+  w `Dokumenty → jupwr-test-audyt`, poza Biblioteką danych dydaktycznych.
+- Polski jako domyślny język nowego profilu, także przy angielskim języku
+  przeglądarki; zapisany wybór użytkownika nadal ma pierwszeństwo.
 - Scalenie upstreamu jamovi 28.14–28.17: poprawki undo/redo przy ukrytych
   wierszach odfiltrowanych i usuwanych kolumnach wynikowych analiz, obsługa
   postępu i anulowania operacji, proxy oraz systemowe certyfikaty TLS.

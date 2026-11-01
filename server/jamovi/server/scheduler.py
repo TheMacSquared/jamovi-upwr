@@ -1,6 +1,5 @@
 
-from asyncio import wait
-from asyncio import FIRST_COMPLETED
+from asyncio import gather
 from asyncio import ensure_future as create_task
 from asyncio import CancelledError
 from logging import getLogger
@@ -40,12 +39,18 @@ class Scheduler:
 
         self._n_initing = 0
         self._n_running = 0
+        self._tasks = {}
+        self._latest_requests = {}
+        self._closed = False
 
         self._analyses.add_options_changed_listener(self._send_next)
 
         self._pool = Pool(self._n_slots)
 
     def _send_next(self, analysis=None):
+
+        if self._closed:
+            return
 
         # print('counts', self._n_initing, self._n_running, self._n_slots, self._n_run_slots)
 
@@ -111,64 +116,100 @@ class Scheduler:
     def _run_analysis(self, analysis, perform):
 
         if analysis.ns not in self._modules:
-            raise BadAnalysis(_('The module for this analysis is not installed, or is unavailable'))
+            message = _('The module for this analysis is not installed, or is unavailable')
+            if perform == 'op' and analysis.op is not None:
+                analysis.op.set_exception(ValueError(message))
+            raise BadAnalysis(message)
 
         request = self._to_message(analysis, perform)
 
         log.debug('%s %s', 'sending_to_pool', req_str(request))
         stream = self._pool.add(request)
         task = create_task(self._handle_results(request, stream))
+        operation = analysis.op if request.perform == PERFORM_SAVE else None
+        self._tasks[task] = (request, operation)
+        self._latest_requests[(request.instanceId, request.analysisId)] = request
         task.add_done_callback(self._run_done)
 
     def _run_done(self, f):
+        request, operation = self._tasks.pop(f)
+        if request.perform == PERFORM_INIT:
+            self._n_initing -= 1
+        else:
+            self._n_running -= 1
         try:
             f.result()
-        except CancelledError:
-            pass
+        except CancelledError as e:
+            self._finish_failed(request, operation, e)
         except Exception as e:
             log.exception(e)
+            self._finish_failed(request, operation, e)
 
+        key = (request.instanceId, request.analysisId)
+        if self._latest_requests.get(key) is request:
+            del self._latest_requests[key]
         self._send_next()
 
+    def _finish_failed(self, request, operation, error):
+        if operation is not None:
+            operation.set_exception(error)
+        analysis = self._analyses.get(request.analysisId, request.instanceId)
+        if analysis is None or self._closed or analysis.status == Analysis.Status.DELETED:
+            return
+        # A superseded request must not overwrite the status of its replacement.
+        if self._latest_requests.get((request.instanceId, request.analysisId)) is not request:
+            return
+        if request.perform != PERFORM_SAVE and analysis.revision != request.revision:
+            return
+        analysis.state_dropped = True
+        message = _('Unable to perform request')
+        if str(error):
+            message += ': ' + str(error)
+        analysis.set_error(message)
+        analysis.set_status(Analysis.Status.ERROR)
+
+    async def close(self):
+        self._closed = True
+        for analysis in self._analyses:
+            analysis.cancel_pending()
+        self._pool.close()
+        tasks = list(self._tasks)
+        for task in tasks:
+            task.cancel()
+        await gather(*tasks, return_exceptions=True)
+
     async def _handle_results(self, request, stream):
+        analysis = self._analyses.get(request.analysisId, request.instanceId)
+        if analysis is None:
+            stream.cancel()
+            raise CancelledError
+        operation = analysis.op if request.perform == PERFORM_SAVE else None
 
-        instance_id = request.instanceId
-        analysis_id = request.analysisId
-        analysis = self._analyses.get(analysis_id, instance_id)
-
-        try:
-            async for results in stream:
-                log.debug('%s %s', 'results_received', req_str(request))
-                analysis.set_results(results, False)
-
+        async for results in stream:
+            if analysis.status == Analysis.Status.DELETED:
+                stream.cancel()
+                raise CancelledError
             log.debug('%s %s', 'results_received', req_str(request))
-            results = stream.result()
+            analysis.set_results(results, False)
 
-            if request.perform == PERFORM_SAVE:
-                if results.status == ANALYSIS_ERROR:
-                    analysis.op.set_exception(ValueError(results.error.message))
-                else:
-                    analysis.op.set_result(results)
-                analysis.set_status(Analysis.Status.COMPLETE)
+        if analysis.status == Analysis.Status.DELETED:
+            raise CancelledError
+        results = stream.result()
+        if request.perform == PERFORM_SAVE:
+            if results.status == ANALYSIS_ERROR:
+                operation.set_exception(ValueError(results.error.message))
             else:
-                if results.status == ANALYSIS_ERROR:
-                    status = Analysis.Status.ERROR
-                elif request.perform == PERFORM_INIT:
-                    status = Analysis.Status.INITED
-                else:
-                    status = Analysis.Status.COMPLETE
-                    # the engine has now written state of its own
-                    analysis.state_dropped = False
-
-                analysis.set_results(results, status=status)
-
-        finally:
-            if request.perform == PERFORM_INIT:
-                self._n_initing -= 1
-                log.debug('%s %s %s', 'dec_counters', 'initing', (self._n_initing, self._n_running, self._n_slots))
+                operation.set_result(results)
+            analysis.set_status(Analysis.Status.COMPLETE)
+        else:
+            if results.status == ANALYSIS_ERROR:
+                status = Analysis.Status.ERROR
+            elif request.perform == PERFORM_INIT:
+                status = Analysis.Status.INITED
             else:
-                self._n_running -= 1
-                log.debug('%s %s %s', 'dec_counters', 'running', (self._n_initing, self._n_running, self._n_slots))
+                status = Analysis.Status.COMPLETE
+                analysis.state_dropped = False
+            analysis.set_results(results, status=status)
 
     @property
     def queue(self):

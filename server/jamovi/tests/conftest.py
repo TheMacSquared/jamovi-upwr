@@ -89,7 +89,12 @@ def simple_dataset(empty_dataset: DataSet) -> DataSet:
 @pytest_asyncio.fixture
 async def session(temp_dir: str) -> Session:
     # constructed inside the event loop, as the engine manager requires one
-    return Session(temp_dir, str(uuid4()))
+    session = Session(temp_dir, str(uuid4()))
+    try:
+        yield session
+    finally:
+        await session._scheduler.close()
+        await session._runner.stop()
 
 
 @pytest_asyncio.fixture

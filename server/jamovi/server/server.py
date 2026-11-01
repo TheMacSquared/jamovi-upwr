@@ -690,6 +690,7 @@ class Server:
         mimetypes.add_type('font/woff', '.woff')
 
         self._session = None
+        self._run_task = None
         self._session_id = session_id if session_id is not None else str(uuid.uuid4())
         self._ioloop = asyncio.get_event_loop()
         self._host = bind_host
@@ -780,11 +781,24 @@ class Server:
             self._session.stop()
 
     def start(self):
-        create_task(self._run())
+        self._run_task = create_task(self._run())
+        self._run_task.add_done_callback(self._run_done)
+
+    def _run_done(self, task):
+        if task.cancelled():
+            if not self.ports_opened.done():
+                self.ports_opened.cancel()
+            return
+        try:
+            task.result()
+        except Exception as e:
+            log.exception(e)
+            if not self.ports_opened.done():
+                self.ports_opened.set_exception(e)
 
     async def wait_ended(self):
-        if self._session is not None:
-            await self._session.wait_ended()
+        if self._run_task is not None:
+            await self._run_task
 
     async def _run(self):
         client_path = conf.get('client_path')

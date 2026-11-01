@@ -281,6 +281,8 @@ class Analyses:
         self._output_received_listeners.remove(listener)
 
     def remove_all(self):
+        for analysis in self._analyses:
+            analysis.notify_removing()
         self._analyses = []
 
     def _notify_options_changed(self, analysis):

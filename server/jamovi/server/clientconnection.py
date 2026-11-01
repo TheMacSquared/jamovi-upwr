@@ -15,6 +15,7 @@ from .jamovi_pb2 import InstanceRequest
 from .jamovi_pb2 import InstanceResponse
 
 from jamovi.server.utils import conf
+from .i18n import _
 
 from asyncio import create_task
 import logging
@@ -49,8 +50,9 @@ class ClientConnection:
         self._instance_id = instance_id
 
     async def on_message_async(self, m_bytes: bytes):
+        message = ComsMessage()
+        request = None
         try:
-            message = ComsMessage()
             message.ParseFromString(m_bytes)
             if not message.payloadType:
                 return
@@ -61,7 +63,7 @@ class ClientConnection:
 
             if isinstance(request, InstanceRequest):
                 if message.instanceId == '':
-                    instance = self._session.create()
+                    instance = await self._session.create()
                 elif message.instanceId not in self._session:
                     raise NoSuchInstanceException()
                 else:
@@ -79,9 +81,16 @@ class ClientConnection:
             self.send_error(
                 message='No such instance',
                 instance_id=message.instanceId,
-                response_to=request)
+                response_to=request,
+                request_id=message.id)
         except Exception as e:
             log.exception(e)
+            self.send_error(
+                message=_('Unable to perform request'),
+                cause=str(e),
+                instance_id=message.instanceId,
+                response_to=request,
+                request_id=message.id)
 
     def send(self, message=None, instance_id=None, response_to=None,
              complete=True, progress=(0, 0), status=None):
@@ -121,7 +130,8 @@ class ClientConnection:
 
         create_task(self._ws.send_bytes(m.SerializeToString()))
 
-    def send_error(self, message=None, cause=None, instance_id=None, response_to=None):
+    def send_error(self, message=None, cause=None, instance_id=None, response_to=None,
+                   request_id=None):
 
         m = ComsMessage()
 
@@ -136,6 +146,9 @@ class ClientConnection:
                     break
         else:
             m.id = 0
+
+        if request_id is not None:
+            m.id = request_id
 
         if message is not None:
             m.error.message = message

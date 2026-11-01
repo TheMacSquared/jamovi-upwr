@@ -23,6 +23,7 @@ class Pool:
         self._wait_rx = OrderedDict()
         self._not_full = Event()
         self._not_full.set()
+        self._closed = False
 
     @property
     def n_slots(self):
@@ -43,6 +44,8 @@ class Pool:
         return self._n_slots
 
     def put_nowait(self, request):
+        if self._closed:
+            raise RuntimeError('Analysis queue is closed')
         instance_id = request.instanceId
         analysis_id = request.analysisId
         key = (instance_id, analysis_id)
@@ -83,6 +86,12 @@ class Pool:
 
     def add(self, request):
         return self.put_nowait(request)
+
+    def close(self):
+        self._closed = True
+        for _, stream in list(self._wait_tx.values()) + list(self._wait_rx.values()):
+            stream.cancel()
+        self._stream_complete(None)
 
     def cancel(self, key):
         existing = self._wait_tx.get(key)

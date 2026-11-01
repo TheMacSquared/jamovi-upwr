@@ -34,9 +34,11 @@ services:
       - '127.0.0.1:41339:41339'
     # --stdin-slave has the server read commands from stdin -- it's how jmc
     # hands it a freshly built module (paired with stdin_open, below)
-    command: ["/usr/bin/python3 -u -m jamovi.server 41337 --if=* --stdin-slave"]
+    # Run Python as PID 1 so Docker's SIGTERM reaches the session shutdown code.
+    command: ["exec /usr/bin/python3 -u -m jamovi.server 41337 --if=* --stdin-slave"]
     stdin_open: true
-    stop_grace_period: 0.1s
+    # Allow the server to finish cancelling work and reap its R processes.
+    stop_grace_period: 10s
     environment: &base_env
 
         # block Rj - don't enable unless you understand the risks!
@@ -85,7 +87,7 @@ services:
     <<: *base
     container_name: jamovi-tests
     profiles: [tests]
-    command: ["/usr/bin/python3 -u -m pytest /usr/lib/jamovi/server/jamovi/tests"]
+    command: ["exec /usr/bin/python3 -u -m pytest /usr/lib/jamovi/server/jamovi/tests"]
 
   vite:
       image: jonathonlove/vite:latest

@@ -5,6 +5,8 @@ from asyncio import wait
 from asyncio import create_task
 from asyncio import sleep
 from asyncio import Event
+from asyncio import gather
+from asyncio import CancelledError
 
 import os
 import uuid
@@ -76,6 +78,8 @@ class Session(dict):
         self._analysis_listeners = [ ]
         self._session_listeners = [ ]
         self._running = False
+        self._run_loop_task = None
+        self._engine_error = None
         self._ended = Event()
 
         os.makedirs(self._session_temp, exist_ok=True)
@@ -118,10 +122,30 @@ class Session(dict):
         self._runner.add_engine_listener(self._on_engine_event)
 
     async def start(self):
-        await self._modules.read()
-        await self._runner.start()
-        t = create_task(self._run_loop())
-        t.add_done_callback(lambda t: t.result())
+        try:
+            await self._modules.read()
+            await self._runner.start()
+            if self._engine_error is not None:
+                raise RuntimeError(self._engine_error)
+        except (Exception, CancelledError):
+            await self._scheduler.close()
+            try:
+                await self._runner.stop()
+            except Exception as e:
+                log.exception(e)
+            finally:
+                self._ended.set()
+            raise
+        self._running = True
+        self._run_loop_task = create_task(self._run_loop())
+        self._run_loop_task.add_done_callback(self._run_loop_done)
+
+    def _run_loop_done(self, task):
+        if not task.cancelled():
+            try:
+                task.result()
+            except Exception as e:
+                log.exception(e)
 
     def __getitem__(self, id):
         try:
@@ -163,7 +187,7 @@ class Session(dict):
         def4ult = False if is_windows else True
         settings.group('main').specify_default('autoUpdate', def4ult)
         settings.group('main').specify_default('missings', 'NA')
-        settings.group('main').specify_default('selectedLanguage', '')
+        settings.group('main').specify_default('selectedLanguage', conf.get('lang', 'pl'))
         settings.group('main').specify_default('updateStatus', 'na')
 
     async def create(self, instance_id=None):
@@ -195,6 +219,7 @@ class Session(dict):
         if event['type'] == 'error':
             message = event.get('message', '')
             cause = event.get('cause', '')
+            self._engine_error = message + (': ' + cause if cause else '')
             for instance in self.values():
                 instance.terminate(message, cause)
             self.stop()
@@ -254,8 +279,6 @@ class Session(dict):
         self.request_update = request_fun
 
     def stop(self):
-        # at present, this is only called when there are zero instances
-        # which is why this doesn't bother cleaning anything up
         self._running = False
 
     async def _run_loop(self):
@@ -345,8 +368,6 @@ class Session(dict):
                   'session_expires_prevent_path=%s',
                   self._id, TIME_LIMIT, TIMEOUT_NC, TIMEOUT_NC_UNCLEAN, TIMEOUT_NC_VIRGIN,
                   TIMEOUT_IDLE, TIMEOUT_IDLE_NOTICE, SESSION_EXPIRES, SESSION_EXPIRES_PREVENT_PATH)
-
-        self._running = True
 
         get_notif_task = create_task(self._runner.notifications().get())
 
@@ -537,11 +558,24 @@ class Session(dict):
                         last_time_limit_warning += 30
         finally:
             log.debug('%s: run loop ended', self._id)
+            get_notif_task.cancel()
+            await gather(get_notif_task, return_exceptions=True)
+            try:
+                await self._scheduler.close()
+            finally:
+                try:
+                    await self._runner.stop()
+                finally:
+                    await self._finish_shutdown()
+
+    async def _finish_shutdown(self):
+        try:
             if self._settings is not None:
                 try:
                     await self._settings.flush()
                 except Exception as e:
                     log.exception(e)
+        finally:
             self._ended.set()
 
     async def wait_ended(self):

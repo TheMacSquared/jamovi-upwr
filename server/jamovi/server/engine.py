@@ -30,6 +30,9 @@ from asyncio import Event
 from asyncio import Lock
 from asyncio import FIRST_COMPLETED
 from asyncio import current_task
+from asyncio import gather
+from asyncio import to_thread
+from asyncio import shield
 
 from .utils import req_str
 from .i18n import _
@@ -90,8 +93,10 @@ class Engine:
         # until after), so they mustn't overlap -- two starts racing would bind
         # the same conn path twice, leaving an engine process nothing can reach
         self._lifecycle = Lock()
+        self._run_lock = Lock()
 
         self._current_analysis = None
+        self._restart_task = None
 
         self._ioloop = get_event_loop()
 
@@ -104,11 +109,13 @@ class Engine:
 
     async def start(self):
         async with self._lifecycle:
-            await self._start()
+            if not self._running.is_set():
+                await self._start()
 
     async def _start(self):
 
         self._at_startup = True
+        self._results_queue = Queue()
         self._process_stopping = threading.Event()
         self._process_abandoned = threading.Event()
 
@@ -203,193 +210,208 @@ class Engine:
             self._stopped.clear()
             self._running.set()
 
-        except Exception as e:
-            log.exception(e)
-            self._parent._notify_engine_event({
-                'type': 'error',
-                'message': 'Engine process could not be started',
-                'cause': str(e),
-            })
+        except (Exception, CancelledError) as e:
+            await self._stop()
+            if not isinstance(e, CancelledError):
+                log.exception(e)
+                self._parent._notify_engine_event({
+                    'type': 'error',
+                    'message': 'Engine process could not be started',
+                    'cause': str(e),
+                })
+            raise
 
     async def stop(self):
+        cleanup = create_task(self._stop_lifecycle())
+        try:
+            await shield(cleanup)
+        except CancelledError:
+            await gather(cleanup, return_exceptions=True)
+            raise
+
+    async def _stop_lifecycle(self):
+        restart_task = self._restart_task
+        if restart_task is not None and restart_task is not current_task():
+            restart_task.cancel()
+            await gather(restart_task, return_exceptions=True)
         async with self._lifecycle:
             await self._stop()
 
+    async def _wait_process(self, process):
+        try:
+            if isinstance(process, subprocess.Popen):
+                await to_thread(process.wait, timeout=1)
+            else:
+                await wait_for(process.wait(), 1)
+        except (TimeoutError, subprocess.TimeoutExpired):
+            pass
+
+    async def _send(self, data, timeout=10):
+        deadline = self._ioloop.time() + timeout
+        while True:
+            if self._stopped.is_set():
+                raise RuntimeError('Analysis engine stopped before receiving the request')
+            try:
+                self._socket.send(data, flags=nanomsg.DONTWAIT)
+                return
+            except nanomsg.NanoMsgAPIError as e:
+                if e.errno not in (nanomsg.EAGAIN, nanomsg.ETIMEDOUT):
+                    raise
+                if self._ioloop.time() >= deadline:
+                    raise TimeoutError('Timed out connecting to the analysis engine') from e
+                # Startup may load R libraries before the IPC peer connects.
+                await sleep(0.01)
+
     async def _stop(self):
+        process = self._process
+        if self._process_stopping is not None:
+            self._process_stopping.set()
 
-        log.debug('Stopping engine (2)')
+        if process is not None and process.returncode is None:
+            if self._socket is not None and self._running.is_set():
+                self._message_id += 1
+                request = AnalysisRequest(restartEngines=True)
+                message = ComsMessage(id=self._message_id,
+                                     payload=request.SerializeToString(),
+                                     payloadType='AnalysisRequest')
+                try:
+                    await self._send(message.SerializeToString(), timeout=1)
+                    await self._wait_process(process)
+                except Exception as e:
+                    log.exception(e)
 
-        self._message_id += 1
+            for action in ('terminate', 'kill'):
+                if process.returncode is not None:
+                    break
+                try:
+                    getattr(process, action)()
+                    await self._wait_process(process)
+                except ProcessLookupError:
+                    break
+                except Exception as e:
+                    log.exception(e)
 
-        request = AnalysisRequest()
-        request.restartEngines = True
-
-        message = ComsMessage()
-        message.id = self._message_id
-        message.payload = request.SerializeToString()
-        message.payloadType = 'AnalysisRequest'
-
-        self._process_stopping.set()
-
-        # send a message to end the engine
-        self._socket.send(message.SerializeToString())
-
-        try:
-            await wait_for(self._stopped.wait(), 1)
-        except TimeoutError:
-            pass
-        else:
-            log.debug('Engine stopped')
-            return
-
-        log.debug('Terminating engine')
-        try:
-            self._process.terminate()
-        except ProcessLookupError:
-            pass  # already terminated
-        except Exception as e:
-            log.exception(e)
-
-        try:
-            await wait_for(self._stopped.wait(), 1)
-        except TimeoutError:
-            pass
-        else:
-            log.debug('Terminated engine')
-            return
-
-        # kill and abandon the engine process
-        log.debug('Killing engine')
-
-        try:
-            log.debug('Trying socket close')
-            self._socket.close()
-            log.debug('Socket closed')
-        except Exception as e:
-            log.debug('Socket close failed')
-            log.exception(e)
-
-        self._process_abandoned.set()
-        try:
-            self._process.kill()
-        except ProcessLookupError:
-            pass  # already terminated
-        except Exception as e:
-            log.exception(e)
-
-        # in the end, if we still can't kill the process
-        # then we've got to move on
+        # Late callbacks from this generation must not stop its replacement.
+        if self._process_abandoned is not None:
+            self._process_abandoned.set()
+        if self._socket is not None:
+            try:
+                self._socket.close()
+            except Exception as e:
+                log.debug('Socket close failed: %s', e)
+        if self._thread is not None and self._thread.is_alive():
+            await to_thread(self._thread.join, 1)
+        if process is not None and process.stdin is not None:
+            process.stdin.close()
+        self._process = None
+        self._socket = None
+        self._thread = None
         self._notify_process_ended()
-        log.debug('Abandoned the engine process')
 
     async def run(self, request, results_stream):
-
+        if results_stream.done():
+            return
         if request.arbitraryCode and not self._allow_arbitrary_code:
-            error = self._create_error_response(
+            results_stream.set_result(self._create_error_response(
                 request,
-                _('Analyses which execute arbitrary code are not permitted in this session.'))
-            results_stream.set_result(error)
+                _('Analyses which execute arbitrary code are not permitted in this session.')))
             return
 
+        task = current_task()
         if self._current_analysis is not None and not self._current_analysis.done():
             self._current_analysis.cancel()
-
-        self._current_analysis = current_task()
-
-        await self._running.wait()
-
-        request.restartEngines = False  # unset in case of malicious actor
-
-        message = ComsMessage()
-        message.id = self._message_id
-        message.payload = request.SerializeToString()
-        message.payloadType = 'AnalysisRequest'
-
-        self._socket.send(message.SerializeToString())
-        self._message_id += 1
-
-        # now we've sent a request, if the engine crashes, we'll
-        # attribute it to the analysis
-        self._at_startup = False
-
-        results_received = create_task(self._results_queue.get())
-        engine_stopped = create_task(self._stopped.wait())
-
-        pending = { results_received, engine_stopped, results_stream }
-
-        timeout = None
-        if self._analysis_duration_limit is not None:
-            timeout = create_task(sleep(self._analysis_duration_limit))
-            pending.add(timeout)
+        self._current_analysis = task
+        helpers = set()
 
         try:
-            complete = False
+            async with self._run_lock:
+                if results_stream.done():
+                    return
+                if self._restart_task is not None:
+                    await shield(self._restart_task)
+                if not self._running.is_set():
+                    raise RuntimeError('Analysis engine is not running')
+                request.restartEngines = False
+                message = ComsMessage(id=self._message_id,
+                                     payload=request.SerializeToString(),
+                                     payloadType='AnalysisRequest')
+                await self._send(message.SerializeToString())
+                self._message_id += 1
+                self._at_startup = False
 
-            while not complete:
-                done, pending = await wait(pending, return_when=FIRST_COMPLETED)
+                results_received = create_task(self._results_queue.get())
+                engine_stopped = create_task(self._stopped.wait())
+                helpers.update((results_received, engine_stopped))
+                pending = {results_received, engine_stopped, results_stream}
+                timeout = None
+                if self._analysis_duration_limit is not None:
+                    timeout = create_task(sleep(self._analysis_duration_limit))
+                    helpers.add(timeout)
+                    pending.add(timeout)
 
-                if results_received in done:
-
-                    results, complete = results_received.result()
-
-                    if (request.instanceId == results.instanceId
-                            and request.analysisId == results.analysisId
-                            and request.revision == results.revision):
-
-                        if complete:
-                            results_stream.set_result(results)
-                        else:
+                while True:
+                    done, pending = await wait(pending, return_when=FIRST_COMPLETED)
+                    # Cancellation can race with the delivery of a final result.
+                    if results_stream.done():
+                        break
+                    if results_received in done:
+                        helpers.discard(results_received)
+                        results, complete = results_received.result()
+                        if (request.instanceId == results.instanceId
+                                and request.analysisId == results.analysisId
+                                and request.revision == results.revision):
+                            if complete:
+                                results_stream.set_result(results)
+                                break
                             results_stream.write(results)
-                    else:
-                        complete = False
-
-                    if not complete:
                         results_received = create_task(self._results_queue.get())
+                        helpers.add(results_received)
                         pending.add(results_received)
-
-                elif timeout in done:
-
-                    log.debug('%s %s', 'timedout', req_str(request))
-
-                    error = self._create_error_response(
-                        request,
-                        _('This analysis has exceeded the current time limits and has been terminated.'))
-                    await self.stop()
-                    results_stream.set_result(error)
-                    await self.restart()
-                    break
-
-                elif engine_stopped in done:
-
-                    log.debug('%s %s', 'crashed', req_str(request))
-
-                    error = self._create_error_response(
-                        request,
-                        _('This analysis has terminated, likely due to hitting a resource limit.'))
-                    results_stream.set_result(error)
-                    await self.restart()
-                    break
-
-                elif results_stream in done:
-                    break
-
+                    elif timeout is not None and timeout in done:
+                        error = self._create_error_response(
+                            request,
+                            _('This analysis has exceeded the current time limits and has been terminated.'))
+                        await self._recover()
+                        if not results_stream.done():
+                            results_stream.set_result(error)
+                        break
+                    elif engine_stopped in done:
+                        error = self._create_error_response(
+                            request,
+                            _('This analysis has terminated, likely due to hitting a resource limit.'))
+                        await self._recover()
+                        if not results_stream.done():
+                            results_stream.set_result(error)
+                        break
         except CancelledError:
+            results_stream.cancel()
             raise
         except Exception as e:
             log.exception(e)
+            try:
+                if self._process is not None:
+                    await self._recover()
+            finally:
+                if not results_stream.done():
+                    results_stream.set_exception(e)
         finally:
-            results_received.cancel()
-            engine_stopped.cancel()
-            if timeout is not None:
-                timeout.cancel()
+            for helper in helpers:
+                helper.cancel()
+            await gather(*helpers, return_exceptions=True)
+            if self._current_analysis is task:
+                self._current_analysis = None
+
+    async def _recover(self):
+        if self._restart_task is None or self._restart_task.done():
+            self._restart_task = create_task(self.restart())
+            self._restart_task.add_done_callback(self._restart_done)
+        # Replacing an analysis must not interrupt recovery of its worker.
+        await shield(self._restart_task)
 
     async def restart(self):
         async with self._lifecycle:
-            # any start already in flight has finished by now, so _running
-            # reflects whether there's actually an engine to stop
-            if self._running.is_set():
-                log.info('Stopping engine')
-                await self._stop()
+            # Reap the previous process even if its exit callback has run.
+            await self._stop()
             log.info('Restarting engine')
             await self._start()
 
@@ -464,7 +486,8 @@ class Engine:
                 else:
                     # crash while analysis not running
                     # unusual, but recoverable -- perform a restart
-                    create_task(self.restart())
+                    self._restart_task = create_task(self.restart())
+                    self._restart_task.add_done_callback(self._restart_done)
             else:
                 # intentional stop
                 pass
@@ -472,6 +495,15 @@ class Engine:
             # termination while analysis running
             # restarting is handled elsewhere
             pass
+
+    def _restart_done(self, task):
+        if self._restart_task is task:
+            self._restart_task = None
+        if not task.cancelled():
+            try:
+                task.result()
+            except Exception as e:
+                log.exception(e)
 
     def _create_error_response(self, request, message):
         results = AnalysisResponse()
@@ -495,5 +527,8 @@ class Engine:
         return results
 
     def __del__(self):
-        if self._process is not None:
-            self._process.terminate()
+        if self._process is not None and self._process.returncode is None:
+            try:
+                self._process.terminate()
+            except (OSError, ProcessLookupError):
+                pass

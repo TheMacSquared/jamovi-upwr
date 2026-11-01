@@ -12,6 +12,7 @@ import pytest
 from jamovi.server import jamovi_pb2 as jcoms
 from jamovi.server.instance import Instance
 from jamovi.server.session import Session
+from jamovi.server.i18n import _
 
 
 class FakeComs:
@@ -61,7 +62,7 @@ async def test_open_blank(instance: Instance):
 
     project = instance.project
     assert project.has_datasets
-    assert project.title == 'Untitled'
+    assert project.title == _('Untitled')
     assert project.is_blank
     assert not project.is_edited
 
@@ -110,7 +111,7 @@ async def test_dataset_set_and_info(instance: Instance, coms: FakeComs):
     info = coms.sent[-1]
     assert isinstance(info, jcoms.InfoResponse)
     assert info.hasDataSet
-    assert info.title == 'Untitled'
+    assert info.title == _('Untitled')
     assert info.edited
     assert info.changesPosition == 1
     assert info.schema.rowCount == 2

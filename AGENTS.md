@@ -126,6 +126,21 @@ do pakowania na konkretny system i nie powinny być źródłem zmian w kodzie.
 - Nowe opcje dodawaj na końcu odpowiedniej sekcji
 - Sprawdź czy nazwa opcji nie koliduje z istniejącymi
 
+### Dane do testów ręcznych
+- Nowe dane testowe dodawaj do `packaging/tests/manual/` i dołączaj do obrazu
+  Dockera, żeby użytkownik mógł je otworzyć bez kopiowania plików z hosta.
+- Umieszczaj je obok istniejących testów w `/root/Documents/jupwr-test-audyt/`
+  (`Otwórz → Ten komputer → Dokumenty → jupwr-test-audyt`), nie w Bibliotece
+  ani w modułach dydaktycznych. Użytkownik nie chce danych testowych w wydaniach.
+- Dockerfile automatycznie kopiuje ten katalog źródłowy do folderu audytu oraz
+  do `/usr/lib/jamovi/test-data/` w obrazie. Nie zmieniaj list modułów wydania.
+- Compose montuje Dokumenty hosta na `/root/Documents` i zasłania kopię obrazu.
+  Po buildzie i uruchomieniu kopiuj nowe zestawy również do działającego kontenera,
+  np. `docker compose cp packaging/tests/manual/upstream-28.17.csv jamovi:/root/Documents/jupwr-test-audyt/`.
+  Zachowaj pozostałe pliki audytu i nie nadpisuj zmodyfikowanych kopii użytkownika.
+- W planie testów podawaj ścieżkę w interfejsie. Po buildzie sprawdź obecność
+  zestawu w folderze audytu i jego otwarcie przez działający serwer.
+
 ### Workflow modyfikacji
 1. Przeczytaj odpowiedni plik .a.yaml — zrozum istniejące opcje
 2. Przeczytaj odpowiedni plik .u.yaml — zrozum układ UI
@@ -154,3 +169,14 @@ Wszystkie zadania pierwotnej kolejki (1–7) są zrealizowane — stan na sierpi
 
 Nowe zadania dopisuj poniżej jako "### Zadanie N: ..." z plikiem docelowym
 i oczekiwanym zachowaniem.
+
+### Zadanie 8: Niezawodność obsługi analiz po merge 28.17
+- Pliki: `server/jamovi/server/{clientconnection,engine,enginemanager,scheduler,pool,session,server}.py`,
+  `server/jamovi/server/analyses/`, `server/jamovi/tests/test_analysis_lifecycle.py`,
+  `docker-compose.yaml`, `docker/jamovi-Dockerfile`.
+- Żądania WebSocket i eksporty kończą się wynikiem, błędem albo anulowaniem;
+  stara analiza nie nadpisuje statusu swojego nowszego żądania.
+- Start, restart i zamknięcie czekają na zadania silników; awaria i timeout
+  pozwalają odbudować proces R, a zamknięcie nie pozostawia procesów i wątków.
+- Testy automatyczne obejmują także prawdziwy proces C++/R w Dockerze oraz
+  nieudane odtwarzanie stanu i usunięcie analizy podczas eksportu.

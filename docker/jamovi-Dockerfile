@@ -342,6 +342,13 @@ COPY --from=server  /staging/libnanomsg.so.5 /staging/libnanomsg.so /usr/lib/
 
 COPY --from=server  /usr/lib/jamovi/ /usr/lib/jamovi/
 
+# Manual audit files are ordinary files, not datasets in the teaching library.
+# Keep an image copy even when Compose mounts the host Documents over /root/Documents.
+# With that mount, also sync new fixtures into the running audit directory
+# (see AGENTS.md); never delete or replace the user's other audit files.
+COPY $JAMOVI_ROOT/packaging/tests/manual/ /usr/lib/jamovi/test-data/
+COPY $JAMOVI_ROOT/packaging/tests/manual/ /root/Documents/jupwr-test-audyt/
+
 # fonts used by the jUPWR plot themes; registered at runtime through
 # systemfonts::add_fonts() rather than installed system wide, so that the
 # Docker image and the native packages behave the same way
@@ -361,4 +368,4 @@ ENV JAMOVI_ALLOW_ARBITRARY_CODE false
 
 EXPOSE 41337
 ENTRYPOINT ["/bin/sh", "-c"]
-CMD ["/usr/bin/python3 -m jamovi.server 41337 --if=*"]
+CMD ["exec /usr/bin/python3 -m jamovi.server 41337 --if=*"]

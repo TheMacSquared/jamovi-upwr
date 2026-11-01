@@ -77,7 +77,7 @@ class Settings extends EventMap<SettingsData> {
             theme: Theme.JUPWR_JASNY,
             devMode: false,
             syntaxMode: false,
-            selectedLanguage: '',
+            selectedLanguage: 'pl',
             zoom: 100,
             resultsFontSize: 100,
             updateStatus: 'na',

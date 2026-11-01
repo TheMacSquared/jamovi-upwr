@@ -41,12 +41,21 @@ class Analysis:
             self.enabled = False
 
         def set_result(self, result):
-            self.parent._ops.remove(self)
-            self.future.set_result(result)
+            if self in self.parent._ops:
+                self.parent._ops.remove(self)
+            if not self.future.done():
+                self.future.set_result(result)
 
         def set_exception(self, exception):
-            self.parent._ops.remove(self)
-            self.future.set_exception(exception)
+            if self in self.parent._ops:
+                self.parent._ops.remove(self)
+            if not self.future.done():
+                self.future.set_exception(exception)
+
+        def cancel(self):
+            if self in self.parent._ops:
+                self.parent._ops.remove(self)
+            self.future.cancel()
 
     def __init__(self,
                  project,
@@ -376,19 +385,31 @@ class Analysis:
                 pb.svg.path = ''
 
     async def save(self, path, part):
+        if not self.enabled:
+            raise RuntimeError('The analysis is disabled')
         if self.state_dropped:
             # rendering for an export needs the state, so the analysis has
             # to run first, and the op can't be queued until it's finished
             waiter = Future()
             self._run_waiters.append(waiter)
             self.rerun()
-            await waiter
+            try:
+                await waiter
+            finally:
+                if waiter in self._run_waiters:
+                    self._run_waiters.remove(waiter)
+        if self.status == Analysis.Status.ERROR or (self.results is not None and self.results.results.error.message):
+            raise ValueError(self.results.results.error.message)
         op = Analysis.Op(Analysis.Op.SAVE, self)
         op.path = path
         op.part = part
         self._ops.append(op)
-        self.parent._notify_options_changed(self)
-        return await op.future
+        try:
+            self.parent._notify_options_changed(self)
+            return await op.future
+        finally:
+            if op in self._ops:
+                op.cancel()
 
     @property
     def needs_op(self):
@@ -496,10 +517,21 @@ class Analysis:
         return [ ]
 
     def notify_removing(self):
+        self._status = Analysis.Status.DELETED
+        for operation in list(self._ops):
+            operation.set_exception(RuntimeError('The analysis was removed'))
         waiters = self._run_waiters
         self._run_waiters = [ ]
         for waiter in waiters:
             if not waiter.done():
                 waiter.set_exception(RuntimeError('The analysis was removed'))
+
+    def cancel_pending(self):
+        for operation in list(self._ops):
+            operation.cancel()
+        waiters = self._run_waiters
+        self._run_waiters = []
+        for waiter in waiters:
+            waiter.cancel()
 
 
