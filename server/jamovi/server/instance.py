@@ -51,8 +51,10 @@ from asyncio import ensure_future as create_task
 from asyncio import wait
 
 from collections import namedtuple
+from contextlib import ExitStack
 
 from tempfile import NamedTemporaryFile
+from tempfile import TemporaryDirectory
 from tempfile import mktemp
 from tempfile import mkstemp
 
@@ -1277,88 +1279,74 @@ class Instance:
         instance_id = self._instance_id
         instance = self
 
-        # class which provides an iterator which iterates over the data sets
         class MultipleDataSets:
-
-            # python 3.6 allows you use to use 'yield' inside async iterators.
-            # unfortunately, we're maintaining compatibility with 3.5, so we
-            # have to do all this bollocks instead:
-
-            def __init__(self, paths):
+            def __init__(self, paths, scratch, cleanup):
                 self._paths = paths
                 self._i = 0
-                self._mm = None
-
-                if os.name == 'nt':
-                    self._buffer_path = None
-                else:
-                    self._buffer_path = NamedTemporaryFile(delete=False).name
-
-            def __del__(self):
-                if self._mm is not None:
-                    self._mm.close()
-                self._del_buffer()
-
-            def _del_buffer(self):
-                if self._buffer_path is not None:
-                    try:
-                        os.remove(self._buffer_path)
-                    except Exception:
-                        pass
-                    self._buffer_path = None
+                self._scratch = scratch
+                self._cleanup = cleanup
 
             def __aiter__(self):
                 return self
 
             async def __anext__(self):
-
-                if os.name == 'nt':
-                    self._del_buffer()
-                    self._buffer_path = mktemp()
-
                 if self._i >= len(self._paths):
                     raise StopAsyncIteration()
 
-                path = self._paths[self._i]
-
+                index = self._i
+                path = self._paths[index]
                 norm_path = instance._normalise_path(path)
                 name, __ = os.path.splitext(os.path.basename(path))
-
                 model = DataSetModel()
                 model.set_log(instance.log)
+                # Each source stays alive until the entire import has finished.
+                # Closing stores before removing scratch files also works on Windows.
+                model.store = StoreFactory.create(os.path.join(self._scratch, str(index)), 'shmem')
+                self._cleanup.callback(model.close)
+                model.dataset = model.store.create_dataset()
+                ioloop = asyncio.get_running_loop()
+                cancelled = threading.Event()
 
-                if self._mm is not None:
-                    self._mm.close()
-
-                assert self._buffer_path is not None
-
-                self._mm = StoreFactory.create(self._buffer_path, 'shmem')
-                model.dataset = self._mm.create_dataset()
-
-                ioloop = asyncio.get_event_loop()
+                def send_progress(p):
+                    if not cancelled.is_set():
+                        coms.send(None, instance_id, request, complete=False,
+                                  progress=(1000 * (index + p) / n_files, 1000))
 
                 def prog_cb(p):
-                    ioloop.call_soon_threadsafe(
-                        functools.partial(
-                            coms.send, None, instance_id, request,
-                            complete=False, progress=(1000 * (self._i + p) / n_files, 1000)))
+                    if cancelled.is_set():
+                        raise RuntimeError('Import cancelled')
+                    ioloop.call_soon_threadsafe(send_progress, p)
 
                 main_settings = instance._settings.group('main')
                 func = functools.partial(formatio.read_dataset, model, norm_path, prog_cb, main_settings)
                 async with model.attach():
-                    await ioloop.run_in_executor(None, func)
-
+                    reading = ioloop.run_in_executor(None, func)
+                    try:
+                        await asyncio.shield(reading)
+                    except asyncio.CancelledError:
+                        # Cancelling the await cannot stop its executor thread.
+                        # Retain the source store until that thread has finished.
+                        cancelled.set()
+                        cleanup = asyncio.gather(reading, return_exceptions=True)
+                        while not cleanup.done():
+                            try:
+                                await asyncio.shield(cleanup)
+                            except asyncio.CancelledError:
+                                pass
+                        raise
                 self._i += 1
-                return (name, model)
+                return name, model
 
         try:
             if self._perms.open.local is False:
                 raise PermissionError()
 
             controller = self._controller()
-            datasets = MultipleDataSets(paths)
-            await controller.dataset.import_from(datasets, n_files > 1)
-            controller.mod_tracker.clear()
+            with TemporaryDirectory(prefix='jamovi-import-') as scratch, ExitStack() as cleanup:
+                datasets = MultipleDataSets(paths, scratch, cleanup)
+                async with controller.dataset.attach():
+                    await controller.dataset.import_from(datasets, n_files > 1)
+                    controller.mod_tracker.clear()
 
             response = jcoms.OpenProgress()
             self._coms.send(response, self._instance_id, request)

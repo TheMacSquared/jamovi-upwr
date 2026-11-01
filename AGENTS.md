@@ -240,3 +240,11 @@ i oczekiwanym zachowaniem.
 - Buforuj niepełne linie i dekoduj UTF-8 strumieniowo; zwracaj ostatni poprawny
   komunikat dopiero po poprawnym końcu odpowiedzi. Błędny/ucięty JSON i UTF-8
   zgłaszają błąd, a reader jest zwalniany również przy niepowodzeniu.
+
+### Zadanie 16: Ochrona danych przy nieudanym odczycie importu
+- Pliki: `server/jamovi/server/{instance,datasetmodel}.py`,
+  `server/jamovi/tests/test_safe_import.py`, `packaging/tests/manual/import-*`.
+- Najpierw odczytaj wszystkie źródła do niezależnych buforów i sprawdź łączną
+  liczbę wierszy. Dopiero potem zastępuj dane i czyść historię cofania.
+- Odczyt kolejnego pliku nie zamyka poprzedniego bufora przed kopiowaniem;
+  anulowanie czeka na wątek czytający, zanim zamknie bufory i usunie pliki.

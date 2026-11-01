@@ -531,6 +531,12 @@ class DataSetModel:
             self.update_filter_names()
 
     async def import_from(self, sources, add_name_column=True):
+        # Reading any source may fail. Do not mutate the destination until all
+        # source datasets have been prepared and their combined size is allowed.
+        prepared = [item async for item in sources]
+        if not prepared:
+            raise ValueError('No files selected for import')
+        self._check_perms(row_count=sum(source.row_count for _, source in prepared))
 
         self.set_row_count(0)
 
@@ -552,7 +558,7 @@ class DataSetModel:
                 measure_type=MeasureType.NOMINAL)
 
         try:
-            async for (name, source) in sources:
+            for name, source in prepared:
 
                 source_columns = [ ]
                 dest_columns = [ ]

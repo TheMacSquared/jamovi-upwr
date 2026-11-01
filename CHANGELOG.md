@@ -5,6 +5,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane — jamovi 28.17
 
+- Import wczytuje wszystkie źródła i sprawdza łączny limit wierszy przed
+  zastąpieniem danych. Błąd odczytu dowolnego pliku albo anulowanie przygotowania
+  zachowuje stary arkusz, formuły, analizy i historię cofania.
+
 - Parser odpowiedzi JSON Lines zachowuje niedokończone linie i znaki UTF-8
   między fragmentami sieciowymi. Niepełna lub błędna odpowiedź kończy się
   błędem zamiast zwrócić wcześniejszy komunikat postępu jako wynik.

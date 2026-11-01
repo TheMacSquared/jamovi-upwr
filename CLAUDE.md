@@ -820,7 +820,9 @@ Pozostaje:
   wszystkich formuł — nie jako drobna poprawka, osobno z testami.
 - Zgłosić do jamovi (upstream, PÓŹNIEJ): `read_dataset` bez .omv/.omt
   i `import_from` zerujący wiersze przed odczytem źródła (błąd czytania
-  dowolnego pliku nadal czyści dane); `Analysis.set_svg` używa
+  dowolnego pliku nadal czyści dane — NAPRAWIONE lokalnie 2026-11-01:
+  wszystkie źródła wczytywane przed podmianą, testy `test_safe_import.py`);
+  `Analysis.set_svg` używa
   `self.dataset.instance_path` (jest w `Project`; padają upstreamowe testy
   SVG w `test_analyses.py`); `client/main/utils/jsonlines.ts` nie buforuje
   niedokończonej linii między fragmentami i dekoduje UTF-8 bez `stream: true`
