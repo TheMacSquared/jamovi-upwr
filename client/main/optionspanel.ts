@@ -75,6 +75,7 @@ class AnalysisResources extends EventEmitter {
         target.append(this.frame);
 
         this.settings.on('change:decSymbol', () => this.updateSettings());
+        this.settings.on('change:uiStyle', () => this.updateSettings());
 
         this.frameCommsApi = {
             action: action => {
@@ -86,6 +87,7 @@ class AnalysisResources extends EventEmitter {
             },
 
             frameDocumentReady: data => {
+                this.updateSettings();
                 this.notifyDocumentReady();
                 this.emit("frameReady");
             },
@@ -226,7 +228,8 @@ class AnalysisResources extends EventEmitter {
 
     updateSettings() {
         this.frameComms.send("updateSettings", {
-            decSymbol: this.settings.getSetting('decSymbol', '.')
+            decSymbol: this.settings.getSetting('decSymbol', '.'),
+            uiStyle: this.settings.getSetting('uiStyle', undefined)
         });
     }
 

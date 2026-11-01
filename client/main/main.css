@@ -63,3 +63,8 @@
 @import "../common/interactionmanager/keytips.css";
 @import "../common/menu.css";
 @import "../common/icon.css";
+
+/* jUPWR: colour tokens, then the interface styles, kept last so they win
+   over the jamovi CSS */
+@import "../common/jupwr-colors.css";
+@import "jupwr-ui-a.css";

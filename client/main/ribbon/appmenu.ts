@@ -9,6 +9,7 @@ import host from '../host';
 import { h }  from '../../common/htmlelementcreator';
 import { RibbonModel } from "../ribbon";
 import { Theme, defaultPaletteFor } from "../settings";
+import { sanitizeUiStyle } from '../../common/uistyle';
 
 function selectOption(value: string, label: string) {
     return h('option', { value: value }, label);
@@ -42,6 +43,7 @@ export class AppMenuButton extends EventDistributor {
     $devModeCheck: HTMLInputElement;
     $languageList: HTMLSelectElement;
     $recoveryIntervalList: HTMLSelectElement;
+    $uiStyleList: HTMLSelectElement;
     model: RibbonModel;
     loop: FocusLoop;
 
@@ -100,6 +102,8 @@ export class AppMenuButton extends EventDistributor {
         let $header = h('div', { class: 'jmv-ribbon-appmenu-header', role: 'none' });
         $menu.append($header);
         $header.append(h('div', { class: 'jmv-ribbon-appmenu-icon', role: 'none' }));
+        // jUPWR: heading shown by the interface styles other than classic
+        $header.append(h('div', { class: 'jmv-ribbon-appmenu-title', role: 'none' }, _('Preferences')));
         let $backOuter = h('div', { class: 'jmv-ribbon-appmenu-back', role: 'none' });
         $header.append($backOuter);
         let $back = h('button', { class: 'jmv-ribbon-appmenu-back-button', 'aria-label': _('Close preferences') });
@@ -126,6 +130,20 @@ export class AppMenuButton extends EventDistributor {
         $zoomButtons.append(this.$zoomLevel);
         let $zoomIn = h('button', { class: 'jmv-ribbon-appmenu-zoomin', 'aria-label': _('Zoom in') }, '+');
         $zoomButtons.append($zoomIn);
+
+        // jUPWR: interface style, see common/uistyle.ts
+        let uiStyleId = interactionManager.nextAriaId('label');
+        let $uiStyle = appMenuItem();
+        $content.append($uiStyle);
+        $uiStyle.append(h('div', { id: uiStyleId }, _('Interface')));
+        this.$uiStyleList = h('select', { 'aria-labelledby': uiStyleId, class: 'jmv-ui-style-list' },
+            selectOption('classic', _('Classic')),
+            selectOption('a', _('Light (A)')));
+        $uiStyle.append(this.$uiStyleList);
+        this.$uiStyleList.addEventListener('click', event => event.stopPropagation());
+        this.$uiStyleList.addEventListener('change', () => {
+            this.model.settings().setSetting('uiStyle', this.$uiStyleList.value);
+        });
 
         $content.append(separator());
 
@@ -336,6 +354,7 @@ export class AppMenuButton extends EventDistributor {
         });
 
         this.model.settings().on('change:theme',        () => this._updateUI());
+        this.model.settings().on('change:uiStyle',      () => this._updateUI());
         this.model.settings().on('change:palette',      () => this._updateUI());
         this.model.settings().on('change:decSymbol',    () => this._updateUI());
         this.model.settings().on('change:devMode',      () => this._updateUI());
@@ -490,6 +509,8 @@ export class AppMenuButton extends EventDistributor {
 
         let language = settings.getSetting('selectedLanguage', '');
         this.$languageList.value = language;
+
+        this.$uiStyleList.value = sanitizeUiStyle(settings.getSetting('uiStyle', undefined));
     }
 
     private isNativeSelectFocusTransition(event: FocusEvent): boolean {

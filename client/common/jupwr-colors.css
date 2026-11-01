@@ -1,0 +1,30 @@
+/* jUPWR interface colours: the one list of the colours the client uses,
+   loaded by the main window, the options panel and the results. The values
+   are those the jamovi/jUPWR CSS already used (most still written out in
+   the jamovi stylesheets); the warm greys came with interface style A.
+   Plot colours are separate: jmvcore/R/themes.R (jUPWR jasny/ciemny).
+   The interface styles (main/jupwr-ui-a.css …) build on these tokens. */
+
+:root {
+    /* brand: UPWr bordo and its tints */
+    --jupwr-bordo: #832034;           /* title bar, active items, accents */
+    --jupwr-bordo-hover: #9A2A40;     /* hover on bordo */
+    --jupwr-bordo-tint: #ece0e3;      /* selected / open item */
+    --jupwr-bordo-pale: #fcf6f7;      /* hover on white, light highlight */
+
+    /* surfaces */
+    --jupwr-surface: #FFFFFF;         /* cards, lists, fields */
+    --jupwr-surface-alt: #F0F0F0;     /* status bar, quiet panels */
+    --jupwr-ground: #E6E6E6;          /* behind the cards */
+    --jupwr-warm-surface: #F4F2F1;    /* options card */
+    --jupwr-warm-sunken: #EAE6E4;     /* sections inside the options card */
+
+    /* lines */
+    --jupwr-line: #D0D0D0;            /* borders of cards and controls */
+    --jupwr-line-light: #E6E6E6;      /* grid lines, separators */
+
+    /* text */
+    --jupwr-text: #333333;
+    --jupwr-text-muted: #555555;      /* secondary text */
+    --jupwr-text-faint: #777777;      /* tertiary text, idle icons */
+}

@@ -1,0 +1,717 @@
+/* jUPWR interface style A ("light"), chosen in the preferences
+   (common/uistyle.ts). Everything is scoped by html[data-ui-style="a"], so
+   the classic style is the untouched jamovi CSS. Colours come from the
+   jUPWR colour tokens (common/jupwr-colors.css). */
+
+:root[data-ui-style="a"] {
+    --jupwr-radius: 12px;
+    --jupwr-radius-small: 6px;
+    --jupwr-gap: 10px;
+
+    accent-color: var(--jupwr-bordo);
+}
+
+/* A1: tab row: tabs as one segmented control, preferences as an icon */
+
+[data-ui-style="a"] .jmv-ribbon-header {
+    min-height: 44px;
+    padding-inline: 6px;
+    gap: 6px;
+}
+
+[data-ui-style="a"] .ribbon-tabs {
+    flex-grow: 0;
+    align-self: center;
+    margin-inline-end: auto;
+    padding: 3px;
+    gap: 2px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-ui-style="a"] .jmv-ribbon-tab {
+    padding: 7px 16px;
+    line-height: normal;
+    border-radius: var(--jupwr-radius-small);
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+[data-ui-style="a"] .jmv-ribbon-tab.file-tab {
+    align-self: center;
+    padding: 6px 12px;
+}
+
+[data-ui-style="a"] .jmv-ribbon-tab:hover {
+    background-color: var(--jupwr-bordo-hover);
+}
+
+[data-ui-style="a"] .jmv-ribbon-tab.selected,
+[data-ui-style="a"] .jmv-ribbon-tab.selected:hover {
+    background-color: var(--jupwr-surface);
+    color: var(--jupwr-bordo);
+    font-weight: 600;
+}
+
+[data-ui-style="a"] .jmv-ribbon-fullscreen,
+[data-ui-style="a"] .jmv-ribbon-appmenu {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--jupwr-radius-small);
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu > .mif-more-vert {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    mask: url('../assets/jupwr-preferences.svg') center / 20px 20px no-repeat;
+    -webkit-mask: url('../assets/jupwr-preferences.svg') center / 20px 20px no-repeat;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu > .mif-more-vert::before {
+    content: none;
+}
+
+/* A2: white, lower ribbon; analysis and plot categories as text pills
+   (icons hidden, as in the prototype), the menus open as before */
+
+[data-ui-style="a"] .jmv-ribbon-body {
+    background-color: var(--jupwr-surface);
+    height: 52px;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 2px;
+    border-bottom: 1px solid var(--jupwr-line);
+}
+
+[data-ui-style="a"] .jmv-analyses-button {
+    flex-direction: row;
+    min-width: 0;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 8px;
+    margin: 0 !important;
+}
+
+[data-ui-style="a"] .jmv-analyses-button > .jmv-ribbon-menu-arrow {
+    display: none;
+}
+
+/* the categories' own colour icons (analysetab.css, plotstab.css), small,
+   beside the label; the line icons in assets/jupwr-line are kept as an
+   alternative */
+[data-ui-style="a"] .jmv-analyses-button > .jmv-ribbon-button-icon {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin-inline-end: 7px;
+    flex-shrink: 0;
+    background-size: contain;
+}
+
+[data-ui-style="a"] .jmv-analyses-button > .jmv-ribbon-button-label {
+    margin: 0;
+    font-size: 105%;
+    color: var(--jupwr-text);
+    white-space: nowrap !important;
+    width: auto !important;
+}
+
+[data-ui-style="a"] .jmv-analyses-button.menu-owner.active {
+    background-color: var(--jupwr-bordo-tint);
+}
+
+[data-ui-style="a"] .jmv-analyses-button.menu-owner.active > .jmv-ribbon-button-label {
+    color: var(--jupwr-bordo);
+    font-weight: 600;
+}
+
+[data-ui-style="a"] .jmv-analyses-button.jmv-modules-menu-item {
+    background-color: var(--jupwr-surface);
+    box-shadow: inset 0 0 0 1px var(--jupwr-bordo);
+}
+
+[data-ui-style="a"] .jmv-analyses-button.jmv-modules-menu-item > .jmv-ribbon-button-label {
+    color: var(--jupwr-bordo);
+}
+
+[data-ui-style="a"] .jmv-ribbon-button:not([aria-disabled]):not(.maintain-color):hover,
+[data-ui-style="a"] .jmv-ribbon-button:not([aria-disabled]).checked {
+    background-color: var(--jupwr-bordo-pale) !important;
+}
+
+/* E1: dropdown menus: white, rounded; title in bold with the subtitle
+   aligned under it; subgroup headings as small capitals with a rule */
+
+[data-ui-style="a"] .jmv-menu {
+    border-radius: 12px;
+    border: 1px solid var(--jupwr-line);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+    overflow: hidden;
+    padding: 6px 0;
+}
+
+[data-ui-style="a"] .jmv-analyses-button .jmv-ribbon-button-menu {
+    min-width: 300px;
+    max-width: 380px;
+}
+
+[data-ui-style="a"] .jmv-ribbon-menu-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: transparent;
+    color: var(--jupwr-text-muted);
+    font-size: 70%;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px 18px 4px;
+}
+
+[data-ui-style="a"] .jmv-ribbon-menu-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--jupwr-line-light);
+}
+
+[data-ui-style="a"] .jmv-ribbon-menu-heading:empty {
+    display: none;
+}
+
+[data-ui-style="a"] .jmv-group-items {
+    padding-top: 0;
+}
+
+[data-ui-style="a"] .jmv-ribbon-menu-item {
+    margin: 1px 6px;
+    padding: 9px 12px;
+    width: calc(100% - 12px);
+    border-radius: 8px;
+}
+
+[data-ui-style="a"] .jmv-ribbon-menu-item > .description {
+    font-size: 100%;
+}
+
+[data-ui-style="a"] .jmv-ribbon-menu-item > .description > :first-child {
+    font-weight: 600;
+    color: var(--jupwr-text);
+}
+
+[data-ui-style="a"] .jmv-ribbon-menu-item-sub {
+    padding-inline-start: 0;
+    padding-top: 2px;
+    color: var(--jupwr-text-muted);
+}
+
+[data-ui-style="a"] .module .jmv-ribbon-menu-item-sub {
+    width: auto;
+}
+
+[data-ui-style="a"] .jmv-ribbon-menu-item:hover,
+[data-ui-style="a"] .jmv-ribbon-menu-item:focus {
+    background-color: var(--jupwr-bordo-pale) !important;
+}
+
+/* data and edit tabs: large buttons in a row, group captions dropped */
+
+[data-ui-style="a"] .jmv-ribbon-group[data-position="bottom"] > .jmv-ribbon-group-label {
+    display: none;
+}
+
+[data-ui-style="a"] .jmv-ribbon-group-body .jmv-ribbon-button.jmv-ribbon-button-size-large {
+    flex-direction: row;
+    gap: 6px;
+    height: 40px;
+    padding: 0 8px;
+    border-radius: 8px;
+}
+
+[data-ui-style="a"] .jmv-ribbon-group-body .jmv-ribbon-button-size-large .jmv-ribbon-button-icon {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+}
+
+[data-ui-style="a"] .jmv-ribbon-group-body .jmv-ribbon-button-size-large .jmv-ribbon-button-label {
+    margin: 0;
+}
+
+[data-ui-style="a"] .jmv-ribbon-group-body .jmv-ribbon-button.jmv-ribbon-button-size-medium {
+    height: 22px;
+    line-height: 22px;
+    border-radius: var(--jupwr-radius-small);
+}
+
+[data-ui-style="a"] .jmv-ribbon-group-body .jmv-ribbon-button.jmv-ribbon-button-size-small {
+    border-radius: var(--jupwr-radius-small);
+}
+
+/* A3: data, options and results as cards on a light grey ground */
+
+[data-ui-style="a"] #main-view {
+    background: var(--jupwr-ground);
+    border-top: none;
+    padding: var(--jupwr-gap);
+    box-sizing: border-box;
+    /* the rounded, clipped cards make Chromium paint the results iframes
+       above the preferences drawer; keep the work area in its own layer */
+    isolation: isolate;
+}
+
+[data-ui-style="a"] #main-table,
+[data-ui-style="a"] #main-options,
+[data-ui-style="a"] #results {
+    background-color: var(--jupwr-surface);
+    border: 1px solid var(--jupwr-line);
+    border-radius: var(--jupwr-radius);
+    overflow: hidden;
+}
+
+[data-ui-style="a"] .silky-splitpanel-splitter {
+    background-color: transparent;
+}
+
+/* A7: status bar as the foot of the data card */
+
+[data-ui-style="a"] .jmv-status-bar {
+    height: 28px;
+    grid-template-rows: 28px;
+    background-color: var(--jupwr-surface-alt);
+    border-top: 1px solid var(--jupwr-line);
+    color: var(--jupwr-text-muted);
+}
+
+/* spreadsheet: white headers, quiet row numbers, thin lines; only colours
+   and borders, as the cell geometry is computed by tableview.ts */
+
+[data-ui-style="a"] .jmv-table-container {
+    background-color: var(--jupwr-surface);
+    border: none;
+}
+
+[data-ui-style="a"] .jmv-table-header-background {
+    background-color: var(--jupwr-surface);
+    border-bottom: 1px solid var(--jupwr-line);
+}
+
+[data-ui-style="a"] .jmv-column-header {
+    background-color: var(--jupwr-surface);
+    border-image: linear-gradient(to top, var(--jupwr-line), rgba(0, 0, 0, 0)) 1;
+    font-weight: 600;
+}
+
+[data-ui-style="a"] .jmv-row-header-cell {
+    background-color: var(--jupwr-surface);
+    color: #999999;
+    border-image: linear-gradient(to left, var(--jupwr-line-light), rgba(0, 0, 0, 0)) 1 100%;
+}
+
+[data-ui-style="a"] .jmv-column-cell {
+    border-color: var(--jupwr-line-light);
+}
+
+[data-ui-style="a"] .jmv-column-header.highlighted,
+[data-ui-style="a"] .jmv-row-header-cell.highlighted {
+    background-color: var(--jupwr-bordo-pale);
+    color: var(--jupwr-bordo);
+}
+
+[data-ui-style="a"] .jmv-column-header:not(.place-holder):hover,
+[data-ui-style="a"] .jmv-row-header-cell:hover {
+    background-color: var(--jupwr-bordo-tint);
+}
+
+[data-ui-style="a"] .jmv-table-cell-selected:not(.has-edit-focus) {
+    box-shadow: 0 0 0 2px var(--jupwr-bordo) !important;
+    background-color: rgba(131, 32, 52, 0.06) !important;
+}
+
+/* results: white page; while an analysis is selected the others fade
+   instead of the whole panel turning grey */
+
+[data-ui-style="a"] .jmv-results-panel[data-analysis-selected] {
+    background-color: var(--jupwr-surface);
+}
+
+[data-ui-style="a"] .jmv-results-panel[data-analysis-selected]:not(.all-selected) .jmv-results-container:not([data-selected]) iframe {
+    opacity: 0.45;
+}
+
+/* A4: the variable editor (and filters, computed and transformed
+   variables) inside the data card, under its header (uicards.ts moves the
+   element); the spreadsheet slides down by the editor's height */
+
+[data-ui-style="a"] {
+    --jupwr-editor-height: 300px;
+}
+
+[data-ui-style="a"] #main-table > .jmv-variable-editor {
+    /* a custom element, inline unless it is a grid item as in the classic place */
+    display: block;
+    grid-area: auto;
+    width: 100%;
+    height: var(--jupwr-editor-height);
+    margin: 0;
+    border: none;
+    border-bottom: 1px solid var(--jupwr-line);
+    background-color: var(--jupwr-bordo-pale);
+}
+
+[data-ui-style="a"] #main-table > .jmv-variable-editor.hidden {
+    height: 0;
+    border-bottom: none;
+}
+
+[data-ui-style="a"] #main-table > .jmv-variable-editor.sub-editor-open {
+    background-color: var(--jupwr-surface-alt);
+}
+
+[data-ui-style="a"] #main-table > .jmv-variable-editor .jmv-variable-editor-main {
+    width: 100%;
+}
+
+[data-ui-style="a"] #main-table > .jmv-variable-editor .jmv-variable-editor-widget {
+    padding: 8px 44px 10px 44px;
+}
+
+[data-ui-style="a"] #main-table > #spreadsheet {
+    transition: top 0.2s, height 0.2s;
+}
+
+[data-ui-style="a"] #main-table > .jmv-variable-editor:not(.hidden) ~ #spreadsheet {
+    top: calc(var(--jupwr-card-header) + var(--jupwr-editor-height));
+    height: calc(100% - var(--jupwr-card-header) - var(--jupwr-editor-height));
+}
+
+[data-ui-style="a"] #main-table > .jmv-variable-editor:not(.hidden) ~ #variablelist {
+    height: calc(100% - var(--jupwr-card-header) - var(--jupwr-editor-height));
+}
+
+[data-ui-style="a"] .jmv-variable-editor-widget-title,
+[data-ui-style="a"] .jmv-variable-editor-widget-description,
+[data-ui-style="a"] .jmv-variable-editor select,
+[data-ui-style="a"] .jmv-variable-editor input[type="text"] {
+    border: 1px solid var(--jupwr-line);
+    border-radius: var(--jupwr-radius-small);
+}
+
+[data-ui-style="a"] .jmv-variable-editor-widget-title {
+    font-weight: 600;
+    color: var(--jupwr-text);
+}
+
+[data-ui-style="a"] .jmv-variable-editor-widget-title:focus {
+    outline: 2px solid var(--jupwr-bordo-tint);
+    border-color: var(--jupwr-bordo);
+}
+
+[data-ui-style="a"] .jmv-variable-editor-levels-control .title {
+    background-color: var(--jupwr-surface-alt);
+    border-color: var(--jupwr-line);
+    border-radius: 8px 8px 0 0;
+}
+
+[data-ui-style="a"] .jmv-variable-editor-levels-control .levels {
+    border-color: var(--jupwr-line);
+    border-radius: 0 0 8px 8px;
+}
+
+[data-ui-style="a"] .jmv-variable-editor-level.selected,
+[data-ui-style="a"] .jmv-variable-editor-level.selected > .jmv-variable-editor-level-label:not(:focus):not(:hover) {
+    background-color: var(--jupwr-bordo-tint);
+}
+
+[data-ui-style="a"] .jmv-variable-editor-widget-move {
+    background: transparent;
+}
+
+/* E2: preferences drawer: white panel with a "Ustawienia" heading and a
+   close cross; sections as small capitals, controls rounded. Grouping and
+   order are still those of appmenu.ts */
+
+:root:not([data-ui-style="a"]) .jmv-ribbon-appmenu-title {
+    display: none;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-menu-panel {
+    background-color: var(--jupwr-surface);
+    color: var(--jupwr-text);
+    border-inline-start: 1px solid var(--jupwr-line);
+    filter: none;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-menu {
+    font-size: 75%;
+    min-width: 360px;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-header {
+    align-items: center;
+    height: 56px;
+    padding-inline: 20px 12px;
+    border-bottom: 1px solid var(--jupwr-line-light);
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-icon {
+    display: none;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-title {
+    font-size: 150%;
+    font-weight: 600;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-back-button {
+    border-radius: var(--jupwr-radius-small);
+    background-color: transparent;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-back-button > div {
+    transform: none !important;
+    -webkit-mask-image: url('../assets/action-close.svg');
+    mask-image: url('../assets/action-close.svg');
+    -webkit-mask-size: 14px;
+    mask-size: 14px;
+    -webkit-mask-position: center;
+    mask-position: center;
+    background-color: var(--jupwr-text-muted);
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-back-button:hover {
+    background-color: var(--jupwr-bordo-pale);
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-back-button:hover > div {
+    background-color: var(--jupwr-bordo);
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-content {
+    margin: 4px 0 16px;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-subheading {
+    padding: 16px 20px 6px;
+    color: var(--jupwr-text-muted);
+    font-size: 85%;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-item {
+    padding: 7px 20px;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-separator {
+    margin: 8px 20px 0;
+    border-bottom-color: var(--jupwr-line-light);
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-item select,
+[data-ui-style="a"] .jmv-ribbon-appmenu-item input[type="text"] {
+    border: 1px solid var(--jupwr-line);
+    border-radius: var(--jupwr-radius-small);
+    background-color: var(--jupwr-surface);
+    padding: 4px 6px;
+    font: inherit;
+    color: inherit;
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-zoomin,
+[data-ui-style="a"] .jmv-ribbon-appmenu-zoomout {
+    border: 1px solid var(--jupwr-line);
+    border-radius: var(--jupwr-radius-small);
+    background-color: var(--jupwr-surface);
+}
+
+[data-ui-style="a"] .jmv-ribbon-appmenu-item.checkbox:hover,
+[data-ui-style="a"] .jmv-ribbon-appmenu-item.action:hover {
+    background-color: var(--jupwr-bordo-pale);
+}
+
+/* E3a: file menu: the operations list as a bordo rail with white text,
+   the selected operation and place as translucent pills. Layout and the
+   places under "Otwórz" are still those of backstage.ts */
+
+[data-ui-style="a"] .silky-bs-op-panel {
+    background-color: var(--jupwr-bordo);
+    color: rgba(255, 255, 255, 0.92);
+}
+
+[data-ui-style="a"] .silky-bs-header {
+    height: 64px;
+}
+
+[data-ui-style="a"] .silky-bs-op-list {
+    margin-top: 8px;
+    padding: 0 10px;
+}
+
+[data-ui-style="a"] .silky-bs-op-button {
+    font-size: 105%;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+[data-ui-style="a"] .silky-bs-op-button:hover,
+[data-ui-style="a"] .silky-bs-op-place:not(.selected-place):hover,
+[data-ui-style="a"] .silky-bs-op-recents .silky-bs-fslist-entry:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-ui-style="a"] .selected > .silky-bs-op-button {
+    background-color: rgba(255, 255, 255, 0.16);
+    font-weight: 600;
+}
+
+[data-ui-style="a"] .silky-bs-menu-item.selected {
+    padding: 4px 0;
+}
+
+[data-ui-style="a"] .silky-bs-op-place {
+    border-radius: var(--jupwr-radius-small);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+[data-ui-style="a"] .silky-bs-op-place.selected-place {
+    background-color: rgba(255, 255, 255, 0.16);
+    color: white;
+    font-size: 100%;
+}
+
+[data-ui-style="a"] .silky-bs-op-recents .silky-bs-fslist-entry {
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: var(--jupwr-radius-small);
+}
+
+[data-ui-style="a"] .silky-bs-op-recents .silky-bs-fslist-entry-icon {
+    filter: brightness(0) invert(1) opacity(0.7);
+}
+
+[data-ui-style="a"] .searchbox > input {
+    border: 1px solid var(--jupwr-line);
+    border-radius: 8px;
+    padding: 5px 8px;
+    outline: none;
+}
+
+[data-ui-style="a"] .searchbox > input:focus {
+    border-color: var(--jupwr-bordo);
+}
+
+/* A1 + A3: document title in the tab row, card headers (uicards.ts) */
+
+:root:not([data-ui-style="a"]) .jupwr-doc-title,
+:root:not([data-ui-style="a"]) .jupwr-card-header {
+    display: none;
+}
+
+[data-ui-style="a"] .jmv-ribbon-header {
+    position: relative;
+}
+
+[data-ui-style="a"] .jupwr-doc-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 40%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: white;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+[data-ui-style="a"] {
+    --jupwr-card-header: 40px;
+}
+
+[data-ui-style="a"] .jupwr-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: var(--jupwr-card-header);
+    box-sizing: border-box;
+    padding: 0 10px 0 14px;
+    border-bottom: 1px solid var(--jupwr-line-light);
+    background-color: var(--jupwr-surface);
+    white-space: nowrap;
+}
+
+[data-ui-style="a"] .jupwr-card-title {
+    font-weight: 600;
+    color: var(--jupwr-text);
+}
+
+[data-ui-style="a"] .jupwr-card-subtitle {
+    color: var(--jupwr-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+[data-ui-style="a"] .jupwr-card-spacer {
+    flex: 1;
+}
+
+[data-ui-style="a"] .jupwr-card-button {
+    font: inherit;
+    font-size: 92%;
+    padding: 4px 10px;
+    border: 1px solid var(--jupwr-line);
+    border-radius: var(--jupwr-radius-small);
+    background-color: var(--jupwr-surface);
+    color: var(--jupwr-text);
+}
+
+[data-ui-style="a"] .jupwr-card-button:hover {
+    border-color: var(--jupwr-bordo);
+    color: var(--jupwr-bordo);
+    background-color: var(--jupwr-bordo-pale);
+}
+
+[data-ui-style="a"] #main-table > #spreadsheet,
+[data-ui-style="a"] #results .jmv-results-panel,
+[data-ui-style="a"] #results .jmv-welcome-panel {
+    top: var(--jupwr-card-header);
+    height: calc(100% - var(--jupwr-card-header));
+}
+
+[data-ui-style="a"] #main-table > #variablelist {
+    height: calc(100% - var(--jupwr-card-header));
+}
+
+[data-ui-style="a"] #results .icon-info-box {
+    top: calc(var(--jupwr-card-header) + 16px);
+}
+
+/* the card must not scroll when focus lands in the editor */
+[data-ui-style="a"] #main-table {
+    overflow: clip;
+}
+
+/* "O zbiorze" is in the data card header, so not in the status bar too */
+[data-ui-style="a"] .jmv-statusbar-button[data-name="datasetinfo"] {
+    display: none;
+}
+
+/* the options card on light grey, so the white lists and fields inside it
+   (analysisui/jupwr-ui-a.css) stand out */
+[data-ui-style="a"] #main-options {
+    background-color: var(--jupwr-warm-surface);
+}
+
+[data-ui-style="a"] .jupwr-write-button {
+    border-color: var(--jupwr-bordo);
+    color: var(--jupwr-bordo);
+}
+
+[data-ui-style="a"] .jupwr-write-button.active {
+    background-color: var(--jupwr-bordo);
+    color: white;
+}

@@ -183,6 +183,8 @@ class ResultsPanel extends EventDistributor {
         this.model.settings().on('change:syntaxMode', () => this._updateAll());
         // jUPWR: results font size (projector legibility) — see appmenu
         this.model.settings().on('change:resultsFontSize', () => this._updateAll());
+        // jUPWR: interface style, see common/uistyle.ts
+        this.model.settings().on('change:uiStyle', () => this._updateAll());
         this.model.settings().on('change:refsMode', () => this._updateRefsMode());
         this.model.on('change:editState', () => this._updateEditState());
         this.model.on('change:path change:title', () => this._updateDatasetRefs());
@@ -517,6 +519,7 @@ class ResultsPanel extends EventDistributor {
                 mode: this.model.settings().get('syntaxMode') ? 'text' : 'rich',
                 devMode: this.model.settings().get('devMode'),
                 fontSize: this.model.settings().getSetting('resultsFontSize', 100),
+                uiStyle: this.model.settings().getSetting('uiStyle', undefined),
                 format: format,
                 refs: this._refsTable.getNumbers(analysis.ns),
                 refsMode: this.model.settings().getSetting('refsMode', 'bottom'),

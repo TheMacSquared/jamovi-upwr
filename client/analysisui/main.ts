@@ -24,6 +24,7 @@ import { h, rich }  from '../common/htmlelementcreator';
 
 import I18ns, { I18n, I18nData } from "../common/i18n";
 import HighContrast from '../common/highcontrast';
+import { applyUiStyle } from '../common/uistyle';
 
 declare global {
     function s_(key: string, formats?: { [key: string]: (string|number); } | (string|number)[] | string, options?: { prefix: string; postfix: string; }): string;
@@ -64,6 +65,9 @@ const frameCommsApi = {
     updateOptions: updateOptions,
 
     updateSettings: settings => {
+        // jUPWR: the interface style also applies to an analysis in error
+        if ('uiStyle' in settings)
+            applyUiStyle(settings.uiStyle);
         if (analysis !== null && analysis.inError === false) {
             for (let settingName in settings) {
                 let value = settings[settingName];

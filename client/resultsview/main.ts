@@ -15,6 +15,7 @@ import { contextMenuListener } from '../common/utils';
 import { h } from '../common/htmlelementcreator';
 import { CollectionView, View } from "./element";
 import HighContrast from '../common/highcontrast';
+import { applyUiStyle } from '../common/uistyle';
 
 window._ = I18ns.get('app')._;
 
@@ -267,6 +268,7 @@ class Main {  // this is constructed at the bottom
             document.body.dir = I18ns.get('app').isRTL(eventData.languageCode) ? 'rtl' : 'ltr';
             this.resultsDefn = eventData;
             this._applyFontSize(eventData.fontSize);
+            applyUiStyle(eventData.uiStyle);
             this._analysisSelected = eventData.selected;
             this._annotationSelected = eventData.annotationSelected;
             this._annotationState = eventData.editState;

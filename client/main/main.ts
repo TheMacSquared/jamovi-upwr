@@ -42,8 +42,10 @@ import type { InfoBox } from './infobox';
 
 import keyboardJS  from 'keyboardjs';
 import HighContrast from '../common/highcontrast';
+import { applyUiStyle } from '../common/uistyle';
 import Store from './store';
 import DatasetInfo from './datasetinfo';
+import { setupCardHeaders, setupEditorPlacement } from './uicards';
 import { relocate } from './relocate';
 
 declare global {
@@ -165,6 +167,10 @@ keyboardJS.Keyboard.prototype.resume = function(key) {
 };
 
 const instance = new Instance(coms);
+
+// jUPWR: interface style (preferences); classic until the settings arrive
+applyUiStyle(instance.settings().getSetting('uiStyle', undefined));
+instance.settings().on('change:uiStyle', () => applyUiStyle(instance.settings().getSetting('uiStyle', undefined)));
 
 const store = new Store(instance.settings(), instance.modules());
 store.classList.add('jmv-store');
@@ -761,6 +767,21 @@ ready(async() => {
 
     resultsView.intialise(host.resultsViewUrl, instance);
 
+    // jUPWR: card headers and document title (shown by the non-classic styles)
+    setupCardHeaders(instance, dataSetModel, {
+        ribbonHeader: ribbon.$header,
+        mainTable: $mainTable as HTMLElement,
+        results: resultsPanel,
+        copyResults: () => resultsView.richView._menuEvent({ op: 'copy', address: [ ] }),
+        exportResults: () => {
+            backstageModel.set('activated', true);
+            backstageModel.set('operation', 'export');
+        },
+        toggleEditResults: () => {
+            ribbonModel.set('selectedTab', instance.get('editState') ? 'analyses' : 'annotation');
+        },
+    });
+
     resultsView.addEventListener('hideOptions', () => {
         optionspanel.hideOptions();
     });
@@ -927,6 +948,8 @@ ready(async() => {
 
     let editor = document.querySelector('#variable-editor') as VariableEditor; //new VariableEditor({ el : '#variable-editor', model : dataSetModel, controller: viewController });
     editor.init(dataSetModel, viewController);
+    // jUPWR: in the non-classic styles the editor sits in the data card
+    setupEditorPlacement(editor, splitPanel, $mainTable as HTMLElement, mainTable, dataSetModel);
 
     let notifications = new Notifications(document.querySelector('#notifications'));
     instance.on( 'notification', note => notifications.notify(note));
