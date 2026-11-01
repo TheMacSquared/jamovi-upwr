@@ -2,8 +2,8 @@
 
 Cel: sprawdzić zachowanie interfejsu i dokumentów po merge `3786706e`, przede
 wszystkim poprawki undo/redo, postępu operacji i zgodność funkcji jUPWR.
-Wersja bazowa serwera: **28.17.0.0**. Numer dystrybucji pozostaje **1.2.4** do
-przygotowania kolejnego wydania; sam numer jUPWR nie identyfikuje tego builda.
+Wersja bazowa serwera: **28.17.0.0**. Numer dystrybucji: **1.3.0**.
+W protokole zanotuj także commit i środowisko wykonania testów.
 
 Plan przygotowany 2026-11-01. **Wszystkie poniższe testy ręczne są do wykonania.**
 Przejście testów automatycznych i technicznego testu HTTP/WebSocket nie oznacza

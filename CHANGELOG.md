@@ -3,62 +3,55 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
-## Niewydane — jamovi 28.17
+## 1.3.0 — 2026-11-01 (linia latest, jamovi 28.17)
 
-- Import wczytuje wszystkie źródła i sprawdza łączny limit wierszy przed
-  zastąpieniem danych. Błąd odczytu dowolnego pliku albo anulowanie przygotowania
-  zachowuje stary arkusz, formuły, analizy i historię cofania.
+Stan buildów: Docker (`jupwr/jupwr:1.3.0`) zbudowany i sprawdzony na Linuxie.
+Windows i macOS oraz ich pliki `.jmo` jRISK/jSpace czekają na build i weryfikację
+na właściwych maszynach. Wersje modułów opcjonalnych bez zmian: jRISK 0.4.4,
+jSpace 0.3.3; wymagają przebudowy dla tej wersji aplikacji.
 
-- Parser odpowiedzi JSON Lines zachowuje niedokończone linie i znaki UTF-8
-  między fragmentami sieciowymi. Niepełna lub błędna odpowiedź kończy się
-  błędem zamiast zwrócić wcześniejszy komunikat postępu jako wynik.
-
-- Preferencje „Dokumenty → Kopie odzyskiwania” pozwalają wybrać interwał:
-  wyłączone, 1, 2, 5, 10 lub 15 minut. Domyślnie 5 minut; wybór jest
-  zapamiętywany w profilu i działa bez restartu.
-
+- Nowa baza jamovi 28.17: poprawki undo/redo przy ukrytych wierszach i usuwanych
+  kolumnach wynikowych, postępu i anulowania operacji, proxy, systemowych
+  certyfikatów TLS, arkusza i panelu wyników. Typ opcji `Color` i kontrolka
+  wyboru koloru w modułach; zaktualizowane tłumaczenia.
+- Kopie odzyskiwania obejmują również nowe, niezapisane dokumenty. Są dostępne
+  w folderze „Odzyskiwanie” i nie zmieniają nazwy ani oznaczenia niezapisanych
+  zmian dokumentu. W Dockerze przetrwają odtworzenie kontenera.
+- Preferencje „Dokumenty → Kopie odzyskiwania”: wyłączone, 1, 2, 5, 10 lub
+  15 minut; domyślnie 5 minut. Wybór jest zapamiętywany w profilu i działa bez
+  restartu. Przy włączonym odzyskiwaniu kopia powstaje też przy kończeniu sesji.
+- Atomowy zapis `.omv`: unikalny plik tymczasowy, `fsync` i podmiana dopiero po
+  zakończeniu zapisu. Błąd przed podmianą zachowuje poprzedni plik, a anulowanie
+  czeka na zakończenie pracy wątku zapisującego.
 - „Wszystko → Usuń” wymaga potwierdzenia nieodwracalnego usunięcia analiz,
-  wyników, uwag i kolumn wynikowych. W Electronie domyślną odpowiedzią
-  jest „Anuluj”.
-
-- Zapis dokumentu używa unikalnego pliku tymczasowego, `fsync` i atomowej podmiany;
-  błąd zapisu zachowuje poprzedni plik. Anulowanie czeka na wątek zapisujący.
-- Kopie odzyskiwania obejmują także nowe, niezapisane dokumenty i są dostępne
-  w folderze „Odzyskiwanie”; w Dockerze przetrwają odtworzenie kontenera.
-
-- Ograniczona liczbowo i bajtowo kolejka WebSocket z jednym nadawcą, scalaniem
-  postępu oraz zamknięciem przeciążonego połączenia umożliwiającym ponowne połączenie.
-- Konfigurowalna liczba procesów R (`JAMOVI_R_PROCESSES`) i kończenie zajętego
-  procesu po anulowaniu analizy, bez blokowania kolejnych obliczeń.
-
-- Aktualizacja modułu `.jmo` rozpakowuje i sprawdza nową paczkę przed podmianą
-  plików. Błąd rozpakowania, walidacji lub podmiany zachowuje poprzednią wersję;
-  instalator przywraca ją także po błędzie odświeżenia rejestru modułów.
-
-- Instalowanie modułów `.jmo` przez przeciągnięcie do panelu „Transfer danych”
-  używa instalatora modułów; plik nie trafia już do otwierania zbiorów danych.
-
-- Obsługa analiz: poprawione tworzenie instancji przez WebSocket i odpowiedzi
-  na błędy żądań, propagowanie awarii silnika, kończenie przerwanych eksportów
-  oraz sprzątanie zadań i procesów R przy restarcie lub zamknięciu sesji.
-- Testy regresji obejmują wyścigi anulowania, nieudany start i restart silników,
-  timeout oraz odzyskiwanie po awarii prawdziwego procesu R w Dockerze.
-- Docker przekazuje sygnał zatrzymania bezpośrednio do serwera i daje mu czas
-  na zamknięcie procesów R przed zakończeniem kontenera.
-- Dane do testów ręcznych są wbudowane w obraz Dockera i dostępne jako pliki
-  w `Dokumenty → jupwr-test-audyt`, poza Biblioteką danych dydaktycznych.
-- Polski jako domyślny język nowego profilu, także przy angielskim języku
-  przeglądarki; zapisany wybór użytkownika nadal ma pierwszeństwo.
-- Scalenie upstreamu jamovi 28.14–28.17: poprawki undo/redo przy ukrytych
-  wierszach odfiltrowanych i usuwanych kolumnach wynikowych analiz, obsługa
-  postępu i anulowania operacji, proxy oraz systemowe certyfikaty TLS.
-- Typ opcji `Color` i kontrolka wyboru koloru w modułach; poprawki arkusza
-  i panelu wyników oraz aktualizacja tłumaczeń.
+  wyników, uwag i kolumn wynikowych. W Electronie domyślnym przyciskiem jest
+  „Anuluj”; Escape również anuluje.
+- Bezpieczniejsza instalacja `.jmo`: rozpakowanie i walidacja przed podmianą,
+  przywracanie poprzedniej wersji przy błędzie podmiany lub odświeżenia rejestru.
+  Przeciągnięcie pliku do panelu „Transfer danych” uruchamia instalator modułu,
+  zamiast próbować otworzyć paczkę jako dane.
+- Import przygotowuje wszystkie pliki i sprawdza łączny limit wierszy przed
+  zastąpieniem danych. Błąd odczytu dowolnego źródła albo anulowanie przygotowania
+  zachowuje stary arkusz, formuły, analizy i historię cofania.
+- Ograniczona liczbowo i bajtowo kolejka WebSocket: jeden nadawca, scalanie
+  postępu i rozłączenie przeciążonego klienta z możliwością ponownego połączenia.
+  Parser JSON Lines obsługuje linie i znaki UTF-8 dzielone między fragmentami
+  odpowiedzi; ucięta lub błędna odpowiedź jest zgłaszana jako błąd.
+- Konfigurowalna liczba procesów R (`JAMOVI_R_PROCESSES`, domyślnie 4).
+  Anulowanie kończy zajęty proces przed następnym obliczeniem. Poprawiona obsługa
+  awarii, timeoutów, startu i restartu silników, eksportów oraz zamykania sesji.
+  Docker przekazuje sygnał zatrzymania bezpośrednio do serwera i czeka na sprzątanie.
+- Polski jest domyślnym językiem nowego profilu także w angielskiej przeglądarce;
+  zapisany wybór języka nadal ma pierwszeństwo.
 - Zachowany podział analiz jUPWR: tabele częstości pozostają w analizach
-  jakościowych; zmiany upstreamu dotyczące częstości w `jmv::descriptives`
-  nie przywracają ich w panelu zmiennych ilościowych.
-- Numer dystrybucji pozostaje 1.2.4 do przygotowania kolejnego wydania;
-  artefakty 1.2.4 i ich macierz zgodności nadal dotyczą jamovi 28.13.
+  jakościowych, bez przywracania ich do panelu zmiennych ilościowych upstreamu.
+- Dane do audytu Dockera są w obrazie jako zwykłe pliki w `Dokumenty →
+  jupwr-test-audyt`, poza Biblioteką danych dydaktycznych.
+
+Konfiguracja backendu i odzyskiwania: [`packaging/BACKEND.md`](packaging/BACKEND.md).
+Sprawdzenie w Dockerze/Linux: 262 testy backendu, 355 testów klienta, 9 testów
+kompilatora tłumaczeń; testy obliczeń R, importu, WebSocket, zapisu/odczytu OMV
+oraz odzyskania kopii dokumentu w drugim kontenerze.
 
 ## 1.2.4 — 2026-10-30 (linia latest, jamovi 28.13)
 
