@@ -777,6 +777,9 @@ ready(async() => {
             backstageModel.set('activated', true);
             backstageModel.set('operation', 'export');
         },
+        toggleEditResults: () => {
+            ribbonModel.set('selectedTab', instance.get('editState') ? 'analyses' : 'annotation');
+        },
     });
 
     resultsView.addEventListener('hideOptions', () => {

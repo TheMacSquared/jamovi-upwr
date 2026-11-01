@@ -4,8 +4,9 @@
 @import '../node_modules/quill/dist/quill.core.css';
 @import '../node_modules/katex/dist/katex.min.css';
 @import './annotation.css';
-/* jUPWR: colour tokens (common/jupwr-colors.css) */
+/* jUPWR: colour tokens (common/jupwr-colors.css), findable text fields */
 @import '../common/jupwr-colors.css';
+@import './jupwr-annotation.css';
 @import '../node_modules/highlight.js/styles/tomorrow.css';
 
 

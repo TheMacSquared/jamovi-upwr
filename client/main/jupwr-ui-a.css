@@ -705,3 +705,13 @@
 [data-ui-style="a"] #main-options {
     background-color: var(--jupwr-warm-surface);
 }
+
+[data-ui-style="a"] .jupwr-write-button {
+    border-color: var(--jupwr-bordo);
+    color: var(--jupwr-bordo);
+}
+
+[data-ui-style="a"] .jupwr-write-button.active {
+    background-color: var(--jupwr-bordo);
+    color: white;
+}

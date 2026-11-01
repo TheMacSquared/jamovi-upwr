@@ -1,0 +1,37 @@
+/* jUPWR: make the places to write in the results findable, in every
+   interface style. Students did not discover that the results take text:
+   outside the edit mode the empty fields only showed ">" when the pointer
+   hit them exactly, and in the edit mode they were thin unlabelled strips. */
+
+/* outside the edit mode: hovering an analysis offers the field below it
+   (the last top-level annotation of the analysis) */
+body:hover #results:not(.edit-state):not(.annotation) .jmv-results-group-container > .jmv-annotation[level="0"]:last-child:not(.focused) .ql-editor.ql-blank::before {
+    content: '+ dopisz tekst';
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+    color: var(--jupwr-bordo);
+    font-style: italic;
+    cursor: text;
+}
+
+/* in the edit mode: every empty field is a dashed, labelled line */
+#results.edit-state .jmv-annotation:not(.focused) .ql-editor.ql-blank {
+    min-height: 1.6em;
+}
+
+#results.edit-state .jmv-annotation:not(.focused):has(.ql-blank) .editor-box {
+    outline: 1px dashed var(--jupwr-line);
+    outline-offset: -1px;
+    border-radius: 4px;
+}
+
+#results.edit-state .jmv-annotation .ql-editor.ql-blank::before {
+    content: 'Kliknij, aby dopisać tekst…';
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+    color: var(--jupwr-text-faint);
+    font-style: italic;
+    line-height: 1.6em;
+}

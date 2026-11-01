@@ -17,6 +17,7 @@ interface CardHeaderOptions {
     results: HTMLElement;
     copyResults: () => void;
     exportResults: () => void;
+    toggleEditResults: () => void;
 }
 
 // Polish plural of "wiersz" (1 wiersz, 2-4 wiersze, 5+ / 12-14 wierszy)
@@ -45,6 +46,14 @@ export function setupCardHeaders(instance: Instance, dataSetModel: DataSetModel,
         $about);
     options.mainTable.prepend($dataHeader);
 
+    // students did not find that the results take text: a visible way into
+    // the edit mode (the "Edytuj" tab), marked while it is on
+    const $write = h('button', { class: 'jupwr-card-button jupwr-write-button', type: 'button' }, '✎ Pisz w wynikach');
+    $write.addEventListener('click', () => options.toggleEditResults());
+    const updateWrite = () => $write.classList.toggle('active', !! instance.get('editState'));
+    instance.on('change:editState', updateWrite);
+    updateWrite();
+
     const $copy = h('button', { class: 'jupwr-card-button', type: 'button' }, _('Copy'));
     $copy.addEventListener('click', () => options.copyResults());
     const $export = h('button', { class: 'jupwr-card-button', type: 'button' }, _('Export'));
@@ -52,6 +61,7 @@ export function setupCardHeaders(instance: Instance, dataSetModel: DataSetModel,
     const $resultsHeader = h('div', { class: 'jupwr-card-header', role: 'none' },
         h('span', { class: 'jupwr-card-title' }, _('Results')),
         h('span', { class: 'jupwr-card-spacer' }),
+        $write,
         $copy,
         $export);
     options.results.prepend($resultsHeader);
