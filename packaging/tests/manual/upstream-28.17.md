@@ -272,6 +272,9 @@ w domu nie potwierdza działania przez uczelniane proxy.
 
 - [ ] Na kopii środowiska zainstaluj jRISK przez Sideload, używając `.jmo`
   zbudowanego dla tej platformy i bieżącego runtime/kompilatora.
+- [ ] W aplikacji Electron sprawdź oba sposoby instalacji: wybór pliku strzałką
+  oraz przeciągnięcie `.jmo` na strzałkę i na puste miejsce panelu. Plik nie
+  powinien trafić do otwierania danych ani zgłosić „Unrecognised file format”.
 - [ ] Uruchom jedną analizę modułu, zapisz dokument i otwórz go ponownie.
 - [ ] Powtórz po restarcie aplikacji. jSpace sprawdź analogicznie, jeśli jest
   przewidziany dla odbiorców wydania.

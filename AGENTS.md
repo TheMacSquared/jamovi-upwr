@@ -180,3 +180,11 @@ i oczekiwanym zachowaniem.
   pozwalają odbudować proces R, a zamknięcie nie pozostawia procesów i wątków.
 - Testy automatyczne obejmują także prawdziwy proces C++/R w Dockerze oraz
   nieudane odtwarzanie stanu i usunięcie analizy podczas eksportu.
+
+### Zadanie 9: Instalacja modułów przez przeciąganie
+- Pliki: `client/main/store/pagesideload.ts`,
+  `client/main/store/tests/pagesideload.test.ts`.
+- Upuszczenie pliku w panelu instalacji modułów w Electronie uruchamia ten sam
+  instalator co wybór pliku strzałką i zatrzymuje otwieranie go jako danych.
+- Kilka plików jest instalowanych kolejno; błąd pozostawia panel otwarty,
+  a udana instalacja zamyka go i pokazuje powiadomienie.

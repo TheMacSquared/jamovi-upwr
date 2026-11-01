@@ -5,6 +5,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane — jamovi 28.17
 
+- Instalowanie modułów `.jmo` przez przeciągnięcie do panelu „Transfer danych”
+  używa instalatora modułów; plik nie trafia już do otwierania zbiorów danych.
+
 - Obsługa analiz: poprawione tworzenie instancji przez WebSocket i odpowiedzi
   na błędy żądań, propagowanie awarii silnika, kończenie przerwanych eksportów
   oraz sprzątanie zadań i procesów R przy restarcie lub zamknięciu sesji.

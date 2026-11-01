@@ -13,6 +13,7 @@ class PageSideload extends HTMLElement {
     model: Modules;
     $body: HTMLElement;
     $drop: HTMLButtonElement;
+    private _installing = false;
 
     constructor(model: Modules) {
         super();
@@ -26,6 +27,7 @@ class PageSideload extends HTMLElement {
         this.$drop = h('button', { class: 'jmv-store-page-installed-drop', tabindex: '-1' }, h('span', { class: 'mif-file-upload' }));
         this.$body.append(this.$drop);
         this.$drop.addEventListener('click', event => this._dropClicked());
+        this.addEventListener('drop', event => this._filesDropped(event));
     }
 
     async _dropClicked() {
@@ -36,16 +38,52 @@ class PageSideload extends HTMLElement {
 
             if ( ! result.cancelled) {
                 const path = result.paths[0];
-                try {
-                    await this.model.install(path);
-                    this._installSuccess();
-                }
-                catch (e) {
-                    this._installFailure(e);
-                }
+                await this._install([path]);
             }
 
             this.$drop.focus();
+        }
+    }
+
+    async _filesDropped(event: DragEvent) {
+        if ( ! host.isElectron)
+            return;
+
+        // Keep module packages out of the document-level dataset opener.
+        event.preventDefault();
+        event.stopPropagation();
+        try {
+            const paths = Array.from(event.dataTransfer.files, file => {
+                const path = host.getPathForFile(file);
+                if ( ! path)
+                    throw new Error(_('Unable to open'));
+                return path;
+            });
+            if (paths.length > 0)
+                await this._install(paths);
+        }
+        catch (e) {
+            this._installFailure(e);
+        }
+    }
+
+    private async _install(paths: string[]) {
+        if (this._installing)
+            return;
+        this._installing = true;
+        this.$drop.disabled = true;
+        try {
+            // Install one at a time; close the panel after the whole batch.
+            for (const path of paths)
+                await this.model.install(path);
+            this._installSuccess();
+        }
+        catch (e) {
+            this._installFailure(e);
+        }
+        finally {
+            this._installing = false;
+            this.$drop.disabled = false;
         }
     }
 
