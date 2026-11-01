@@ -738,3 +738,8 @@
 [data-ui-style="a"] #main-table {
     overflow: clip;
 }
+
+/* "O zbiorze" is in the data card header, so not in the status bar too */
+[data-ui-style="a"] .jmv-statusbar-button[data-name="datasetinfo"] {
+    display: none;
+}
