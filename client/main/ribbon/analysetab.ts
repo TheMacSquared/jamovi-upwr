@@ -2,7 +2,7 @@
 'use strict';
 
 import RibbonMenu from './ribbonmenu';
-import { JUPWR_HIDDEN_ANALYSES, JUPWR_MENU_LAST, JUPWR_MENU_ORDER } from '../../common/jupwr';
+import { JUPWR_HIDDEN_ANALYSES, JUPWR_MENU_LABELS, JUPWR_MENU_LAST, JUPWR_MENU_ORDER } from '../../common/jupwr';
 import RibbonTab, { RibbonItem } from './ribbontab';
 import Placeholder from './placeholder';
 import interactionManager from '../../common/interactionmanager';
@@ -146,11 +146,12 @@ export class AnalyseTab extends RibbonTab {
                     submenu = menu[subgroup];
                 else
                     submenu = { name: subgroup, title: translateMenu(_translate, subgroup), items: [ ] };
+                let label = JUPWR_MENU_LABELS.get(`${analysis.ns}::${analysis.name}`);
                 let item = {
                     name: analysis.name,
                     ns: analysis.ns,
-                    title: _translate(analysis.menuTitle),
-                    subtitle: _translate(analysis.menuSubtitle),
+                    title: label ? label.title : _translate(analysis.menuTitle),
+                    subtitle: label ? label.subtitle : _translate(analysis.menuSubtitle),
                     moduleName: module.name,
                     new: isNew,
                     hidden: module.visible === false,

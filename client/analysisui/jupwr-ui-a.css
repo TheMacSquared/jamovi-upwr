@@ -1,0 +1,119 @@
+/* jUPWR interface style A ("light") for the options panel, see
+   main/jupwr-ui-a.css and common/uistyle.ts. Only colours, borders and
+   radii: the control layout comes from the modules' .u.yaml files. */
+
+:root[data-ui-style="a"] {
+    --jupwr-bordo: #832034;
+    --jupwr-bordo-tint: #ece0e3;
+    --jupwr-bordo-pale: #fcf6f7;
+    --jupwr-surface: #FFFFFF;
+    --jupwr-surface-alt: #F4F4F4;
+    --jupwr-line: #D0D0D0;
+    --jupwr-text: #333333;
+    --jupwr-text-muted: #777777;
+    --jupwr-radius-small: 6px;
+
+    accent-color: var(--jupwr-bordo);
+}
+
+/* header: title over a thin line, smaller round back button */
+
+[data-ui-style="a"] .silky-options-header {
+    margin-top: 0;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-image: none;
+    border-bottom: 1px solid var(--jupwr-line);
+}
+
+[data-ui-style="a"] .silky-options-title {
+    font-size: 135%;
+    font-weight: 600;
+    color: var(--jupwr-text);
+}
+
+[data-ui-style="a"] .silky-sp-back-button {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    margin: 0;
+    border: 1px solid var(--jupwr-line);
+    color: var(--jupwr-text-muted);
+}
+
+[data-ui-style="a"] .silky-sp-back-button:hover {
+    border-color: var(--jupwr-bordo);
+    color: var(--jupwr-bordo);
+    background-color: var(--jupwr-bordo-pale);
+}
+
+/* variable lists and transfer buttons */
+
+[data-ui-style="a"] .silky-option-list,
+[data-ui-style="a"] .silky-target-list,
+[data-ui-style="a"] .silky-variable-supplier {
+    border: 1px solid var(--jupwr-line);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+[data-ui-style="a"] .silky-layout-cell.selected {
+    background-color: var(--jupwr-bordo-tint);
+}
+
+[data-ui-style="a"] .silky-target-list-header {
+    font-weight: 600;
+}
+
+[data-ui-style="a"] .jmv-variable-transfer,
+[data-ui-style="a"] .silky-option-variable-button {
+    border: 1px solid var(--jupwr-line) !important;
+    border-radius: var(--jupwr-radius-small);
+    background-color: var(--jupwr-surface);
+}
+
+[data-ui-style="a"] .jmv-variable-transfer:hover,
+[data-ui-style="a"] .silky-option-variable-button:hover {
+    border-color: var(--jupwr-bordo) !important;
+    background-color: var(--jupwr-bordo-pale);
+}
+
+/* text boxes and combo boxes */
+
+[data-ui-style="a"] input[type="text"],
+[data-ui-style="a"] select {
+    border: 1px solid var(--jupwr-line);
+    border-radius: var(--jupwr-radius-small);
+    background-color: var(--jupwr-surface);
+    padding: 3px 6px;
+}
+
+/* collapsed sections ("Założenia", "Zaawansowane") as light rows */
+
+[data-ui-style="a"] .silky-options-collapse-button {
+    padding: 9px 4px;
+    border: none;
+    border-top: 1px solid var(--jupwr-line);
+    background-color: transparent;
+    color: var(--jupwr-text);
+    font-weight: 600;
+}
+
+[data-ui-style="a"] .silky-options-collapse-button:hover {
+    background-color: var(--jupwr-bordo-pale);
+}
+
+[data-ui-style="a"] .silky-options-collapse-icon {
+    border-inline-end: none;
+    padding-inline-end: 14px;
+    margin-inline-end: 4px;
+}
+
+[data-ui-style="a"] .variablesupplier-button-box {
+    border-color: var(--jupwr-line);
+    border-radius: 0 0 8px 8px;
+}
+
+[data-ui-style="a"] .supplier-search {
+    border-bottom-color: var(--jupwr-line);
+}

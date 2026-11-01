@@ -62,6 +62,16 @@ export const JUPWR_MENU_LAST: ReadonlySet<string> = new Set([
     'jmv::logLinear',
 ]);
 
+// Menu labels replacing the module's own (title, subtitle) — jmv labels that
+// read badly in Polish next to the jUPWR analyses ("N wartości" for the
+// multinomial regression comes from jmv's menuTitle "N Outcomes").
+export const JUPWR_MENU_LABELS: ReadonlyMap<string, { title: string, subtitle: string }> = new Map([
+    ['jmv::corrPart', { title: 'Korelacja cząstkowa', subtitle: 'przy kontroli innych zmiennych' }],
+    ['jRegr::logistyczna', { title: 'Dwie kategorie', subtitle: 'zmienna zależna dwupoziomowa' }],
+    ['jmv::logRegOrd', { title: 'Porządkowa', subtitle: 'kategorie uporządkowane' }],
+    ['jmv::logRegMulti', { title: 'Wielomianowa', subtitle: 'wiele kategorii bez kolejności' }],
+]);
+
 // Explicit order inside a submenu (lower first; unlisted = 500, MENU_LAST = 1000).
 // Module load order would otherwise put jmv analyses before jUPWR ones.
 export const JUPWR_MENU_ORDER: ReadonlyMap<string, number> = new Map([
