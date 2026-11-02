@@ -123,9 +123,9 @@
     background-color: var(--jupwr-bordo-tint);
 }
 
+/* colour only: a bolder weight widens the label and shifts the neighbours */
 [data-ui-style="a"] .jmv-analyses-button.menu-owner.active > .jmv-ribbon-button-label {
     color: var(--jupwr-bordo);
-    font-weight: 600;
 }
 
 [data-ui-style="a"] .jmv-analyses-button.jmv-modules-menu-item {
