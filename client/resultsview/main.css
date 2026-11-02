@@ -6,6 +6,7 @@
 @import './annotation.css';
 /* jUPWR: colour tokens (common/jupwr-colors.css), findable text fields */
 @import '../common/jupwr-colors.css';
+@import '../common/jupwr-scrollbars.css';
 @import './jupwr-annotation.css';
 @import '../node_modules/highlight.js/styles/tomorrow.css';
 
