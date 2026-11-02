@@ -5,8 +5,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## 1.3.1 — 2026-11-02 (linia latest, jamovi 28.17)
 
-Stan buildów: Docker (`jupwr/jupwr:1.3.1`) i buildy Windows/macOS do wykonania;
-moduły opcjonalne jRISK 0.4.4 i jSpace 0.3.3 do przebudowy dla tej wersji.
+Stan buildów: Docker (`jupwr/jupwr:1.3.1`) zbudowany 2026-11-02; buildy Windows i macOS
+zbudowane tego samego dnia; moduły opcjonalne jRISK 0.4.4 i jSpace 0.3.3 zbudowane jako
+`.jmo` na obu maszynach.
 
 - Wygląd interfejsu do wyboru w ustawieniach („Interface”): Klasyczny (jak dotąd)
   albo Lekki (A). Lekki: przełącznik zakładek z tytułem zbioru w pasku, kolorowe
