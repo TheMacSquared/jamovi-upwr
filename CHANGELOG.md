@@ -3,6 +3,27 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.3.1 — 2026-11-02 (linia latest, jamovi 28.17)
+
+Stan buildów: Docker (`jupwr/jupwr:1.3.1`) i buildy Windows/macOS do wykonania;
+moduły opcjonalne jRISK 0.4.4 i jSpace 0.3.3 do przebudowy dla tej wersji.
+
+- Wygląd interfejsu do wyboru w ustawieniach („Interface”): Klasyczny (jak dotąd)
+  albo Lekki (A). Lekki: przełącznik zakładek z tytułem zbioru w pasku, kolorowe
+  ikony kategorii, karty danych, opcji i wyników (nagłówki z liczbą wierszy,
+  „O zbiorze”, Kopiuj, Eksportuj), edytor zmiennej w karcie danych (także filtry,
+  zmienne wyliczone i przekształcone), menu i szuflada ustawień w nowym stylu,
+  cienkie paski przewijania, ciepła szarość karty opcji.
+- Kolory interfejsu zebrane w jednym pliku (`client/common/jupwr-colors.css`).
+- Wyniki: podpowiedź „+ dopisz tekst” pod analizą i wyraźne pola do pisania
+  w trybie edycji (oba wyglądy); w wyglądzie Lekkim przycisk „Pisz w wynikach”.
+- Menu Regresja: czytelne podpisy „Wielomianowa”, „Porządkowa”, „Korelacja
+  cząstkowa”, „Dwie kategorie” (zamiast „N wartości” z angielskiej etykiety).
+- distrACTION 1.3.5: przy dużym n oś X rozkładów dwumianowego, geometrycznego,
+  Poissona i ujemnego dwumianowego pokazuje około 10 podziałek zamiast wszystkich
+  wartości.
+- Tłumaczenia polskie etykiet wyglądu (i18n).
+
 ## 1.3.0 — 2026-11-01 (linia latest, jamovi 28.17)
 
 Stan buildów: Docker (`jupwr/jupwr:1.3.0`) zbudowany i sprawdzony na Linuxie.
