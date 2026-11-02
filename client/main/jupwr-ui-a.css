@@ -706,6 +706,19 @@
     background-color: var(--jupwr-warm-surface);
 }
 
+/* the 6px strip above the tab row (#header) would make the top margin of the
+   bordo bar larger than the bottom one; on Windows the strip carries the
+   window buttons and stays */
+[data-ui-style="a"] body:not(.windows.electron) #header {
+    min-height: 0;
+    height: 0;
+}
+
+/* on Windows the window title already names the document */
+[data-ui-style="a"] body.windows.electron .jupwr-doc-title {
+    display: none;
+}
+
 [data-ui-style="a"] .jupwr-write-button {
     border-color: var(--jupwr-bordo);
     color: var(--jupwr-bordo);

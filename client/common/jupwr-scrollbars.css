@@ -1,0 +1,7 @@
+/* jUPWR: thin scrollbars in the colours of the design, interface style A
+   only (common/uistyle.ts). Loaded by the main window and both iframes. */
+
+[data-ui-style="a"] * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--jupwr-line) transparent;
+}

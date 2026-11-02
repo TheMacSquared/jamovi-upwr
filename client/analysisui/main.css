@@ -31,6 +31,7 @@
 /* jUPWR: colour tokens and the interface styles (scoped by
    [data-ui-style], see common/uistyle.ts) */
 @import "../common/jupwr-colors.css";
+@import "../common/jupwr-scrollbars.css";
 @import "jupwr-ui-a.css";
 
 * {
