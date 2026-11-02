@@ -404,7 +404,7 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           # Y-axis-label
           ggplot2::ylab("")+
           # Add x-axis scale
-          scale_x_continuous(breaks = AxisSegments)
+          scale_x_continuous(breaks = discreteAxisBreaks(AxisSegments))
         
         
         ##### 2.3.2) Area ##### 

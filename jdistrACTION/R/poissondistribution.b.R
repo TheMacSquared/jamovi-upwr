@@ -192,7 +192,7 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Plot <- ggplot(Datas, aes(x = X, y = Prob)) +
         geom_col(fill = BarFill, color = theme$color[1], width = 0.7) +
         ggplot2::xlab("") + ggplot2::ylab("") +
-        scale_x_continuous(breaks = Datas$X) +
+        scale_x_continuous(breaks = discreteAxisBreaks(Datas$X)) +
         ggtheme +
         theme(legend.title = element_blank())
 
