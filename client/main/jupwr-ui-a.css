@@ -604,28 +604,14 @@
     border-color: var(--jupwr-bordo);
 }
 
-/* A1 + A3: document title in the tab row, card headers (uicards.ts) */
+/* A3: card headers (uicards.ts) */
 
-:root:not([data-ui-style="a"]) .jupwr-doc-title,
 :root:not([data-ui-style="a"]) .jupwr-card-header {
     display: none;
 }
 
 [data-ui-style="a"] .jmv-ribbon-header {
     position: relative;
-}
-
-[data-ui-style="a"] .jupwr-doc-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    max-width: 40%;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    color: white;
-    font-weight: 600;
-    pointer-events: none;
 }
 
 [data-ui-style="a"] {
@@ -712,11 +698,6 @@
 [data-ui-style="a"] body:not(.windows.electron) #header {
     min-height: 0;
     height: 0;
-}
-
-/* on Windows the window title already names the document */
-[data-ui-style="a"] body.windows.electron .jupwr-doc-title {
-    display: none;
 }
 
 [data-ui-style="a"] .jupwr-write-button {

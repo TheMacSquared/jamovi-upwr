@@ -20,21 +20,7 @@ interface CardHeaderOptions {
     toggleEditResults: () => void;
 }
 
-// Polish plural of "wiersz" (1 wiersz, 2-4 wiersze, 5+ / 12-14 wierszy)
-function rowsLabel(n: number): string {
-    if (n === 1)
-        return '1 wiersz';
-    const lastDigit = n % 10;
-    const lastTwo = n % 100;
-    if (lastDigit >= 2 && lastDigit <= 4 && (lastTwo < 12 || lastTwo > 14))
-        return `${ n } wiersze`;
-    return `${ n } wierszy`;
-}
-
 export function setupCardHeaders(instance: Instance, dataSetModel: DataSetModel, options: CardHeaderOptions) {
-
-    const $docTitle = h('div', { class: 'jupwr-doc-title app-dragable', role: 'none' });
-    options.ribbonHeader.querySelector('.ribbon-tabs').after($docTitle);
 
     const $dataInfo = h('span', { class: 'jupwr-card-subtitle' });
     const $about = h('button', { class: 'jupwr-card-button', type: 'button' }, 'O zbiorze');
@@ -73,7 +59,6 @@ export function setupCardHeaders(instance: Instance, dataSetModel: DataSetModel,
         const rows = dataSetModel.attributes.rowCount;
         const filters = dataSetModel.filterCount(false);
         const columns = dataSetModel.attributes.columnCount - filters;
-        $docTitle.textContent = title ? `${ title } · ${ rowsLabel(rows) }` : '';
         $dataInfo.textContent = `${ title ? title + ' · ' : '' }${ rows } × ${ columns } · filtry ${ dataSetModel.filterCount(true) }`;
     };
 
