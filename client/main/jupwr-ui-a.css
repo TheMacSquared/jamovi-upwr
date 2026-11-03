@@ -137,6 +137,74 @@
     color: var(--jupwr-bordo);
 }
 
+/* scroll arrows when the categories do not fit: plain background under the
+   sticky modules button, an arrow beside it and at the start of the row; a
+   click brings the next hidden category into view (ribbon.ts) */
+[data-ui-style="a"] .jmv-ribbon-body-frame {
+    --jupwr-scroll-size: 44px;
+}
+
+[data-ui-style="a"] .jmv-modules-menu-item {
+    z-index: 3;
+}
+
+[data-ui-style="a"] .jmv-ribbon-scroll.visible {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    bottom: 1px;
+    width: var(--jupwr-scroll-size);
+    z-index: 2;
+    pointer-events: none;
+}
+
+[data-ui-style="a"] .jmv-ribbon-scroll-left {
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 4px;
+    background: linear-gradient(to left, transparent, var(--jupwr-surface) 16px);
+}
+
+[data-ui-style="a"] .jmv-ribbon-scroll-right {
+    right: 0;
+    justify-content: flex-start;
+    padding-left: 16px;
+    box-sizing: border-box;
+    background: linear-gradient(to right, transparent, var(--jupwr-surface) 16px);
+}
+
+[data-ui-style="a"] .jmv-ribbon-scroll-button {
+    pointer-events: auto;
+    width: 24px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background-color: transparent;
+    color: var(--jupwr-bordo);
+    cursor: pointer;
+}
+
+[data-ui-style="a"] .jmv-ribbon-scroll-button:hover {
+    background-color: var(--jupwr-bordo-pale);
+}
+
+[data-ui-style="a"] .jmv-ribbon-scroll-button::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    margin: auto;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: translateX(-2px) rotate(45deg);
+}
+
+[data-ui-style="a"] .jmv-ribbon-scroll-left .jmv-ribbon-scroll-button::before {
+    transform: translateX(2px) rotate(-135deg);
+}
+
 [data-ui-style="a"] .jmv-ribbon-button:not([aria-disabled]):not(.maintain-color):hover,
 [data-ui-style="a"] .jmv-ribbon-button:not([aria-disabled]).checked {
     background-color: var(--jupwr-bordo-pale) !important;

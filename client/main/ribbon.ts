@@ -121,6 +121,10 @@ export class RibbonView extends EventDistributor {
     $header: HTMLElement;
     $ribbonTabs: HTMLElement;
     $body: HTMLElement;
+    $scrollLeft: HTMLElement;
+    $scrollRight: HTMLElement;
+    _scrollTarget = 0;
+    _scrollTargetTime = 0;
     $fileButton: HTMLElement;
     $fullScreen: HTMLElement;
     tabSelection: SelectionLoop;
@@ -182,7 +186,14 @@ export class RibbonView extends EventDistributor {
             h('div', { class: 'ribbon-tabs', role: 'tablist' }),
             h('div', { id: 'jmv-user-button' }),
             h('button', { class: 'jmv-ribbon-fullscreen', 'aria-label': _('Enable/disable full screen mode') })));
-        this.append(h('div', { id: 'ribbon-body', class: 'jmv-ribbon-body jmv-ribbon-group-body-horizontal', hloop: 'true', role: 'tabpanel', 'aria-roledescription': '' }));
+        // jUPWR: the body sits in a frame which carries the scroll arrows; they
+        // overlay the body, so the body's own layout is unchanged (style A only)
+        this.$scrollLeft = this._createScroller('left');
+        this.$scrollRight = this._createScroller('right');
+        this.append(h('div', { class: 'jmv-ribbon-body-frame' },
+            h('div', { id: 'ribbon-body', class: 'jmv-ribbon-body jmv-ribbon-group-body-horizontal', hloop: 'true', role: 'tabpanel', 'aria-roledescription': '' }),
+            this.$scrollLeft,
+            this.$scrollRight));
 
         this.notifs = new Notifs();
         this.append(this.notifs);
@@ -198,6 +209,12 @@ export class RibbonView extends EventDistributor {
         this.$body   = this.querySelector<HTMLElement>('.jmv-ribbon-body');
         this.$fileButton = this.querySelector<HTMLElement>('.jmv-ribbon-tab[data-tabname="file"]');
         this.$fullScreen = this.querySelector<HTMLElement>('.jmv-ribbon-fullscreen');
+
+        const updateScrollers = () => this._updateScrollers();
+        this.$body.addEventListener('scroll', updateScrollers, { passive: true });
+        new ResizeObserver(updateScrollers).observe(this.$body);
+        this.$body.addEventListener('wheel', (event) => this._wheelScroll(event), { passive: false });
+        new MutationObserver(updateScrollers).observe(this.$body, { childList: true, subtree: true });
 
         this.$fileButton.addEventListener('click', (event) => {
             let newEvent = new CustomEvent<{tabName: keyof TabTypes, withMouse: boolean}>('tabSelected', { detail: { tabName: 'file', withMouse: event.detail > 0 }});
@@ -339,6 +356,93 @@ export class RibbonView extends EventDistributor {
         if (tab.ribbon) {
             this.$body.append(tab.ribbon);
             keyTips.update({ silent: true});
+        }
+    }
+
+    _createScroller(side: 'left' | 'right') {
+        let $button = h('button', { class: 'jmv-ribbon-scroll-button', tabindex: '-1', 'aria-hidden': 'true' });
+        $button.addEventListener('mousedown', (event) => event.preventDefault());
+        $button.addEventListener('click', () => this._scrollByItem(side));
+        return h('div', { class: `jmv-ribbon-scroll jmv-ribbon-scroll-${ side }` }, $button);
+    }
+
+    // the sticky modules button stays at the end of the row; its width is the
+    // part of the body the items scroll under
+    _stickyEnd(): HTMLElement | null {
+        return this.$body.querySelector<HTMLElement>('.jmv-modules-menu-item');
+    }
+
+    _ribbonItems(): HTMLElement[] {
+        let $menu = this.$body.querySelector<HTMLElement>('.jmv-ribbon-menu');
+        if ( ! $menu)
+            return [];
+        let $sticky = this._stickyEnd();
+        return Array.from($menu.children).filter((el) => {
+            return el !== $sticky
+                && ! el.classList.contains('jmv-ribbon-button-separator')
+                && (el as HTMLElement).offsetWidth > 0;
+        }) as HTMLElement[];
+    }
+
+    _updateScrollers() {
+        let body = this.$body;
+        let rtl = getComputedStyle(body).direction === 'rtl';
+        let max = body.scrollWidth - body.clientWidth;
+        let pos = Math.abs(body.scrollLeft);
+        let canLeft = ! rtl && pos > 1;
+        let canRight = ! rtl && pos < max - 1;
+
+        let end = 0;
+        let $sticky = this._stickyEnd();
+        if ($sticky && canRight)
+            end = body.getBoundingClientRect().right - $sticky.getBoundingClientRect().left;
+
+        this.$scrollRight.style.width = canRight ? `calc(${ end }px + var(--jupwr-scroll-size))` : '';
+        this.$scrollLeft.classList.toggle('visible', canLeft);
+        this.$scrollRight.classList.toggle('visible', canRight);
+    }
+
+    // a vertical mouse wheel scrolls the categories sideways when they do not
+    // fit; horizontal gestures (trackpad) are left to the browser
+    _wheelScroll(event: WheelEvent) {
+        let body = this.$body;
+        if (document.documentElement.dataset.uiStyle !== 'a')
+            return;
+        if (body.scrollWidth <= body.clientWidth || Math.abs(event.deltaY) <= Math.abs(event.deltaX))
+            return;
+        let delta = event.deltaY * (event.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 : 1);
+        this._scrollTargetTime = 0;
+        body.scrollLeft += delta;
+        event.preventDefault();
+    }
+
+    // bring the next item hidden under an arrow fully into view; positions are
+    // taken at the end of a smooth scroll still running, so quick clicks add up
+    _scrollByItem(side: 'left' | 'right') {
+        let body = this.$body;
+        let pending = performance.now() - this._scrollTargetTime < 500;
+        let shift = pending ? this._scrollTarget - body.scrollLeft : 0;
+        let leftEdge = this.$scrollLeft.getBoundingClientRect().right + shift;
+        let rightEdge = this.$scrollRight.getBoundingClientRect().left + shift;
+        let items = this._ribbonItems();
+        let delta = 0;
+
+        if (side === 'right') {
+            let next = items.find((el) => el.getBoundingClientRect().right > rightEdge + 1);
+            if (next)
+                delta = next.getBoundingClientRect().right - rightEdge;
+        }
+        else {
+            let previous = items.reverse().find((el) => el.getBoundingClientRect().left < leftEdge - 1);
+            if (previous)
+                delta = previous.getBoundingClientRect().left - leftEdge;
+        }
+
+        if (delta !== 0) {
+            let max = body.scrollWidth - body.clientWidth;
+            this._scrollTarget = Math.min(max, Math.max(0, body.scrollLeft + shift + delta));
+            this._scrollTargetTime = performance.now();
+            body.scrollTo({ left: this._scrollTarget, behavior: 'smooth' });
         }
     }
 

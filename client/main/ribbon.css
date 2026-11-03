@@ -164,6 +164,15 @@ body.windows.electron .jmv-ribbon-appmenu {
   display: none;
 }
 
+/* jUPWR: frame for the scroll arrows (shown in style A only) */
+.jmv-ribbon-body-frame {
+    position: relative;
+}
+
+.jmv-ribbon-scroll {
+    display: none;
+}
+
 .jmv-ribbon-button-separator {
     flex: 1 1 auto ;
 }
