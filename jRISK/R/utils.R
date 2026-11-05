@@ -196,22 +196,40 @@ riskFtaImportance <- function(probs, branch, innerGate, topGate) {
 # (index into `pEv`), so a repeated label is the same event in several
 # branches; exact by enumeration over the 2^m states of the distinct events
 riskFtaTopProbShared <- function(pEv, ev, branch, innerGate, topGate) {
+  st <- riskFtaSharedStates(pEv, ev, branch, innerGate, topGate)
+  sum(st$pr[st$hit])
+}
+
+# the 2^m states once, vectorised: which states trigger the top event and
+# their probabilities (apply() with closures, m + 1 times, took 18 s at m = 16)
+riskFtaSharedStates <- function(pEv, ev, branch, innerGate, topGate) {
   m <- length(pEv)
   S <- riskAllStates(m)
-  occ <- riskFtaOccurrence(branch, innerGate, topGate)
-  hit <- apply(S, 1, function(x) occ(x[ev]))
-  pr <- apply(S, 1, function(x) prod(ifelse(x == 1, pEv, 1 - pEv)))
-  sum(pr[hit == 1])
+  X <- S[, ev, drop = FALSE] == 1                       # leaves
+  b <- vapply(split(seq_along(branch), branch), function(i) {
+    k <- rowSums(X[, i, drop = FALSE])
+    if (innerGate == "and") k == length(i) else k > 0
+  }, logical(nrow(S)))
+  if (is.null(dim(b))) b <- matrix(b, nrow = nrow(S))
+  hit <- if (topGate == "and") rowSums(b) == ncol(b) else rowSums(b) > 0
+  pr <- rep(1, nrow(S))
+  for (j in seq_len(m)) pr <- pr * ifelse(S[, j] == 1, pEv[j], 1 - pEv[j])
+  list(S = S, hit = hit, pr = pr)
 }
 
 # importance for shared events: drop in P(top) when distinct event i is
-# made impossible
+# made impossible; from the same states -- with p_i = 0 only states with
+# x_i = 0 remain, each with probability pr / (1 - p_i)
 riskFtaImportanceShared <- function(pEv, ev, branch, innerGate, topGate) {
-  top <- riskFtaTopProbShared(pEv, ev, branch, innerGate, topGate)
+  st <- riskFtaSharedStates(pEv, ev, branch, innerGate, topGate)
+  top <- sum(st$pr[st$hit])
   vapply(seq_along(pEv), function(i) {
-    p0 <- pEv
-    p0[i] <- 0
-    top - riskFtaTopProbShared(p0, ev, branch, innerGate, topGate)
+    off <- st$hit & st$S[, i] == 0
+    without <- if (pEv[i] < 1) sum(st$pr[off]) / (1 - pEv[i]) else {
+      p0 <- pEv; p0[i] <- 0
+      riskFtaTopProbShared(p0, ev, branch, innerGate, topGate)
+    }
+    top - without
   }, 0)
 }
 
