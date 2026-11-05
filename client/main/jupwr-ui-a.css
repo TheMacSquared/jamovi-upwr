@@ -740,10 +740,6 @@
     height: calc(100% - var(--jupwr-card-header));
 }
 
-[data-ui-style="a"] #results .icon-info-box {
-    top: calc(var(--jupwr-card-header) + 16px);
-}
-
 /* the card must not scroll when focus lands in the editor */
 [data-ui-style="a"] #main-table {
     overflow: clip;

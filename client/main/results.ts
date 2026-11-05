@@ -2,7 +2,6 @@
 
 import ActionHub from './actionhub';
 
-import host from './host';
 import ResultsPanel from './resultspanel';
 import { keyTips } from '../common/interactionmanager';
 import jamoviIcon from '../common/icon';
@@ -26,10 +25,8 @@ export class ResultsView extends HTMLElement {
         this.iframeUrl = iframeUrl;
 
         this.classList.add('ResultsView');
-        host.version.then(version => {
-            this.icon = new jamoviIcon(version);
-            this.appendChild(this.icon.el);
-        });
+        // jUPWR: no logo over the results; it is on the loading screen
+        // (index.html, jupwrsplash.ts) and beside the version in the settings
 
 
         this.classList.add('jmv-results');
