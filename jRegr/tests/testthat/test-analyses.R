@@ -78,3 +78,46 @@ test_that("logistic analysis reports aliasing and suppresses Wald inference unde
     expect_false(res$plot$visible)
     expect_match(res$metody$content, "pominięto")
 })
+
+test_that("CIs stay on their own rows when a predictor is collinear (audit 2026-11-05)", {
+    set.seed(5)
+    dd <- data.frame(y = rnorm(40), a = rnorm(40), c = rnorm(40), g = factor(rep(c("x", "y"), 20)))
+    dd$dup <- 2 * dd$a
+    cf <- jRegr:::liniowa(data = dd, dep = "y", covs = c("a", "dup", "c"), factors = "g")$coef$asDF
+    fit <- lm(y ~ a + dup + c + g, data = dd); ci <- confint(fit)
+    keep <- !is.na(coef(fit))
+    expect_equal(cf$lower, unname(ci[keep, 1]))
+    expect_true(all(cf$lower <= cf$b & cf$b <= cf$upper))
+})
+
+test_that("no slope to estimate gives a note, not an error (audit 2026-11-05)", {
+    dd <- data.frame(y = rnorm(20), k = 1)
+    res <- jRegr:::liniowa(data = dd, dep = "y", covs = "k")
+    expect_true(is.na(res$fit$asDF$F))
+})
+
+test_that("saved values carry the spreadsheet row numbers (audit 2026-11-05)", {
+    set.seed(6)
+    dd <- data.frame(y = rnorm(12), x = rnorm(12)); rownames(dd) <- as.character(c(2:7, 10:15))
+    # Output options are not wrapper arguments: run the analysis classes
+    run <- function(name, data, outputs, ...) {
+        opts <- get(paste0(name, "Options"), asNamespace("jRegr"))$new(...)
+        for (nm in outputs) opts$.__enclos_env__$private[[paste0("..", nm)]]$value <- list(value = TRUE)
+        a <- get(paste0(name, "Class"), asNamespace("jRegr"))$new(options = opts, data = data)
+        a$init()
+        # outside jamovi an Output reports itself as filled; the engine marks
+        # it as initialised in the run, which makes the analysis fill it
+        for (nm in c("predictOV", "residsOV")) {
+            out <- tryCatch(eval(parse(text = paste0("a$results$", nm))), error = function(e) NULL)
+            if (!is.null(out)) out$.__enclos_env__$private$.initInRun <- TRUE
+        }
+        a$run(); a$results
+    }
+    rn <- function(out) out$.__enclos_env__$private$.rowNums
+    res <- run("liniowa", dd, c("predictOV", "residsOV"), dep = "y", covs = "x")
+    expect_equal(rn(res$predictOV), c(2:7, 10:15))
+    expect_equal(rn(res$residsOV), c(2:7, 10:15))
+    dl <- data.frame(y = factor(rep(c("a", "b"), 6)), x = rnorm(12)); rownames(dl) <- rownames(dd)
+    rl <- run("logistyczna", dl, "predictOV", dep = "y", covs = "x")
+    expect_equal(rn(rl$predictOV), c(2:7, 10:15))
+})

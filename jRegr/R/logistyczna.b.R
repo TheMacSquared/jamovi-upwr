@@ -86,7 +86,9 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             if (isTRUE(o$cooks)) { cs <- cooksSummary(fit); self$results$cooks$setRow(rowNo = 1, values = list(mean = cs$mean, max = cs$max, nHigh = cs$nHigh, thr = cs$thr)) }
             if (simple && reliable) self$results$plot$setState(list(x = d[[covs]], y = y, xlab = covs, eventLabel = event, fit = fit, covName = covs))
             complete <- stats::complete.cases(self$data[c(dep, covs, factors)])
-            if (isTRUE(o$predictOV) && self$results$predictOV$isNotFilled()) { full <- rep(NA_real_, length(complete)); full[complete] <- prob; self$results$predictOV$setValues(full) }
+            # spreadsheet row numbers: with a filter the data has only the rows shown
+            if (isTRUE(o$predictOV) && self$results$predictOV$isNotFilled()) { full <- rep(NA_real_, length(complete)); full[complete] <- prob
+                self$results$predictOV$setRowNums(rownames(self$data)); self$results$predictOV$setValues(full) }
         },
         .plot = function(image, ggtheme, theme, ...) { s <- image$state; if (is.null(s)) return(FALSE); logisticSimplePlot(s$x, s$y, s$xlab, s$eventLabel, s$fit, s$covName, ggtheme, theme) },
         .rocPlot = function(image, ggtheme, theme, ...) { s <- image$state; if (is.null(s)) return(FALSE); rocPlot(s$roc, s$auc, ggtheme, theme) }
