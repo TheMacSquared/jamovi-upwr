@@ -288,6 +288,9 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             self$results$qq$setState(list(resid = resid))
             if (self$options$residsOV && self$results$residsOV$isNotFilled()) {
                 full <- rep(NA_real_, length(complete)); full[complete] <- resid
+                # spreadsheet row numbers: with a filter the data has only the
+                # rows shown, and without them the values go to rows 1..n
+                self$results$residsOV$setRowNums(rownames(self$data))
                 self$results$residsOV$setValues(full)
             }
             if (length(factors) >= 2) {

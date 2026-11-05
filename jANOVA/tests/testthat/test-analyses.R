@@ -123,7 +123,8 @@ test_that("Welch with several factors: means without letters and a note", {
     res <- jANOVA:::anova(data = tg, dep = "len", factors = c("supp", "dose"), welch = TRUE)
     mt <- res$means$get(key = "dose")
     expect_false(mt$getColumn("letters")$visible)
-    txt <- paste(capture.output(print(mt)), collapse = "\n")
+    # the printed note wraps at the table width
+    txt <- gsub("\\s+", " ", paste(capture.output(print(mt)), collapse = " "))
     expect_true(grepl("tylko dla jednego czynnika", txt))
 })
 
@@ -149,4 +150,15 @@ test_that("variable names with spaces and brackets (afex runs on aliases)", {
     tg <- ToothGrowth; tg$dose <- factor(tg$dose); names(tg) <- c("dł. zęba", "suplement x", "dawka (mg)")
     res <- jANOVA:::anova(data = tg, dep = "dł. zęba", factors = c("suplement x", "dawka (mg)"))
     expect_equal(res$anova$asDF$source[1:3], c("suplement x", "dawka (mg)", "suplement x × dawka (mg)"))
+})
+
+test_that("saved residuals carry the spreadsheet row numbers (audit 2026-11-05)", {
+    dd <- ToothGrowth[c(1:10, 31:40), ]; rownames(dd) <- as.character(seq(3, 60, by = 3))
+    opts <- jANOVA:::anovaOptions$new(dep = "len", factors = "supp")
+    opts$.__enclos_env__$private$..residsOV$value <- list(value = TRUE)
+    a <- jANOVA:::anovaClass$new(options = opts, data = dd); a$init()
+    out <- a$results$residsOV
+    out$.__enclos_env__$private$.initInRun <- TRUE
+    a$run()
+    expect_equal(out$.__enclos_env__$private$.rowNums, seq(3, 60, by = 3))
 })

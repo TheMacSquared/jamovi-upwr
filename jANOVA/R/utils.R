@@ -148,7 +148,11 @@ dunnettCorrFromV <- function(V, idx, ctrl) {
 }
 
 # means: data.frame(level, mean, df); V: covariance of means.
-pairwiseFromEmm <- function(means, V, method, alpha, control = NULL, mse = NULL) {
+# emm (optional): the emmeans object of the means, for the df of each pair.
+# In a repeated-measures (afex univariate) model a mean's df blends the
+# subject and error strata; the df of a difference is not the smaller of
+# the two means' df but the contrast's own (as emmeans::pairs reports).
+pairwiseFromEmm <- function(means, V, method, alpha, control = NULL, mse = NULL, emm = NULL) {
     levs <- means$level; k <- length(levs)
     m <- stats::setNames(means$mean, levs)
     df <- stats::setNames(means$df, levs)
@@ -163,6 +167,15 @@ pairwiseFromEmm <- function(means, V, method, alpha, control = NULL, mse = NULL)
     out$diff <- m[out$g1] - m[out$g2]
     out$se <- sqrt(V[cbind(out$g1, out$g1)] + V[cbind(out$g2, out$g2)] - 2 * V[cbind(out$g1, out$g2)])
     out$df <- pmin(df[out$g1], df[out$g2])
+    if (!is.null(emm)) {
+        L <- lapply(seq_len(n), function(i) {
+            v <- numeric(k); v[match(out$g1[i], levs)] <- 1; v[match(out$g2[i], levs)] <- -1; v
+        })
+        names(L) <- paste0("p", seq_len(n))
+        cs <- tryCatch(as.data.frame(summary(emmeans::contrast(emm, method = L, adjust = "none"))),
+                       error = function(e) NULL)
+        if (!is.null(cs) && nrow(cs) == n && all(is.finite(cs$df))) out$df <- cs$df
+    }
     out$stat <- out$diff / out$se
     t <- out$stat; dfp <- out$df; se <- out$se
     out$p <- NA_real_; out$crit <- NA_real_
@@ -171,12 +184,13 @@ pairwiseFromEmm <- function(means, V, method, alpha, control = NULL, mse = NULL)
         out$crit <- stats::qtukey(1 - alpha, k, dfp) / sqrt(2) * se
     } else if (method == "dunnett") {
         R <- dunnettCorrFromV(V, match(out$g1, levs), match(control, levs))
-        dfi <- max(1L, as.integer(round(dfp[1])))
-        for (i in seq_len(n))
+        # one df per comparison (equal in a between-subjects model)
+        for (i in seq_len(n)) {
+            dfi <- max(1L, as.integer(round(dfp[i])))
             out$p[i] <- 1 - mvtnorm::pmvt(lower = rep(-abs(t[i]), n), upper = rep(abs(t[i]), n),
                 df = dfi, corr = R)[1]
-        q <- mvtnorm::qmvt(1 - alpha, tail = "both.tails", df = dfi, corr = R)$quantile
-        out$crit <- q * se
+            out$crit[i] <- mvtnorm::qmvt(1 - alpha, tail = "both.tails", df = dfi, corr = R)$quantile * se[i]
+        }
     }
     out$lower <- out$diff - out$crit
     out$upper <- out$diff + out$crit
@@ -226,7 +240,7 @@ compareTerm <- function(fit, term, method, alpha, control = NULL, mse = NULL) {
         means$letters <- ""
         return(list(means = means, pairs = NULL, critNote = NULL))
     }
-    pairs <- pairwiseFromEmm(means, tm$vcov, method, alpha, control, mse)
+    pairs <- pairwiseFromEmm(means, tm$vcov, method, alpha, control, mse, emm = tm$emm)
     finishComparison(means, pairs, method, alpha, control)
 }
 
@@ -539,7 +553,17 @@ fitRm <- function(d, dep, subject, within, between = NULL, covs = NULL, ssType =
         type = as.integer(ssType), include_aov = TRUE, fun_aggregate = mean,
         anova_table = list(correction = "none"))
     if (length(between)) args$between <- between
-    if (length(covs)) { args$covariate <- covs; args$factorize <- FALSE }
+    if (length(covs)) {
+        # afex adds covariate × within terms, so without centring the within
+        # effects are tested at covariate = 0 (afex warns "likely bogus").
+        # Centred on the mean over units: effects at the mean covariate.
+        for (v in covs) {
+            perUnit <- tapply(d[[v]], d[[subject]], mean)
+            d[[v]] <- d[[v]] - mean(perUnit, na.rm = TRUE)
+        }
+        args$data <- d
+        args$covariate <- covs; args$factorize <- FALSE
+    }
     fit <- suppressWarnings(suppressMessages(do.call(afex::aov_ez, args)))
     # afex turns within-factor levels into syntactic names (make.names);
     # keep the originals so tables and plots show the user's labels
