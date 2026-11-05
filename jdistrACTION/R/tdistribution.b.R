@@ -32,33 +32,19 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         
         
         ##### 1.1.2) Definition of variables #####
-        # The lower end of the distribution
-        LowerTail <- qt(0.5, df = DP1, ncp = DP2 )-4
-        # The upper end of the distribution
-        UpperTail <- qt(0.5, df = DP1, ncp = DP2 )+(4*(DP2+1))
-        # The number of labels for the x-axis is defined
-        NumberOfAxisLabels <- (4*2)+1
-        # These settings are changed for small values of DP1
-        if(DP1<11){
-          LowerTail <- qt(0.5, df = DP1, ncp = DP2 )-5
-          UpperTail <- qt(0.5, df = DP1, ncp = DP2 )+(5*(DP2+1))
-          NumberOfAxisLabels <- (5*2)+1}
-        if(DP1<6){
-          LowerTail <- qt(0.5, df = DP1, ncp = DP2 )-6
-          UpperTail <- qt(0.5, df = DP1, ncp = DP2 )+(6*(DP2+1))
-          NumberOfAxisLabels <- (6*2)+1}
-        if(DP1<5){
-          LowerTail <- qt(0.5, df = DP1, ncp = DP2 )-7
-          UpperTail <- qt(0.5, df = DP1, ncp = DP2 )+(7*(DP2+1))
-          NumberOfAxisLabels <- (7*2)+1}
-        if(DP1<3){
-          LowerTail <- qt(0.5, df = DP1, ncp = DP2 )-8
-          UpperTail <- qt(0.5, df = DP1, ncp = DP2 )+(8*(DP2+1))
-          NumberOfAxisLabels <- (8*2)+1}
-        if(DP1<2){
-          LowerTail <- qt(0.5, df = DP1, ncp = DP2 )-10
-          UpperTail <- qt(0.5, df = DP1, ncp = DP2 )+(10*(DP2+1))
-          NumberOfAxisLabels <- (5*2)+1}
+        # Plot range around the median: k units on one side and k*(|ncp|+1)
+        # on the side of the skew -- right for ncp >= 0 (as before), left for
+        # a negative ncp (the upper limit used to fall below the lower one)
+        k <- if (DP1 < 2) 10 else if (DP1 < 3) 8 else if (DP1 < 5) 7 else if (DP1 < 6) 6 else if (DP1 < 11) 5 else 4
+        NumberOfAxisLabels <- (if (DP1 < 2) 5 else k) * 2 + 1
+        Median <- qt(0.5, df = DP1, ncp = DP2)
+        if (DP2 >= 0) {
+          LowerTail <- Median - k
+          UpperTail <- Median + k * (DP2 + 1)
+        } else {
+          LowerTail <- Median - k * (-DP2 + 1)
+          UpperTail <- Median + k
+        }
         # The number of values in the curve
         N <- 1000
         # Define a variable for the columname of dataframes

@@ -127,3 +127,12 @@ test_that("t distribution: E[X] undefined for df <= 1, finite for large df (audi
     expect_false(is.na(suppressWarnings(as.numeric(moment(big, "mean")))))
     expect_false(is.na(suppressWarnings(as.numeric(moment(big, "var")))))
 })
+
+test_that("t distribution: the plot covers the distribution for a negative ncp (audit 2026-11-05)", {
+    res <- distrACTION:::TDistribution(x1 = -3, dp1 = 10, dp2 = -3)
+    st <- res$plot$state
+    expect_false(is.null(st))
+    x <- st[[1]]   # first column: the x grid of the curve
+    expect_lt(min(x), qt(0.001, 10, ncp = -3))
+    expect_gt(max(x), qt(0.999, 10, ncp = -3))
+})
