@@ -10,15 +10,24 @@
 #' @return numeric p-value
 permPValue <- function(observed, permDist, hypothesis) {
     B <- length(permDist)
-
-    count <- switch(hypothesis,
-        different = sum(abs(permDist) >= abs(observed)),
-        greater  = sum(permDist >= observed),
-        less     = sum(permDist <= observed)
-    )
+    count <- sum(atLeastAsExtreme(permDist, observed, hypothesis))
 
     if (isTRUE(attr(permDist, "exact"))) return(count / B)
     return((count + 1) / (B + 1))
+}
+
+#' Which permuted statistics are at least as extreme as the observed one.
+#' Compared with a tolerance: an arrangement equal to the observed one in
+#' exact arithmetic can differ in the last bits (mean(x) - mu against
+#' mean(x - mu), mirrored arrangements), and must still be counted --
+#' otherwise an exact test can miss the observed arrangement itself (p = 0)
+atLeastAsExtreme <- function(permDist, observed, hypothesis) {
+    tol <- 1e-9 * max(abs(observed), abs(permDist), 1e-300)
+    switch(hypothesis,
+        different = abs(permDist) >= abs(observed) - tol,
+        greater  = permDist >= observed - tol,
+        less     = permDist <= observed + tol
+    )
 }
 
 #' Generate permutation distribution for one-sample test
@@ -35,15 +44,13 @@ permDistOneSample <- function(x, mu0, nPerm, seed, exact) {
     n <- length(centered)
 
     if (exact && n <= 20) {
-        # Enumerate all 2^n sign-flip combinations
-        nAll <- 2^n
-        permDist <- numeric(nAll)
-        for (i in seq_len(nAll)) {
-            # Convert integer to sign pattern: 0 -> -1, 1 -> +1
-            bits <- as.integer(intToBits(i - 1)[1:n])
-            signs <- ifelse(bits == 1, 1, -1)
-            permDist[i] <- mean(signs * centered)
-        }
+        # All 2^n sign-flip combinations, built by doubling: each value is
+        # added with + and with - to every sum so far (n vector steps
+        # instead of a 2^n loop: n = 20 took ~6 s per variable)
+        sums <- 0
+        for (v in centered)
+            sums <- c(sums + v, sums - v)
+        permDist <- sums / n
         attr(permDist, "exact") <- TRUE
         return(permDist)
     }
@@ -125,11 +132,7 @@ buildPermPlot <- function(permDist, observed, hypothesis, ggtheme, theme, label 
     df <- data.frame(stat = permDist)
 
     # Determine rejection region for shading
-    df$reject <- switch(hypothesis,
-        different = abs(df$stat) >= abs(observed),
-        greater  = df$stat >= observed,
-        less     = df$stat <= observed
-    )
+    df$reject <- atLeastAsExtreme(df$stat, observed, hypothesis)
 
     p <- ggplot2::ggplot(df, ggplot2::aes(x = stat)) +
         ggplot2::geom_histogram(
