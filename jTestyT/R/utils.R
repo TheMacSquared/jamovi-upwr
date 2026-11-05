@@ -26,7 +26,9 @@ wilcoxOne <- function(x, mu = 0, hypothesis = "different") {
     S <- length(dif) * (length(dif) + 1) / 2
     r <- if (S > 0) (2 * unname(w$statistic) - S) / S else NA_real_   # matched-pairs rank-biserial
     list(test = "Wilcoxona (rangowanych znaków)", stat = unname(w$statistic), df = NA, p = w$p.value,
-        est = unname(w$estimate), es = r, esLabel = "r rangowo-dwuseryjne")
+        # wilcox.test's estimate is the pseudomedian of x itself; the table
+        # column is the difference from the test value, as in the t row
+        est = unname(w$estimate) - mu, es = r, esLabel = "r rangowo-dwuseryjne")
 }
 
 # ---------------------------------------------------------------------------
@@ -47,7 +49,9 @@ mannWhitney <- function(y, g, hypothesis = "different") {
     w <- suppressWarnings(stats::wilcox.test(x1, x2, alternative = altR(hypothesis), conf.int = TRUE, exact = FALSE, correct = TRUE))
     U <- unname(w$statistic)
     list(test = "Manna-Whitneya U", stat = U, df = NA, p = w$p.value, est = unname(w$estimate),
-        es = 1 - 2 * U / (length(x1) * length(x2)), esLabel = "r rangowo-dwuseryjne")
+        # U counts pairs with group 1 above group 2, so r > 0 when group 1 is
+        # higher: the same sign as the difference and Cohen's d
+        es = 2 * U / (length(x1) * length(x2)) - 1, esLabel = "r rangowo-dwuseryjne")
 }
 
 leveneTwo <- function(y, g) {
@@ -109,13 +113,13 @@ metodyWspolne <- function(m, o, kind, diffLab, homog = FALSE) {
         m$add("Testy", paste(
             if (kind == "two") "U Manna-Whitneya" else "Test Wilcoxona rangowanych znaków",
             "z przybliżeniem normalnym i poprawką ciągłości; estymator = %s Hodgesa-Lehmanna."),
-            if (kind == "two") "przesunięcie" else "pseudomediana")
+            switch(kind, two = "przesunięcie", one = "pseudomediana − wartość testowa", "pseudomediana różnic"))
     m$add("Wielkość efektu", "d Cohena = %s (wartość punktowa).",
           switch(kind, one = "(średnia − wartość testowa) / SD",
                  two = "różnica średnich / łączone SD (Studenta)",
                  paired = "średnia różnica / SD różnic"))
     m$addIf(o$nonpar, "Wielkość efektu", "Dla testu rangowego: r rangowo-dwuseryjne (%s).",
-            if (kind == "two") "1 − 2U / (n₁ n₂)" else "z sumy rang dodatnich i ujemnych")
+            if (kind == "two") "2U / (n₁ n₂) − 1, dodatnie, gdy pierwsza grupa ma wyższe wartości" else "z sumy rang dodatnich i ujemnych")
     m$add("Wielkość efektu", "Przedziały ufności dla różnicy i d Cohena, bootstrap i wykres estymacyjny: menu „Przedziały ufności” (%s).",
           switch(kind, one = "Średnia", two = "Różnica średnich", paired = "Średnia różnic"))
     m$addIf(o$desc, "Dodatkowe", "Statystyki opisowe: n, średnia, mediana, SD, SE%s.",
