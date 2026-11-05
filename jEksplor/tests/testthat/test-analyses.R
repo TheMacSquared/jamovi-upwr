@@ -74,3 +74,11 @@ test_that("zmienne jakosciowe: simple and grouped tables, summary, plots", {
     expect_equal(g$n_1, c(3L, 0L, 0L, 3L)); expect_equal(g$n_2, c(0L, 1L, 1L, 2L)); expect_equal(g$n_tot[4], 5L)
     expect_equal(g$pcCol_1[1], 100); expect_equal(g$pcRow_1[1], 100); expect_equal(g$pcTotal_2[2], 20)
 })
+
+test_that("extreme values report the spreadsheet row when rows are filtered (audit 2026-11-05)", {
+    # the engine leaves filtered rows out and names the rest by their row number
+    f <- data.frame(x = c(5, 1, 9, 3)); rownames(f) <- c("2", "5", "7", "11")
+    ex <- jEksplor:::ilosciowe(data = f, vars = "x", extreme = TRUE, extremeN = 1)$extreme$get(key = "x")$asDF
+    expect_equal(ex$row, c(5, 7))
+    expect_equal(ex$value, c(1, 9))
+})

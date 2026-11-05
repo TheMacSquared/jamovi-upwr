@@ -175,9 +175,13 @@ iloscioweClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             t <- self$results$extreme$get(key = v)
             idx <- which(!is.na(raw)); ord <- idx[order(raw[idx])]
             k <- min(o$extremeN, length(ord))
-            for (i in seq_len(k)) t$addRow(rowKey = paste("lo", i), values = list(type = "Najmniejsze", place = i, row = ord[i], value = raw[ord[i]]))
+            # the engine names the rows by their number in the spreadsheet and
+            # leaves filtered rows out, so a position in self$data is not a row
+            sheetRow <- suppressWarnings(as.integer(rownames(self$data)))
+            if (length(sheetRow) != length(raw) || anyNA(sheetRow)) sheetRow <- seq_along(raw)
+            for (i in seq_len(k)) t$addRow(rowKey = paste("lo", i), values = list(type = "Najmniejsze", place = i, row = sheetRow[ord[i]], value = raw[ord[i]]))
             hi <- rev(ord)
-            for (i in seq_len(k)) t$addRow(rowKey = paste("hi", i), values = list(type = "Największe", place = i, row = hi[i], value = raw[hi[i]]))
+            for (i in seq_len(k)) t$addRow(rowKey = paste("hi", i), values = list(type = "Największe", place = i, row = sheetRow[hi[i]], value = raw[hi[i]]))
         },
         .histPlot = function(image, ggtheme, theme, ...) { s <- image$state; if (is.null(s)) return(FALSE); histPlot(s$d, s$label, isTRUE(self$options$dens), ggtheme, theme) },
         .boxPlot = function(image, ggtheme, theme, ...) { s <- image$state; if (is.null(s)) return(FALSE)
