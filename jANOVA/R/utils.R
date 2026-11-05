@@ -252,6 +252,9 @@ compareTerm <- function(fit, term, method, alpha, control = NULL, mse = NULL) {
 welchMeans <- function(y, g, alpha = 0.05) {
     g <- droplevels(factor(g)); levs <- levels(g)
     n <- as.numeric(table(g)); m <- as.numeric(tapply(y, g, mean))
+    if (any(n < 2))
+        stop(sprintf("porównania przy nierównych wariancjach wymagają co najmniej 2 obserwacji w każdej grupie (grupa „%s”: %d).",
+            levs[which(n < 2)[1]], as.integer(n[which(n < 2)[1]])), call. = FALSE)
     v <- as.numeric(tapply(y, g, stats::var))
     se <- sqrt(v / n); tq <- stats::qt(1 - alpha / 2, n - 1)
     data.frame(level = levs, mean = m, se = se, df = n - 1, lower = m - tq * se,
@@ -322,8 +325,12 @@ finishComparison <- function(means, pairs, method, alpha, control = NULL) {
         mark[pairs$g1[pairs$sig]] <- "*"
         means$letters <- unname(mark)
     } else {
-        ord <- means$level[order(means$mean)]
-        means$letters <- unname(cldLetters(ord, pairs)[means$level])
+        # a level whose mean cannot be estimated (an empty cell) gets no letter
+        ok <- is.finite(means$mean)
+        ord <- means$level[ok][order(means$mean[ok])]
+        pp <- pairs[pairs$g1 %in% ord & pairs$g2 %in% ord, , drop = FALSE]
+        lt <- cldLetters(ord, pp)
+        means$letters <- ifelse(ok, unname(lt[means$level]), "")
     }
     if (length(unique(round(pairs$crit, 10))) == 1)
         critNote <- sprintf("%s = %.4g (α = %g)", phCritLabel(method), pairs$crit[1], alpha)
@@ -634,7 +641,8 @@ dunnPairs <- function(y, g, adjust = "holm", alpha = 0.05) {
     out$se <- sqrt((N * (N + 1) / 12 - Tc / (12 * (N - 1))) * (1 / ns[out$g1] + 1 / ns[out$g2]))
     out$stat <- out$diff / out$se
     out$p <- stats::p.adjust(2 * stats::pnorm(-abs(out$stat)), method = adjust)
-    out$sig <- out$p < alpha
+    # a constant outcome gives se = 0 and p = NaN: no difference, not an error
+    out$sig <- !is.na(out$p) & out$p < alpha
     rownames(out) <- NULL
     levelsTab <- data.frame(level = levs, n = ns, median = as.numeric(tapply(y, g, stats::median)),
         meanRank = as.numeric(Rm), stringsAsFactors = FALSE)
@@ -671,7 +679,7 @@ friedmanPairs <- function(m, alpha = 0.05) {
     out$se <- sqrt(k * (k + 1) / (6 * n))
     out$stat <- out$diff / out$se
     out$p <- stats::ptukey(abs(out$stat) * sqrt(2), k, Inf, lower.tail = FALSE)
-    out$sig <- out$p < alpha
+    out$sig <- !is.na(out$p) & out$p < alpha
     rownames(out) <- NULL
     levelsTab <- data.frame(level = levs, n = n, median = apply(m, 2, stats::median),
         meanRank = as.numeric(Rmean), stringsAsFactors = FALSE)

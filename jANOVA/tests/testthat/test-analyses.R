@@ -162,3 +162,26 @@ test_that("saved residuals carry the spreadsheet row numbers (audit 2026-11-05)"
     a$run()
     expect_equal(out$.__enclos_env__$private$.rowNums, seq(3, 60, by = 3))
 })
+
+test_that("crash cases give notes (audit 2026-11-05, group 3)", {
+    # an empty cell with interactions and type III
+    tg <- ToothGrowth; tg$dose <- factor(tg$dose)
+    tg <- tg[!(tg$supp == "VC" & tg$dose == "2"), ]
+    res <- jANOVA:::anova(data = tg, dep = "len", factors = c("supp", "dose"))
+    txt <- gsub("\\s+", " ", paste(capture.output(print(res$anova)), collapse = " "))
+    expect_true(grepl("Puste komórki planu", txt))
+    # type II: the non-estimable mean gets no letter
+    r2 <- jANOVA:::anova(data = tg, dep = "len", factors = c("supp", "dose"), ss = "2", phInter = TRUE)
+    m <- r2$means$get(key = "supp:dose")$asDF
+    # an empty text cell comes back from asDF as NA
+    expect_true(all(is.na(m$letters[!is.finite(m$mean)]) | m$letters[!is.finite(m$mean)] == ""))
+    expect_true(any(!is.finite(m$mean)))
+    # constant outcome, nonparametric: no error
+    cst <- data.frame(y = rep(5, 12), g = factor(rep(c("a", "b", "c"), 4)))
+    expect_silent(rc <- jANOVA:::anova(data = cst, dep = "y", factors = "g", nonpar = TRUE, norm = TRUE))
+    # Welch with a group of one observation: a note, not an error
+    w <- data.frame(y = c(1, 2, 3, 4, 5, 6, 7, 20), g = factor(c("a", "a", "a", "b", "b", "b", "b", "c")))
+    rw <- jANOVA:::anova(data = w, dep = "y", factors = "g", welch = TRUE)
+    txt <- gsub("\\s+", " ", paste(capture.output(print(rw$means$get(key = "g"))), collapse = " "))
+    expect_true(grepl("co najmniej 2 obserwacji", txt))
+})

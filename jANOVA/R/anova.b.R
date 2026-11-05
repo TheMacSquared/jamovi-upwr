@@ -80,6 +80,17 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 return()
             }
 
+            # an empty combination of factor levels: the full interaction model
+            # cannot be estimated with type III sums of squares
+            if (isTRUE(opts$interactions) && length(factors) >= 2 && opts$ss == "3") {
+                emptyCells <- sum(table(d[factors]) == 0)   # all level combinations, empty ones too
+                if (emptyCells > 0) {
+                    self$results$anova$setNote("err", sprintf(paste(
+                        "Puste komórki planu (%d kombinacji poziomów bez obserwacji): model z interakcjami",
+                        "nie da się oszacować przy sumach kwadratów typu III. Wyłącz interakcje albo wybierz typ II."), emptyCells))
+                    return()
+                }
+            }
             res <- tryCatch(fitAnova(d, dep, factors, blocks, covs, isTRUE(opts$interactions), opts$ss),
                 error = function(e) e)
             if (inherits(res, "error")) {
@@ -279,10 +290,9 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             resid <- stats::residuals(res$fit)
             if (isTRUE(opts$norm)) {
                 nt <- self$results$norm
-                if (length(resid) >= 3 && length(resid) <= 5000) {
-                    sw <- stats::shapiro.test(resid)
-                    nt$setRow(rowNo = 1, values = list(w = unname(sw$statistic), p = sw$p.value))
-                } else nt$setNote("n", "Test Shapiro-Wilka wymaga od 3 do 5000 reszt.")
+                sw <- if (length(resid) >= 3 && length(resid) <= 5000) tryCatch(stats::shapiro.test(resid), error = function(e) NULL) else NULL
+                if (!is.null(sw)) nt$setRow(rowNo = 1, values = list(w = unname(sw$statistic), p = sw$p.value))
+                else nt$setNote("n", "Test Shapiro-Wilka wymaga od 3 do 5000 reszt, które nie są wszystkie równe.")
             }
             self$results$residPlot$setState(data.frame(fitted = stats::fitted(res$fit), resid = resid))
             self$results$qq$setState(list(resid = resid))

@@ -268,10 +268,9 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             resid <- tryCatch(as.numeric(stats::residuals(res$fit$lm)), error = function(e) NULL)
             if (isTRUE(o$norm)) {
                 nt <- self$results$norm
-                if (!is.null(resid) && length(resid) >= 3 && length(resid) <= 5000) {
-                    sw <- stats::shapiro.test(resid)
-                    nt$setRow(rowNo = 1, values = list(w = unname(sw$statistic), p = sw$p.value))
-                } else nt$setNote("n", "Test Shapiro-Wilka wymaga od 3 do 5000 reszt.")
+                sw <- if (!is.null(resid) && length(resid) >= 3 && length(resid) <= 5000) tryCatch(stats::shapiro.test(resid), error = function(e) NULL) else NULL
+                if (!is.null(sw)) nt$setRow(rowNo = 1, values = list(w = unname(sw$statistic), p = sw$p.value))
+                else nt$setNote("n", "Test Shapiro-Wilka wymaga od 3 do 5000 reszt, które nie są wszystkie równe.")
             }
             if (!is.null(resid)) self$results$qq$setState(list(resid = resid))
             all <- c(within, between)
