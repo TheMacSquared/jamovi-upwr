@@ -3,6 +3,56 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## 1.4.0 — 2026-11-05 (linia latest, jamovi 28.17)
+
+Stan buildów: Docker (`jupwr/jupwr:1.4.0`) i buildy Windows/macOS do wykonania;
+moduły opcjonalne jRISK 0.4.5 i jSpace 0.3.4 do przebudowy dla tej wersji.
+
+Nowe:
+- Wykresy wektorowe (SVG) w Eksploracji (jEksplor): histogramy, ECDF, krzywa
+  Lorenza, słupkowy, mozaikowy, histogram klas i ogiwa; ostre w eksporcie.
+  Wykres pudełkowy i Q-Q zostają rastrowe (punkt na obserwację).
+- „Ustaw rozmiar” w menu kontekstowym wykresu: szerokość i wysokość wpisane
+  w px, cm, mm albo calach (z jamovi, gałąź rozwojowa); przeciąganie wykresu nie
+  przewija już panelu wyników.
+- Ekran ładowania z logo UPWr zamiast logo nad wynikami; małe logo i wersje
+  jUPWR/jamovi na dole ustawień.
+- Kopie odzyskiwania usuwane po zapisie dokumentu i po 30 dniach; zapisany plik
+  czytelny dla innych użytkowników (w Dockerze dla użytkownika hosta).
+- Zmiana opcji w trakcie liczenia nie restartuje już procesu R, gdy poprzednie
+  obliczenie kończy się w ciągu 2 s (`JAMOVI_ANALYSIS_CANCEL_GRACE`).
+- Z jamovi: dopasowanie szerokości kolumny podwójnym kliknięciem, spacje na
+  początku i końcu wartości obcinane przy imporcie.
+
+Poprawione błędne wyniki (audyt kodu 2026-11-05; także w 1.0.10):
+- ANOVA powtórzonych pomiarów z kowariantą: efekty czynników przy średniej
+  kowariancie (były przy kowariancie = 0); porównania parami ze stopniami
+  swobody kontrastów (były zaniżone).
+- Regresja: przedziały ufności współczynników na właściwych wierszach przy
+  współliniowości; VIF dla predyktorów jakościowych jako GVIF.
+- Zapis reszt i wartości przewidywanych do arkusza (ANOVA, regresja) oraz numery
+  wierszy wartości skrajnych przy aktywnym filtrze trafiają we właściwe wiersze.
+- Szereg rozdzielczy nie gubi obserwacji i przestrzega przedziałów [a; b).
+- Test permutacyjny dokładny liczy obserwowany układ (bywało p = 0).
+- Testy t: różnica w wierszu Wilcoxona jednej próby, znak r Manna-Whitneya.
+- Częstości: poprawka ciągłości w teście zgodności, kierunek OR w porównaniach
+  po Q Cochrana, przedział dla V Craméra z niecentralnego χ².
+- Przedziały ufności: BCa przy remisach (proporcje, mediana).
+- Rozkład t: średnia nieokreślona dla df ≤ 1; jSpace: punkty na granicy państw.
+
+Poprawione awarie i wydajność:
+- ANOVA: polskie komunikaty dla pustych komórek planu, stałej zmiennej
+  zależnej i grupy z jedną obserwacją przy Welchu.
+- Wykresy: raincloud z brakami w grupie, „wyklucz przypadki” w trybie kilku
+  zmiennych, rój przy pustej kolumnie, bubble z wartościami ≤ 0, histogram
+  z wartością odstającą, odświeżanie wykresów jEksplor po zmianie ich opcji.
+- Szybciej: układ „rój” (do 25×), bootstrap BCa i regresji, ROC, ważność zdarzeń
+  w drzewie błędów, duże rozkłady dyskretne; mniej danych zapisywanych w .omv.
+
+Wersje modułów: jANOVA 0.5.6, jRegr 0.1.9, jEksplor 0.1.10, jperm 0.2.8,
+jTestyT 0.4.6, jCzest 0.2.7, jCI 0.3.8, distrACTION 1.3.8, scatr 2.9.13,
+jRISK 0.4.5, jSpace 0.3.4.
+
 ## 1.3.1 — 2026-11-02 (linia latest, jamovi 28.17)
 
 Stan buildów: Docker (`jupwr/jupwr:1.3.1`) zbudowany 2026-11-02; buildy Windows i macOS
