@@ -266,6 +266,8 @@ export class View extends Elem.View<Model> {
         const heightScale = (heightOfImage - element.heightB) / heightM;
 
         window.setParam(this.address(), { widthScale, heightScale });
+        // jUPWR: the new image is the same plot; its ink stays current
+        document.dispatchEvent(new CustomEvent('jupwr-image-resized', { detail: { address: this.address() } }));
 
         interactionManager.announce(_('Image resized to {width} by {height}', { width: widthOfImage, height: heightOfImage }));
     }

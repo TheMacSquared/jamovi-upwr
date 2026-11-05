@@ -17,6 +17,7 @@ import { CollectionView, View } from "./element";
 import HighContrast from '../common/highcontrast';
 import { applyUiStyle } from '../common/uistyle';
 import { isManualImageResize } from './image';
+import { FrameInk } from './jupwrink';
 
 window._ = I18ns.get('app')._;
 
@@ -89,6 +90,7 @@ class Main {  // this is constructed at the bottom
     active: View;
     _analysisSelected: any;
     resultsDefn: any;
+    ink: FrameInk;
 
     moduleI18nDef: I18nData;
     highContrast: HighContrast;
@@ -166,6 +168,14 @@ class Main {  // this is constructed at the bottom
         // the location of the script should be inside the body
         // so we don't need document.ready()
         this.$body = document.body;
+
+        // jUPWR: handwriting saved with the results (jupwrink.ts)
+        this.ink = new FrameInk({
+            results: () => this.results,
+            setParam: (address, options) => window.setParam(address, options),
+            post: (type, data) => this.mainWindow.postMessage({ type, data }, '*'),
+        });
+        this.mainWindow.postMessage({ type: 'jupwrInkHello' }, '*');
 
         this.bodyLoop = interactionManager.registerLoop(document.body);
         interactionManager.on('focus', (event) => {
@@ -279,6 +289,16 @@ class Main {  // this is constructed at the bottom
             // ensure empty root results still display
             this.resultsDefn.results.visible = 2;
             this._render();
+            this.ink.sync(this.resultsDefn.options);
+        }
+        else if (hostEvent.type === 'jupwrInkState') {
+            this.ink.setState(eventData);
+        }
+        else if (hostEvent.type === 'jupwrInkUndo') {
+            this.ink.undo(eventData.id);
+        }
+        else if (hostEvent.type === 'jupwrInkClear') {
+            this.ink.clear(eventData.id);
         }
         else if (hostEvent.type === 'mouseEvent') {
             switch (eventData.type) {

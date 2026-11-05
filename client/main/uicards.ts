@@ -10,6 +10,7 @@ import ActionHub from './actionhub';
 import { findDataset } from './datasetdocs';
 import type Instance from './instance';
 import type { DataSetModel } from './dataset';
+import type { InkBoard } from './jupwrink';
 
 interface CardHeaderOptions {
     ribbonHeader: HTMLElement;
@@ -18,6 +19,7 @@ interface CardHeaderOptions {
     copyResults: () => void;
     exportResults: () => void;
     toggleEditResults: () => void;
+    ink: InkBoard;
 }
 
 export function setupCardHeaders(instance: Instance, dataSetModel: DataSetModel, options: CardHeaderOptions) {
@@ -40,6 +42,12 @@ export function setupCardHeaders(instance: Instance, dataSetModel: DataSetModel,
     instance.on('change:editState', updateWrite);
     updateWrite();
 
+    // handwriting saved with the results (jupwrink.ts); in the classic style only its
+    // shortcut, Ctrl+Shift+P, since the card headers are hidden there
+    const $draw = h('button', { class: 'jupwr-card-button jupwr-draw-button', type: 'button', title: 'Pisz odręcznie po wynikach, pismo zapisuje się w pliku (Ctrl+Shift+P)' }, 'Rysuj');
+    $draw.addEventListener('click', () => options.ink.toggle());
+    options.ink.onActiveChanged(active => $draw.classList.toggle('active', active));
+
     const $copy = h('button', { class: 'jupwr-card-button', type: 'button' }, _('Copy'));
     $copy.addEventListener('click', () => options.copyResults());
     const $export = h('button', { class: 'jupwr-card-button', type: 'button' }, _('Export'));
@@ -48,6 +56,7 @@ export function setupCardHeaders(instance: Instance, dataSetModel: DataSetModel,
         h('span', { class: 'jupwr-card-title' }, _('Results')),
         h('span', { class: 'jupwr-card-spacer' }),
         $write,
+        $draw,
         $copy,
         $export);
     options.results.prepend($resultsHeader);

@@ -1,0 +1,68 @@
+/* jUPWR: handwriting saved with the results (jupwrink.ts) */
+
+/* all the ink of the analysis: a 1px box with visible overflow, so it
+   neither grows the frame nor takes the pointer */
+.jupwr-ink-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 9000;
+}
+
+/* takes the pointer while the pen is on */
+.jupwr-ink-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9001;
+    background: transparent;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.jupwr-ink-overlay[hidden] {
+    display: none;
+}
+
+.jupwr-ink-overlay[data-tool="eraser"] {
+    cursor: cell;
+}
+
+/* ink drawn on an earlier version of the element: the mark above it */
+.jupwr-ink-stale {
+    position: absolute;
+    z-index: 9002;
+    transform: translateY(-100%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 4px 2px 8px;
+    border: 1px solid #e0c48a;
+    border-radius: 6px;
+    background: #fff8e6;
+    color: #6b5313;
+    font: 11px sans-serif;
+    white-space: nowrap;
+}
+
+.jupwr-ink-stale[hidden] {
+    display: none;
+}
+
+.jupwr-ink-stale button {
+    padding: 1px 8px;
+    border: 1px solid #d8c08a;
+    border-radius: 4px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.jupwr-ink-stale button:hover {
+    background: #f6ecd2;
+}

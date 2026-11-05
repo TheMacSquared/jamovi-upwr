@@ -8,6 +8,7 @@
 @import '../common/jupwr-colors.css';
 @import '../common/jupwr-scrollbars.css';
 @import './jupwr-annotation.css';
+@import './jupwr-ink.css';
 @import '../node_modules/highlight.js/styles/tomorrow.css';
 
 

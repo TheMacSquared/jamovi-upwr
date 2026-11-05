@@ -46,6 +46,7 @@ import { applyUiStyle } from '../common/uistyle';
 import Store from './store';
 import DatasetInfo from './datasetinfo';
 import { setupCardHeaders, setupEditorPlacement } from './uicards';
+import { InkBoard } from './jupwrink';
 import { initSplash, hideSplash } from './jupwrsplash';
 import { relocate } from './relocate';
 
@@ -771,8 +772,13 @@ ready(async() => {
 
     resultsView.intialise(host.resultsViewUrl, instance);
 
+    // jUPWR: handwriting on the results, saved with them
+    const ink = new InkBoard(resultsPanel, resultsView.richView);
+    shortcuts.register('Ctrl+Shift+KeyP', () => ink.toggle(), 'Pisz odręcznie po wynikach');
+
     // jUPWR: card headers and document title (shown by the non-classic styles)
     setupCardHeaders(instance, dataSetModel, {
+        ink,
         ribbonHeader: ribbon.$header,
         mainTable: $mainTable as HTMLElement,
         results: resultsPanel,

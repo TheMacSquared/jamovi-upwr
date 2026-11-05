@@ -1,0 +1,93 @@
+/* jUPWR: pen on the results, the toolbar (main/jupwrink.ts); the strokes
+   are drawn in the results frames (resultsview/jupwr-ink.css) */
+
+#results.jupwr-ink-active {
+    box-shadow: inset 0 0 0 2px #d62728;
+}
+
+.jupwr-ink-toolbar {
+    position: absolute;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    border: 1px solid #0000001f;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 4px 16px #00000026;
+    font: 13px sans-serif;
+    color: #333;
+}
+
+/* display: flex above would otherwise beat the hidden attribute */
+.jupwr-ink-toolbar[hidden] {
+    display: none;
+}
+
+.jupwr-ink-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 6px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.jupwr-ink-toolbar button:hover {
+    background: #f0f0f0;
+}
+
+.jupwr-ink-toolbar button.active {
+    border-color: #999;
+    background: #ececec;
+}
+
+.jupwr-ink-toolbar button:focus-visible {
+    outline: 2px solid #005a9e;
+    outline-offset: 1px;
+}
+
+.jupwr-ink-toolbar button:last-child,
+.jupwr-ink-toolbar button.jupwr-ink-clear {
+    font-size: 13px;
+}
+
+.jupwr-ink-toolbar button.jupwr-ink-clear.armed {
+    border-color: #d62728;
+    color: #d62728;
+}
+
+.jupwr-ink-swatch {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+}
+
+.jupwr-ink-swatch.wide {
+    width: 18px;
+    height: 10px;
+    border-radius: 2px;
+    opacity: 0.7;
+}
+
+.jupwr-ink-separator {
+    width: 1px;
+    height: 20px;
+    margin: 0 4px;
+    background: #d0d0d0;
+}
+
+[data-ui-style="a"] .jupwr-draw-button.active {
+    border-color: var(--jupwr-bordo);
+    background-color: var(--jupwr-bordo);
+    color: white;
+}
