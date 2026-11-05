@@ -177,8 +177,18 @@ test_that("crash cases give notes (audit 2026-11-05, group 3)", {
     expect_true(all(is.na(m$letters[!is.finite(m$mean)]) | m$letters[!is.finite(m$mean)] == ""))
     expect_true(any(!is.finite(m$mean)))
     # constant outcome, nonparametric: no error
+    # constant outcome: one Polish note, the other tables hidden (the fit
+    # used to fail with an English "residual sum of squares is 0")
     cst <- data.frame(y = rep(5, 12), g = factor(rep(c("a", "b", "c"), 4)))
-    expect_silent(rc <- jANOVA:::anova(data = cst, dep = "y", factors = "g", nonpar = TRUE, norm = TRUE))
+    rc <- jANOVA:::anova(data = cst, dep = "y", factors = "g", nonpar = TRUE, norm = TRUE)
+    txt <- gsub("\\s+", " ", paste(capture.output(print(rc$anova)), collapse = " "))
+    expect_true(grepl("wszystkie wartości równe", txt))
+    expect_false(grepl("residual sum of squares", txt))
+    expect_false(rc$npTests$visible); expect_false(rc$means$visible); expect_false(rc$norm$visible)
+    rm <- data.frame(y = 5, id = factor(rep(1:4, each = 2)), t = factor(rep(c("t1", "t2"), 4)))
+    rr <- jANOVA:::anovarm(data = rm, dep = "y", subject = "id", within = "t")
+    txt <- gsub("\\s+", " ", paste(capture.output(print(rr$anova)), collapse = " "))
+    expect_true(grepl("wszystkie wartości równe", txt))
     # Welch with a group of one observation: a note, not an error
     w <- data.frame(y = c(1, 2, 3, 4, 5, 6, 7, 20), g = factor(c("a", "a", "a", "b", "b", "b", "b", "c")))
     rw <- jANOVA:::anova(data = w, dep = "y", factors = "g", welch = TRUE)

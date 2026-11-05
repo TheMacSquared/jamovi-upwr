@@ -832,3 +832,16 @@ welchJamesTable <- function(d, dep, factors) {
     }
     out <- do.call(rbind, rows); rownames(out) <- NULL; out
 }
+
+# jUPWR: a constant outcome (all values equal) has nothing to analyse: the
+# model fit fails ("residual sum of squares is 0") and every table stays
+# empty. One Polish note and the other results hidden.
+constantOutcomeNote <- function(results, dep, items) {
+    results$anova$setNote("err", sprintf(
+        "Zmienna zależna „%s” ma wszystkie wartości równe — nie ma zmienności do analizy.", dep))
+    for (nm in items) {
+        el <- tryCatch(results$get(nm), error = function(e) NULL)
+        if (!is.null(el)) el$setVisible(FALSE)
+    }
+    invisible(NULL)
+}

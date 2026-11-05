@@ -75,6 +75,7 @@ anovaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             d <- d[complete, , drop = FALSE]
             for (v in c(factors, blocks)) d[[v]] <- droplevels(d[[v]])
             if (nrow(d) < 3) stop(sprintf("«%s»: liczba kompletnych obserwacji: %d; bieżąca implementacja modelu wymaga co najmniej 3.", dep, nrow(d)), call. = FALSE)
+            if (length(unique(d[[dep]])) < 2) return(constantOutcomeNote(self$results, dep, c("welch", "npTests", "npMeans", "npPairs", "art", "artMeans", "artPairs", "means", "pairs", "contrasts", "homog", "norm", "plotMeans", "plotInteraction", "qq", "residPlot")))
             for (v in c(factors, blocks)) if (nlevels(d[[v]]) < 2) {
                 self$results$anova$setNote("err", sprintf("Zmienna %s musi mieć co najmniej 2 poziomy.", v))
                 return()
