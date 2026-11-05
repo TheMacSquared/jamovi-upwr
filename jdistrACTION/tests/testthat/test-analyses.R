@@ -117,3 +117,13 @@ test_that("GeometricDistribution keeps the failures default and adds trials", {
     x1 = 4, dp1 = p, RandomVariable = "trials")
   expect_equal(getProb(res), round(1 - (1 - p)^4, 3), tolerance = 1e-9)
 })
+
+test_that("t distribution: E[X] undefined for df <= 1, finite for large df (audit 2026-11-05)", {
+    moment <- function(res, key) res$MomentsTable$getCell(rowKey = key, "ValueColumn")$value
+    cauchy <- distrACTION:::TDistribution(x1 = 0, dp1 = 1, dp2 = 0, showMean = TRUE, showVariance = TRUE)
+    expect_match(moment(cauchy, "mean"), "nieokreślone")
+    expect_equal(moment(distrACTION:::TDistribution(x1 = 0, dp1 = 5, dp2 = 0, showMean = TRUE), "mean"), "0")
+    big <- distrACTION:::TDistribution(x1 = 0, dp1 = 400, dp2 = 1, showMean = TRUE, showVariance = TRUE)
+    expect_false(is.na(suppressWarnings(as.numeric(moment(big, "mean")))))
+    expect_false(is.na(suppressWarnings(as.numeric(moment(big, "var")))))
+})
