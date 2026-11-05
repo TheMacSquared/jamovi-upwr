@@ -1020,3 +1020,62 @@ zmian. Testy: `tests/testthat/test-utils-03.R`, `test-analyses-03.R`
 (Bananpol: RR 0,31, RD −0,19). Do zrobienia poza repo: lista 2.7
 i `jrisk-pokrycie-zadan.md` (wskazanie na `eventtables`), klucz zad. 2.2
 (częstości na 10 000).
+
+### Zadanie 27: audyt kodu 2026-11-05 — pozostałe drobne (grupa 4) — DO ZROBIENIA
+Audyt 10 agentami (moduły kursu, klient/serwer, scatr, opcjonalne). Grupy 1–3
+(błędne wyniki, awarie, wydajność) ZROBIONE 2026-11-05 i wypchnięte; poprawki
+błędnych wyników przeniesione na `release/1.0` (wersje `x.y.z.1`, GVIF
+`jRegr 0.1.4.2`). Dane i listy testów ręcznych:
+`packaging/tests/manual/audyt-2026-11-05/` (LISTA-KONTROLNA.md, LISTA-GRUPA3.md).
+Świadomie bez zmian: wykres interakcji jANOVA przy wyłączonych interakcjach
+(równoległe linie = wartość dydaktyczna); kopia odzyskiwania NIE jest usuwana
+przy zamknięciu (close() woła się też po zerwaniu połączenia).
+Pozostaje (drobne, bez wpływu na wyniki, chyba że zaznaczono):
+- Wspólne: `format(x, big.mark = " ")` trafia w `jmvcore::format` i ignoruje
+  separator („N = 1e+05”) — jperm `utils.R:195`, jCzest (tabela/zgodnosc/
+  zalezne), jRISK (eventtables, relsystem, utils, fta); zamienić na `formatC`.
+- jCzest: zerowa komórka 2×2 → OR = Inf z dolną granicą NaN (Haldane +0,5
+  z notą albo puste komórki); Q Cochrana odrzuca pomiar z jedną kategorią
+  (wziąć sumę poziomów jak `pairedTable`); opis metod „odwrotna kolejność
+  odwraca OR i RR” — dla zamiany kolumn RR liczy się dla drugiej kategorii;
+  liczności niecałkowite obcinane `as.integer` w teście dwumianowym/McNemarze;
+  miary 2×2 w warstwie, która stała się 2×2 po usunięciu pustych kolumn.
+- jEksplor: percentyle z przecinkiem dziesiętnym („2,5; 97,5” → P2, P5, P97);
+  Anderson-Darling traci ogon dla z > 8 (`pnorm(..., log.p = TRUE)`); wykresy
+  Lorenza/słupkowy/mozaikowy wysypują się na pustej zmiennej; brak informacji
+  o kilku dominantach; skośność nieliczona dla n = 3.
+- jCI: wykresy nieaktualne przy ziarnie 0 (brak `metody`, `plot`, `bootPlot`
+  w clearWith obrazów); Wilson daje 2,8e-17 zamiast 0 (i 1 − 1e-16);
+  nota „fallback” przy zdegenerowanym bootstrapie (stałe replikacje) myląca;
+  stałe dane → NaN bez wyjaśnienia (citwomeans, cicorrelation).
+- jRegr: test jednostronny korelacji z przedziałem dwustronnym; panele
+  macierzy rozrzutów na wierszach kompletnych we wszystkich zmiennych, a tytuły
+  z korelacji parami.
+- jTestyT/jperm: brak części opcji w `clearWith` (`student`, `plot`, `metody`);
+  ta sama zmienna dwa razy w parze → błąd wykresu i zdublowane klucze.
+- jANOVA: Dunnett (mvtnorm) daje nieznacznie różne p między uruchomieniami
+  (ziarno lub `GenzBretz`); kolumna „q” Nemenyiego pokazuje q/√2; brak jednego
+  pomiaru blokuje całą ANOVA powtórzonych pomiarów (może świadome — do decyzji).
+- scatr: dumbbell bez kontroli duplikatów po `wrapLabels`; heatmap pokazuje
+  „0” dla komórki z samymi brakami (suma); stackbar i pareto wysypują się na
+  pustej zmiennej; stripmean nie podpisuje rodzaju słupków błędu; meanprofile
+  bez komunikatu, gdy brak wierszy kompletnych.
+- distrACTION: F z p = 1 wysypuje się (`is.finite`); Weibull z kształtem
+  < 0,003 (`min` w .a.yaml); F dla df1 < 2 rysuje fałszywy szczyt
+  (`c(0,5, ...)`); zakresy F/χ² ignorują duże λ i przy df ≤ 4 dają setki
+  etykiet; literówki `LoweSegment`, `QuantAlpha*`.
+- jmvcore: `metody$add()` z wektorem (np. pusta zmienna opcjonalna) wysypuje się
+  dopiero przy renderowaniu; gałąź `mode: vector` w `analysis.R` bez
+  zapasowego PNG, gdy `svg()`/cairo niedostępne.
+- jSpace: luki w `clearWith` (geomap, tleorbit, satgroups, satclassify);
+  `rasterstats` w trybie kolumn zawsze EPSG:4326 (metry jako stopnie);
+  k w k-NN po cichu obcinane do wielkości zbioru uczącego; kartogram przy samych
+  brakach; `tleorbit` inicjuje SGP4 na każdy krok (zmierzyć w Dockerze).
+- Klient/serwer: kopia odzyskiwania zapisywana co 5 min także bez zmian
+  (licznik modyfikacji); pojedyncza wiadomość > 64 MiB zamyka WebSocket (1013);
+  `findDataset()` bez ochrony przed kolejnością odpowiedzi, `loadModule`
+  zapamiętuje nieudane pobranie; „Ustaw rozmiar” w menu elementów Svg nic nie
+  robi (`getResizeTarget` tylko w image.ts); blokada auto-przewijania włącza
+  się przy zwykłym kliknięciu w wykres (`manualImageResize`).
+- Stable: 3 testy `test-analyses.R` jEksplor 0.1.4.x padają także na kodzie
+  sprzed poprawek (oczekują nowszego układu tabeli) — sprawdzić.
