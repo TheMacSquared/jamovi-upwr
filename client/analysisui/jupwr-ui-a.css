@@ -48,7 +48,8 @@
 [data-ui-style="a"] .silky-variable-supplier {
     border: 1px solid var(--jupwr-line);
     border-radius: 8px;
-    overflow: hidden;
+    /* x only: the lists scroll vertically (main.css, .multi-item) */
+    overflow-x: hidden;
 }
 
 [data-ui-style="a"] .silky-layout-cell.selected {
