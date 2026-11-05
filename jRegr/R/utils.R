@@ -222,10 +222,16 @@ aucValue <- function(y, prob) {
     r <- rank(prob); (sum(r[y == 1]) - n1 * (n1 + 1) / 2) / (n1 * n0)
 }
 
+# One point per distinct threshold, from cumulative counts in one pass
+# (one data frame per threshold took 7.7 s at n = 20 000); the same points
+# as thresholds Inf, every distinct probability (decreasing), -Inf.
 rocCurve <- function(y, prob) {
-    th <- c(Inf, sort(unique(prob), decreasing = TRUE), -Inf)
-    do.call(rbind, lapply(th, function(t) { pred <- prob >= t
-        data.frame(fpr = sum(pred & y == 0) / sum(y == 0), tpr = sum(pred & y == 1) / sum(y == 1)) }))
+    th <- sort(unique(prob), decreasing = TRUE)
+    f <- factor(prob, levels = th)
+    tp <- cumsum(tabulate(f[y == 1], nbins = length(th)))
+    fp <- cumsum(tabulate(f[y == 0], nbins = length(th)))
+    n1 <- sum(y == 1); n0 <- sum(y == 0)
+    data.frame(fpr = c(0, fp / n0, 1), tpr = c(0, tp / n1, 1))
 }
 
 rocPlot <- function(roc, auc, ggtheme, theme) {
@@ -236,10 +242,15 @@ rocPlot <- function(roc, auc, ggtheme, theme) {
         ggplot2::labs(x = "1 − swoistość (odsetek fałszywie dodatnich)", y = "Czułość (odsetek prawdziwie dodatnich)") + ggtheme
 }
 
-logisticSimplePlot <- function(x, y, xlab, eventLabel, fit, covName, ggtheme, theme) {
+# the fitted curve with its band on a 100-point grid, computed in .run, so
+# the plot state holds these points instead of the whole glm object
+logisticBand <- function(fit, x, covName) {
     xg <- seq(min(x), max(x), length.out = 100); nd <- data.frame(xg); names(nd) <- covName
     pr <- stats::predict(fit, newdata = nd, type = "link", se.fit = TRUE)
-    band <- data.frame(x = xg, fit = stats::plogis(pr$fit), lower = stats::plogis(pr$fit - 1.96 * pr$se.fit), upper = stats::plogis(pr$fit + 1.96 * pr$se.fit))
+    data.frame(x = xg, fit = stats::plogis(pr$fit), lower = stats::plogis(pr$fit - 1.96 * pr$se.fit), upper = stats::plogis(pr$fit + 1.96 * pr$se.fit))
+}
+
+logisticSimplePlot <- function(x, y, xlab, eventLabel, band, ggtheme, theme) {
     ggplot2::ggplot(data.frame(x = x, y = y), ggplot2::aes(x = x, y = y)) +
         ggplot2::geom_ribbon(data = band, ggplot2::aes(x = x, ymin = lower, ymax = upper), inherit.aes = FALSE, fill = accent(theme), alpha = 0.18) +
         ggplot2::geom_jitter(width = 0, height = 0.03, alpha = 0.5, size = 2, colour = theme$color[1]) +

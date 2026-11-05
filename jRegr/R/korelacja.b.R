@@ -57,10 +57,14 @@ korelacjaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 coefs <- list(); fmtP <- function(p) if (!is.finite(p)) "" else if (p < 0.001) "< .001" else sprintf("%.3f", p)
                 kinds <- c(r = switch(o$method, pearson = "r", spearman = "ρ", kendall = "τ-b"), p = "p", n = "N")
                 show <- c("r", "p", if (isTRUE(o$showN)) "n")
+                # each pair once (the r, p and N rows used to recompute it)
+                pairs <- list()
+                for (i in 2:k) for (j in seq_len(i - 1))
+                    pairs[[paste(i, j)]] <- corPair(d[[i]], d[[j]], o$method, level, o$hypothesis)
                 for (i in 2:k) for (kk in show) {
                     vals <- list(var = vars[i], kind = kinds[[kk]])
                     for (j in seq_len(i - 1)) {
-                        rr <- corPair(d[[i]], d[[j]], o$method, level, o$hypothesis)
+                        rr <- pairs[[paste(i, j)]]
                         coefs[[paste(vars[j], vars[i])]] <- rr$r
                         stars <- if (isTRUE(o$flag) && is.finite(rr$p)) (if (rr$p < 0.001) "***" else if (rr$p < 0.01) "**" else if (rr$p < 0.05) "*" else "") else ""
                         vals[[paste0("c_", vars[j])]] <- switch(kk, r = if (is.finite(rr$r)) paste0(sprintf("%.3f", rr$r), stars) else "",

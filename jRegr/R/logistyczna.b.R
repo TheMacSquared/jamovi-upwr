@@ -80,8 +80,9 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             tt$addRow(rowKey = "obs0", values = list(obs = other, pred0 = cl$tn, pred1 = cl$fp, pct = 100 * cl$tn / (cl$tn + cl$fp)))
             tt$addRow(rowKey = "obs1", values = list(obs = event, pred0 = cl$fn, pred1 = cl$tp, pct = 100 * cl$tp / (cl$tp + cl$fn)))
             tt$getColumn("pred0")$setTitle(other); tt$getColumn("pred1")$setTitle(event)
-            self$results$classStats$setRow(rowNo = 1, values = list(cutoff = o$cutoff, acc = cl$acc, sens = cl$sens, spec = cl$spec, auc = aucValue(y, prob)))
-            if (isTRUE(o$roc)) self$results$roc$setState(list(roc = rocCurve(y, prob), auc = aucValue(y, prob)))
+            auc <- aucValue(y, prob)   # once, for the table and the ROC plot
+            self$results$classStats$setRow(rowNo = 1, values = list(cutoff = o$cutoff, acc = cl$acc, sens = cl$sens, spec = cl$spec, auc = auc))
+            if (isTRUE(o$roc)) self$results$roc$setState(list(roc = rocCurve(y, prob), auc = auc))
             if (isTRUE(o$vif)) {
                 vt <- self$results$vif; v <- vifTable(fit)
                 if (is.null(v)) vt$setNote("n", "VIF wymaga co najmniej dwóch kolumn predyktorów.")
@@ -90,13 +91,14 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                     vif = v$vif[i], df = v$df[i], adj = v$adj[i], tol = v$tol[i]))
             }
             if (isTRUE(o$cooks)) { cs <- cooksSummary(fit); self$results$cooks$setRow(rowNo = 1, values = list(mean = cs$mean, max = cs$max, nHigh = cs$nHigh, thr = cs$thr)) }
-            if (simple && reliable) self$results$plot$setState(list(x = d[[covs]], y = y, xlab = covs, eventLabel = event, fit = fit, covName = covs))
+            if (simple && reliable) self$results$plot$setState(list(x = d[[covs]], y = y, xlab = covs, eventLabel = event, band = logisticBand(fit, d[[covs]], covs)))
             complete <- stats::complete.cases(self$data[c(dep, covs, factors)])
             # spreadsheet row numbers: with a filter the data has only the rows shown
             if (isTRUE(o$predictOV) && self$results$predictOV$isNotFilled()) { full <- rep(NA_real_, length(complete)); full[complete] <- prob
                 self$results$predictOV$setRowNums(rownames(self$data)); self$results$predictOV$setValues(full) }
         },
-        .plot = function(image, ggtheme, theme, ...) { s <- image$state; if (is.null(s)) return(FALSE); logisticSimplePlot(s$x, s$y, s$xlab, s$eventLabel, s$fit, s$covName, ggtheme, theme) },
+        .plot = function(image, ggtheme, theme, ...) { s <- image$state; if (is.null(s)) return(FALSE); band <- if (!is.null(s$band)) s$band else logisticBand(s$fit, s$x, s$covName)   # older .omv: the glm
+            logisticSimplePlot(s$x, s$y, s$xlab, s$eventLabel, band, ggtheme, theme) },
         .rocPlot = function(image, ggtheme, theme, ...) { s <- image$state; if (is.null(s)) return(FALSE); rocPlot(s$roc, s$auc, ggtheme, theme) }
     )
 )

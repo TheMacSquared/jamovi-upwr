@@ -87,3 +87,19 @@ test_that("GVIF per predictor equals car::vif and ignores the reference level (a
     expect_true(is.infinite(vv$vif[vv$term == "dup"]))
     expect_equal(vv$vif[vv$term == "c"], unname(car::vif(lm(y ~ a + c, dd))["c"]))
 })
+
+test_that("ROC from cumulative counts: same points as one threshold at a time, fast (audit 2026-11-05)", {
+    slow <- function(y, prob) {
+        th <- c(Inf, sort(unique(prob), decreasing = TRUE), -Inf)
+        do.call(rbind, lapply(th, function(t) { pred <- prob >= t
+            data.frame(fpr = sum(pred & y == 0) / sum(y == 0), tpr = sum(pred & y == 1) / sum(y == 1)) }))
+    }
+    set.seed(2)
+    for (i in 1:20) {
+        y <- rbinom(60, 1, 0.4); p <- round(runif(60), sample(1:3, 1))
+        expect_equal(rocCurve(y, p), slow(y, p))
+    }
+    y <- rbinom(20000, 1, 0.3); p <- runif(20000)
+    t0 <- proc.time()[["elapsed"]]; rocCurve(y, p)
+    expect_lt(proc.time()[["elapsed"]] - t0, 1)
+})
