@@ -46,6 +46,7 @@ import { applyUiStyle } from '../common/uistyle';
 import Store from './store';
 import DatasetInfo from './datasetinfo';
 import { setupCardHeaders, setupEditorPlacement } from './uicards';
+import { initSplash, hideSplash } from './jupwrsplash';
 import { relocate } from './relocate';
 
 declare global {
@@ -57,6 +58,9 @@ declare global {
 window._ = I18ns.get('app')._;
 window.n_ = I18ns.get('app')._n;
 window.interactionManager = interactionManager;
+
+// jUPWR: the loading screen with the logo (index.html)
+initSplash(host.version);
 
 function ready(fn: () => void) {
     if (document.readyState !== 'loading')
@@ -1018,6 +1022,7 @@ ready(async() => {
 
         const notify = (progress) => {
             if (progress.p !== undefined) {
+                hideSplash();  // jUPWR: the opening progress must be seen
                 progNotif.set({
                     title: progress.title,
                     progress: [ progress.p, progress.n ],
@@ -1025,8 +1030,10 @@ ready(async() => {
                 notifications.notify(progNotif);
             }
 
-            if (progress['message-src'])
+            if (progress['message-src']) {
+                hideSplash();
                 infoBox.setup(progress);
+            }
         };
 
         let options: IInstanceOpenOptions = { };
@@ -1055,6 +1062,7 @@ ready(async() => {
             const embeddedAndReady = (location === 'embed' && options.authToken);
 
             if ( ! instanceId && hasLobby && ! embeddedAndReady) {
+                hideSplash();
                 const response = await lobby.show(location, params);
                 if (response.action === 'open')
                     options = response.data;
@@ -1119,10 +1127,12 @@ ready(async() => {
         auth.beginSync();
 
         progNotif.dismiss();
+        hideSplash();
     }
     catch (e) {
 
         progNotif.dismiss();
+        hideSplash();
 
         if (e instanceof UserFacingError) {
             infoBox.setup({

@@ -10,6 +10,9 @@ import { h }  from '../../common/htmlelementcreator';
 import { RibbonModel } from "../ribbon";
 import { Theme, defaultPaletteFor } from "../settings";
 import { sanitizeUiStyle } from '../../common/uistyle';
+import upwrLogo from '../../assets/upwr-logotyp-pl-poziomy.png';
+import { JUPWR_VERSION } from '../../common/jupwr';
+import { shortVersion } from '../jupwrsplash';
 
 function selectOption(value: string, label: string) {
     return h('option', { value: value }, label);
@@ -341,11 +344,16 @@ export class AppMenuButton extends EventDistributor {
         });
 
         $menu.append(h('div', { class: 'jmv-ribbon-appmenu-spacer' }));
-        let $version = h('div', { class: 'jmv-ribbon-appmenu-version' });
+        // jUPWR: the UPWr logo and both versions (the logo left the results)
+        let $versionText = h('div', { class: 'jupwr-appmenu-version-text' });
+        let $version = h('div', { class: 'jmv-ribbon-appmenu-version jupwr-appmenu-version' },
+            h('img', { class: 'jupwr-appmenu-logo', src: upwrLogo, alt: 'UPWr' }),
+            $versionText);
         $menu.append($version);
 
+        $versionText.innerText = `jUPWR ${ JUPWR_VERSION }`;
         host.version.then(version => {
-            $version.innerText = _('Version {v}', { v: version });
+            $versionText.innerText = `jUPWR ${ JUPWR_VERSION } (jamovi ${ shortVersion(version) })`;
         });
 
         $syntaxModeCheck.addEventListener('change', event => this.model.settings().setSetting('syntaxMode', $syntaxModeCheck.checked));
