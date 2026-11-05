@@ -46,6 +46,8 @@ def active_engine():
     engine._socket = Mock()
     engine._running.set()
     engine._stopped.clear()
+    # these tests are about the immediate path; the grace period has its own
+    engine._cancel_grace = 0.05
     return engine
 
 
@@ -753,3 +755,41 @@ async def test_real_worker_failure_restart_and_shutdown(tmp_path):
     assert all(process.returncode is not None for process in processes)
     assert not any(thread.is_alive() for thread in threads)
     assert not session._runner._tasks and not session._scheduler._tasks
+
+
+@pytest.mark.asyncio
+async def test_cancelled_request_finishing_in_grace_keeps_the_worker():
+    # jUPWR: a worker that finishes the cancelled request within the grace
+    # period is not restarted, and the latest request then runs on it
+    engine = active_engine()
+    engine._cancel_grace = 1.0
+    engine._interrupt = AsyncMock()
+    old_stream, new_stream = ProgressStream(), ProgressStream()
+    old = asyncio.create_task(engine.run(request(1), old_stream))
+    await until(lambda: bool(engine._results_queue._getters))
+    latest = request(2)
+    new = asyncio.create_task(engine.run(latest, new_stream))
+    await asyncio.sleep(0.05)
+    engine._results_queue.put_nowait((response(request(1)), True))
+    await until(lambda: engine._socket.send.call_count == 2)
+    engine._results_queue.put_nowait((response(latest), True))
+    assert (await asyncio.wait_for(new_stream, 2)).revision == 2
+    await new
+    with pytest.raises(asyncio.CancelledError):
+        await old
+    engine._interrupt.assert_not_awaited()
+    assert not engine._results_queue._getters
+
+
+@pytest.mark.asyncio
+async def test_cancelled_request_still_running_after_grace_interrupts():
+    engine = active_engine()
+    engine._cancel_grace = 0.1
+    engine._interrupt = AsyncMock()
+    stream = ProgressStream()
+    task = asyncio.create_task(engine.run(request(1), stream))
+    await until(lambda: bool(engine._results_queue._getters))
+    stream.cancel()
+    await asyncio.wait_for(task, 2)
+    engine._interrupt.assert_awaited_once()
+    assert not engine._results_queue._getters

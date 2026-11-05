@@ -173,6 +173,9 @@ async def test_cancelled_real_worker_is_reaped_and_replacement_computes(monkeypa
         instance = await session.create()
         await instance.open(str(fixture))
         engine = session._runner._engines[0]
+        # the immediate path: no grace for a cancelled request (jUPWR keeps a
+        # worker that finishes it within analysis_cancel_grace)
+        engine._cancel_grace = 0
         process = engine._process
         req = request()
         req.sessionId, req.instanceId = session.id, instance.id
@@ -186,6 +189,44 @@ async def test_cancelled_real_worker_is_reaped_and_replacement_computes(monkeypa
         await asyncio.wait_for(task, 15)
         assert process.returncode is not None
         assert engine._process.pid != process.pid
+        result = ProgressStream()
+        await asyncio.wait_for(engine.run(req, result), 15)
+        assert (await result).status == pb.ANALYSIS_COMPLETE
+    finally:
+        session.stop()
+        await asyncio.wait_for(session.wait_ended(), 15)
+
+
+@pytest.mark.asyncio
+async def test_cancelled_quick_request_keeps_real_worker(monkeypatch, tmp_path):
+    from pathlib import Path
+    home = Path(conf.get('home'))
+    fixture = home / 'test-data' / 'upstream-28.17.csv'
+    if not fixture.is_file() or not (home / 'bin' / 'jamovi-engine').is_file():
+        pytest.skip('Requires Docker R worker and manual fixture')
+    monkeypatch.setitem(conf.config_values, 'r_processes', '1')
+    session = session_code.Session(str(tmp_path), 'cancel-real-worker')
+    await session.start()
+    try:
+        instance = await session.create()
+        await instance.open(str(fixture))
+        engine = session._runner._engines[0]
+        # jUPWR: a quick request cancelled mid-run finishes within the grace
+        # period, so the worker is kept (no R restart) and computes the next one
+        engine._cancel_grace = 15
+        process = engine._process
+        req = request()
+        req.sessionId, req.instanceId = session.id, instance.id
+        req.options.hasNames = True
+        req.options.names.append('vars')
+        req.options.options.add().c.options.add().s = 'wynik (cm)'
+        stream = ProgressStream()
+        task = asyncio.create_task(engine.run(req, stream))
+        await until(lambda: bool(engine._results_queue._getters))
+        stream.cancel()
+        await asyncio.wait_for(task, 15)
+        assert process.returncode is None
+        assert engine._process.pid == process.pid
         result = ProgressStream()
         await asyncio.wait_for(engine.run(req, result), 15)
         assert (await result).status == pb.ANALYSIS_COMPLETE

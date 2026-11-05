@@ -5,6 +5,7 @@ import os.path as path
 import platform
 
 import threading
+from time import monotonic
 import subprocess
 from enum import Enum
 
@@ -106,6 +107,12 @@ class Engine:
         if dur_limit:
             dur_limit = int(dur_limit)
         self._analysis_duration_limit = dur_limit
+
+        # jUPWR: after a cancellation (an option changed during a calculation)
+        # the worker gets this long to finish the cancelled request; only if
+        # it does not is it restarted. A restart costs an R start and the
+        # package loading, which every click during a calculation used to pay.
+        self._cancel_grace = float(self._config.get('analysis_cancel_grace', 2.0))
 
     async def start(self):
         async with self._lifecycle:
@@ -323,6 +330,8 @@ class Engine:
         self._current_analysis = task
         helpers = set()
         sent = False
+        settled = False
+        results_received = None
 
         try:
             async with self._run_lock:
@@ -351,45 +360,58 @@ class Engine:
                     helpers.add(timeout)
                     pending.add(timeout)
 
-                while True:
-                    done, pending = await wait(pending, return_when=FIRST_COMPLETED)
-                    # Cancellation can race with the delivery of a final result.
-                    if results_stream.done():
-                        if results_stream.cancelled():
-                            await self._interrupt()
-                        break
-                    if results_received in done:
-                        helpers.discard(results_received)
-                        results, complete = results_received.result()
-                        if (request.instanceId == results.instanceId
-                                and request.analysisId == results.analysisId
-                                and request.revision == results.revision):
-                            if complete:
-                                results_stream.set_result(results)
-                                break
-                            results_stream.write(results)
-                        results_received = create_task(self._results_queue.get())
-                        helpers.add(results_received)
-                        pending.add(results_received)
-                    elif timeout is not None and timeout in done:
-                        error = self._create_error_response(
-                            request,
-                            _('This analysis has exceeded the current time limits and has been terminated.'))
-                        await self._recover()
-                        if not results_stream.done():
-                            results_stream.set_result(error)
-                        break
-                    elif engine_stopped in done:
-                        error = self._create_error_response(
-                            request,
-                            _('This analysis has terminated, likely due to hitting a resource limit.'))
-                        await self._recover()
-                        if not results_stream.done():
-                            results_stream.set_result(error)
-                        break
+                # jUPWR: a cancellation is settled while the lock is held, so the
+                # next request is sent only after the worker finished the
+                # cancelled one or was restarted (and its results cannot be
+                # taken by this task)
+                try:
+                    while True:
+                        done, pending = await wait(pending, return_when=FIRST_COMPLETED)
+                        # Cancellation can race with the delivery of a final result.
+                        if results_stream.done():
+                            if results_stream.cancelled():
+                                await self._finish_or_interrupt(request, results_received)
+                            break
+                        if results_received in done:
+                            helpers.discard(results_received)
+                            results, complete = results_received.result()
+                            if (request.instanceId == results.instanceId
+                                    and request.analysisId == results.analysisId
+                                    and request.revision == results.revision):
+                                if complete:
+                                    results_stream.set_result(results)
+                                    break
+                                results_stream.write(results)
+                            results_received = create_task(self._results_queue.get())
+                            helpers.add(results_received)
+                            pending.add(results_received)
+                        elif timeout is not None and timeout in done:
+                            error = self._create_error_response(
+                                request,
+                                _('This analysis has exceeded the current time limits and has been terminated.'))
+                            await self._recover()
+                            if not results_stream.done():
+                                results_stream.set_result(error)
+                            break
+                        elif engine_stopped in done:
+                            error = self._create_error_response(
+                                request,
+                                _('This analysis has terminated, likely due to hitting a resource limit.'))
+                            await self._recover()
+                            if not results_stream.done():
+                                results_stream.set_result(error)
+                            break
+                except CancelledError:
+                    results_stream.cancel()
+                    settled = True
+                    try:
+                        await self._finish_or_interrupt(request, results_received)
+                    except CancelledError:
+                        await self._interrupt()
+                    raise
         except CancelledError:
             results_stream.cancel()
-            if sent:
+            if sent and not settled:
                 await self._interrupt()
             raise
         except Exception as e:
@@ -406,6 +428,40 @@ class Engine:
             await gather(*helpers, return_exceptions=True)
             if self._current_analysis is task:
                 self._current_analysis = None
+
+    async def _finish_or_interrupt(self, request, receiver):
+        # jUPWR: wait up to _cancel_grace for the final result of the
+        # cancelled request (R does not stop computing it); when it comes the
+        # worker is idle again and keeps running. Otherwise interrupt.
+        deadline = monotonic() + self._cancel_grace
+        task = receiver
+        created = []
+        try:
+            while self._cancel_grace > 0:
+                remaining = deadline - monotonic()
+                if remaining <= 0:
+                    break
+                if task is None or task.cancelled():
+                    task = create_task(self._results_queue.get())
+                    created.append(task)
+                done, _ = await wait({task}, timeout=remaining)
+                if task not in done:
+                    break
+                try:
+                    results, complete = task.result()
+                except Exception:
+                    task = None
+                    continue
+                task = None
+                if (complete and request.instanceId == results.instanceId
+                        and request.analysisId == results.analysisId
+                        and request.revision == results.revision):
+                    return
+        finally:
+            for t in created:
+                if not t.done():
+                    t.cancel()
+        await self._interrupt()
 
     async def _interrupt(self):
         # A cancelled R calculation may never return to the IPC loop. Reap the

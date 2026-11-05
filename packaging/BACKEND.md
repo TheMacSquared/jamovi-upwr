@@ -10,6 +10,7 @@ W Docker Compose dodaj wybrane wartości do `environment` usługi `jamovi`.
 | `JAMOVI_WEBSOCKET_QUEUE_MESSAGES` | `256` | Maksymalna liczba oczekujących wiadomości, poza jedną wysyłaną. |
 | `JAMOVI_WEBSOCKET_QUEUE_BYTES` | `67108864` | Limit bajtów oczekujących i wysyłanej wiadomości razem (64 MiB). |
 | `JAMOVI_WEBSOCKET_SEND_TIMEOUT` | `30` | Maksymalny czas wysłania jednej wiadomości, w sekundach. |
+| `JAMOVI_ANALYSIS_CANCEL_GRACE` | `2` | Czas (w sekundach, może być ułamkowy) na dokończenie anulowanego obliczenia, zanim proces R zostanie zrestartowany; `0` = restart od razu. |
 
 Wartości muszą być dodatnimi liczbami całkowitymi. Zwiększenie liczby procesów
 R zwiększa także użycie pamięci; limit jest liczony na sesję serwera.
@@ -21,8 +22,11 @@ zamyka przeciążone połączenie kodem 1013; sesja pozostaje dostępna do ponow
 połączenia. Takie zamknięcie jest traktowane jak utrata połączenia, a nie
 świadome zamknięcie dokumentu. Obowiązują nadal limity czasu życia sesji.
 
-Anulowanie wysłanego obliczenia kończy zajęty proces R i uruchamia jego następcę,
-zanim przyjmie następne obliczenie. Pozostałe procesy pracują dalej. Zamknięcie
+Anulowanie wysłanego obliczenia (np. zmiana opcji w trakcie liczenia) daje
+procesowi R czas `analysis_cancel_grace` (domyślnie 2 s) na dokończenie
+anulowanego obliczenia; jeśli zdąży, ten sam proces liczy dalej bez restartu.
+Jeśli nie, proces R jest kończony i uruchamiany jego następca, zanim przyjmie
+następne obliczenie. Pozostałe procesy pracują dalej. Zamknięcie
 sesji i globalny restart sprzątają procesy bez uruchamiania zbędnych następców.
 
 ## Zapis i odzyskiwanie
