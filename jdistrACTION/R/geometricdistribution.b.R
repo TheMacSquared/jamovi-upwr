@@ -65,7 +65,8 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         QuantileFunctionColumn = paste("p = ", Quantile, sep = "")))
 
       # Discrete: integer sequence
-      x <- seq(LowerTail, UpperTail, by = 1)
+      rng <- discretePlotRange(LowerTail, UpperTail, qGeom, c(XValue, XValue2))
+      x <- seq(rng[1], rng[2], by = 1)
       Density <- dGeom(x)
 
       if(DistributionFunction == "TRUE"){
@@ -218,7 +219,7 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       TypeOfLine <- "dashed"
 
       Plot <- ggplot(Datas, aes(x = X, y = Prob)) +
-        geom_col(fill = BarFill, color = theme$color[1], width = 0.7) +
+        discreteColumns(Datas$X, fill = BarFill, outline = theme$color[1]) +
         ggplot2::xlab("") + ggplot2::ylab("") +
         scale_x_continuous(breaks = discreteAxisBreaks(Datas$X)) +
         ggtheme +

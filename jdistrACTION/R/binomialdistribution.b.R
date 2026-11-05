@@ -108,7 +108,8 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         ###### 1.2) Quantile & Distribution calculation ######
         ##### 1.2.1) Calculations #####
         # The sequence with the values for the distribution is created
-        x <- seq(0, N, length=N+1)
+        rng <- discretePlotRange(0, N, function(p) qbinom(p, DP1, DP2), c(XValue, XValue2))
+        x <- seq(rng[1], rng[2], by = 1)
         # Calculation of the distribution density
         Density <- dbinom(x, DP1, DP2)
         if(DistributionFunction=="TRUE"){ 

@@ -62,7 +62,8 @@ NegBinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         QuantileFunctionColumn = paste("p = ", Quantile, sep = "")))
 
       # Discrete: integer sequence over the support
-      x <- seq(SupportStart, UpperTail, by = 1)
+      rng <- discretePlotRange(SupportStart, UpperTail, qNB, c(XValue, XValue2))
+      x <- seq(rng[1], rng[2], by = 1)
       Density <- dNB(x)
 
       if(DistributionFunction == "TRUE"){
@@ -210,7 +211,7 @@ NegBinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       TypeOfLine <- "dashed"
 
       Plot <- ggplot(Datas, aes(x = X, y = Prob)) +
-        geom_col(fill = BarFill, color = theme$color[1], width = 0.7) +
+        discreteColumns(Datas$X, fill = BarFill, outline = theme$color[1]) +
         ggplot2::xlab("") + ggplot2::ylab("") +
         scale_x_continuous(breaks = discreteAxisBreaks(Datas$X)) +
         ggtheme +

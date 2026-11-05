@@ -136,3 +136,15 @@ test_that("t distribution: the plot covers the distribution for a negative ncp (
     expect_lt(min(x), qt(0.001, 10, ncp = -3))
     expect_gt(max(x), qt(0.999, 10, ncp = -3))
 })
+
+test_that("discrete plots: huge supports are trimmed, usual ones unchanged (audit 2026-11-05)", {
+    p <- distrACTION:::PoissonDistribution(x1 = 1e6, dp1 = 1e6, DistributionFunction = TRUE)
+    xs <- p$plot$state$Datas$X
+    expect_lt(length(xs), 20000)
+    expect_true(1e6 >= min(xs) && 1e6 <= max(xs))
+    expect_equal(range(distrACTION:::PoissonDistribution(x1 = 2, dp1 = 5)$plot$state$Datas$X), c(0, qpois(0.999, 5)))
+    t0 <- proc.time()[["elapsed"]]
+    b <- distrACTION:::BinomialDistribution(x1 = 5e6, dp1 = 1e7, dp2 = 0.5, DistributionFunction = TRUE)
+    expect_lt(proc.time()[["elapsed"]] - t0, 5)
+    expect_equal(range(distrACTION:::BinomialDistribution(x1 = 3, dp1 = 10, dp2 = 0.3)$plot$state[[1]]), c(0, 10))
+})

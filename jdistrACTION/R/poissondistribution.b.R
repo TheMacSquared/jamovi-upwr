@@ -47,7 +47,8 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         DistributionFunctionColumn = paste("x1 = ", XValue, sep = ""),
         QuantileFunctionColumn = paste("p = ", Quantile, sep = "")))
 
-      x <- seq(LowerTail, UpperTail, by = 1)
+      rng <- discretePlotRange(LowerTail, UpperTail, function(p) qpois(p, DP1), c(XValue, XValue2))
+      x <- seq(rng[1], rng[2], by = 1)
       Density <- dpois(x, DP1)
 
       if(DistributionFunction == "TRUE"){
@@ -190,7 +191,7 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       TypeOfLine <- "dashed"
 
       Plot <- ggplot(Datas, aes(x = X, y = Prob)) +
-        geom_col(fill = BarFill, color = theme$color[1], width = 0.7) +
+        discreteColumns(Datas$X, fill = BarFill, outline = theme$color[1]) +
         ggplot2::xlab("") + ggplot2::ylab("") +
         scale_x_continuous(breaks = discreteAxisBreaks(Datas$X)) +
         ggtheme +
