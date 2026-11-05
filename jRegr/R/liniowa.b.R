@@ -36,9 +36,11 @@ liniowaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     paste(c(if (o$predictOV) "wartości przewidywane", if (o$residsOV) "reszty"), collapse = " i "))
             m$render(self$results$metody)
 
+            # no F test when no slope could be estimated (e.g. a constant predictor)
             fs <- sm$fstatistic
+            if (is.null(fs)) { fs <- c(NA_real_, NA_real_, NA_real_); ft$setNote("noF", "Brak testu F: żadnego nachylenia nie da się oszacować (predyktor stały lub liniowo zależny).") }
             ft$setRow(rowNo = 1, values = list(r = sqrt(sm$r.squared), r2 = sm$r.squared, r2adj = sm$adj.r.squared,
-                F = unname(fs[1]), df1 = unname(fs[2]), df2 = unname(fs[3]), p = stats::pf(fs[1], fs[2], fs[3], lower.tail = FALSE),
+                F = unname(fs[1]), df1 = unname(fs[2]), df2 = unname(fs[3]), p = if (anyNA(fs)) NA_real_ else stats::pf(fs[1], fs[2], fs[3], lower.tail = FALSE),
                 rmse = sqrt(mean(stats::residuals(fit)^2)), aic = stats::AIC(fit), bic = stats::BIC(fit)))
             ft$setNote("n", sprintf("N = %d.", n))
 
@@ -47,7 +49,9 @@ liniowaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             for (i in seq_len(nrow(cf))) {
                 nm <- rownames(cf)[i]
                 ct$addRow(rowKey = nm, values = list(term = if (!is.null(lab[nm]) && !is.na(lab[nm])) lab[[nm]] else nm,
-                    b = cf[i, 1], se = cf[i, 2], t = cf[i, 3], p = cf[i, 4], lower = ci[i, 1], upper = ci[i, 2],
+                    # by name: summary() leaves out coefficients dropped as
+                    # collinear (NA), confint() keeps them
+                    b = cf[i, 1], se = cf[i, 2], t = cf[i, 3], p = cf[i, 4], lower = ci[nm, 1], upper = ci[nm, 2],
                     beta = if (is.null(beta)) NULL else unname(beta[nm])))
             }
             if (any(is.na(stats::coef(fit)))) ct$setNote("na", "Współczynniki NA: predyktor liniowo zależny od pozostałych (usunięty z modelu).")
@@ -83,8 +87,12 @@ liniowaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             }
             self$results$resPlot$setState(list(fitted = fitted, resid = res)); self$results$qq$setState(list(resid = res))
             complete <- stats::complete.cases(self$data[c(dep, covs, factors)])
-            if (isTRUE(o$predictOV) && self$results$predictOV$isNotFilled()) { full <- rep(NA_real_, length(complete)); full[complete] <- fitted; self$results$predictOV$setValues(full) }
-            if (isTRUE(o$residsOV) && self$results$residsOV$isNotFilled()) { full <- rep(NA_real_, length(complete)); full[complete] <- res; self$results$residsOV$setValues(full) }
+            # with a filter the data has only the rows shown; their spreadsheet
+            # numbers are the row names, without them the values go to rows 1..n
+            if (isTRUE(o$predictOV) && self$results$predictOV$isNotFilled()) { full <- rep(NA_real_, length(complete)); full[complete] <- fitted
+                self$results$predictOV$setRowNums(rownames(self$data)); self$results$predictOV$setValues(full) }
+            if (isTRUE(o$residsOV) && self$results$residsOV$isNotFilled()) { full <- rep(NA_real_, length(complete)); full[complete] <- res
+                self$results$residsOV$setRowNums(rownames(self$data)); self$results$residsOV$setValues(full) }
         },
         .plot = function(image, ggtheme, theme, ...) { s <- image$state; if (is.null(s)) return(FALSE); simpleRegressionPlot(s$x, s$y, s$xlab, s$ylab, s$band, ggtheme, theme) },
         .resPlot = function(image, ggtheme, theme, ...) { s <- image$state; if (is.null(s)) return(FALSE); residFittedPlot(s$fitted, s$resid, ggtheme, theme) },
