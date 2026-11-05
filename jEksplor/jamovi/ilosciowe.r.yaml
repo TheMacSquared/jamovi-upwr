@@ -151,7 +151,11 @@ items:
       title: Histogramy
       type: Array
       visible: (hist)
-      clearWith: *cw
+      # only what the plot depends on: data and its own options
+      clearWith:
+        - vars
+        - splitBy
+        - dens
       template:
         title: ''
         type: Image
@@ -165,7 +169,13 @@ items:
       title: Wykresy pudełkowe
       type: Array
       visible: (box)
-      clearWith: *cw
+      # only what the plot depends on: data and its own options
+      clearWith:
+        - vars
+        - splitBy
+        - violin
+        - dot
+        - boxMean
       template:
         title: ''
         type: Image
@@ -179,7 +189,10 @@ items:
       title: Wykresy Q-Q
       type: Array
       visible: (qq)
-      clearWith: *cw
+      # only what the plot depends on: data and its own options
+      clearWith:
+        - vars
+        - splitBy
       template:
         title: ''
         type: Image
@@ -193,7 +206,10 @@ items:
       title: Dystrybuanty empiryczne
       type: Array
       visible: (ecdf)
-      clearWith: *cw
+      # only what the plot depends on: data and its own options
+      clearWith:
+        - vars
+        - splitBy
       template:
         title: ''
         type: Image
@@ -207,7 +223,10 @@ items:
       title: Krzywe Lorenza
       type: Array
       visible: (lorenz)
-      clearWith: *cw
+      # only what the plot depends on: data and its own options
+      clearWith:
+        - vars
+        - splitBy
       template:
         title: ''
         type: Image
