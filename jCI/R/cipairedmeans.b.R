@@ -24,7 +24,8 @@ cipairedmeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
             fallback <- FALSE
             if (isBoot(method)) {
                 r <- bootCI(d, function(v, i) mean(v[i]), o$nBoot, o$seed, method, level); fallback <- r$fallback
-                self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = "Średnia różnic"))
+                # the replicates (up to B values) only when the histogram is on: state goes into the .omv
+                if (isTRUE(o$bootPlot)) self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = "Średnia różnic"))
                 clab <- NULL
             } else { r <- ciMeanT(d, level); clab <- sprintf("t-Studenta, df = %d", n - 1) }
             dC <- mean(d) / stats::sd(d); dci <- if (isTRUE(o$effSize)) dInterval(dC, n, level = level) else c(NA_real_, NA_real_)

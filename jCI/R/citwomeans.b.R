@@ -32,7 +32,8 @@ citwomeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 r <- bootCI(d, function(dd, i) { s <- dd[i, ]; mean(s$x[s$g == sel[1]]) - mean(s$x[s$g == sel[2]]) },
                             o$nBoot, o$seed, method, level, strata = g)
                 fallback <- r$fallback
-                self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = "Różnica średnich"))
+                # the replicates (up to B values) only when the histogram is on: state goes into the .omv
+                if (isTRUE(o$bootPlot)) self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = "Różnica średnich"))
                 clab <- NULL
             } else if (method == "student") { r <- ciTwoMeansStudent(x1, x2, level); clab <- sprintf("t-Studenta, df = %d", r$df)
             } else { r <- ciTwoMeansWelch(x1, x2, level); clab <- sprintf("Welcha, df = %.1f", r$df) }

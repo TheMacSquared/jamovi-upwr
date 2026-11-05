@@ -36,7 +36,8 @@ cidiffpropClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 r <- bootCI(d, function(dd, i) { z <- dd[i, ]; mean(z$s[z$g == sel[1]]) - mean(z$s[z$g == sel[2]]) },
                             o$nBoot, o$seed, method, level, strata = g)
                 fallback <- r$fallback
-                self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = "Różnica udziałów"))
+                # the replicates (up to B values) only when the histogram is on: state goes into the .omv
+                if (isTRUE(o$bootPlot)) self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = "Różnica udziałów"))
                 clab <- NULL
             } else { r <- ciDiffProportion(x1, n1, x2, n2, level, method); clab <- switch(method, newcombe = "Newcombe’a", wald = "Walda") }
             t$setRow(rowNo = 1, values = list(var = o$dep, group1 = sel[1], group2 = sel[2], p1 = p1, p2 = p2,

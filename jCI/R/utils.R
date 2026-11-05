@@ -79,11 +79,16 @@ bcaInterval <- function(b, j, level) {
 
 # Keep intercept and slope paired: a rank-deficient resample estimates neither
 # statistic for the purpose of this joint bootstrap distribution.
+# Least squares in closed form on the resampled vectors (lm() per replicate
+# took ~2 s per 10 000 replicates at n = 200); the same coefficients.
 regressionBootStatistic <- function(d, i) {
-    fit <- stats::lm(y ~ x, data = d[i, , drop = FALSE])
-    cf <- stats::coef(fit)
-    if (fit$rank < 2 || any(!is.finite(cf))) return(c(NA_real_, NA_real_))
-    unname(cf)
+    x <- d$x[i]; y <- d$y[i]
+    vx <- stats::var(x)
+    if (!is.finite(vx) || vx <= 0) return(c(NA_real_, NA_real_))
+    b1 <- stats::cov(x, y) / vx
+    b0 <- mean(y) - b1 * mean(x)
+    if (!is.finite(b0) || !is.finite(b1)) return(c(NA_real_, NA_real_))
+    c(b0, b1)
 }
 
 # Pointwise percentile band, irrespective of the coefficient CI method.

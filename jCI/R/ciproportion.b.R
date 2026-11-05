@@ -28,7 +28,8 @@ ciproportionClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Clas
             fallback <- FALSE
             if (isBoot(method)) {
                 r <- bootCI(succ, function(v, i) mean(v[i]), o$nBoot, o$seed, method, level); fallback <- r$fallback
-                self$results$bootPlot$setState(list(reps = r$reps, est = phat, lower = r$lower, upper = r$upper, xlab = "Udział"))
+                # the replicates (up to B values) only when the histogram is on: state goes into the .omv
+                if (isTRUE(o$bootPlot)) self$results$bootPlot$setState(list(reps = r$reps, est = phat, lower = r$lower, upper = r$upper, xlab = "Udział"))
                 clab <- NULL
             } else {
                 ci <- ciProportion(k, n, level, method); r <- list(lower = ci$lower, upper = ci$upper)

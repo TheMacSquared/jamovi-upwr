@@ -28,7 +28,8 @@ cicorrelationClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
                 d <- data.frame(a = a, b = b)
                 r <- bootCI(d, function(dd, i) stats::cor(dd$a[i], dd$b[i], method = o$method), o$nBoot, o$seed, method, level)
                 fallback <- r$fallback
-                self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = corLab))
+                # the replicates (up to B values) only when the histogram is on: state goes into the .omv
+                if (isTRUE(o$bootPlot)) self$results$bootPlot$setState(list(reps = r$reps, est = r$est, lower = r$lower, upper = r$upper, xlab = corLab))
                 clab <- NULL
             } else { r <- ciCorrelation(a, b, level, o$method); clab <- if (o$method == "pearson") "transformacja Fishera z" else "Fishera z z błędem Bonetta-Wrighta" }
             t$getColumn("estimate")$setTitle(if (o$method == "pearson") "r" else "ρ")

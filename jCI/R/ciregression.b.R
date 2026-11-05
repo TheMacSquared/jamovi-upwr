@@ -44,7 +44,8 @@ ciregressionClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Clas
                 rows <- list(list(key = "b0", term = "Wyraz wolny", r = r[[1]]), list(key = "b1", term = paste0("Nachylenie (", o$pred, ")"), r = r[[2]]))
                 if (isTRUE(o$plot))
                     band <- regressionBootBand(xg, cf, r[[1]]$reps, r[[2]]$reps, level)
-                self$results$bootPlot$setState(list(reps = r[[2]]$reps, est = cf[2], lower = r[[2]]$lower, upper = r[[2]]$upper, xlab = "Nachylenie"))
+                # the replicates (up to B values) only when the histogram is on: state goes into the .omv
+                if (isTRUE(o$bootPlot)) self$results$bootPlot$setState(list(reps = r[[2]]$reps, est = cf[2], lower = r[[2]]$lower, upper = r[[2]]$upper, xlab = "Nachylenie"))
                 clab <- NULL
             } else {
                 ci <- stats::confint(fit, level = level); se <- summary(fit)$coefficients[, "Std. Error"]
