@@ -17,6 +17,9 @@ przedział V Craméra), BCa przy remisach, średnia rozkładu t dla df ≤ 1,
 jSpace (punkty na granicy państw). Wersje modułów z czwartym członem
 (np. jANOVA 0.5.1.1).
 
+Moduły jRol, jPomiar i jWody są od teraz wewnętrzne: zamrożone, bez `.jmo`
+w wydaniu (Windows: `build.ps1 -InternalModules` buduje je na żądanie).
+
 ## 1.0.9 — 2026-10-18
 Poprawka bezpieczeństwa z jamovi 28.13.
 
