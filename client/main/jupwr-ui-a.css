@@ -78,12 +78,17 @@
 
 [data-ui-style="a"] .jmv-ribbon-body {
     background-color: var(--jupwr-surface);
-    height: 52px;
+    /* tall enough for the stacked small buttons (Filtry / Wstaw / Usuń, 2 × 24 px):
+       the body must not overflow vertically, or a scrollbar gutter and a
+       scrollable top edge appear */
+    height: 60px;
     padding: 4px 8px;
     box-sizing: border-box;
     align-items: center;
     gap: 2px;
     border-bottom: 1px solid var(--jupwr-line);
+    overflow-y: hidden;
+    scrollbar-width: none;
 }
 
 [data-ui-style="a"] .jmv-analyses-button {
