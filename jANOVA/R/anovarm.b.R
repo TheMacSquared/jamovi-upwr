@@ -209,6 +209,8 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
 
             # --- parametric comparisons
             metodyAnovaWspolne(md, o, c(within, between), method = method, parametric = !hideParam)
+            md$addIf(!hideParam && method != "none", "Post-hoc",
+                "Stopnie swobody każdego porównania z jego kontrastu w modelu jednowymiarowym (emmeans, jak w emmeans::pairs), a nie ze średnich brzegowych.")
             md$addIf(o$homog, "Założenia", "Jednorodność wariancji: test Levene’a (odchylenia od mediany) i test Bartletta na średnich jednostek (uśrednionych po czynnikach wewnątrzobiektowych) między grupami międzyobiektowymi.")
             md$render(self$results$metody)
             keys <- if (hideParam) list() else private$.termKeys()
