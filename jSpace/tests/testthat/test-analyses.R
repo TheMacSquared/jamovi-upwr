@@ -151,3 +151,13 @@ test_that("satclassify: decision tree fills the rules output", {
   trafne <- sum(diag(as.matrix(mac[, -1])))
   expect_true(trafne / sum(mac[, -1]) > 0.5)
 })
+
+test_that("geomap: a point on a border is counted once and does not shift others (audit 2026-11-05)", {
+  d <- data.frame(lon = c(-100, 17, 20, 21, 25), lat = c(49, 51, 52, 52.5, 22), w = c(1, 2, 3, 4, 5))
+  res <- jSpace::geomap(data = d, lon = "lon", lat = "lat", wartosc = "w", pokazRegiony = TRUE)
+  r <- res$regiony$asDF
+  expect_equal(sum(r$n), nrow(d))
+  pl <- r[grepl("Pol", r$panstwo), ]
+  expect_equal(pl$n, 3)
+  expect_equal(pl$mean, 3)
+})
