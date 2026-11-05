@@ -33,7 +33,8 @@ permtestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cl
                 tt$addRow(rowKey = k, values = list(var = k, stat = observed,
                     p = permPValue(observed, permDist, o$hypothesis), nPerm = length(permDist)))
                 exactNote(tt, k, permDist, o$exact)
-                self$results$plots$get(key = k)$setState(list(permDist = permDist, observed = observed, hypothesis = o$hypothesis, label = k))
+                # the whole permutation distribution (up to 2^20 values) only when the plot is on
+                if (isTRUE(o$plot)) self$results$plots$get(key = k)$setState(list(permDist = permDist, observed = observed, hypothesis = o$hypothesis, label = k))
             }
             tt$setNote("h", "Różnica = pierwsza − druga zmienna.")
         },

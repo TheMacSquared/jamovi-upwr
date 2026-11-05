@@ -25,7 +25,8 @@ permtestoneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
                 tt$addRow(rowKey = v, values = list(var = v, stat = observed,
                     p = permPValue(observed, permDist, o$hypothesis), nPerm = length(permDist)))
                 exactNote(tt, v, permDist, o$exact)
-                self$results$plots$get(key = v)$setState(list(permDist = permDist, observed = observed, hypothesis = o$hypothesis, label = v))
+                # the whole permutation distribution (up to 2^20 values) only when the plot is on
+                if (isTRUE(o$plot)) self$results$plots$get(key = v)$setState(list(permDist = permDist, observed = observed, hypothesis = o$hypothesis, label = v))
             }
             tt$setNote("h", sprintf("Różnica = średnia − %g.", mu))
         },
