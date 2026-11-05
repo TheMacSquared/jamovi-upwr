@@ -180,12 +180,14 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           MomentsTable$setVisible(visible = TRUE)
           if (ShowMean) {
             if (DP2 == 0) {
+              # the mean exists only for df > 1 (df = 1 is the Cauchy distribution)
               MeanFormula <- "E[X] = 0"
-              MeanVal <- "0"
+              MeanVal <- if (DP1 > 1) "0" else "nieokreślone (df ≤ 1)"
             } else {
               MeanFormula <- "E[X] = λ√(df/2)·Γ((df−1)/2)/Γ(df/2)"
               MeanVal <- if (DP1 > 1) {
-                as.character(round(DP2 * sqrt(DP1/2) * gamma((DP1-1)/2) / gamma(DP1/2), 4))
+                # Γ via lgamma: gamma() overflows for df > ~343
+                as.character(round(DP2 * sqrt(DP1/2) * exp(lgamma((DP1-1)/2) - lgamma(DP1/2)), 4))
               } else "nieokreślone (df ≤ 1)"
             }
             MomentsTable$addRow(rowKey = "mean", values = list(
@@ -201,7 +203,7 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             } else {
               VarFormula <- "Var[X] = df(1+λ²)/(df−2) − [E[X]]²"
               VarVal <- if (DP1 > 2) {
-                EX <- if (DP1 > 1) DP2 * sqrt(DP1/2) * gamma((DP1-1)/2) / gamma(DP1/2) else 0
+                EX <- if (DP1 > 1) DP2 * sqrt(DP1/2) * exp(lgamma((DP1-1)/2) - lgamma(DP1/2)) else 0
                 as.character(round(DP1 * (1 + DP2^2) / (DP1 - 2) - EX^2, 4))
               } else "nieokreślone (df ≤ 2)"
             }
