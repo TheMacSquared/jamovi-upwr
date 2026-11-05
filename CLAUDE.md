@@ -769,6 +769,15 @@ Etap 1 — wykresy wektorowe.
     jeszcze takiego wykresu — pilot jEksplor) i Windows (do testu natywnie).
 1b. Pilot na jEksplor (9 wykresów): wygląd w aplikacji, eksport .docx/.odt,
     rozmiar .omv, wydajność przy N ~ 10 000 (ECDF, punkty na boxplocie).
+    STAN 2026-11-05 (jEksplor 0.1.8): 7 wykresów `mode: vector`, pudełkowy
+    i Q-Q jawnie `mode: raster` (decyzja: wariant A). Pomiar lokalny (WSL,
+    ścieżka `.createImage`): czas jak PNG; SVG 35–190 KB, ECDF ~420 KB przy
+    N = 10 000, ale pudełkowy z punktami i Q-Q ~4,2 MB na wykres (węzeł SVG
+    na obserwację; PNG ~25–57 KB). Odrzucone: przełączanie trybu wg N
+    w `.b.R` (`image$setMode`) i wszystko wektorowe. Do sprawdzenia
+    w Dockerze: wygląd z IBM Plex, eksport .docx/.odt, rozmiar .omv.
+    REGUŁA dla kolejnych modułów: wykres z punktem na obserwację
+    (rozrzut, Q-Q, punkty na pudełkach) zostaje rastrowy.
 1c. Zakres:
     A) wszystkie 50 + scatr z wyjątkami (hexbin, scat, bubble przy dużym N
        rastrowe) — spójność, ryzyko ciężkich SVG.

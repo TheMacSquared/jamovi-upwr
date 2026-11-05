@@ -59,6 +59,7 @@ items:
       width: 520
       height: 380
       renderFun: .histPlot
+      mode: vector
       refs: ggplot2
       clearWith: *cw
 
@@ -69,6 +70,7 @@ items:
       width: 520
       height: 380
       renderFun: .ogivePlot
+      mode: vector
       refs: ggplot2
       clearWith: *cw
 

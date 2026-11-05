@@ -67,6 +67,7 @@ items:
         width: 520
         height: 400
         renderFun: .barPlot
+        mode: vector
         refs: ggplot2
 
     - name: mosaics
@@ -80,6 +81,7 @@ items:
         width: 520
         height: 420
         renderFun: .mosaicPlot
+        mode: vector
         refs: ggplot2
 
     - name: metody

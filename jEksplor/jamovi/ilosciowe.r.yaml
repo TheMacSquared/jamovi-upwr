@@ -158,6 +158,7 @@ items:
         width: 520
         height: 380
         renderFun: .histPlot
+        mode: vector
         refs: ggplot2
 
     - name: box
@@ -171,6 +172,7 @@ items:
         width: 520
         height: 380
         renderFun: .boxPlot
+        mode: raster  # one SVG node per observation: ~4 MB at N = 10 000
         refs: ggplot2
 
     - name: qq
@@ -184,6 +186,7 @@ items:
         width: 420
         height: 380
         renderFun: .qqPlot
+        mode: raster  # one SVG node per observation: ~4 MB at N = 10 000
         refs: ggplot2
 
     - name: ecdf
@@ -197,6 +200,7 @@ items:
         width: 520
         height: 380
         renderFun: .ecdfPlot
+        mode: vector
         refs: ggplot2
 
     - name: lorenz
@@ -210,6 +214,7 @@ items:
         width: 420
         height: 420
         renderFun: .lorenzPlot
+        mode: vector
         refs: ggplot2
 
     - name: metody
