@@ -90,3 +90,11 @@ test_that("zmienne jakosciowe: simple and grouped tables, summary, plots", {
     expect_equal(sm$layer, c("a", "b", "Razem")); expect_equal(sm$n, c(3L, 2L, 5L)); expect_equal(sm$missing, c(0L, 1L, 1L))
     expect_equal(r3$freqs$get(key = "kolor | b")$asDF$n, c(2L, 0L, 0L, 2L))
 })
+
+test_that("extreme values report the spreadsheet row when rows are filtered (audit 2026-11-05)", {
+    # the engine leaves filtered rows out and names the rest by their row number
+    f <- data.frame(x = c(5, 1, 9, 3)); rownames(f) <- c("2", "5", "7", "11")
+    ex <- jEksplor:::ilosciowe(data = f, vars = "x", extreme = TRUE, extremeN = 1)$extreme$get(key = "x")$asDF
+    expect_equal(ex$row, c(5, 7))
+    expect_equal(ex$value, c(1, 9))
+})

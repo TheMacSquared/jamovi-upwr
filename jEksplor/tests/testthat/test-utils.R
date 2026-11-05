@@ -76,3 +76,32 @@ test_that("szereg: class construction and grouped statistics", {
     expect_false(is.na(gini(c(1L, seq_len(60000L) * 1000L))))
     big <- c(0, 1e6, runif(1e4, 0, 1e6)); expect_lt(classBreaks(big, "width", h = 0)$k, 30)
 })
+
+test_that("classes keep every observation and the [a; b) rule (audit 2026-11-05)", {
+    # the maximum used to fall one ulp beyond the last boundary
+    x <- c(0.1, seq(0.15, 0.95, length.out = 16), 1, 1)
+    expect_equal(sum(classTable(x, classBreaks(x, "sturges")$breaks)$n), length(x))
+    # a value on an inner boundary belongs to the class starting there
+    y <- c(0.1, 0.3, 0.7)
+    tab <- classTable(y, classBreaks(y, "width", h = 0.1)$breaks)
+    expect_equal(tab$n[tab$lower == 0.3], 1)
+    expect_equal(tab$n[tab$lower == 0.2], 0)
+    # with a given width the maximum opens a class of its own
+    expect_equal(tail(tab$lower, 1), 0.7)
+    # a boundary at zero is 0, not 4e-16
+    z <- c(-1.7, -0.5, 0)
+    expect_true(0 %in% classBreaks(z, "width", h = 0.1)$breaks)
+    # a constant variable
+    expect_equal(sum(classTable(rep(5, 10), classBreaks(rep(5, 10), "sturges")$breaks)$n), 10)
+    set.seed(3)
+    for (i in 1:2000) {
+        n <- sample(5:60, 1); lo <- round(runif(1, -50, 50), 1); x <- round(lo + runif(n, 0, runif(1, 0, 30)), 1)
+        m <- sample(c("sturges", "count", "width"), 1)
+        br <- classBreaks(x, m, sample(3:12, 1), if (m == "width") sample(c(0, 0.1, 0.5, 1), 1) else 0)
+        if (is.null(br) || br$k > 200) next
+        tab <- classTable(x, br$breaks)
+        expect_equal(sum(tab$n), n)
+        b <- br$breaks; k <- length(b) - 1
+        expect_equal(tab$n, tabulate(findInterval(round(x, 9), round(b, 9), rightmost.closed = m != "width"), k))
+    }
+})

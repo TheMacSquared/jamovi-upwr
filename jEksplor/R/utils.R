@@ -192,13 +192,23 @@ classBreaks <- function(x, method = "sturges", k = 5, h = 0, start = NULL) {
     if (method == "width") {
         if (is.finite(h) && h == 0) h <- niceWidth((hi - lo) / ceiling(log2(n) + 1))
         if (!is.finite(h) || h <= 0) return(NULL)
-        k <- max(1, ceiling((hi - lo) / h)); if (lo + k * h <= hi) k <- k + 1
+        k <- max(1, ceiling(signif((hi - lo) / h, 12)))
+        if (round(lo + k * h - hi, max(0, 12 - ceiling(log10(max(abs(lo), abs(hi), h))))) <= 0) k <- k + 1
     } else {
         if (method == "sturges") k <- ceiling(log2(n) + 1)
         k <- max(1, as.integer(k))
         h <- if (hi > lo) (hi - lo) / k else 1
     }
-    list(breaks = lo + h * (0:k), h = h, k = k)
+    # lo + h*i carries floating-point noise (0.1 + 0.1*2 = 0.30000000000000004):
+    # a value on a boundary would fall in the lower class, and the last
+    # boundary could end one ulp below the maximum, dropping it from the table
+    # rounded relative to the scale of the data, not of each boundary: a
+    # boundary at zero must come out as 0, not 4.4e-16
+    scale <- max(abs(lo), abs(hi), h, 1e-300)
+    breaks <- round(lo + h * (0:k), max(0, 12 - ceiling(log10(scale))))
+    breaks[1] <- lo
+    if (method != "width" && hi > lo) breaks[k + 1] <- hi
+    list(breaks = breaks, h = h, k = k)
 }
 
 #' Rounds a width to the nearest (on the log scale) of 1, 2, 2.5, 5, 10 x 10^k
@@ -212,7 +222,11 @@ niceWidth <- function(h) {
 #' Frequency table for the classes: counts, shares, cumulative, midpoints
 classTable <- function(x, breaks) {
     k <- length(breaks) - 1
-    idx <- findInterval(x, breaks, rightmost.closed = TRUE)
+    # a value within rounding noise of a boundary belongs to the class that
+    # starts there ([a; b)); the maximum on the last boundary to the last class
+    eps <- 1e-9 * max(diff(breaks), 1e-300)
+    idx <- findInterval(x + eps, breaks)
+    idx[idx == k + 1 & x <= breaks[k + 1] + eps] <- k
     idx[idx < 1] <- NA; idx[idx > k] <- NA
     n <- tabulate(idx[!is.na(idx)], nbins = k)
     data.frame(lower = breaks[-(k + 1)], upper = breaks[-1], mid = (breaks[-(k + 1)] + breaks[-1]) / 2,

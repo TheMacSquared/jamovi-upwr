@@ -15,6 +15,8 @@ szeregClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (is.null(br)) { ct$setNote("h", "Szerokość klasy musi być dodatnia (0 = automatyczna)."); return() }
             if (br$k > 200) { ct$setNote("k", sprintf("Szerokość %s daje %d klas (limit 200) — zwiększ szerokość klasy.", format(signif(br$h, 6)), br$k)); return() }
             tab <- classTable(x, br$breaks); k <- nrow(tab)
+            if (sum(tab$n) != length(x))
+                ct$setNote("lost", sprintf("Uwaga: %d obserwacji poza klasami — wyniki niepełne.", length(x) - sum(tab$n)))
 
             m <- jmvcore::metodyNew()
             m$add("Dane", "Zmienna „%s”; N = %d (braki pominięte); minimum %s, maksimum %s.", o$var, length(x), format(signif(min(x), 6)), format(signif(max(x), 6)))
