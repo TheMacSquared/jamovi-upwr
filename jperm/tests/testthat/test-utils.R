@@ -57,3 +57,44 @@ test_that("full enumeration includes the observed arrangement exactly once", {
     expect_equal(permPValue(-5, d, "less"), 1 / 6)
     expect_equal(permPValue(-5, d, "different"), 2 / 6)
 })
+
+test_that("exact tests count the observed arrangement despite rounding (audit 2026-11-05)", {
+    x <- c(3.6, 5.1, 5.8, 3.9, 3.3, 5.1)
+    d <- permDistOneSample(x, 0.1, 1000, 0, TRUE)
+    expect_equal(length(d), 64)
+    expect_equal(permPValue(mean(x) - 0.1, d, "greater"), 1 / 64)
+    # the same distribution as enumerating every sign pattern
+    signs <- as.matrix(expand.grid(rep(list(c(1, -1)), length(x))))
+    ref <- as.vector(signs %*% (x - 0.1)) / length(x)
+    expect_equal(sort(d), sort(ref))
+    set.seed(7)
+    for (k in 1:200) {
+        x <- round(runif(8, 1, 6), 1)
+        d <- permDistOneSample(x, 2.7, 1000, 0, TRUE)
+        ref <- as.vector(as.matrix(expand.grid(rep(list(c(1, -1)), 8))) %*% (x - 2.7)) / 8
+        obs <- mean(x) - 2.7
+        for (h in c("greater", "less", "different")) {
+            exact <- switch(h, greater = mean(round(ref, 10) >= round(obs, 10)),
+                            less = mean(round(ref, 10) <= round(obs, 10)),
+                            different = mean(round(abs(ref), 10) >= round(abs(obs), 10)))
+            expect_equal(permPValue(obs, d, h), exact)
+        }
+    }
+})
+
+test_that("two-sample exact two-sided p counts mirrored ties (audit 2026-11-05)", {
+    set.seed(11)
+    for (k in 1:100) {
+        x <- round(runif(10, 0, 3), 1); g <- factor(rep(c("a", "b"), c(4, 6)))
+        d <- permDistTwoSample(x, g, 1000, 0, TRUE)
+        obs <- mean(x[g == "a"]) - mean(x[g == "b"])
+        expect_equal(permPValue(obs, d, "different"), mean(round(abs(d), 10) >= round(abs(obs), 10)))
+    }
+})
+
+test_that("exact one-sample enumeration is fast at n = 20", {
+    t0 <- proc.time()[["elapsed"]]
+    d <- permDistOneSample(rnorm(20), 0, 1000, 0, TRUE)
+    expect_equal(length(d), 2^20)
+    expect_lt(proc.time()[["elapsed"]] - t0, 2)
+})
