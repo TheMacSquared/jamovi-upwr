@@ -70,3 +70,20 @@ test_that("separation detection distinguishes overlap, aliasing and quasi-separa
     expect_true(logisticSeparation(suppressWarnings(glm(y ~ x + z, multi, family = binomial()))))
     expect_false(logisticSeparation(glm(am ~ wt, mtcars, family = binomial())))
 })
+
+test_that("GVIF per predictor equals car::vif and ignores the reference level (audit 2026-11-05)", {
+    skip_if_not_installed("car")
+    set.seed(4); n <- 103
+    d <- data.frame(y = rnorm(n), x1 = rnorm(n), g = factor(c(rep("ref", 3), sample(c("b", "c"), n - 3, TRUE))))
+    d$x2 <- d$x1 + rnorm(n, 0, 0.5)
+    fit <- lm(y ~ x1 + x2 + g, d)
+    v <- vifTable(fit); ref <- car::vif(fit)
+    expect_equal(v$vif, unname(ref[, "GVIF"]), tolerance = 1e-8)
+    expect_equal(v$adj, unname(ref[, "GVIF^(1/(2*Df))"]), tolerance = 1e-8)
+    expect_lt(v$vif[v$term == "g"], 2)
+    # a collinear column: the others keep their own value
+    dd <- data.frame(y = rnorm(40), a = rnorm(40), c = rnorm(40)); dd$dup <- 2 * dd$a
+    vv <- vifTable(lm(y ~ a + dup + c, dd))
+    expect_true(is.infinite(vv$vif[vv$term == "dup"]))
+    expect_equal(vv$vif[vv$term == "c"], unname(car::vif(lm(y ~ a + c, dd))["c"]))
+})

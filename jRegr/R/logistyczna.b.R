@@ -49,7 +49,9 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             m$add("Klasyfikacja", "Przewidywane zdarzenie, gdy P ≥ %g; trafność = (TP + TN)/N, czułość = TP/(TP + FN), swoistość = TN/(TN + FP).", o$cutoff)
             m$addIf(o$roc, "Klasyfikacja", "Krzywa ROC: czułość wobec 1 − swoistość dla wszystkich progów; AUC = P(losowe zdarzenie ma większe P niż losowe niezdarzenie) (statystyka Manna-Whitneya).")
             m$addIf(o$ic, "Model", "AIC i BIC: kryteria informacyjne, mniejsze = lepsze.")
-            m$addIf(o$vif, "Założenia", "Współliniowość: VIF z regresji liniowej każdej kolumny predyktorów na pozostałe; tolerancja = 1/VIF.")
+            m$addIf(o$vif, "Założenia", paste(
+                "Współliniowość predyktorów: VIF dla ilościowych, uogólniony GVIF (Fox i Monette, 1992) dla jakościowych;",
+                "porównywalna kolumna GVIF^(1/(2·df)) (= √VIF dla ilościowych), powyżej √10 ≈ 3.16 = problem; tolerancja = 1/GVIF."))
             m$addIf(o$cooks, "Założenia", "Odległość Cooka dla obserwacji; liczba powyżej progu 4/n.")
             m$addIf(simple && o$plot && reliable, "Wykres", "Punkty = obserwacje (0/1, lekko rozproszone), krzywa = P(zdarzenie) z pasmem ±1.96 SE na skali logitu.")
             m$addIf(o$predictOV, "Dodatkowe", "Do arkusza zapisane prawdopodobieństwa zdarzenia (NA dla wierszy pominiętych).")
@@ -81,7 +83,9 @@ logistycznaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
             if (isTRUE(o$vif)) {
                 vt <- self$results$vif; v <- vifTable(fit)
                 if (is.null(v)) vt$setNote("n", "VIF wymaga co najmniej dwóch kolumn predyktorów.")
-                else for (i in seq_len(nrow(v))) vt$addRow(rowKey = v$term[i], values = list(term = if (!is.na(lab[v$term[i]])) lab[[v$term[i]]] else v$term[i], vif = v$vif[i], tol = v$tol[i]))
+                else for (i in seq_len(nrow(v))) vt$addRow(rowKey = v$term[i], values = list(
+                    term = v$term[i],   # one row per predictor (variable name)
+                    vif = v$vif[i], df = v$df[i], adj = v$adj[i], tol = v$tol[i]))
             }
             if (isTRUE(o$cooks)) { cs <- cooksSummary(fit); self$results$cooks$setRow(rowNo = 1, values = list(mean = cs$mean, max = cs$max, nHigh = cs$nHigh, thr = cs$thr)) }
             if (simple && reliable) self$results$plot$setState(list(x = d[[covs]], y = y, xlab = covs, eventLabel = event, fit = fit, covName = covs))

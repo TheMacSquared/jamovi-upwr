@@ -41,7 +41,8 @@ test_that("linear regression: simple fit matches lm, factors with chosen referen
     expect_equal(cf$b, unname(coef(fit2))); expect_false(res$plot$visible && FALSE); expect_false(r2$plot$visible)
     expect_equal(nrow(r2$anova$asDF), 3); expect_equal(r2$anova$asDF$term[3], "Reszty")
     expect_equal(r2$norm$asDF$w, unname(shapiro.test(residuals(fit2))$statistic))
-    expect_equal(nrow(r2$vif$asDF), 3); expect_true(is.finite(r2$durbin$asDF$dw)); expect_true(r2$cooks$asDF$nHigh >= 0)
+    # one row per predictor (GVIF for the factor), not per indicator column
+    expect_equal(r2$vif$asDF$term, c("supp", "dose")); expect_equal(r2$vif$asDF$df, c(1L, 2L)); expect_true(is.finite(r2$durbin$asDF$dw)); expect_true(r2$cooks$asDF$nHigh >= 0)
     expect_true(grepl("poziom odniesienia „2”", r2$metody$content) && grepl("VIF", r2$metody$content))
 })
 

@@ -94,15 +94,38 @@ stdBetas <- function(fit) {
     out <- b * sx / sy; out["(Intercept)"] <- NA_real_; out
 }
 
-#' VIF per model-matrix column (1 / (1 - R2 of that column on the others)); tolerance = 1/VIF
+#' Collinearity per predictor (model term), as car::vif: generalized VIF
+#' (Fox & Monette, 1992) GVIF = det(R11) det(R22) / det(R) on the correlation
+#' matrix of the predictor columns, R11 = the term's columns. For a numeric
+#' predictor (one column) GVIF is the ordinary VIF; for a factor it does not
+#' depend on the reference level -- VIF per indicator column did (a 3-level
+#' factor with a small reference group showed VIF ~ 9 while GVIF = 1.02).
+#' GVIF^(1/(2 df)) is comparable with sqrt(VIF) across terms; tolerance = 1/GVIF.
+#' term: the term label (variable name); col: its single column name, if any.
 vifTable <- function(fit) {
-    X <- stats::model.matrix(fit); X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
-    if (ncol(X) < 2) return(NULL)
-    vif <- vapply(seq_len(ncol(X)), function(j) {
-        r2 <- summary(stats::lm(X[, j] ~ X[, -j, drop = FALSE]))$r.squared
-        if (r2 >= 1) Inf else 1 / (1 - r2)
-    }, numeric(1))
-    data.frame(term = colnames(X), vif = vif, tol = 1 / vif, stringsAsFactors = FALSE)
+    X <- stats::model.matrix(fit)
+    asg <- attr(X, "assign"); keep <- colnames(X) != "(Intercept)"
+    X <- X[, keep, drop = FALSE]; asg <- asg[keep]
+    if (ncol(X) < 2 || length(unique(asg)) < 2) return(NULL)
+    labs <- attr(stats::terms(fit), "term.labels")
+    allTerms <- sort(unique(asg))
+    # columns dropped from the model as collinear (NA coefficients) are left
+    # out, so the other predictors still get their own value; a predictor
+    # left with no column is reported as Inf
+    aliased <- colnames(X) %in% names(stats::coef(fit))[is.na(stats::coef(fit))]
+    X <- X[, !aliased, drop = FALSE]; asg <- asg[!aliased]
+    R <- suppressWarnings(stats::cor(X))
+    detR <- if (any(!is.finite(R))) 0 else det(R)
+    out <- lapply(allTerms, function(a) {
+        j <- which(asg == a)
+        g <- if (length(j) == 0 || ncol(X) < 2) Inf
+             else if (!is.finite(detR) || detR <= 1e-12) Inf
+             else det(R[j, j, drop = FALSE]) * det(R[-j, -j, drop = FALSE]) / detR
+        df <- max(1L, length(j))
+        data.frame(term = gsub("^`|`$", "", labs[a]), col = if (length(j) == 1) colnames(X)[j] else NA_character_,
+                   vif = g, df = df, adj = g^(1 / (2 * df)), tol = 1 / g, stringsAsFactors = FALSE)
+    })
+    do.call(rbind, out)
 }
 
 durbinWatson <- function(fit, seed = 1) {

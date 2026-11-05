@@ -29,7 +29,11 @@ liniowaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             m$addIf(o$qq, "Założenia", "Wykres Q-Q reszt wobec rozkładu normalnego.")
             m$addIf(o$resPlot, "Założenia", "Reszty wobec wartości dopasowanych z wygładzeniem loess (liniowość i stałość wariancji).")
             m$addIf(o$durbin, "Założenia", "Autokorelacja reszt: statystyka Durbina-Watsona (≈ 2 = brak), autokorelacja rzędu 1, p z symulacji (car, 1000 powtórzeń, ziarno 1).")
-            m$addIf(o$vif, "Założenia", "Współliniowość: VIF = 1/(1 − R²) każdego predyktora objaśnianego pozostałymi; tolerancja = 1/VIF; VIF &gt; 10 (tolerancja &lt; 0.1) = problem.")
+            m$addIf(o$vif, "Założenia", paste(
+                "Współliniowość: dla predyktora ilościowego VIF = 1/(1 − R²) z regresji na pozostałe predyktory;",
+                "dla jakościowego uogólniony GVIF (Fox i Monette, 1992) dla wszystkich jego kolumn naraz, niezależny od poziomu odniesienia.",
+                "Porównywalna między predyktorami jest kolumna GVIF^(1/(2·df)) (dla ilościowych = √VIF): wartość powyżej √10 ≈ 3.16",
+                "(VIF &gt; 10, tolerancja &lt; 0.1) oznacza problem."))
             m$addIf(o$cooks, "Założenia", "Odległość Cooka: wpływ obserwacji na dopasowanie; liczba obserwacji powyżej progu 4/n.")
             m$addIf(simple && o$plot, "Wykres", "Rozrzut z prostą MNK i pasmem przedziału ufności %g%% dla wartości średniej (predict).", o$ciWidth)
             m$addIf(o$predictOV || o$residsOV, "Dodatkowe", "Do arkusza zapisane: %s (NA dla wierszy pominiętych).",
@@ -76,7 +80,9 @@ liniowaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (isTRUE(o$vif)) {
                 vt <- self$results$vif; v <- vifTable(fit)
                 if (is.null(v)) vt$setNote("n", "VIF wymaga co najmniej dwóch kolumn predyktorów.")
-                else for (i in seq_len(nrow(v))) vt$addRow(rowKey = v$term[i], values = list(term = if (!is.na(lab[v$term[i]])) lab[[v$term[i]]] else v$term[i], vif = v$vif[i], tol = v$tol[i]))
+                else for (i in seq_len(nrow(v))) vt$addRow(rowKey = v$term[i], values = list(
+                    term = v$term[i],   # one row per predictor (variable name)
+                    vif = v$vif[i], df = v$df[i], adj = v$adj[i], tol = v$tol[i]))
             }
             if (isTRUE(o$cooks)) { cs <- cooksSummary(fit); self$results$cooks$setRow(rowNo = 1, values = list(mean = cs$mean, max = cs$max, nHigh = cs$nHigh, thr = cs$thr)) }
             if (simple) {
