@@ -119,3 +119,38 @@ test_that("przypadki brzegowe nie wywalaja analizy", {
     braki <- data.frame(a = factor(c("x", "y", NA, "x")), b = factor(c("p", NA, "q", "q")))
     expect_error(jCzest:::tabela(data = braki, rows = "a", cols = "b"), NA)
 })
+
+test_that("χ² zgodności z poprawką ciągłości naprawdę ją stosuje (audyt 2026-11-05)", {
+    d <- data.frame(x = factor(c(rep("a", 14), rep("b", 6))))
+    t <- jCzest:::zgodnosc(data = d, var = "x", chiSqCorr = TRUE)$tests$asDF
+    cc <- t[t$test == "χ² z poprawką ciągłości", ]
+    expect_equal(cc$stat, (abs(14 - 10) - 0.5)^2 / 10 * 2)
+    expect_equal(cc$stat, 2.45)
+})
+
+test_that("V Craméra: nota, gdy V jest powyżej górnej granicy (audyt 2026-11-05)", {
+    # niezależne zmienne w dużej tabeli: V obciążone w górę, często ponad przedziałem
+    found <- FALSE
+    for (s in 1:200) {
+        set.seed(s)
+        d <- data.frame(r = factor(sample(letters[1:6], 80, TRUE)), c = factor(sample(LETTERS[1:6], 80, TRUE)))
+        tab <- table(d$r, d$c)
+        if (cramersV(tab) <= cramersVCI(tab)[2]) next
+        found <- TRUE; break
+    }
+    expect_true(found)
+    res <- jCzest:::tabela(data = d, rows = "r", cols = "c", effSize = TRUE, effSizeCI = TRUE)
+    es <- res$effsize$asDF
+    expect_gt(es$value, es$upper)
+    txt <- gsub("\\s+", " ", paste(capture.output(print(res$effsize)), collapse = " "))
+    expect_true(grepl("obciążone w górę", txt))
+})
+
+test_that("OR pary w porównaniach po Q Cochrana = OR McNemara dla tej pary (audyt 2026-11-05)", {
+    d <- data.frame(p1 = c(rep("nie", 15), rep("tak", 5), rep("nie", 10), rep("tak", 10)),
+                    p2 = c(rep("tak", 15), rep("nie", 5), rep("nie", 10), rep("tak", 10)))
+    d$p3 <- d$p2
+    two <- jCzest:::zalezne(data = d, vars = c("p1", "p2"), effSize = TRUE)$tests$asDF
+    three <- jCzest:::zalezne(data = d, vars = c("p1", "p2", "p3"), posthoc = TRUE)$posthoc$asDF
+    expect_equal(three$or[1], two$or[1])
+})

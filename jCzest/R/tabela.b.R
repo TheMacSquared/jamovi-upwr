@@ -237,13 +237,15 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                       else if (v < med) "słaby" else if (v < large) "umiarkowany" else "silny"
             t$addRow(rowKey = "v", values = list(measure = "V Craméra", value = v,
                                                  lower = ci[1], upper = ci[2], interp = interp))
+            if (is.finite(v) && is.finite(ci[2]) && v > ci[2] + 1e-12)
+                t$setNote("vbias", "V powyżej górnej granicy: V jest obciążone w górę, a przedział wskazuje, że w populacji V może być bliskie 0.")
             m <- private$.metody
             m$add("Wielkość efektu", paste(
                 "V Craméra = √(χ² / (N · (min(r, c) − 1))); interpretacja wg progów Cohena",
                 "dla tej tabeli: słaby %.2f, umiarkowany %.2f, silny %.2f."), small, med, large)
             m$addIf(o$effSizeCI, "Wielkość efektu", paste(
-                "Przedział ufności %g%% dla V: bootstrap percentylowy, 1000 losowań",
-                "z rozkładu wielomianowego, ziarno 1."), o$ciWidth)
+                "Przedział ufności %g%% dla V z niecentralnego rozkładu χ²: granice parametru niecentralności λ",
+                "przeliczone na V = √(λ / (N · (min(r, c) − 1)))."), o$ciWidth)
         },
 
         .fillMeasures = function(tab) {
