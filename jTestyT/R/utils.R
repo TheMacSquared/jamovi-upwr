@@ -112,7 +112,7 @@ metodyWspolne <- function(m, o, kind, diffLab, homog = FALSE) {
     if (isTRUE(o$nonpar))
         m$add("Testy", paste(
             if (kind == "two") "U Manna-Whitneya" else "Test Wilcoxona rangowanych znaków",
-            "z przybliżeniem normalnym i poprawką ciągłości; estymator = %s Hodgesa-Lehmanna."),
+            "z przybliżeniem normalnym i poprawką ciągłości; estymator Hodgesa-Lehmanna: %s."),
             switch(kind, two = "przesunięcie", one = "pseudomediana − wartość testowa", "pseudomediana różnic"))
     m$add("Wielkość efektu", "d Cohena = %s (wartość punktowa).",
           switch(kind, one = "(średnia − wartość testowa) / SD",
