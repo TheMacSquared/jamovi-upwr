@@ -5,8 +5,8 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## 1.4.0 — 2026-11-05 (linia latest, jamovi 28.17)
 
-Stan buildów: Docker (`jupwr/jupwr:1.4.0`) i buildy Windows/macOS do wykonania;
-moduły opcjonalne jRISK 0.4.5 i jSpace 0.3.4 do przebudowy dla tej wersji.
+Stan buildów: macOS zbudowany 2026-11-05 (aplikacja, `.jmo` jRISK 0.4.5
+i jSpace 0.3.4); Docker (`jupwr/jupwr:1.4.0`) i Windows do wykonania.
 
 Nowe:
 - Wykresy wektorowe (SVG) w Eksploracji (jEksplor): histogramy, ECDF, krzywa
