@@ -305,7 +305,8 @@ input, [contenteditable], [contenteditable] * {
     width: max-content;
 }
 
-.jmv-results-image.selectedable-result-item:focus {
+.jmv-results-image.selectedable-result-item:focus,
+.jmv-results-image:has(> .resize-image-dialog[open]) {
     outline-style: dashed;
     outline-width: 2px;
 }
@@ -596,12 +597,82 @@ table.row-selectable tr.selected th[scope=rowgroup] {
 
 .jmv-results-image {
     position: relative ;
+    anchor-scope: --jmv-results-image;
 }
 
 .jmv-results-image-image {
+    anchor-name: --jmv-results-image;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 100% 100%;
+}
+
+/* "Set size" dialog -- ported from upstream jamovi (branch svg-ftw,
+   client/resultsview/main.css); keep in sync until upstream releases it */
+.resize-image-dialog {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    z-index: 5002;
+    border: 1px solid #0000001f;
+    border-radius: 10px;
+    padding: 12px;
+    width: 240px;
+    max-width: calc(100vw - 40px);
+    box-sizing: border-box;
+    box-shadow: 0 6px 24px #0000001f;
+    color: #222;
+    background: #fff;
+    font: 13px sans-serif;
+}
+
+/* The shade follows the graphic's bounds, leaving other results untouched. */
+.jmv-results-image:has(> .resize-image-dialog[open])::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #00000026;
+    pointer-events: none;
+    z-index: 5001;
+    top: anchor(--jmv-results-image top);
+    bottom: anchor(--jmv-results-image bottom);
+    inset-inline-start: anchor(--jmv-results-image start);
+    inset-inline-end: anchor(--jmv-results-image end);
+}
+
+.resize-image-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.resize-image-dialog h2 { margin: 0; font-size: 13px; font-weight: 600; }
+.resize-image-header select { padding: 3px; border: 1px solid #d4d4d4; border-radius: 4px; color: inherit; background: #fafafa; font: inherit; }
+.resize-image-dialog label { display: flex; align-items: center; gap: 10px; margin-block: 8px; }
+.resize-image-dialog label span { flex: 1; }
+.resize-image-dialog input {
+    width: 100px;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid #d4d4d4;
+    border-radius: 5px;
+    color: inherit;
+    background: #fafafa;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+}
+.resize-image-buttons { display: flex; justify-content: flex-end; gap: 6px; margin-top: 10px; }
+.resize-image-buttons button {
+    padding: 6px 12px;
+    border: 0;
+    border-radius: 5px;
+    color: #444;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+.resize-image-buttons button:hover { background: #f0f0f0; }
+.resize-image-buttons .resize-image-apply { color: #fff; background: #1769aa; }
+.resize-image-buttons .resize-image-apply:hover { background: #12588f; }
+.resize-image-dialog :focus {
+    outline: 2px solid #005a9e;
+    outline-offset: 2px;
 }
 
 .jmv-results-image:focus > .jmv-results-image-image {

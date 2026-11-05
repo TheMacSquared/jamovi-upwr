@@ -7,6 +7,16 @@ import { h, setRich }  from '../common/htmlelementcreator';
 
 import { flatten } from '../common/utils/addresses';
 import { AnalysisStatus } from './analysisstatus';
+import type { ResizeTarget } from './resize';
+
+// jUPWR: while a plot is being resized by hand, the results frame changes
+// height on every pointer move; main.ts must not scroll the analysis into
+// view then, or the panel jumps (worst for a plot with nothing below it)
+export const manualImageResize = { active: false, last: 0 };
+const SCROLL_QUIET_MS = 1500;
+export const isManualImageResize = () =>
+    manualImageResize.active || Date.now() - manualImageResize.last < SCROLL_QUIET_MS;
+const markManualImageResize = () => { manualImageResize.last = Date.now(); };
 
 export interface IImageElementData {
     path: string,
@@ -167,6 +177,7 @@ export class View extends Elem.View<Model> {
     }
 
     atomicSizeChange(width: number, height: number) {
+        markManualImageResize();
         this.$image.style.height = `${height}px`;
         this.$image.style.width = `${width}px`;
         if (this.atomicChange)
@@ -174,6 +185,27 @@ export class View extends Elem.View<Model> {
         this.atomicChange = setTimeout(() => {
             this.applyScaleValues();
         }, 500);
+    }
+
+    getResizeTarget(): ResizeTarget {
+        return {
+            size: () => this.$image.getBoundingClientRect(),
+            apply: (width, height) => {
+                if (this.atomicChange) clearTimeout(this.atomicChange);
+                // Begin observing before applying an explicit size so later
+                // pointer/keyboard resizing continues from the same geometry.
+                this.resizeObserver.observe(this.$image);
+                markManualImageResize();
+                this.$image.style.width = `${width}px`;
+                this.$image.style.height = `${height}px`;
+                this.widthOfImage = width;
+                this.heightOfImage = height;
+                this.manualResize = false;
+                this.updating = false;
+                this.updateScaleValues(width, height);
+            },
+            focus: () => { if (this.isConnected) this.focus({ preventScroll: true }); },
+        };
     }
 
     disconnectedCallback() {
@@ -189,6 +221,7 @@ export class View extends Elem.View<Model> {
     }
 
     imagePointerDown() {
+        manualImageResize.active = true;
         this.manualResize = true;
         if (this.initalised === false)
             this.resizeObserver.observe(this.$image);
@@ -202,6 +235,10 @@ export class View extends Elem.View<Model> {
     }
 
     applyScaleValues() {
+        if (manualImageResize.active) {
+            manualImageResize.active = false;
+            markManualImageResize();
+        }
         this.manualResize = false;
         
         if (this.updating) {

@@ -16,6 +16,7 @@ import { h } from '../common/htmlelementcreator';
 import { CollectionView, View } from "./element";
 import HighContrast from '../common/highcontrast';
 import { applyUiStyle } from '../common/uistyle';
+import { isManualImageResize } from './image';
 
 window._ = I18ns.get('app')._;
 
@@ -208,6 +209,9 @@ class Main {  // this is constructed at the bottom
         let scrollIntoView = true;
         let $focusedAnnotations = document.querySelectorAll('.jmv-annotation.focused');
         if ($focusedAnnotations.length > 0)
+            scrollIntoView = false;
+        // jUPWR: no auto-scroll while a plot is resized by hand (image.ts)
+        if (isManualImageResize())
             scrollIntoView = false;
 
         this.mainWindow.postMessage({
@@ -747,6 +751,11 @@ class Main {  // this is constructed at the bottom
             this.active = this.results;
         else if (this.results instanceof CollectionView)
             this.active = this.results.get(address);
+
+        if (event.op === 'resize') {
+            this.active?.resizeImage(event.withMouse);
+            return;
+        }
 
         switch (event.type) {
             case 'activated':
