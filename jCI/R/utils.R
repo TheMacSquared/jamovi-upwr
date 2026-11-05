@@ -28,10 +28,14 @@ bootCI <- function(data, statFun, nBoot, seed, method = "perc", level = 0.95, st
             return(list(est = unname(b$t0[j]), se = NA_real_, lower = NA_real_, upper = NA_real_,
                         reps = reps, fallback = FALSE, nValid = nValid, nFailed = nBoot - nValid, sufficient = FALSE))
         ci <- tryCatch(suppressWarnings({
-            # boot.ci prints (not signals) "All values of t are equal" and returns NULL
-            junk <- utils::capture.output(c0 <- boot::boot.ci(b, conf = level, type = method, index = j))
-            v <- if (method == "perc") c0$percent else c0$bca
-            if (is.null(v) || length(v) < 5) NULL else list(lower = v[4], upper = v[5], fallback = FALSE)
+            if (method == "bca") {
+                bcaInterval(b, j, level)
+            } else {
+                # boot.ci prints (not signals) "All values of t are equal" and returns NULL
+                junk <- utils::capture.output(c0 <- boot::boot.ci(b, conf = level, type = method, index = j))
+                v <- c0$percent
+                if (is.null(v) || length(v) < 5) NULL else list(lower = v[4], upper = v[5], fallback = FALSE)
+            }
         }), error = function(e) NULL)
         if (is.null(ci) || any(!is.finite(c(ci$lower, ci$upper)))) {
             a <- (1 - level) / 2
@@ -42,6 +46,35 @@ bootCI <- function(data, statFun, nBoot, seed, method = "perc", level = 0.95, st
              reps = reps, fallback = ci$fallback, nValid = nValid, nFailed = nBoot - nValid, sufficient = TRUE)
     })
     if (k == 1) out[[1]] else out
+}
+
+# BCa (Efron 1987) as boot.ci computes it, with two changes:
+# - the bias correction counts ties with the estimate as half
+#   (z0 = qnorm((#{t < t0} + #{t = t0}/2) / R)); boot.ci counts only t < t0,
+#   which shifts the interval for discrete statistics (a proportion, a
+#   difference of proportions, a median), e.g. 10/20: [0.25; 0.65] around 0.5;
+# - the acceleration comes from the jackknife influence values (empinf), as
+#   boot.ci would without L but without its B × n regression matrix (n = 2000,
+#   B = 20 000 took 28 s and ~1.8 GB).
+# Quantiles are interpolated as in boot.ci (norm.inter), so statistics
+# without ties give boot.ci's interval.
+bcaInterval <- function(b, j, level) {
+    t <- b$t[, j]; t <- t[is.finite(t)]; t0 <- b$t0[j]
+    R <- length(t)
+    # all replicates equal: no BCa (as boot.ci), the caller falls back and says so
+    if (R < 2 || !is.finite(t0) || length(unique(t)) < 2) return(NULL)
+    z0 <- stats::qnorm((sum(t < t0) + sum(t == t0) / 2) / R)
+    if (!is.finite(z0)) return(NULL)
+    L <- boot::empinf(b, index = j, type = "jack")
+    if (any(!is.finite(L))) return(NULL)
+    acc <- if (sum(L^2) > 0) sum(L^3) / (6 * sum(L^2)^1.5) else 0
+    zq <- stats::qnorm((1 + c(-level, level)) / 2)
+    adj <- stats::pnorm(z0 + (z0 + zq) / (1 - acc * (z0 + zq)))
+    if (any(!is.finite(adj))) return(NULL)
+    normInter <- utils::getFromNamespace("norm.inter", "boot")
+    q <- normInter(t, adj)[, 2]
+    if (length(q) != 2 || any(!is.finite(q))) return(NULL)
+    list(lower = q[1], upper = q[2], fallback = FALSE)
 }
 
 # Keep intercept and slope paired: a rank-deficient resample estimates neither
@@ -138,7 +171,7 @@ ciCorrelation <- function(x, y, level = 0.95, method = "pearson") {
 metodyPrzedzial <- function(m, o, method, classic, scheme, extra = NULL) {
     if (isBoot(method)) {
         m$add("Przedział ufności", "%s (poziom %g%%): B = %s losowań, %s; SE = odchylenie standardowe replikacji.",
-              if (method == "bca") "Bootstrap BCa (z korektą obciążenia i przyspieszenia)" else "Bootstrap percentylowy (kwantyle replikacji)",
+              if (method == "bca") "Bootstrap BCa (korekta obciążenia z replikacji, remisy z estymatorem liczone po połowie; przyspieszenie z jackknife)" else "Bootstrap percentylowy (kwantyle replikacji)",
               o$ciWidth, format(o$nBoot, big.mark = " "), scheme)
         m$add("Przedział ufności", if (o$seed > 0) sprintf("Ziarno generatora %d — wynik powtarzalny.", o$seed)
               else "Bez ustawionego ziarna — granice zmieniają się nieznacznie między uruchomieniami.")

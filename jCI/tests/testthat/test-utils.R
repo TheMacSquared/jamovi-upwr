@@ -84,3 +84,19 @@ test_that("regression bootstrap drops failed coefficient pairs together", {
     expect_false(few[[1]]$sufficient)
     expect_true(is.na(few[[1]]$lower))
 })
+
+test_that("BCa: boot.ci for continuous statistics, ties counted half, fast (audit 2026-11-05)", {
+    skip_if_not_installed("boot")
+    set.seed(2); x <- rexp(40)
+    set.seed(5); b <- boot::boot(x, function(d, i) mean(d[i]), R = 2000)
+    expect_equal(unname(unlist(bcaInterval(b, 1, 0.95)[1:2])), boot::boot.ci(b, type = "bca")$bca[4:5], tolerance = 1e-10)
+    # a proportion with many replicates equal to the estimate: not shifted
+    y <- c(rep(1, 10), rep(0, 10))
+    bca <- bootCI(y, function(d, i) mean(d[i]), 2000, 1, "bca")
+    perc <- bootCI(y, function(d, i) mean(d[i]), 2000, 1, "perc")
+    expect_equal(c(bca$lower, bca$upper), c(perc$lower, perc$upper))
+    expect_true(bca$lower < 0.5 && 0.5 < bca$upper)
+    t0 <- proc.time()[["elapsed"]]
+    bootCI(rnorm(2000), function(d, i) mean(d[i]), 20000, 1, "bca")
+    expect_lt(proc.time()[["elapsed"]] - t0, 5)
+})
