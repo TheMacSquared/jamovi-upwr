@@ -107,6 +107,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                   if (length(between)) paste0("; międzyobiektowe: ", jmvcore::metodyCyt(between)) else "",
                   if (length(covs)) paste0("; kowarianty: ", jmvcore::metodyCyt(covs)) else "")
             md$addIf(any(tab > 1), "Dane", "Powtórzone obserwacje w tej samej komórce jednostki uśredniono.")
+            md$addIf(length(covs) > 0, "Model", "Kowarianty wycentrowane (średnia jednostek = 0): efekty czynników oceniane przy średniej wartości kowarianty.")
             md$add("Model", "ANOVA powtórzonych pomiarów (afex::aov_ez): każdy efekt testowany wobec błędu swojej warstwy; sumy kwadratów typu %s; sferyczność: %s.",
                   switch(o$ss, '2' = "II", "III"), switch(o$spherCorr, none = "bez poprawki", GG = "stopnie swobody z poprawką Greenhouse’a-Geissera",
                                HF = "stopnie swobody z poprawką Huynha-Feldta"))

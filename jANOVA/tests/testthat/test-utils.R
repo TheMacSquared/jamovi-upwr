@@ -176,3 +176,35 @@ test_that("Welch-James reduces to Welch for one factor and matches welchADF for 
         expect_equal(row$p, ref2[[nm]]$pval, tolerance = 1e-6, info = nm)
     }
 })
+
+test_that("RM covariates are centred: within effects at the mean covariate (audit 2026-11-05)", {
+    skip_if_not_installed("afex"); skip_if_not_installed("emmeans")
+    set.seed(1)
+    n <- 12
+    id <- factor(rep(1:n, each = 3)); time <- factor(rep(c("t1", "t2", "t3"), n))
+    cv <- rep(rnorm(n, 50, 10), each = 3)
+    y <- 10 + c(0, 1, 2)[as.integer(time)] + 0.05 * cv * as.integer(time) + rep(rnorm(n), each = 3) + rnorm(3 * n)
+    d <- data.frame(y, id, time, cv)
+    raw <- fitRm(d, "y", "id", "time", NULL, "cv", "3")$an0
+    d2 <- d; d2$cv <- d2$cv - mean(d2$cv)
+    centred <- fitRm(d2, "y", "id", "time", NULL, "cv", "3")$an0
+    expect_equal(raw["time", "F"], centred["time", "F"])
+    expect_gt(raw["time", "F"], 100)
+})
+
+test_that("RM pairwise comparisons use the df of each contrast (audit 2026-11-05)", {
+    skip_if_not_installed("afex"); skip_if_not_installed("emmeans")
+    set.seed(2)
+    n <- 8
+    id <- factor(rep(1:n, each = 4)); time <- factor(rep(c("a", "b", "c", "d"), n))
+    grp <- factor(rep(rep(c("g1", "g2"), each = n / 2), each = 4))
+    y <- 10 + c(0, .5, 1, 1.2)[as.integer(time)] + rep(rnorm(n, 0, 3), each = 4) + rnorm(4 * n)
+    r <- fitRm(data.frame(y, id, time, grp), "y", "id", "time", "grp", NULL, "3")
+    cmp <- compareTerm(r$fit, "time", "tukey", 0.05)
+    ref <- as.data.frame(pairs(emmeans::emmeans(r$fit, ~time, model = "univariate"), adjust = "tukey"))
+    expect_equal(cmp$pairs$df, ref$df)
+    expect_equal(cmp$pairs$p, ref$p.value, tolerance = 1e-6)
+    # Dunnett: one df per comparison
+    dn <- compareTerm(r$fit, "time", "dunnett", 0.05)
+    expect_equal(dn$pairs$df, rep(18, 3))
+})
