@@ -5,6 +5,18 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane
 
+## 1.0.10 — 2026-11-05
+Poprawki błędnych wyników z audytu kodu (przeniesione z 1.4.0): ANOVA
+powtórzonych pomiarów z kowariantą i stopnie swobody porównań, przedziały
+współczynników regresji przy współliniowości i GVIF dla czynników, zapis reszt
+i wartości przewidywanych oraz numery wierszy wartości skrajnych przy filtrze,
+szereg rozdzielczy (gubione obserwacje, granice klas), dokładny test
+permutacyjny, testy t (Wilcoxon jednej próby, znak r Manna-Whitneya),
+częstości (poprawka ciągłości w zgodności, kierunek OR po Q Cochrana,
+przedział V Craméra), BCa przy remisach, średnia rozkładu t dla df ≤ 1,
+jSpace (punkty na granicy państw). Wersje modułów z czwartym członem
+(np. jANOVA 0.5.1.1).
+
 ## 1.0.9 — 2026-10-18
 Poprawka bezpieczeństwa z jamovi 28.13.
 
