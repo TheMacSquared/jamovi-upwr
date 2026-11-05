@@ -108,7 +108,7 @@ options:
       default: false
 
     - name: effSizeCI
-      title: Przedział ufności dla V (bootstrap)
+      title: Przedział ufności dla V
       type: Bool
       default: false
 

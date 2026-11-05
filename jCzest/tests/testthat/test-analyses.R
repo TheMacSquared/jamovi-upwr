@@ -145,3 +145,29 @@ test_that("warstwy: testy i miary osobno w kazdej warstwie oraz Ogolem", {
     # bez warstw kolumna warstwy niewidoczna, wyniki jak wczesniej
     expect_false(jCzest:::tabela(data = d, rows = "plec", cols = "wybor")$tests$getColumn("layer")$visible)
 })
+
+test_that("χ² zgodności z poprawką ciągłości naprawdę ją stosuje (audyt 2026-11-05)", {
+    d <- data.frame(x = factor(c(rep("a", 14), rep("b", 6))))
+    t <- jCzest:::zgodnosc(data = d, var = "x", chiSqCorr = TRUE)$tests$asDF
+    cc <- t[t$test == "χ² z poprawką ciągłości", ]
+    expect_equal(cc$stat, (abs(14 - 10) - 0.5)^2 / 10 * 2)
+    expect_equal(cc$stat, 2.45)
+})
+
+test_that("V Craméra: nota, gdy V jest powyżej górnej granicy (audyt 2026-11-05)", {
+    # niezależne zmienne w dużej tabeli: V obciążone w górę, często ponad przedziałem
+    found <- FALSE
+    for (s in 1:200) {
+        set.seed(s)
+        d <- data.frame(r = factor(sample(letters[1:6], 80, TRUE)), c = factor(sample(LETTERS[1:6], 80, TRUE)))
+        tab <- table(d$r, d$c)
+        if (cramersV(tab) <= cramersVCI(tab)[2]) next
+        found <- TRUE; break
+    }
+    expect_true(found)
+    res <- jCzest:::tabela(data = d, rows = "r", cols = "c", effSize = TRUE, effSizeCI = TRUE)
+    es <- res$effsize$asDF
+    expect_gt(es$value, es$upper)
+    txt <- gsub("\\s+", " ", paste(capture.output(print(res$effsize)), collapse = " "))
+    expect_true(grepl("obciążone w górę", txt))
+})

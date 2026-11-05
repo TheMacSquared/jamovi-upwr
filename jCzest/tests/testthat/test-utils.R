@@ -27,13 +27,22 @@ test_that("V Cramera: 2x2 = sqrt(chi2/n), zakres [0,1], zero przy niezaleznosci"
     expect_true(v >= 0 && v <= 1)
 })
 
-test_that("bootstrapowy CI dla V jest powtarzalny i zawiera estymate", {
-    a <- cramersVCI(t34, nBoot = 300, seed = 42)
-    b <- cramersVCI(t34, nBoot = 300, seed = 42)
-    expect_identical(a, b)
-    v <- cramersV(t34)
-    expect_true(a[1] <= v && v <= a[2])
-    expect_true(a[1] >= 0 && a[2] <= 1)
+test_that("CI dla V z niecentralnego chi2: zgodny z effectsize, deterministyczny (audyt 2026-11-05)", {
+    # effectsize::cramers_v(matrix(c(20, 10, 5, 25), 2), adjust = FALSE, alternative = "two.sided")
+    ci <- cramersVCI(as.table(matrix(c(20, 10, 5, 25), 2)))
+    expect_equal(ci, c(0.2540623, 0.7601228), tolerance = 1e-6)
+    expect_identical(cramersVCI(t34), cramersVCI(t34))
+    # niezależność: dolna granica 0, przedział obejmuje 0
+    ind <- as.table(matrix(c(30, 30, 30, 30), 2))
+    expect_equal(cramersVCI(ind)[1], 0)
+    # przy wyniku istotnym przedział obejmuje V
+    set.seed(9)
+    for (i in 1:200) {
+        tab <- as.table(matrix(rmultinom(1, 150, c(.3, .1, .1, .2, .1, .2)), 2))
+        if (suppressWarnings(chisq.test(tab, correct = FALSE))$p.value > 0.05) next
+        ci <- cramersVCI(tab); v <- cramersV(tab)
+        expect_true(ci[1] <= v && v <= ci[2])
+    }
 })
 
 test_that("reszty standaryzowane zgodne z chisq.test$stdres", {
@@ -117,4 +126,20 @@ test_that("buildTable radzi sobie z licznosciami, brakami i pustymi komorkami", 
 
     withNA <- buildTable(c("A", "B", NA, "A"), c("x", NA, "y", "y"))
     expect_equal(sum(withNA), 2)          # tylko kompletne obserwacje
+})
+
+test_that("OR w porównaniach parami ma kierunek McNemara przy dwóch pomiarach (audyt 2026-11-05)", {
+    # 15 par nie → tak, 5 par tak → nie; „wystąpiło” = tak (poziom 2)
+    a <- c(rep(0, 15), rep(1, 5), rep(0, 10), rep(1, 10))
+    b <- c(rep(1, 15), rep(0, 5), rep(0, 10), rep(1, 10))
+    m <- cbind(p1 = a, p2 = b, p3 = b)
+    pw <- pairwiseMcnemar(m, c("p1", "p2", "p3"))
+    two <- mcnemarOR(as.table(matrix(c(10, 5, 15, 10), 2, dimnames = list(c("nie", "tak"), c("nie", "tak")))))
+    expect_equal(pw$or[1], two$est)
+    expect_equal(pw$or[1], 3)
+    # przedział z poziomu ufności z ustawień
+    w90 <- pairwiseMcnemar(m, c("p1", "p2", "p3"), level = 0.90)
+    expect_gt(w90$lower[1], pw$lower[1])
+    # „wystąpiło” = poziom 1: ta sama definicja po poziomach
+    expect_equal(pairwiseMcnemar(1 - m, c("p1", "p2", "p3"), eventIsSecond = FALSE)$or[1], 3)
 })

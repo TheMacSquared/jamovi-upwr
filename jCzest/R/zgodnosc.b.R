@@ -119,10 +119,12 @@ zgodnoscClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     switch(o$hypothesis, greater = "udział większy niż p₀",
                            less = "udział mniejszy niż p₀", "udział różny od p₀ (dwustronna)"))
                 if (isTRUE(o$chiSqCorr)) {
-                    ct <- suppressWarnings(stats::chisq.test(as.vector(obs), p = e / n, correct = TRUE))
+                    # chisq.test applies Yates only to 2×2 matrices, never to a
+                    # goodness-of-fit vector (correct = TRUE was silently ignored)
+                    x2y <- sum(pmax(0, abs(as.vector(obs) - e) - 0.5)^2 / e)
                     t$addRow(rowKey = "cc", values = list(
-                        test = "χ² z poprawką ciągłości", stat = unname(ct$statistic),
-                        df = unname(ct$parameter), p = unname(ct$p.value)))
+                        test = "χ² z poprawką ciągłości", stat = x2y,
+                        df = 1L, p = stats::pchisq(x2y, 1, lower.tail = FALSE)))
                     m$add("Testy", "χ² zgodności z poprawką ciągłości Yatesa, df = 1.")
                 }
             } else {

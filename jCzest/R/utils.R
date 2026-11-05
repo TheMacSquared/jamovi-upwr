@@ -69,24 +69,30 @@ cramersV <- function(tab) {
     sqrt(unname(x2) / (n * (min(dim(tab)) - 1)))
 }
 
-#' Bootstrapowy przedział percentylowy dla V Craméra.
-#' Losujemy n obserwacji z rozkładu wielomianowego zadanego tabelą.
-cramersVCI <- function(tab, level = 0.95, nBoot = 1000, seed = 1) {
+#' Przedział ufności dla V Craméra z niecentralnego rozkładu χ²
+#' (jak effectsize::cramers_v, alternative = "two.sided"): granice
+#' parametru niecentralności λ spełniają P(χ²(df, λ) ≤ X²) = 1 − α/2 i α/2,
+#' V = √(λ / (N (min(r, c) − 1))). Deterministyczny (dawniej bootstrap
+#' percentylowy, który przy małym V nie obejmował V, np. V = 0 z [0,001; 0,20]).
+#' Przy wynikach nieistotnych V bywa powyżej górnej granicy: V jest obciążone
+#' w górę (przy niezależności X² ≈ df, nie 0) — zob. nota w tabela.b.R.
+cramersVCI <- function(tab, level = 0.95) {
     n <- sum(tab)
     if (n == 0 || any(dim(tab) < 2)) return(c(NA_real_, NA_real_))
-    set.seed(seed)
-    p <- as.vector(tab) / n
-    d <- dim(tab)
-    vs <- vapply(seq_len(nBoot), function(i) {
-        draw <- stats::rmultinom(1, n, p)
-        m <- matrix(draw, nrow = d[1], ncol = d[2])
-        if (any(rowSums(m) == 0) || any(colSums(m) == 0)) return(NA_real_)
-        cramersV(as.table(m))
-    }, numeric(1))
-    vs <- vs[is.finite(vs)]
-    if (length(vs) < 50) return(c(NA_real_, NA_real_))
+    x2 <- unname(suppressWarnings(stats::chisq.test(tab, correct = FALSE)$statistic))
+    df <- (nrow(tab) - 1) * (ncol(tab) - 1)
+    if (!is.finite(x2)) return(c(NA_real_, NA_real_))
     a <- (1 - level) / 2
-    unname(stats::quantile(vs, c(a, 1 - a)))
+    # smallest λ with P(χ²(df, λ) ≤ x2) = target; P decreases with λ
+    lambdaFor <- function(target) {
+        f <- function(l) stats::pchisq(x2, df, ncp = l) - target
+        if (f(0) <= 0) return(0)
+        hi <- max(10, 2 * x2)
+        while (f(hi) > 0) hi <- hi * 2
+        stats::uniroot(f, c(0, hi), tol = 1e-10)$root
+    }
+    lam <- c(lambdaFor(1 - a), lambdaFor(a))
+    sqrt(lam / (n * (min(dim(tab)) - 1)))
 }
 
 #' Skorygowane reszty standaryzowane (adjusted Pearson).
@@ -351,7 +357,10 @@ cochranQ <- function(mat) {
 }
 
 #' Post-hoc do Q Cochrana: McNemar dla każdej pary pomiarów, p korygowane Holmem.
-pairwiseMcnemar <- function(mat, names_ = NULL, method = "holm") {
+#' mat: 0/1 (1 = kategoria „wystąpiło”). OR par niezgodnych w tym samym
+#' kierunku co przy dwóch pomiarach (mcnemarOR): liczba par „poziom 1 → poziom 2”
+#' / „poziom 2 → poziom 1”; eventIsSecond = TRUE, gdy „wystąpiło” to poziom 2.
+pairwiseMcnemar <- function(mat, names_ = NULL, method = "holm", level = 0.95, eventIsSecond = TRUE) {
     mat <- mat[stats::complete.cases(mat), , drop = FALSE]
     k <- ncol(mat)
     if (k < 3) return(NULL)
@@ -366,8 +375,9 @@ pairwiseMcnemar <- function(mat, names_ = NULL, method = "holm") {
         st <- (n01 - n10)^2 / (n01 + n10)
         # OR par niezgodnych dla tej pary — ta sama miara co przy dwoch pomiarach,
         # dzieki czemu wielkosc efektu jest dostepna takze przy k >= 3
-        z <- stats::qnorm(0.975)
-        or <- if (n01 > 0 && n10 > 0) n10 / n01 else NA_real_
+        z <- stats::qnorm(1 - (1 - level) / 2)
+        # n01 = 0 → 1 (do „wystąpiło”); poziom 1 → poziom 2 to n01, gdy „wystąpiło” = poziom 2
+        or <- if (n01 > 0 && n10 > 0) { if (eventIsSecond) n01 / n10 else n10 / n01 } else NA_real_
         se <- if (is.finite(or)) sqrt(1 / n01 + 1 / n10) else NA_real_
         list(stat = st, p = stats::pchisq(st, 1, lower.tail = FALSE), disc = n01 + n10,
              or = or,

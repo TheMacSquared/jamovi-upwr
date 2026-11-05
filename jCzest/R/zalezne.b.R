@@ -175,7 +175,8 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             for (col in c("or", "lower", "upper")) t$getColumn(col)$setVisible(FALSE)
 
             if (isTRUE(o$posthoc)) {
-                pw <- pairwiseMcnemar(m, vars)
+                lv1 <- levels(factor(self$data[[vars[1]]]))
+                pw <- pairwiseMcnemar(m, vars, level = o$ciWidth / 100, eventIsSecond = identical(ev, lv1[2]))
                 ph <- self$results$posthoc
                 if (!is.null(pw)) {
                     for (i in seq_len(nrow(pw)))
@@ -185,7 +186,9 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                             or = pw$or[i], lower = pw$lower[i], upper = pw$upper[i]))
                     md$add("Post-hoc", paste(
                         "Dla każdej pary pomiarów test McNemara (liczba porównań: %d), p skorygowane metodą Holma;",
-                        "OR par niezgodnych z 95%% przedziałem ufności, 1 = brak zmiany."), nrow(pw))
+                        "OR par niezgodnych = liczba par „%s → %s” / liczba par „%s → %s” (jak przy dwóch pomiarach),",
+                        "z przedziałem ufności %g%% metodą Walda; 1 = brak zmiany."),
+                        nrow(pw), lv1[1], lv1[2], lv1[2], lv1[1], o$ciWidth)
                 }
             } else if (isTRUE(o$effSize)) {
                 self$results$tests$setNote("es", paste(
