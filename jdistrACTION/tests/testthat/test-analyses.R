@@ -146,5 +146,5 @@ test_that("discrete plots: huge supports are trimmed, usual ones unchanged (audi
     t0 <- proc.time()[["elapsed"]]
     b <- distrACTION:::BinomialDistribution(x1 = 5e6, dp1 = 1e7, dp2 = 0.5, DistributionFunction = TRUE)
     expect_lt(proc.time()[["elapsed"]] - t0, 5)
-    expect_equal(range(distrACTION:::BinomialDistribution(x1 = 3, dp1 = 10, dp2 = 0.3)$plot$state[[1]]), c(0, 10))
+    expect_equal(range(distrACTION:::BinomialDistribution(x1 = 3, dp1 = 10, dp2 = 0.3)$plot$state$Dataset[[1]]), c(0, 10))
 })

@@ -21,6 +21,11 @@ Nowe:
   czytelny dla innych użytkowników (w Dockerze dla użytkownika hosta).
 - Zmiana opcji w trakcie liczenia nie restartuje już procesu R, gdy poprzednie
   obliczenie kończy się w ciągu 2 s (`JAMOVI_ANALYSIS_CANCEL_GRACE`).
+- Rozkład dwumianowy: zwinięta sekcja „Dane empiryczne” — zmienna z danymi obok
+  modelu: częstość zdarzenia w danych obok P, tabela liczności obserwowanych
+  i oczekiwanych N·P, momenty z danych, punkty częstości na wykresie; opcjonalnie
+  p oszacowane z danych, dokładny zakres 95% liczności i test χ² zgodności
+  (distrACTION 1.4.0, pilot — pozostałe rozkłady później).
 - Z jamovi: dopasowanie szerokości kolumny podwójnym kliknięciem, spacje na
   początku i końcu wartości obcinane przy imporcie.
 
@@ -50,7 +55,7 @@ Poprawione awarie i wydajność:
   w drzewie błędów, duże rozkłady dyskretne; mniej danych zapisywanych w .omv.
 
 Wersje modułów: jANOVA 0.5.6, jRegr 0.1.9, jEksplor 0.1.10, jperm 0.2.8,
-jTestyT 0.4.6, jCzest 0.2.7, jCI 0.3.8, distrACTION 1.3.8, scatr 2.9.13,
+jTestyT 0.4.6, jCzest 0.2.7, jCI 0.3.8, distrACTION 1.4.0, scatr 2.9.13,
 jRISK 0.4.5, jSpace 0.3.4.
 
 ## 1.3.1 — 2026-11-02 (linia latest, jamovi 28.17)

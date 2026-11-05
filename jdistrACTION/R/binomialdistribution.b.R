@@ -12,7 +12,22 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         if (!is.finite(self$options$dp2) || self$options$dp2 < 0 || self$options$dp2 > 1)
           stop(sprintf("Nie można obliczyć rozkładu: p musi należeć do [0, 1] (podano %s).", self$options$dp2), call. = FALSE)
 
-        
+        ##### 1.0) Empirical data (optional) #####
+        # Counts of successes in n trials; with "estimated" the model p is
+        # replaced by the maximum likelihood estimate mean(x) / n.
+        EmpX <- NULL
+        EmpEstimated <- FALSE
+        if (!is.null(self$options$empVar)) {
+          EmpX <- empReadCounts(self$data, self$options$empVar, 0, self$options$dp1,
+                                sprintf(" (liczba sukcesów w n = %s próbach)", self$options$dp1))
+          if (self$options$empParams == "estimated") {
+            if (self$options$dp1 == 0)
+              stop("Nie można oszacować p przy n = 0.", call. = FALSE)
+            EmpEstimated <- TRUE
+          }
+        }
+
+
         
         ###### 1.1) Preparation ######
         ##### 1.1.1) Extraction of Input-Values #####
@@ -34,6 +49,8 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         DP1 <- self$options$dp1
         # The specification of the second distribution parameter (Probability) is extracted
         DP2 <- self$options$dp2
+        if (EmpEstimated)
+          DP2 <- mean(EmpX) / DP1
         #The quantiles are recalculated if the central interval quantile is selected
         if(QuantileFunction== "TRUE"){
           if (QuantileFunctionType=="central") {
@@ -89,6 +106,8 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         InputSummary <- matrix(ncol = 3, nrow = 2)
         InputSummary[1,1] <- paste(InputLabel1, DP1, sep = "")
         InputSummary[2,1] <- paste(InputLabel2, DP2, sep = "")
+        if (EmpEstimated)
+          InputSummary[2,1] <- paste0(InputLabel2, round(DP2, 4), " (oszacowane z danych)")
         InputSummary[1,2] <- paste("x1 = ", XValue, sep = "")
         InputSummary[2,2] <- DistributionFunctionTypeLabel
         InputSummary[1,3] <- paste("p = ", Quantile, sep = "")
@@ -162,7 +181,15 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         Outputs <- self$results$Outputs
         Outputs$setRow(rowNo=1, values=list(
           DistributionResultColumn=OutputSummary[1,1],
-          QuantileResultColumn=OutputSummary[1,2]))    
+          QuantileResultColumn=OutputSummary[1,2]))
+        if (!is.null(EmpX) && DistributionFunction == "TRUE") {
+          Outputs$setRow(rowNo=1, values=list(
+            EmpiricalResultColumn=empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2)))
+        } else {
+          Outputs$getColumn("EmpiricalResultColumn")$setVisible(FALSE)
+        }
+        if (is.null(EmpX))
+          self$results$EmpChiSq$setVisible(FALSE)
         if((QuantileFunction=="TRUE")&(QuantileFunctionType=="central")){
           Outputs$addRow(rowKey=2, values=list(
             DistributionResultColumn=OutputSummary[2,1],
@@ -327,8 +354,27 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         Dataset[8,4] <- Textsize
         Dataset[1:(length(AxisSegments)),5] <- AxisSegments        
         # The new variable is transferred to the plot-object
+        # Empirical data: tables and per-value frequencies for the plot
+        EmpPlot <- NULL
+        if (!is.null(EmpX)) {
+          # the plot range x may be trimmed for n > 2000 (discretePlotRange);
+          # the tables need every observed value inside the support, and the
+          # mass beyond the trimmed range goes to the (unobserved) end points,
+          # which fall into the "≤ k" / "≥ k" classes
+          EmpLo <- max(0, min(x[1], min(EmpX)) - 1)
+          EmpHi <- min(DP1, max(x[length(x)], max(EmpX)) + 1)
+          EmpSupport <- seq(EmpLo, EmpHi, by = 1)
+          EmpPmf <- dbinom(EmpSupport, DP1, DP2)
+          EmpPmf[1] <- EmpPmf[1] + pbinom(EmpLo - 1, DP1, DP2)
+          EmpPmf[length(EmpPmf)] <- EmpPmf[length(EmpPmf)] + pbinom(EmpHi, DP1, DP2, lower.tail = FALSE)
+          EmpPlot <- empFillResults(
+            self$results, self$options, EmpX, EmpSupport, EmpPmf,
+            modelMean = DP1 * DP2, modelVar = DP1 * DP2 * (1 - DP2),
+            nEstimated = as.integer(EmpEstimated),
+            estimatedNote = "p oszacowane z danych (p̂ = x̄ / n), więc model jest do nich dopasowany")
+        }
         image <- self$results$plot
-        image$setState(Dataset)
+        image$setState(list(Dataset = Dataset, emp = EmpPlot))
         
         
         
@@ -347,7 +393,15 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         ###### 2.1) Extraction of values ######
         ##### 2.1.1) Extraction of the plot datas #####
         # The main dataset for the plot is extracted
-        Dataset <- image$state
+        # States saved before the empirical-data option are plain data frames
+        State <- image$state
+        EmpPlot <- NULL
+        if (is.data.frame(State)) {
+          Dataset <- State
+        } else {
+          Dataset <- State$Dataset
+          EmpPlot <- State$emp
+        }
         # The datas are recreated as a variable for the plot
         PlotData <- Dataset[,1:3]
         colnames(PlotData) <- c("X", "Prob", "CurveProb")
@@ -427,7 +481,12 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             scale_linetype_manual(values=TypeOfLine)}
         
         
-        ##### 2.3.4) Final adjustments of the plot #####
+        ##### 2.3.4) Empirical data #####
+        if (!is.null(EmpPlot))
+          Plot <- Plot + empPlotLayers(EmpPlot, self$options$empBand, theme)
+
+
+        ##### 2.3.5) Final adjustments of the plot #####
         Plot <- Plot+
           # Set fontsize of the legend
           theme(legend.text = element_text(size = Textsize))+

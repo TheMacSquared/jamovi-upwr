@@ -1079,3 +1079,26 @@ Pozostaje (drobne, bez wpływu na wyniki, chyba że zaznaczono):
   się przy zwykłym kliknięciu w wykres (`manualImageResize`).
 - Stable: 3 testy `test-analyses.R` jEksplor 0.1.4.x padają także na kodzie
   sprzed poprawek (oczekują nowszego układu tabeli) — sprawdzić.
+
+### Zadanie 28: distrACTION — dane empiryczne obok rozkładu — PILOT 2026-11-04 (rozkład dwumianowy, distrACTION 1.4.0)
+Inspiracja: lista z analizy ryzyka, zad. 4.3 (Bananpol, `kontrole_niezaliczone`,
+Bin(12; 0,15): 19 obserwowanych wobec 21,3 oczekiwanych). Decyzja: TRYB w istniejącej
+analizie, nie nowa pozycja menu — zwinięta sekcja „Dane empiryczne” (zmienna `empVar`);
+bez zmiennej kalkulator działa jak dotąd. Wyniki: kolumna „Częstość w danych” obok
+odczytanego P (to samo zdarzenie, to samo zaokrąglanie x1/x2), tabela obserwowane /
+oczekiwane N·P (wiersze: wszystkie obserwowane wartości i każda z N·P ≥ 1, reszta
+nośnika w „≤ k” / „≥ k”; wiersz Razem), momenty z danych obok modelu (wariancja z n − 1),
+na wykresie punkty = częstość względna. Opcje: `empParams` given/estimated (p̂ = x̄/n;
+Inputs pokazuje „oszacowane z danych”, dp2 wyłączone), `empBand` — zakres 95% liczności
+DOKŁADNY (O_x ~ Bin(N, P(X = x)), qbinom, bez symulacji; punktowy, przy p̂ bez niepewności
+oszacowania — nota), `empChiSq` — χ² zgodności z klasami łączonymi od lewej do E ≥ 5
+(krótka ostatnia klasa dołączana do poprzedniej), df = k − 1 − liczba oszacowanych.
+Silnik wspólny dla rozkładów dyskretnych: `jdistrACTION/R/empirical.R`; testy
+`tests/testthat/test-empirical.R` (klucz 4.3). PUŁAPKA: w `.r.yaml` wyrażenie
+`(empVar && x)` rzuca „Could not resolve” przy pustej zmiennej (NULL && …) — w r.yaml
+tylko pojedyncza opcja, resztę widoczności ustawiać w `.b.R`. Stan zapisu wykresu to
+lista `list(Dataset, emp)`; `.plot` czyta też stary stan (data.frame).
+Dalej (do decyzji po pilocie): Poisson, geometryczny, ujemny dwumianowy (te same
+helpery, inny nośnik i estymator), potem ciągłe (normalny, wykładniczy, gamma, Weibull:
+histogram gęstości + krzywa, ewentualnie ECDF vs dystrybuanta); t, χ², F — nie.
+Etap 2: „Podziel według” (różne p w grupach → nadmierna dyspersja).
