@@ -40,6 +40,7 @@ import threading
 import re
 from uuid import uuid4
 from typing import Callable
+import time
 from time import monotonic
 from urllib import parse
 
@@ -71,6 +72,35 @@ log = logging.getLogger(__name__)
 ConnectionStatus = namedtuple('ConnectionStatus',
                               ('connected', 'inactive_since', 'unclean', 'virgin'),
                               defaults=(True, None, False, False))
+
+
+
+RECOVERY_KEEP_DAYS = 30
+
+
+def default_recovery_directory():
+    return conf.get('recovery_path') or os.path.join(Dirs.app_data_dir(), 'recovery')
+
+
+def prune_recovery_copies(directory=None, max_age_days=RECOVERY_KEEP_DAYS, now=None):
+    # jUPWR: recovery copies not touched for max_age_days are removed; the
+    # copy of a document still being edited is rewritten every few minutes
+    directory = directory or default_recovery_directory()
+    now = time.time() if now is None else now
+    removed = 0
+    try:
+        entries = list(os.scandir(directory))
+    except OSError:
+        return 0
+    for entry in entries:
+        try:
+            if (entry.is_file() and entry.name.endswith('.omv')
+                    and now - entry.stat().st_mtime > max_age_days * 86400):
+                os.remove(entry.path)
+                removed += 1
+        except OSError as e:
+            log.debug('recovery copy %s not removed: %s', entry.path, e)
+    return removed
 
 
 class Instance:
@@ -826,7 +856,21 @@ class Instance:
 
 
     def recovery_directory(self):
-        return conf.get('recovery_path') or os.path.join(Dirs.app_data_dir(), 'recovery')
+        return default_recovery_directory()
+
+    def _discard_recovery_file(self):
+        # jUPWR: the document is saved, so its recovery copy is not needed;
+        # left in place, copies piled up (shared computers in teaching rooms)
+        path = self._recovery_file
+        self._recovery_file = None
+        if path is None:
+            return
+        try:
+            root = os.path.realpath(self.recovery_directory())
+            if os.path.commonpath([root, os.path.realpath(path)]) == root:
+                os.remove(path)
+        except (OSError, ValueError) as e:
+            log.debug('recovery copy %s not removed: %s', path, e)
 
     def needs_recovery(self):
         return (self._perms.save.local and self._project.has_datasets
@@ -963,6 +1007,7 @@ class Instance:
                 self._project.save_format = 'jamovi'
                 self._project.is_edited = False
                 self._project.file_sync = file_sync
+                self._discard_recovery_file()
 
                 if not trigger_download:
                     self._add_to_recents(path, self._project.title)
@@ -1202,6 +1247,10 @@ class Instance:
             if is_recovery:
                 self._project.path = ''
                 self._project.is_edited = True
+                # jUPWR: keep recovering into the copy that was opened, not
+                # into a new one next to it
+                if norm_path:
+                    self._recovery_file = norm_path
             if file_sync is not None:
                 self._project.file_sync = file_sync
                 self._project.path = url

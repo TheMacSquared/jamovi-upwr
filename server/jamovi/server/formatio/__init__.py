@@ -123,6 +123,21 @@ def _import(data, path, prog_cb, settings, ext):
         raise RuntimeError('Unrecognised file format')
 
 
+def _current_umask():
+    # read without changing it: os.umask() alone sets it process-wide, which
+    # is not safe with saves running in threads
+    try:
+        with open('/proc/self/status') as status:
+            for line in status:
+                if line.startswith('Umask:'):
+                    return int(line.split()[1], 8)
+    except (OSError, ValueError):
+        pass
+    mask = os.umask(0o022)
+    os.umask(mask)
+    return mask
+
+
 def write(project, path, prog_cb, content=None, cancelled=None):
     """Write beside the destination and publish only a complete, flushed file."""
     path = os.fspath(path)
@@ -139,6 +154,11 @@ def write(project, path, prog_cb, content=None, cancelled=None):
             raise RuntimeError('Unrecognised file format')
         if os.path.exists(path):
             os.chmod(temp_path, stat.S_IMODE(os.stat(path).st_mode))
+        elif os.name != 'nt':
+            # jUPWR: mkstemp creates 0600; a new file gets the mode a plain
+            # open() would (0666 & ~umask), so in Docker (root) the host user
+            # can still read the file just saved
+            os.chmod(temp_path, 0o666 & ~_current_umask())
         with open(temp_path, 'rb') as stream:
             os.fsync(stream.fileno())
         if cancelled is not None and cancelled.is_set():

@@ -17,6 +17,7 @@ from enum import Enum
 from time import monotonic
 
 from .instance import Instance
+from .instance import prune_recovery_copies
 from .analyses import AnalysisIterator
 from .enginemanager import EngineManager
 from .scheduler import Scheduler
@@ -124,6 +125,13 @@ class Session(dict):
         self._runner.add_engine_listener(self._on_engine_event)
 
     async def start(self):
+        # jUPWR: recovery copies older than 30 days are removed
+        try:
+            n = prune_recovery_copies()
+            if n:
+                log.info('removed %d old recovery copies', n)
+        except Exception as e:
+            log.exception(e)
         try:
             await self._modules.read()
             await self._runner.start()
