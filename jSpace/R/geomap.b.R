@@ -38,8 +38,13 @@ geomapClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             punkty <- sf::st_as_sf(
                 data.frame(lon = lon, lat = lat),
                 coords = c("lon", "lat"), crs = sf::st_crs(kraje))
-            zlacz <- suppressMessages(sf::st_join(punkty, kraje["panstwo"]))
-            panstwo <- zlacz$panstwo
+            # one country per point: st_join returns a row per matching
+            # polygon, so a point on a border (lat 49 on the US/Canada border,
+            # a tripoint) made the result longer than the points and shifted
+            # every later country; the first matching country is taken
+            hits <- suppressMessages(sf::st_intersects(punkty, kraje))
+            idx <- vapply(hits, function(h) if (length(h)) h[1] else NA_integer_, integer(1))
+            panstwo <- as.character(kraje$panstwo[idx])
             panstwo[is.na(panstwo)] <- "(poza ladem)"
 
             if (self$options$pokazRegiony) {
