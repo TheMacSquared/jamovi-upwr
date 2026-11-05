@@ -147,7 +147,13 @@ items:
           title: ''
           type: text
         - name: vif
-          title: VIF
+          title: VIF / GVIF
+          type: number
+        - name: df
+          title: df
+          type: integer
+        - name: adj
+          title: GVIF^(1/(2·df))
           type: number
         - name: tol
           title: Tolerancja
