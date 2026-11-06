@@ -8,13 +8,44 @@ Ten plik jest identyczny na wszystkich aktywnych gałęziach. Zmiany wprowadzaj 
 | Kanał | Gałąź | jUPWR | jamovi | Submoduły jmv/plots/i18n | Co tu trafia |
 |---|---|---|---|---|---|
 | stable | `release/1.0` | 1.0.x | 28.2 | `release/1.0` | tylko poprawki błędów krytycznych |
-| latest | `main` | 1.3.x | 28.17 | `main` | nowe funkcje, nowy upstream, poprawki |
+| latest | `main` | 1.4.x | 28.17 | `main` | nowe funkcje, nowy upstream, poprawki |
 | legacy | `legacy/win81` | 1.0.4 | 28.2 | (stan z gałęzi) | zamrożona; Windows 8.1, osobny Electron i R; bez przenoszenia poprawek w żadną stronę (`packaging/30-legacy-win81.md`) |
 
-Kanał to etykieta, gałąź to nazwa stała. Gdy latest dojrzeje do wydania dla studentów:
-z `main` zakłada się `release/1.1` (w głównym repo i w submodułach jmv, plots, i18n),
-ta gałąź staje się stable, a `release/1.0` zostaje zamrożona. Wtedy aktualizuje się
-tabelę powyżej (na `main` i nowej `release/*`).
+Kanał to etykieta, gałąź to nazwa stała. Gdy latest dojrzeje do wydania dla studentów
+(reguła niżej, „Awans latest → stable”): z `main` zakłada się `release/X.Y` nazwaną od
+awansowanej serii (np. `release/1.4` dla 1.4.x; w głównym repo i w submodułach jmv,
+plots, i18n), ta gałąź staje się stable, a poprzednia `release/*` zostaje zamrożona.
+Wtedy aktualizuje się tabelę powyżej (na `main` i nowej `release/*`).
+
+## Awans latest → stable: kiedy
+
+Moment awansu się ustala, a nie wypatruje. Dopóki na `main` dochodzą funkcje, każda
+wersja jest „w trakcie” (decyzja 2026-11-06; do 1.4.0 wydania szły co 1–4 dni,
+także poprawkowe z nowymi funkcjami, a poważne błędy wychodziły po kilku dniach —
+żadna wersja 1.1–1.4.0 nie była dobrym kandydatem).
+
+1. **Ogłoszenie kandydata** (decyzja kalendarzowa): „seria X.Y jest kandydatem”. Od
+   tej chwili na `main` tylko poprawki błędów — bez nowych funkcji i bez nowego
+   upstreamu; pomysły idą do CLAUDE.md jako zadania na później. Kolejne wydania
+   podbijają tylko ostatnią cyfrę (X.Y.1, X.Y.2…).
+2. **Zegar**: 2–3 tygodnie normalnego użycia albo pełny cykl zajęć na kandydacie.
+3. **Przy każdym znalezionym błędzie jedno pytanie** — czy jest krytyczny (utrata lub
+   zepsucie danych, awaria aplikacji, błędny wynik; ta sama definicja co niżej przy
+   przenoszeniu poprawek):
+   - nie (kosmetyka, układ, teksty) → poprawka, zegar biegnie dalej;
+   - tak → poprawka, nowe wydanie X.Y.z+1 i zegar od zera.
+4. **Pokrycie**: przed końcem zegara każda analiza kursu podstawowego uruchomiona
+   choć raz na prawdziwych danych (listy w `packaging/tests/manual/`), otwarte
+   przykładowe .omv z zajęć zapisane w poprzedniej stable, buildy Docker, Windows
+   i macOS oraz .jmo modułów opcjonalnych z kandydata.
+5. **Awans na granicy semestru**, nie w trakcie zajęć: tag `jupwr-X.Y.z` na commicie
+   wydania, `release/X.Y` z tego commitu we wszystkich forkach, GitHub Release jako
+   „Latest release”, nowa kolumna w macierzy `packaging/MODULES.md`, przełączenie
+   katalogu stable (sekcja „Zmiana linii stable”), na `main` wersja X.(Y+1).0.
+
+Uprzedzić prowadzących: pliki .omv z nowej stable nie otworzą się w starej (wyższa
+wersja jamovi), a część starszych analiz zmieniła tabele (CHANGELOG, wpisy
+„Stare .omv…” w CLAUDE.md).
 
 `readstat` jest wspólny dla wszystkich linii (gałąź `sync-28`).
 
