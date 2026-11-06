@@ -159,7 +159,9 @@ def write(project, path, prog_cb, content=None, cancelled=None):
             # open() would (0666 & ~umask), so in Docker (root) the host user
             # can still read the file just saved
             os.chmod(temp_path, 0o666 & ~_current_umask())
-        with open(temp_path, 'rb') as stream:
+        # jUPWR: on Windows os.fsync is _commit(), which needs a writable
+        # descriptor; a read-only one fails with EBADF ("Bad file descriptor")
+        with open(temp_path, 'r+b') as stream:
             os.fsync(stream.fileno())
         if cancelled is not None and cancelled.is_set():
             raise RuntimeError('Save cancelled')

@@ -51,6 +51,33 @@ def test_failed_save_preserves_existing_document_and_cleans_staging(tmp_path, mo
     assert not list(tmp_path.glob('.*.tmp'))
 
 
+def test_save_flushes_through_a_writable_descriptor(tmp_path, monkeypatch):
+    # Windows implements os.fsync with _commit(), which rejects read-only
+    # descriptors with EBADF; emulate that check on every platform
+    import errno
+    import os
+    target = tmp_path / 'document.omv'
+    real_fsync = os.fsync
+    flushed = []
+
+    def windows_fsync(fd):
+        if os.name != 'nt':
+            import fcntl
+            if fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY:
+                raise OSError(errno.EBADF, 'Bad file descriptor')
+        flushed.append(fd)
+        real_fsync(fd)
+
+    def write(project, path, *args, **kwargs):
+        Path(path).write_bytes(b'complete document')
+
+    monkeypatch.setattr(formatio.omv, 'write', write)
+    monkeypatch.setattr(formatio.os, 'fsync', windows_fsync)
+    formatio.write(None, str(target), lambda p: None)
+    assert target.read_bytes() == b'complete document'
+    assert flushed
+
+
 def test_simultaneous_writers_publish_complete_independent_files(tmp_path, monkeypatch):
     target = tmp_path / 'document.omv'
     old_document(target)
