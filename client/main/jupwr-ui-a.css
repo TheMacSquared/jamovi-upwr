@@ -565,7 +565,14 @@
 }
 
 [data-ui-style="a"] .jmv-ribbon-appmenu-content {
-    margin: 4px 0 16px;
+    /* the drawer is as tall as the window and the menu clips (overflow:
+       hidden, appmenu.css): with a larger zoom the lower settings were out
+       of reach. The list scrolls, the header with the close cross stays */
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    margin: 0;
+    padding: 4px 0 16px;
 }
 
 [data-ui-style="a"] .jmv-ribbon-appmenu-subheading {
