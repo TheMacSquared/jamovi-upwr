@@ -5,8 +5,8 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## 1.4.0 — 2026-11-05 (linia latest, jamovi 28.17)
 
-Stan buildów: macOS zbudowany 2026-11-05 (aplikacja, `.jmo` jRISK 0.4.5
-i jSpace 0.3.4); Docker (`jupwr/jupwr:1.4.0`) i Windows do wykonania.
+Stan buildów (2026-11-05): Docker (`jupwr/jupwr:1.4.0`) zbudowany,
+macOS i Windows zbudowane (aplikacja, .jmo jRISK 0.4.5 i jSpace 0.3.4).
 
 Nowe:
 - Wykresy wektorowe (SVG) w Eksploracji (jEksplor): histogramy, ECDF, krzywa
@@ -53,6 +53,8 @@ Poprawione awarie i wydajność:
   z wartością odstającą, odświeżanie wykresów jEksplor po zmianie ich opcji.
 - Szybciej: układ „rój” (do 25×), bootstrap BCa i regresji, ROC, ważność zdarzeń
   w drzewie błędów, duże rozkłady dyskretne; mniej danych zapisywanych w .omv.
+- Wygląd Light (A): wstążka bez paska przewijania i uciętych ikon (grupa
+  Filtry / Wstaw / Usuń); wygląd Classic bez zmian.
 
 Wersje modułów: jANOVA 0.5.6, jRegr 0.1.9, jEksplor 0.1.10, jperm 0.2.8,
 jTestyT 0.4.6, jCzest 0.2.7, jCI 0.3.8, distrACTION 1.4.0, scatr 2.9.13,
