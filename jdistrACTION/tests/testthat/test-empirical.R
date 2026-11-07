@@ -208,3 +208,31 @@ test_that("exponential: moments, event frequency and the support check", {
   res <- distrACTION::ExponentialDistribution(data = far, empVar = "czas", dp1 = 0.5)
   expect_equal(max(res$plot$state$Dataset[[1]]), 50)
 })
+
+# Gamma and Weibull: as the exponential (non-negative continuous variable).
+test_that("gamma: moments next to alpha / lambda", {
+  d <- data.frame(czas = c(0.8, 1.5, 2.2, 3.0, 3.6, 4.1, 5.0, 6.3, 7.9, 10.5),
+                  ujemne = c(-0.1, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+  res <- distrACTION::GammaDistribution(
+    data = d, empVar = "czas", dp1 = 2, dp2 = 0.5,
+    DistributionFunction = TRUE, DistributionFunctionType = "interval", x1 = 2, x2 = 6)
+  mom <- res$EmpMoments$asDF
+  expect_equal(mom$data, c(mean(d$czas), var(d$czas), sd(d$czas)))
+  expect_equal(mom$model, c(4, 8, sqrt(8)))
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, "0.5 (5 z 10)")
+  expect_error(distrACTION::GammaDistribution(data = d, empVar = "ujemne", dp1 = 2, dp2 = 0.5),
+               "mniejsze niż 0")
+})
+
+test_that("weibull: moments next to the Gamma-function formulas", {
+  d <- data.frame(zycie = c(150, 320, 480, 610, 750, 880, 1020, 1240, 1500, 1900))
+  res <- distrACTION::WeibullDistribution(data = d, empVar = "zycie", dp1 = 1.5, dp2 = 1000)
+  mom <- res$EmpMoments$asDF
+  v <- 1000^2 * (gamma(1 + 2 / 1.5) - gamma(1 + 1 / 1.5)^2)
+  expect_equal(mom$model, c(1000 * gamma(1 + 1 / 1.5), v, sqrt(v)))
+  expect_equal(mom$data[1], mean(d$zycie))
+  # the curve reaches the largest observation
+  far <- data.frame(zycie = c(10, 100, 9000))
+  res <- distrACTION::WeibullDistribution(data = far, empVar = "zycie", dp1 = 1.5, dp2 = 1000)
+  expect_equal(max(res$plot$state$Dataset[[1]]), 9000)
+})

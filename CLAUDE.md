@@ -1080,7 +1080,7 @@ Pozostaje (drobne, bez wpływu na wyniki, chyba że zaznaczono):
 - Stable: 3 testy `test-analyses.R` jEksplor 0.1.4.x padają także na kodzie
   sprzed poprawek (oczekują nowszego układu tabeli) — sprawdzić.
 
-### Zadanie 28: distrACTION — dane empiryczne obok rozkładu — dwumianowy i normalny ZROBIONE (distrACTION 1.5.0, 2026-11-07)
+### Zadanie 28: distrACTION — dane empiryczne obok rozkładu — ZROBIONE (distrACTION 1.5.0, 2026-11-07; 8 rozkładów)
 Inspiracja: lista z analizy ryzyka, zad. 4.3 (Bananpol, `kontrole_niezaliczone`,
 Bin(12; 0,15): 19 obserwowanych wobec 21,3 oczekiwanych). Decyzja: TRYB w istniejącej
 analizie, nie nowa pozycja menu — zwinięta sekcja „Dane empiryczne” (zmienna `empVar`);
@@ -1121,5 +1121,8 @@ dwumianowy ZROBIONY (2026-11-07) tak samo (konwencja z panelu, nośnik od 0 albo
 Wykładniczy ZROBIONY (2026-11-07) wg wzoru normalnego: momenty 1/λ, 1/λ², 1/λ;
 wartości < 0 → „ma wartości mniejsze niż 0 (rozkład wykładniczy: X ≥ 0)”
 (`empReadContinuous(lower =)`), krzywa sięga największej obserwacji; legenda pola
-„P (Pole)” zamiast angielskiego „P (Area)”. Dalej: gamma, Weibull; t, χ², F — nie. Etap 2: „Podziel według” (różne p w grupach → nadmierna
+„P (Pole)” zamiast angielskiego „P (Area)”. Gamma i Weibull ZROBIONE (2026-11-07) tak
+samo (momenty α/λ, α/λ²; η·Γ(1 + 1/β), η²·[Γ(1 + 2/β) − Γ(1 + 1/β)²]; zakres rozszerzany
+PRZED wyznaczeniem początku siatki dla kształtu < 1). ZADANIE 28 ZAMKNIĘTE dla rozkładów
+z planu; t, χ², F — świadomie bez danych empirycznych. Zostaje etap 2: „Podziel według”. Etap 2: „Podziel według” (różne p w grupach → nadmierna
 dyspersja).
