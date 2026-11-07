@@ -1116,6 +1116,7 @@ momenty średnia / wariancja obok λ / λ, oś X do największej obserwacji. Na 
 tylko pojedyncze wartości tabeli, nie klasy końcowe „≤ k” / „≥ k” (nawet gdy obejmują
 jedną wartość nośnika). Geometryczny ZROBIONY (2026-11-07): dane w konwencji
 `RandomVariable` z panelu (porażki od 0 / numer próby od 1), momenty z modelu tej
-konwencji; wartość spoza nośnika → „ma wartości mniejsze niż 1 (X = …)”. Dalej: ujemny
-dwumianowy, ciągłe (wykładniczy, gamma, Weibull); t, χ², F — nie. Etap 2: „Podziel według” (różne p w grupach → nadmierna
+konwencji; wartość spoza nośnika → „ma wartości mniejsze niż 1 (X = …)”. Ujemny
+dwumianowy ZROBIONY (2026-11-07) tak samo (konwencja z panelu, nośnik od 0 albo od r).
+Dalej: ciągłe (wykładniczy, gamma, Weibull — wzór: normalny); t, χ², F — nie. Etap 2: „Podziel według” (różne p w grupach → nadmierna
 dyspersja).

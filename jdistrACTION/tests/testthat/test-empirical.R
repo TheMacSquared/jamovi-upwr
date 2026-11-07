@@ -168,3 +168,24 @@ test_that("geometric: data in the trials convention next to the model", {
   res <- distrACTION::GeometricDistribution(data = d, empVar = "zero", dp1 = 0.25)
   expect_equal(res$EmpMoments$asDF$model[1], 0.75 / 0.25)
 })
+
+# Negative binomial: X read in the convention chosen in the parameters.
+test_that("negative binomial: data in the trials convention next to the model", {
+  d <- data.frame(tel = c(3, 5, 8, 10, 12, 15, 9, 20, 6, 14), male = c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+  res <- distrACTION::NegBinomialDistribution(
+    data = d, empVar = "tel", dp1 = 3, dp2 = 0.2, RandomVariable = "trials",
+    DistributionFunction = TRUE, DistributionFunctionType = "lower", x1 = 10)
+  mom <- res$EmpMoments$asDF
+  expect_equal(mom$data, c(mean(d$tel), var(d$tel)))
+  expect_equal(mom$model, c(3 / 0.2, 3 * 0.8 / 0.2^2))
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, "0.6 (6 z 10)")
+  tab <- res$EmpTable$asDF
+  expect_equal(tail(tab$exp, 1), 10, tolerance = 1e-9)
+  expect_equal(tab$exp[tab$x == "3"], 10 * dnbinom(0, 3, 0.2), tolerance = 1e-9)
+  # values below r are outside the trials support
+  expect_error(distrACTION::NegBinomialDistribution(data = d, empVar = "male", dp1 = 3, dp2 = 0.2),
+               "mniejsze niż 3")
+  res <- distrACTION::NegBinomialDistribution(data = d, empVar = "male", dp1 = 3, dp2 = 0.2,
+                                              RandomVariable = "failures")
+  expect_equal(res$EmpMoments$asDF$model[1], 3 * 0.8 / 0.2)
+})
