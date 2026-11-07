@@ -14,9 +14,17 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       XValue2 <- self$options$x2
       DP1 <- self$options$dp1  # lambda
 
+      # Empirical data (optional): every row = number of events; the bars
+      # stay Poisson(lambda) from the parameters, the data are drawn on them
+      EmpX <- NULL
+      if (!is.null(self$options$empVar))
+        EmpX <- empReadCounts(self$data, self$options$empVar, 0, Inf)
+
       LowerTail <- 0
       UpperTail <- qpois(0.999, DP1)
       if (UpperTail < 5) UpperTail <- 5
+      # the axis reaches the largest observation
+      if (!is.null(EmpX)) UpperTail <- max(UpperTail, max(EmpX))
       N <- UpperTail + 1
       Columnames <- c("X", "Prob")
 
@@ -91,6 +99,12 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Outputs$setRow(rowNo = 1, values = list(
         DistributionResultColumn = OutputLabel11,
         QuantileResultColumn = OutputLabel12))
+      if (!is.null(EmpX) && DistributionFunction == "TRUE") {
+        Outputs$setRow(rowNo = 1, values = list(
+          EmpiricalResultColumn = empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2)))
+      } else {
+        Outputs$getColumn("EmpiricalResultColumn")$setVisible(FALSE)
+      }
       if((QuantileFunction == "TRUE") & (QuantileFunctionType == "central"))
         Outputs$addRow(rowKey = 2, values = list(
           DistributionResultColumn = "",
@@ -155,6 +169,20 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           HigherSegment <- qpois(HigherQuantile, DP1)
           HigherSegmentLength <- max(Datas$Prob) * 0.8}}
 
+      # Empirical data: tables on a support covering every observed value,
+      # the mass beyond it in the end classes ("≤ k" / "≥ k")
+      EmpPlot <- NULL
+      if (!is.null(EmpX)) {
+        EmpLo <- max(0, min(x[1], min(EmpX)) - 1)
+        EmpHi <- max(x[length(x)], max(EmpX)) + 1
+        EmpSupport <- seq(EmpLo, EmpHi, by = 1)
+        EmpPmf <- dpois(EmpSupport, DP1)
+        EmpPmf[1] <- EmpPmf[1] + ppois(EmpLo - 1, DP1)
+        EmpPmf[length(EmpPmf)] <- EmpPmf[length(EmpPmf)] + ppois(EmpHi, DP1, lower.tail = FALSE)
+        EmpPlot <- empFillResults(self$results, EmpX, EmpSupport, EmpPmf,
+                                  modelMean = DP1, modelVar = DP1)
+      }
+
       PlotDataset <- list(
         Datas = Datas,
         BarColors = BarColors,
@@ -165,7 +193,8 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         QuantileAlphaLow = QuantileAlphaLow,
         QuantileAlphaHigh = QuantileAlphaHigh,
         QuantileLabel = QuantileLabel,
-        Textsize = Textsize)
+        Textsize = Textsize,
+        emp = EmpPlot)
 
       image <- self$results$plot
       image$setState(PlotDataset)
@@ -176,6 +205,10 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
     .plot = function(image, ggtheme, theme, ...) {
       state <- image$state
+      # no state when .run stopped with an error (a variable of the wrong
+      # format): draw nothing, so the error of .run stays visible
+      if (is.null(state))
+        return(FALSE)
       Datas <- state$Datas
       BarColors <- state$BarColors
 
@@ -213,6 +246,10 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             alpha = state$QuantileAlphaHigh) +
           scale_linetype_manual(values = TypeOfLine)
       }
+
+      # empirical data: points = observed relative frequency
+      if (!is.null(state$emp))
+        Plot <- Plot + empPlotLayers(state$emp, theme)
 
       Plot <- Plot +
         theme(legend.text = element_text(size = as.numeric(state$Textsize)))

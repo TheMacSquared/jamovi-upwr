@@ -170,7 +170,9 @@ empFillResults <- function(results, x, support, pmf, modelMean, modelVar) {
         stat = "Wariancja", data = if (length(x) > 1) stats::var(x) else NaN,
         model = modelVar))
 
-    single <- cls[cls$lo == cls$hi, ]
+    # single values only: an end class ("≤ k" / "≥ k") may cover just one
+    # value of the support, but it stands for the whole tail
+    single <- cls[!grepl("^[≤≥]", cls$label), ]
     data.frame(X = single$lo, Freq = single$obs / length(x))
 }
 

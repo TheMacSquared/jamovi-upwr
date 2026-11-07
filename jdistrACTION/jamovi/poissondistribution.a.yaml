@@ -73,4 +73,19 @@ options:
       name: showVariance
       type: Bool
       default: FALSE
+
+    - name: data
+      type: Data
+
+    # every row = number of events (0, 1, 2, ...)
+    - name: empVar
+      title: Dane empiryczne
+      type: Variable
+      suggested:
+        - continuous
+        - ordinal
+      permitted:
+        - numeric
+        - factor
+      default: null
 ...

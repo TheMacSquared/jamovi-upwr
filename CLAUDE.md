@@ -1111,6 +1111,9 @@ logs jamovi`; (2) w `.r.yaml` wyrażenie `(empVar && x)` rzuca „Could not reso
 pustej zmiennej — w r.yaml tylko pojedyncza opcja, resztę widoczności w `.b.R`; (3) stan
 wykresu to lista, `.plot` czyta też stary stan (data.frame). Dane testowe (poza repo):
 `~/Documents/jupwr-test-dwumianowy/` (kontrola_partii, kontrola_sztuk, masa_produktow).
-Dalej: Poisson, potem geometryczny, ujemny dwumianowy, ciągłe (wykładniczy, gamma,
-Weibull); t, χ², F — nie. Etap 2: „Podziel według” (różne p w grupach → nadmierna
+Poisson ZROBIONY (2026-11-07): jak dwumianowy `counts` (wiersz = liczba zdarzeń),
+momenty średnia / wariancja obok λ / λ, oś X do największej obserwacji. Na wykres trafiają
+tylko pojedyncze wartości tabeli, nie klasy końcowe „≤ k” / „≥ k” (nawet gdy obejmują
+jedną wartość nośnika). Dalej: geometryczny, ujemny dwumianowy, ciągłe (wykładniczy,
+gamma, Weibull); t, χ², F — nie. Etap 2: „Podziel według” (różne p w grupach → nadmierna
 dyspersja).

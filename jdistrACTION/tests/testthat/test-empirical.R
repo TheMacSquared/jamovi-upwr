@@ -112,3 +112,38 @@ test_that("normal: density histogram uses Sturges' classes and has area 1", {
   # the maximum falls into the last class (closed on both sides)
   expect_gt(h$density[nrow(h)], 0)
 })
+
+# Poisson: counts of events next to Poisson(lambda) from the parameters.
+test_that("poisson: observed / expected table, moments and event frequency", {
+  d <- data.frame(zgl = rep(0:5, c(10, 20, 25, 20, 15, 10)),
+                  tekst = factor(rep(c("a", "b"), 50)))
+  res <- distrACTION::PoissonDistribution(
+    data = d, empVar = "zgl", dp1 = 2.5,
+    DistributionFunction = TRUE, DistributionFunctionType = "lower", x1 = 1)
+  tab <- res$EmpTable$asDF
+  expect_equal(tail(tab$x, 1), "Razem")
+  expect_equal(tail(tab$obs, 1), 100)
+  expect_equal(tail(tab$exp, 1), 100, tolerance = 1e-9)
+  expect_equal(tab$obs[tab$x == "3"], 20)
+  expect_equal(tab$exp[tab$x == "3"], 100 * dpois(3, 2.5), tolerance = 1e-9)
+  mom <- res$EmpMoments$asDF
+  expect_equal(mom$data, c(mean(d$zgl), var(d$zgl)))
+  expect_equal(mom$model, c(2.5, 2.5))
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value,
+               "0.3 (30 z 100)")
+  expect_error(distrACTION::PoissonDistribution(data = d, empVar = "tekst", dp1 = 2.5),
+               "Nieprawidłowy format zmiennej")
+  # the axis reaches the largest observation
+  far <- data.frame(zgl = c(0, 1, 2, 20))
+  res <- distrACTION::PoissonDistribution(data = far, empVar = "zgl", dp1 = 2)
+  expect_equal(max(res$plot$state$Datas$X), 20)
+})
+
+test_that("end classes are not drawn as single values", {
+  # lambda = 3, data up to 10: the table ends with "≥ 11", which must not
+  # become a point at x = 11
+  d <- data.frame(zgl = c(rep(0:6, c(5, 15, 22, 22, 17, 10, 5)), 8, 10))
+  res <- distrACTION::PoissonDistribution(data = d, empVar = "zgl", dp1 = 3)
+  expect_true(any(grepl("^≥", res$EmpTable$asDF$x)))
+  expect_equal(max(res$plot$state$emp$X), 10)
+})
