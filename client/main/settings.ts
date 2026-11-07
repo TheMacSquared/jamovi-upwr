@@ -20,7 +20,8 @@ export enum Theme {
 
 // palettes offered in the app menu; must match the values understood by
 // jmvcore::colorPalette()
-export const PALETTES = ['jmv', 'okabeito', 'jupwrJasny', 'jupwrCiemny', 'greyscale'];
+export const PALETTES = ['jmv', 'okabeito', 'jupwrJasny', 'jupwrCiemny',
+    'ctpLatte', 'ctpMocha', 'greyscale'];
 
 export function defaultPaletteFor(theme: string): string {
     if (theme === Theme.BW)

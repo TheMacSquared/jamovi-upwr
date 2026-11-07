@@ -785,3 +785,25 @@
     background-color: var(--jupwr-bordo);
     color: white;
 }
+
+/* dimmed tone (uistyle.ts 'a-dim', tokens in common/jupwr-colors.css): the
+   ribbon in light grey, the cards outlined against the warm grey ground */
+
+[data-ui-style="a"][data-ui-tone="dim"] .jmv-ribbon-body {
+    background-color: var(--jupwr-ribbon);
+    border-bottom-color: var(--jupwr-card-edge);
+}
+
+[data-ui-style="a"][data-ui-tone="dim"] .jmv-ribbon-scroll-left {
+    background: linear-gradient(to left, transparent, var(--jupwr-ribbon) 16px);
+}
+
+[data-ui-style="a"][data-ui-tone="dim"] .jmv-ribbon-scroll-right {
+    background: linear-gradient(to right, transparent, var(--jupwr-ribbon) 16px);
+}
+
+[data-ui-style="a"][data-ui-tone="dim"] #main-table,
+[data-ui-style="a"][data-ui-tone="dim"] #main-options,
+[data-ui-style="a"][data-ui-tone="dim"] #results {
+    border-color: var(--jupwr-card-edge);
+}

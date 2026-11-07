@@ -7,12 +7,21 @@
 // so the classic look stays the untouched jamovi CSS
 
 export const UI_STYLE_CLASSIC = 'classic';
-export const UI_STYLES = [ UI_STYLE_CLASSIC, 'a' ];
+// 'a-dim' is style A on a warm grey ground: it sets data-ui-style="a" (so all
+// of style A applies) plus data-ui-tone="dim", which only swaps the colour
+// tokens (common/jupwr-colors.css)
+export const UI_STYLES = [ UI_STYLE_CLASSIC, 'a', 'a-dim' ];
 
 export function sanitizeUiStyle(style: unknown): string {
     return typeof style === 'string' && UI_STYLES.includes(style) ? style : UI_STYLE_CLASSIC;
 }
 
 export function applyUiStyle(style: unknown) {
-    document.documentElement.setAttribute('data-ui-style', sanitizeUiStyle(style));
+    const sanitized = sanitizeUiStyle(style);
+    const root = document.documentElement;
+    root.setAttribute('data-ui-style', sanitized === 'a-dim' ? 'a' : sanitized);
+    if (sanitized === 'a-dim')
+        root.setAttribute('data-ui-tone', 'dim');
+    else
+        root.removeAttribute('data-ui-tone');
 }

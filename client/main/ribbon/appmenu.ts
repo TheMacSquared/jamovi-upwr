@@ -141,7 +141,8 @@ export class AppMenuButton extends EventDistributor {
         $uiStyle.append(h('div', { id: uiStyleId }, _('Interface')));
         this.$uiStyleList = h('select', { 'aria-labelledby': uiStyleId, class: 'jmv-ui-style-list' },
             selectOption('classic', _('Classic')),
-            selectOption('a', _('Light (A)')));
+            selectOption('a', _('Light (A)')),
+            selectOption('a-dim', _('Light, dimmed')));
         $uiStyle.append(this.$uiStyleList);
         this.$uiStyleList.addEventListener('click', event => event.stopPropagation());
         this.$uiStyleList.addEventListener('change', () => {
@@ -274,6 +275,9 @@ export class AppMenuButton extends EventDistributor {
             selectOption('okabeito', _('Okabe-Ito')),
             selectOption('jupwrJasny', _('jUPWR — light')),
             selectOption('jupwrCiemny', _('jUPWR — dark')),
+            // Catppuccin flavour names are proper names, not translated
+            selectOption('ctpLatte', 'Catppuccin Latte'),
+            selectOption('ctpMocha', 'Catppuccin Mocha'),
             selectOption('greyscale', _('Greyscale')));
         $palette.append(this.$paletteList);
         this.$paletteList.addEventListener('click', event => event.stopPropagation())

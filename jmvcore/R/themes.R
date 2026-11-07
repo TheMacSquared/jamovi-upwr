@@ -319,6 +319,24 @@ greyscaleColors <- c('#1a1a1a', '#3d3d3a', '#8a8780', '#b8b5ad', '#d9d5cc', '#e8
 # theme and palette names map onto the same variant
 jupwrNames <- c(jupwrJasny = 'jasny', jupwrCiemny = 'ciemny')
 
+# Catppuccin palettes (https://github.com/catppuccin/palette, MIT licence,
+# copyright (c) 2021 Catppuccin; licence text in inst/LICENSE-catppuccin.txt).
+# Latte is the light flavour, Mocha the dark one; the other dark flavours
+# (Frappe, Macchiato) differ from Mocha almost only in background, which a
+# palette does not set, so they are left out.
+# main -- accents ordered so that neighbouring groups stay apart:
+#         blue, peach, green, red, mauve, teal, yellow, pink
+# base -- the flavour's background, the low end of the continuous ramps
+catppuccinFlavors <- list(
+    latte = list(
+        main = c('#1e66f5', '#fe640b', '#40a02b', '#d20f39', '#8839ef', '#179299', '#df8e1d', '#ea76cb'),
+        base = '#eff1f5'),
+    mocha = list(
+        main = c('#89b4fa', '#fab387', '#a6e3a1', '#f38ba8', '#cba6f7', '#94e2d5', '#f9e2af', '#f5c2e7'),
+        base = '#1e1e2e'))
+
+catppuccinNames <- c(ctpLatte = 'latte', ctpMocha = 'mocha')
+
 # fonts shipped with the distribution, keyed by the family name they report
 jupwrFontFiles <- c(
     'IBM Plex Sans' = 'IBMPlexSans-Regular.ttf',
@@ -655,6 +673,14 @@ colorPalette <- function(n = 5, pal = 'jmv', type='fill') {
         if (type == 'fill')
             cols <- lighten(cols, .25)
 
+    } else if (pal %in% names(catppuccinNames)) {
+
+        cols <- catppuccinFlavors[[catppuccinNames[[pal]]]]$main
+
+        # as with the jUPWR palettes: keep a box or bar lighter than its outline
+        if (type == 'fill')
+            cols <- lighten(cols, .25)
+
     } else if (pal == 'greyscale') {
 
         cols <- greyscaleColors
@@ -759,6 +785,16 @@ gradientPalette <- function(pal = 'jmv', type = 'sequential', n = 256) {
             anchors <- rev(p$rozbiezna)
         else
             anchors <- rev(p$ciepla)
+
+    } else if (pal %in% names(catppuccinNames)) {
+
+        # low -> high like the other ramps: blue at the low end of the
+        # diverging ramp, red at the high end, the flavour's base between
+        f <- catppuccinFlavors[[catppuccinNames[[pal]]]]
+        if (type == 'diverging')
+            anchors <- c(f$main[1], f$base, f$main[4])
+        else
+            anchors <- c(f$base, f$main[1])
 
     } else {
 

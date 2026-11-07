@@ -28,3 +28,23 @@
     --jupwr-text-muted: #555555;      /* secondary text */
     --jupwr-text-faint: #777777;      /* tertiary text, idle icons */
 }
+
+/* style A, dimmed (uistyle.ts 'a-dim'): a warm grey ground and off-white
+   cards, so the surroundings are not glaring but the cards (data, options,
+   results) stay light; results and exports are unchanged. The ribbon stays
+   light grey because its button icons (Data, Variables tabs) are drawn for
+   a light background. */
+:root[data-ui-style="a"][data-ui-tone="dim"] {
+    --jupwr-surface: #F7F6F4;
+    --jupwr-surface-alt: #ECEAE7;
+    --jupwr-ground: #8A8580;
+    --jupwr-warm-surface: #EFECE9;
+    --jupwr-warm-sunken: #E3DFDB;
+
+    --jupwr-line: #CDC9C4;
+    --jupwr-line-light: #E2DFDB;
+
+    /* dimmed only */
+    --jupwr-ribbon: #E6E4E1;          /* ribbon body */
+    --jupwr-card-edge: #8A8580;       /* card outline against the ground */
+}
