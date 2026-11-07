@@ -76,10 +76,6 @@ items:
         - name: diff
           title: Obs. − oczek.
           type: number
-        - name: band
-          title: Zakres 95%
-          type: text
-          visible: (empBand)
 
     - name: EmpMoments
       title: Momenty z danych i z modelu
@@ -96,26 +92,6 @@ items:
         - name: model
           title: Model
           type: number
-
-    - name: EmpChiSq
-      title: Test zgodności χ²
-      type: Table
-      rows: 1
-      visible: (empChiSq)
-      columns:
-        - name: chi
-          title: χ²
-          type: number
-        - name: df
-          title: df
-          type: integer
-        - name: p
-          title: p
-          type: number
-          format: zto,pvalue
-        - name: classes
-          title: Klasy
-          type: integer
 
     - name: plot
       title: ""

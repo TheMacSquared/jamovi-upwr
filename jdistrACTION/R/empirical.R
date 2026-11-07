@@ -1,11 +1,26 @@
 # Helpers comparing a discrete distribution with empirical data
-# ("Dane empiryczne" section). The distribution-specific code supplies the
-# probability mass function on its support; everything below is shared.
+# ("Dane empiryczne" section). The comparison is descriptive only (counts,
+# frequencies, moments; no tests or ranges): it is used in class before
+# tests and confidence intervals are introduced. The distribution-specific
+# code supplies the probability mass function on its support; everything
+# below is shared.
 
 # Reads the selected variable as whole numbers within the support
-# [lower, upper]; missing values are dropped.
+# [lower, upper]; missing values are dropped. Text categories mean the
+# variable does not hold counts (short message, as asked for class use).
 empReadCounts <- function(data, name, lower = 0, upper = Inf, what = "") {
-    x <- jmvcore::toNumeric(data[[name]])
+    x <- data[[name]]
+    if (is.factor(x) || is.character(x)) {
+        # nominal / ordinal columns arrive as factors; their labels must be
+        # numbers (e.g. an integer column set to nominal)
+        lab <- as.character(x)
+        num <- suppressWarnings(as.numeric(lab))
+        if (any(!is.na(lab) & is.na(num)))
+            stop("Nieprawidłowy format zmiennej.", call. = FALSE)
+        x <- num
+    } else {
+        x <- jmvcore::toNumeric(x)
+    }
     x <- x[!is.na(x)]
     if (length(x) == 0)
         stop(sprintf("Zmienna „%s” nie ma żadnych wartości.", name), call. = FALSE)
@@ -17,6 +32,69 @@ empReadCounts <- function(data, name, lower = 0, upper = Inf, what = "") {
         stop(sprintf("Zmienna „%s” ma wartości spoza zakresu %s–%s%s.",
                      name, lower, upper, what), call. = FALSE)
     x
+}
+
+# Reads a continuous variable for a continuous distribution; missing values
+# are dropped. Nominal / ordinal columns with numeric labels are read as
+# numbers, text categories are a wrong variable format.
+empReadContinuous <- function(data, name) {
+    x <- data[[name]]
+    if (is.factor(x) || is.character(x)) {
+        lab <- as.character(x)
+        num <- suppressWarnings(as.numeric(lab))
+        if (any(!is.na(lab) & is.na(num)))
+            stop("Nieprawidłowy format zmiennej.", call. = FALSE)
+        x <- num
+    } else {
+        x <- jmvcore::toNumeric(x)
+    }
+    x <- x[is.finite(x)]
+    if (length(x) == 0)
+        stop(sprintf("Zmienna „%s” nie ma żadnych wartości.", name), call. = FALSE)
+    x
+}
+
+# Density histogram of a continuous variable (area = 1). Classes as in
+# jEksplor "Szereg rozdzielczy": k from Sturges' rule ⌈log₂ N + 1⌉ unless
+# given (k > 0), equal width from the minimum, left-closed, the last one
+# closed on both sides.
+empHistogram <- function(x, k = 0) {
+    N <- length(x)
+    if (is.null(k) || k < 1)
+        k <- ceiling(log2(N) + 1)
+    lo <- min(x)
+    hi <- max(x)
+    if (hi == lo) {
+        lo <- lo - 0.5
+        hi <- hi + 0.5
+    }
+    br <- seq(lo, hi, length.out = k + 1)
+    n <- tabulate(findInterval(x, br, rightmost.closed = TRUE), nbins = k)
+    data.frame(xmin = br[-length(br)], xmax = br[-1],
+               density = n / (N * diff(br)))
+}
+
+# Reads a two-category variable where every row is one trial; `level` is the
+# category chosen as "success" (by default the second one, as in jCzest and
+# jRegr). Numeric 0/1 columns work too: their categories are "0" and "1".
+# More than two categories: the variable is not a 0/1 one.
+empReadBinary <- function(data, name, level) {
+    x <- data[[name]]
+    x <- x[!is.na(x)]
+    if (length(x) == 0)
+        stop(sprintf("Zmienna „%s” nie ma żadnych wartości.", name), call. = FALSE)
+    x <- factor(x)
+    lv <- levels(x)
+    if (length(lv) > 2)
+        stop("Nieprawidłowy format zmiennej.", call. = FALSE)
+    if (!is.null(level) && length(level) == 1 && nzchar(level))
+        success <- level
+    else if (length(lv) == 2)
+        success <- lv[2]
+    else
+        success <- if (lv == "0") "1" else lv
+    s <- sum(as.character(x) == success)
+    list(successes = s, N = length(x), level = success, phat = s / length(x))
 }
 
 # Rows of the observed / expected table: single values from `lo` to `hi`
@@ -50,50 +128,19 @@ empClasses <- function(x, support, pmf) {
     }
     out <- do.call(rbind, rows)
     out$exp <- N * out$P
-    # Counts O_x of N independent units are Bin(N, P(X = x)) under the
-    # model, so the 95% range is exact and needs no simulation.
-    out$bandLo <- stats::qbinom(0.025, N, pmin(out$P, 1))
-    out$bandHi <- stats::qbinom(0.975, N, pmin(out$P, 1))
     out
 }
 
-# Chi-squared goodness of fit: adjacent values pooled from the left until
-# the expected count reaches 5; a short last class joins the previous one.
-empChiSq <- function(x, support, pmf, nEstimated = 0) {
-    N <- length(x)
-    obs <- vapply(support, function(v) sum(x == v), numeric(1))
-    E <- N * pmf
-    groups <- integer(length(support))
-    g <- 1
-    acc <- 0
-    for (i in seq_along(support)) {
-        groups[i] <- g
-        acc <- acc + E[i]
-        if (acc >= 5 && i < length(support)) {
-            g <- g + 1
-            acc <- 0
-        }
-    }
-    O <- tapply(obs, groups, sum)
-    Eg <- tapply(E, groups, sum)
-    k <- length(Eg)
-    if (k > 1 && Eg[k] < 5) {
-        O[k - 1] <- O[k - 1] + O[k]
-        Eg[k - 1] <- Eg[k - 1] + Eg[k]
-        O <- O[-k]
-        Eg <- Eg[-k]
-        k <- k - 1
-    }
-    df <- k - 1 - nEstimated
-    chi <- sum((O - Eg)^2 / Eg)
-    list(chi = chi, df = df, classes = k,
-         p = if (df >= 1) stats::pchisq(chi, df, lower.tail = FALSE) else NA)
-}
-
 # Observed relative frequency of the event selected in the distribution
-# function, using the same rounding of x1 / x2 as the model probability.
-empEventFreq <- function(x, type, x1, x2) {
-    hit <- switch(type,
+# function, using the same rounding of x1 / x2 as the model probability
+# (no rounding for a continuous distribution).
+empEventFreq <- function(x, type, x1, x2, discrete = TRUE) {
+    if (!discrete) {
+        hit <- switch(type,
+            lower    = x <= x1,
+            higher   = x >= x1,
+            interval = x >= x1 & x <= x2)
+    } else hit <- switch(type,
         is       = x == x1,
         lower    = x <= floor(x1),
         higher   = x >= ceiling(x1),
@@ -101,29 +148,20 @@ empEventFreq <- function(x, type, x1, x2) {
     sprintf("%s (%d z %d)", round(mean(hit), 3), sum(hit), length(x))
 }
 
-# Fills the observed / expected table, the moments table and the
-# chi-squared test; returns the per-value data for the plot.
-empFillResults <- function(results, options, x, support, pmf,
-                           modelMean, modelVar, nEstimated, estimatedNote) {
+# Fills the observed / expected table and the moments table; returns the
+# per-value data for the plot.
+empFillResults <- function(results, x, support, pmf, modelMean, modelVar) {
     cls <- empClasses(x, support, pmf)
     tab <- results$EmpTable
     for (i in seq_len(nrow(cls))) {
         tab$addRow(rowKey = i, values = list(
             x = cls$label[i], obs = cls$obs[i], obsPct = cls$obs[i] / length(x),
-            exp = cls$exp[i], diff = cls$obs[i] - cls$exp[i],
-            band = sprintf("%d–%d", cls$bandLo[i], cls$bandHi[i])))
+            exp = cls$exp[i], diff = cls$obs[i] - cls$exp[i]))
     }
     tab$addRow(rowKey = "total", values = list(
         x = "Razem", obs = length(x), obsPct = 1,
-        exp = sum(cls$exp), diff = length(x) - sum(cls$exp), band = ""))
+        exp = sum(cls$exp), diff = length(x) - sum(cls$exp)))
     tab$addFormat(rowKey = "total", col = 1, jmvcore::Cell.BEGIN_END_GROUP)
-    notes <- character(0)
-    if (options$empBand)
-        notes <- c(notes, "Zakres 95%: liczności, które model daje w 95% prób tej samej wielkości (osobno w każdym wierszu)")
-    if (nEstimated > 0)
-        notes <- c(notes, estimatedNote)
-    if (length(notes) > 0)
-        tab$setNote("note", paste0(paste(notes, collapse = "; "), "."))
 
     mom <- results$EmpMoments
     mom$addRow(rowKey = "mean", values = list(
@@ -132,35 +170,30 @@ empFillResults <- function(results, options, x, support, pmf,
         stat = "Wariancja", data = if (length(x) > 1) stats::var(x) else NaN,
         model = modelVar))
 
-    if (options$empChiSq) {
-        ch <- empChiSq(x, support, pmf, nEstimated)
-        chiTab <- results$EmpChiSq
-        chiTab$setRow(rowNo = 1, values = list(
-            chi = ch$chi, df = ch$df, p = ch$p, classes = ch$classes))
-        if (ch$df < 1)
-            chiTab$setNote("df", "Za mało klas z liczebnością oczekiwaną ≥ 5, by przeprowadzić test.")
-    }
-
     single <- cls[cls$lo == cls$hi, ]
-    N <- length(x)
-    data.frame(X = single$lo, Freq = single$obs / N,
-               Lo = single$bandLo / N, Hi = single$bandHi / N)
+    data.frame(X = single$lo, Freq = single$obs / length(x))
 }
 
-# Layers drawing the empirical data on a discrete distribution plot:
-# points = observed relative frequency, error bars = 95% range of the model.
-empPlotLayers <- function(emp, band, theme) {
+# Layers drawing the empirical data on a discrete distribution plot as
+# points: the observed relative frequency, or, for a 0/1 variable, the
+# model drawn from the data.
+empPlotLayers <- function(emp, theme, label = "Dane (częstość)") {
     ink <- if (!is.null(theme$color)) theme$color[1] else "#333333"
-    layers <- list()
-    if (band)
-        layers <- c(layers, list(ggplot2::geom_errorbar(
-            data = emp, inherit.aes = FALSE,
-            mapping = ggplot2::aes(x = X, ymin = Lo, ymax = Hi),
-            width = 0.35, colour = ink, alpha = 0.6)))
-    c(layers, list(
+    list(
         ggplot2::geom_point(
             data = emp, inherit.aes = FALSE,
-            mapping = ggplot2::aes(x = X, y = Freq, shape = "Dane (częstość)"),
+            mapping = ggplot2::aes(x = X, y = Freq, shape = label),
             colour = ink, size = 2.5),
-        ggplot2::scale_shape_manual(values = 19)))
+        ggplot2::scale_shape_manual(values = 19))
 }
+
+# Layer drawing a density histogram (empHistogram) under the curve of a
+# continuous distribution; the fill joins the plot's manual fill scale
+# under `label`; `outline` separates the bars (the plot background colour).
+empHistogramLayer <- function(hist, outline = "white", label = "Dane (histogram)") {
+    ggplot2::geom_rect(
+        data = hist, inherit.aes = FALSE,
+        mapping = ggplot2::aes(xmin = xmin, xmax = xmax, ymin = 0, ymax = density, fill = label),
+        colour = outline, alpha = 0.6)
+}
+

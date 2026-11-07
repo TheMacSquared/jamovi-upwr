@@ -13,18 +13,18 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           stop(sprintf("Nie można obliczyć rozkładu: p musi należeć do [0, 1] (podano %s).", self$options$dp2), call. = FALSE)
 
         ##### 1.0) Empirical data (optional) #####
-        # Counts of successes in n trials; with "estimated" the model p is
-        # replaced by the maximum likelihood estimate mean(x) / n.
+        # The bars always show Bin(n, p) from the parameters; the data are
+        # drawn on top of them. counts: every row is X = successes in n
+        # trials (EmpX). binary: every row is one trial (EmpBin); the points
+        # are then Bin(n, p̂) with p̂ = share of successes in the data.
         EmpX <- NULL
-        EmpEstimated <- FALSE
+        EmpBin <- NULL
         if (!is.null(self$options$empVar)) {
-          EmpX <- empReadCounts(self$data, self$options$empVar, 0, self$options$dp1,
-                                sprintf(" (liczba sukcesów w n = %s próbach)", self$options$dp1))
-          if (self$options$empParams == "estimated") {
-            if (self$options$dp1 == 0)
-              stop("Nie można oszacować p przy n = 0.", call. = FALSE)
-            EmpEstimated <- TRUE
-          }
+          if (self$options$empType == "binary")
+            EmpBin <- empReadBinary(self$data, self$options$empVar, self$options$empLevel)
+          else
+            EmpX <- empReadCounts(self$data, self$options$empVar, 0, self$options$dp1,
+              sprintf(" (liczba sukcesów w n = %s próbach)", self$options$dp1))
         }
 
 
@@ -49,8 +49,6 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         DP1 <- self$options$dp1
         # The specification of the second distribution parameter (Probability) is extracted
         DP2 <- self$options$dp2
-        if (EmpEstimated)
-          DP2 <- mean(EmpX) / DP1
         #The quantiles are recalculated if the central interval quantile is selected
         if(QuantileFunction== "TRUE"){
           if (QuantileFunctionType=="central") {
@@ -106,8 +104,6 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         InputSummary <- matrix(ncol = 3, nrow = 2)
         InputSummary[1,1] <- paste(InputLabel1, DP1, sep = "")
         InputSummary[2,1] <- paste(InputLabel2, DP2, sep = "")
-        if (EmpEstimated)
-          InputSummary[2,1] <- paste0(InputLabel2, round(DP2, 4), " (oszacowane z danych)")
         InputSummary[1,2] <- paste("x1 = ", XValue, sep = "")
         InputSummary[2,2] <- DistributionFunctionTypeLabel
         InputSummary[1,3] <- paste("p = ", Quantile, sep = "")
@@ -185,11 +181,20 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         if (!is.null(EmpX) && DistributionFunction == "TRUE") {
           Outputs$setRow(rowNo=1, values=list(
             EmpiricalResultColumn=empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2)))
+        } else if (!is.null(EmpBin) && DistributionFunction == "TRUE") {
+          # the same event under Bin(n, p̂)
+          ph <- EmpBin$phat
+          EmpEventP <- switch(DistributionFunctionType,
+            is       = dbinom(XValue, DP1, ph),
+            lower    = pbinom(floor(XValue), DP1, ph),
+            higher   = pbinom(ceiling(XValue) - 1, DP1, ph, lower.tail = FALSE),
+            interval = pbinom(floor(XValue2), DP1, ph) - pbinom(ceiling(XValue) - 1, DP1, ph))
+          Outputs$getColumn("EmpiricalResultColumn")$setTitle("Przy p̂ z danych")
+          Outputs$setRow(rowNo=1, values=list(
+            EmpiricalResultColumn=paste0("P = ", round(EmpEventP, digits = 3))))
         } else {
           Outputs$getColumn("EmpiricalResultColumn")$setVisible(FALSE)
         }
-        if (is.null(EmpX))
-          self$results$EmpChiSq$setVisible(FALSE)
         if((QuantileFunction=="TRUE")&(QuantileFunctionType=="central")){
           Outputs$addRow(rowKey=2, values=list(
             DistributionResultColumn=OutputSummary[2,1],
@@ -356,6 +361,25 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # The new variable is transferred to the plot-object
         # Empirical data: tables and per-value frequencies for the plot
         EmpPlot <- NULL
+        EmpLabel <- NULL
+        if (!is.null(EmpBin)) {
+          ph <- EmpBin$phat
+          self$results$EmpTable$setVisible(FALSE)
+          mom <- self$results$EmpMoments
+          mom$getColumn("data")$setTitle("Z danych (p̂)")
+          mom$getColumn("model")$setTitle("Z parametrów (p)")
+          mom$addRow(rowKey = "p", values = list(stat = "p", data = ph, model = DP2))
+          mom$addRow(rowKey = "mean", values = list(
+            stat = "E[X] = n · p", data = DP1 * ph, model = DP1 * DP2))
+          mom$addRow(rowKey = "var", values = list(
+            stat = "Var[X] = n · p · (1 − p)", data = DP1 * ph * (1 - ph), model = DP1 * DP2 * (1 - DP2)))
+          mom$setNote("phat", sprintf("p̂ = %d sukcesów („%s”) / %d prób; n = %s z parametrów.",
+                                      EmpBin$successes, EmpBin$level, EmpBin$N, DP1))
+          # the points cover the plot range and every value Bin(n, p̂) reaches
+          EmpXs <- seq(min(x[1], qbinom(1e-4, DP1, ph)), max(x[length(x)], qbinom(1 - 1e-4, DP1, ph)), by = 1)
+          EmpPlot <- data.frame(X = EmpXs, Freq = dbinom(EmpXs, DP1, ph))
+          EmpLabel <- "Dane: Bin(n, p̂)"
+        }
         if (!is.null(EmpX)) {
           # the plot range x may be trimmed for n > 2000 (discretePlotRange);
           # the tables need every observed value inside the support, and the
@@ -368,13 +392,15 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           EmpPmf[1] <- EmpPmf[1] + pbinom(EmpLo - 1, DP1, DP2)
           EmpPmf[length(EmpPmf)] <- EmpPmf[length(EmpPmf)] + pbinom(EmpHi, DP1, DP2, lower.tail = FALSE)
           EmpPlot <- empFillResults(
-            self$results, self$options, EmpX, EmpSupport, EmpPmf,
-            modelMean = DP1 * DP2, modelVar = DP1 * DP2 * (1 - DP2),
-            nEstimated = as.integer(EmpEstimated),
-            estimatedNote = "p oszacowane z danych (p̂ = x̄ / n), więc model jest do nich dopasowany")
+            self$results, EmpX, EmpSupport, EmpPmf,
+            modelMean = DP1 * DP2, modelVar = DP1 * DP2 * (1 - DP2))
+          # only 0 and 1 with n > 1: most likely one trial per row
+          if (DP1 > 1 && all(EmpX %in% c(0, 1)))
+            self$results$EmpTable$setNote("binary",
+              "Zmienna ma tylko wartości 0 i 1. Jeśli każdy wiersz to jedna próba, wybierz w „Zawartość zmiennej” opcję „zero-jedynkowa”.")
         }
         image <- self$results$plot
-        image$setState(list(Dataset = Dataset, emp = EmpPlot))
+        image$setState(list(Dataset = Dataset, emp = EmpPlot, empLabel = EmpLabel))
         
         
         
@@ -395,12 +421,18 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # The main dataset for the plot is extracted
         # States saved before the empirical-data option are plain data frames
         State <- image$state
+        # no state when .run stopped with an error (e.g. a variable of the
+        # wrong content): draw nothing, so the error of .run stays visible
+        if (is.null(State))
+          return(FALSE)
         EmpPlot <- NULL
+        EmpLabel <- NULL
         if (is.data.frame(State)) {
           Dataset <- State
         } else {
           Dataset <- State$Dataset
           EmpPlot <- State$emp
+          EmpLabel <- State$empLabel
         }
         # The datas are recreated as a variable for the plot
         PlotData <- Dataset[,1:3]
@@ -482,8 +514,12 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         
         
         ##### 2.3.4) Empirical data #####
-        if (!is.null(EmpPlot))
-          Plot <- Plot + empPlotLayers(EmpPlot, self$options$empBand, theme)
+        if (!is.null(EmpPlot)) {
+          if (is.null(EmpLabel))
+            Plot <- Plot + empPlotLayers(EmpPlot, theme)
+          else
+            Plot <- Plot + empPlotLayers(EmpPlot, theme, EmpLabel)
+        }
 
 
         ##### 2.3.5) Final adjustments of the plot #####

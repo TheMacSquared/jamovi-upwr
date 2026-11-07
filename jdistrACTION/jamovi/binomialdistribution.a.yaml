@@ -90,27 +90,27 @@ options:
       suggested:
         - continuous
         - ordinal
+        - nominal
       permitted:
         - numeric
+        - factor
       default: null
 
-    - name: empParams
-      title: Parametr p modelu
+    # counts: every row is X = number of successes in n trials;
+    # binary: every row is one trial, the model drawn from the data is
+    # Bin(n, p̂) with p̂ = share of successes and n from the parameters
+    - name: empType
+      title: Zmienna
       type: List
       options:
-        - title: podany w panelu
-          name: given
-        - title: oszacowany z danych (p̂ = x̄ / n)
-          name: estimated
-      default: given
+        - title: liczba sukcesów w n próbach
+          name: counts
+        - title: zero-jedynkowa (jedna próba w wierszu)
+          name: binary
+      default: counts
 
-    - title: Zakres losowych wahań liczności (95%)
-      name: empBand
-      type: Bool
-      default: FALSE
-
-    - title: Test zgodności χ²
-      name: empChiSq
-      type: Bool
-      default: FALSE
+    - name: empLevel
+      title: Kategoria „sukces”
+      type: Level
+      variable: (empVar)
 ...

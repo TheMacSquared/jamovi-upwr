@@ -316,6 +316,10 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         ##### 2.1.1) Extraction of the plot datas #####
         # The main dataset for the plot is extracted
         Dataset <- image$state
+        # no state when .run stopped with an error (invalid parameters):
+        # draw nothing, so the error of .run stays visible
+        if (is.null(Dataset))
+          return(FALSE)
         # The datas are recreated as a variable for the plot
         PlotData <- Dataset[,c(1:3, 6)]
         colnames(PlotData) <- c("X", "Prob", "CurveProb", "QuantileAreaProb")

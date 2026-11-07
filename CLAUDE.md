@@ -1080,25 +1080,37 @@ Pozostaje (drobne, bez wpływu na wyniki, chyba że zaznaczono):
 - Stable: 3 testy `test-analyses.R` jEksplor 0.1.4.x padają także na kodzie
   sprzed poprawek (oczekują nowszego układu tabeli) — sprawdzić.
 
-### Zadanie 28: distrACTION — dane empiryczne obok rozkładu — PILOT 2026-11-04 (rozkład dwumianowy, distrACTION 1.4.0)
+### Zadanie 28: distrACTION — dane empiryczne obok rozkładu — dwumianowy i normalny ZROBIONE (distrACTION 1.5.0, 2026-11-07)
 Inspiracja: lista z analizy ryzyka, zad. 4.3 (Bananpol, `kontrole_niezaliczone`,
 Bin(12; 0,15): 19 obserwowanych wobec 21,3 oczekiwanych). Decyzja: TRYB w istniejącej
 analizie, nie nowa pozycja menu — zwinięta sekcja „Dane empiryczne” (zmienna `empVar`);
-bez zmiennej kalkulator działa jak dotąd. Wyniki: kolumna „Częstość w danych” obok
-odczytanego P (to samo zdarzenie, to samo zaokrąglanie x1/x2), tabela obserwowane /
-oczekiwane N·P (wiersze: wszystkie obserwowane wartości i każda z N·P ≥ 1, reszta
-nośnika w „≤ k” / „≥ k”; wiersz Razem), momenty z danych obok modelu (wariancja z n − 1),
-na wykresie punkty = częstość względna. Opcje: `empParams` given/estimated (p̂ = x̄/n;
-Inputs pokazuje „oszacowane z danych”, dp2 wyłączone), `empBand` — zakres 95% liczności
-DOKŁADNY (O_x ~ Bin(N, P(X = x)), qbinom, bez symulacji; punktowy, przy p̂ bez niepewności
-oszacowania — nota), `empChiSq` — χ² zgodności z klasami łączonymi od lewej do E ≥ 5
-(krótka ostatnia klasa dołączana do poprzedniej), df = k − 1 − liczba oszacowanych.
-Silnik wspólny dla rozkładów dyskretnych: `jdistrACTION/R/empirical.R`; testy
-`tests/testthat/test-empirical.R` (klucz 4.3). PUŁAPKA: w `.r.yaml` wyrażenie
-`(empVar && x)` rzuca „Could not resolve” przy pustej zmiennej (NULL && …) — w r.yaml
-tylko pojedyncza opcja, resztę widoczności ustawiać w `.b.R`. Stan zapisu wykresu to
-lista `list(Dataset, emp)`; `.plot` czyta też stary stan (data.frame).
-Dalej (do decyzji po pilocie): Poisson, geometryczny, ujemny dwumianowy (te same
-helpery, inny nośnik i estymator), potem ciągłe (normalny, wykładniczy, gamma, Weibull:
-histogram gęstości + krzywa, ewentualnie ECDF vs dystrybuanta); t, χ², F — nie.
-Etap 2: „Podziel według” (różne p w grupach → nadmierna dyspersja).
+bez zmiennej kalkulator działa jak dotąd. ZASADA (decyzja 2026-11-07): model (słupki /
+krzywa) ZAWSZE z parametrów panelu, dane rysowane NA nim; porównanie TYLKO OPISOWE —
+bez testów, przedziałów i zakresów losowych (przerabiane przed testami i CI; testy są
+w modułach testów). Usunięte w 1.5.0: `empParams` (p̂ zamiast p z panelu), `empBand`
+(zakres 95%), `empChiSq` (χ² zgodności) — stare .omv liczą z p z panelu.
+Rozkład dwumianowy: `empType` = `counts` (wiersz = X sukcesów w n próbach; kolumna
+„Częstość w danych” obok P — to samo zdarzenie i zaokrąglanie x1/x2; tabela obserwowane
+/ oczekiwane N·P: wiersze = obserwowane wartości i każda z N·P ≥ 1, reszta nośnika
+w „≤ k” / „≥ k”, wiersz Razem; momenty z danych obok modelu, wariancja z n − 1; punkty =
+częstość względna; nota, gdy same 0/1 przy n > 1) albo `binary` (wiersz = jedna próba,
+kategoria „sukces” `empLevel`, domyślnie druga; punkty = Bin(n, p̂), p̂ = udział sukcesów;
+tabela momentów p, E[X], Var[X] „Z danych (p̂)” / „Z parametrów (p)”; kolumna „Przy p̂
+z danych”; tabela liczności ukryta). Rozkład normalny: histogram gęstości (pole = 1,
+półprzezroczysty, NAD polem P) pod krzywą, klasy jak jEksplor „Szereg rozdzielczy”
+(Sturges ⌈log₂ N + 1⌉, równa szerokość od minimum, lewostronnie domknięte, ostatnia
+obustronnie; `empBins` > 0 = liczba ręcznie), momenty średnia / wariancja / odch. std.,
+„Częstość w danych” bez zaokrąglania x1/x2. Zła zawartość zmiennej (tekst jako liczby,
+> 2 kategorie jako 0/1) → krótki błąd „Nieprawidłowy format zmiennej.” (decyzja:
+komunikaty nierozgadane). Silnik wspólny: `jdistrACTION/R/empirical.R`; testy
+`tests/testthat/test-empirical.R` (klucz 4.3). PUŁAPKI: (1) po błędzie w `.run` jamovi
+i tak woła `.plot` z pustym stanem — `.plot` musi zaczynać od `if (is.null(state))
+return(FALSE)`, inaczej błąd wykresu („colnames…”) zasłania komunikat `.run` (dodane też
+w F i normalnym); testy wrapperem tego nie łapią (nie renderują), błąd widać w `docker
+logs jamovi`; (2) w `.r.yaml` wyrażenie `(empVar && x)` rzuca „Could not resolve” przy
+pustej zmiennej — w r.yaml tylko pojedyncza opcja, resztę widoczności w `.b.R`; (3) stan
+wykresu to lista, `.plot` czyta też stary stan (data.frame). Dane testowe (poza repo):
+`~/Documents/jupwr-test-dwumianowy/` (kontrola_partii, kontrola_sztuk, masa_produktow).
+Dalej: Poisson, potem geometryczny, ujemny dwumianowy, ciągłe (wykładniczy, gamma,
+Weibull); t, χ², F — nie. Etap 2: „Podziel według” (różne p w grupach → nadmierna
+dyspersja).

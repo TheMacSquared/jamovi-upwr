@@ -10,6 +10,13 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         if (!is.finite(self$options$dp2) || self$options$dp2 < 0)
           stop(sprintf("Nie można obliczyć rozkładu: odchylenie standardowe musi być skończone i nieujemne (podano %s).", self$options$dp2), call. = FALSE)
 
+      ##### 1.0) Empirical data (optional) #####
+      # A continuous variable drawn as a density histogram under the curve
+      # of N(mean, SD) from the parameters; descriptive comparison only
+      EmpX <- NULL
+      if (!is.null(self$options$empVar))
+        EmpX <- empReadContinuous(self$data, self$options$empVar)
+
       
 
       ###### 1.1) Preparation ######
@@ -146,7 +153,14 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Outputs <- self$results$Outputs
       Outputs$setRow(rowNo=1, values=list(
         DistributionResultColumn=OutputSummary[1,1],
-        QuantileResultColumn=OutputSummary[1,2]))    
+        QuantileResultColumn=OutputSummary[1,2]))
+      if (!is.null(EmpX) && DistributionFunction == "TRUE") {
+        Outputs$setRow(rowNo=1, values=list(
+          EmpiricalResultColumn=empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2,
+                                             discrete = FALSE)))
+      } else {
+        Outputs$getColumn("EmpiricalResultColumn")$setVisible(FALSE)
+      }
       if((QuantileFunction=="TRUE")&(QuantileFunctionType=="central")){
         Outputs$addRow(rowKey=2, values=list(
           DistributionResultColumn=OutputSummary[2,1],
@@ -175,6 +189,20 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         }
       } else {
         MomentsTable$setVisible(visible = FALSE)
+      }
+
+      ###### 1.X) Empirical data: moments and histogram ######
+      EmpHist <- NULL
+      if (!is.null(EmpX)) {
+        EmpVar <- if (length(EmpX) > 1) stats::var(EmpX) else NaN
+        mom <- self$results$EmpMoments
+        mom$addRow(rowKey = "mean", values = list(
+          stat = "Średnia", data = mean(EmpX), model = DP1))
+        mom$addRow(rowKey = "var", values = list(
+          stat = "Wariancja", data = EmpVar, model = DP2^2))
+        mom$addRow(rowKey = "sd", values = list(
+          stat = "Odch. std.", data = sqrt(EmpVar), model = DP2))
+        EmpHist <- empHistogram(EmpX, self$options$empBins)
       }
 
 
@@ -325,7 +353,7 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Dataset[1:(length(AxisSegments)),5] <- AxisSegments        
       # The new variable is transferred to the plot-object
       image <- self$results$plot
-      image$setState(Dataset)
+      image$setState(list(Dataset = Dataset, hist = EmpHist))
       
       
       ###### 1.4) Error Messages #####
@@ -343,7 +371,20 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       ###### 2.1) Extraction of values ######
       ##### 2.1.1) Extraction of the plot datas #####
       # The main dataset for the plot is extracted
-      Dataset <- image$state
+      State <- image$state
+      # no state when .run stopped with an error (invalid parameters, a
+      # variable of the wrong format): draw nothing, so the error of .run
+      # stays visible
+      if (is.null(State))
+        return(FALSE)
+      # states saved before the empirical-data option are plain data frames
+      EmpHist <- NULL
+      if (is.data.frame(State)) {
+        Dataset <- State
+      } else {
+        Dataset <- State$Dataset
+        EmpHist <- State$hist
+      }
       # The datas are recreated as a variable for the plot
       PlotData <- Dataset[,c(1:3, 6)]
       colnames(PlotData) <- c("X", "Prob", "CurveProb", "QuantileAreaProb")
@@ -405,9 +446,17 @@ NormaldistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       if (DistributionFunction=="TRUE") {
         Plot <- Plot+
           # The area of the searched interval is marked
-          geom_area(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Pole)"))+
-          # Set the colors of the legend
-          scale_fill_manual(values = Color)}
+          geom_area(PlotData, mapping = aes(x=PlotData$X, y=PlotData$CurveProb, fill=" P (Pole)"))}
+
+      ##### 2.3.2b) Empirical data #####
+      # the histogram is translucent and drawn over the area, so both show
+      if (!is.null(EmpHist)) {
+        Outline <- if (!is.null(theme$fill)) theme$fill[1] else "white"
+        Plot <- Plot + empHistogramLayer(EmpHist, Outline)
+      }
+      if (DistributionFunction=="TRUE" || !is.null(EmpHist))
+        # Set the colors of the legend
+        Plot <- Plot + scale_fill_manual(values = c(" P (Pole)" = Color[1], "Dane (histogram)" = Color[3]))
       
       
       ##### 2.3.3) Quantile #####

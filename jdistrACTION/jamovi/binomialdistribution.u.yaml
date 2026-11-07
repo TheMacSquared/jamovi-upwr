@@ -13,7 +13,6 @@ children:
       - type: TextBox
         name: dp2
         format: number
-        enable: (!empVar || empParams:given)
   - type: Label
     label: Funkcja
     children:
@@ -96,31 +95,27 @@ children:
         stretchFactor: 1
         children:
           - type: TargetLayoutBox
-            label: Zmienna (liczba sukcesów w n próbach)
+            label: Zmienna
             children:
               - type: VariablesListBox
                 name: empVar
                 maxItemCount: 1
                 isTarget: true
       - type: Label
-        label: Model
+        label: Zawartość zmiennej
         children:
           - type: RadioButton
-            name: empParams_given
-            optionName: empParams
-            optionPart: given
+            name: empType_counts
+            optionName: empType
+            optionPart: counts
             enable: (empVar)
           - type: RadioButton
-            name: empParams_estimated
-            optionName: empParams
-            optionPart: estimated
+            name: empType_binary
+            optionName: empType
+            optionPart: binary
             enable: (empVar)
-      - type: Label
-        label: Porównanie
-        children:
-          - type: CheckBox
-            name: empBand
-            enable: (empVar)
-          - type: CheckBox
-            name: empChiSq
-            enable: (empVar)
+            children:
+              - type: LevelSelector
+                name: empLevel
+                defaultLevelIndex: 1
+                enable: (empVar && empType:binary)
