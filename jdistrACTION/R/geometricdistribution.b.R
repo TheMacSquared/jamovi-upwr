@@ -29,9 +29,22 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       qGeom <- function(q)
         qgeom(q, DP1) + Offset
 
+      ConventionLabel <- "X = liczba porażek przed pierwszym sukcesem"
+      if (Convention == "trials")
+        ConventionLabel <- "X = numer próby pierwszego sukcesu"
+
+      # Empirical data (optional): every row = X in the convention chosen in
+      # the parameters; the bars stay the model from the parameters
+      EmpX <- NULL
+      if (!is.null(self$options$empVar))
+        EmpX <- empReadCounts(self$data, self$options$empVar, SupportStart, Inf,
+                              sprintf(" (%s)", ConventionLabel))
+
       LowerTail <- SupportStart
       UpperTail <- qGeom(0.999)
       if ((UpperTail - SupportStart) < 5) UpperTail <- SupportStart + 5
+      # the axis reaches the largest observation
+      if (!is.null(EmpX)) UpperTail <- max(UpperTail, max(EmpX))
       Columnames <- c("X", "Prob")
 
       if(QuantileFunction == "TRUE"){
@@ -39,9 +52,6 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           LowerQuantile <- ((1 - Quantile) / 2)
           HigherQuantile <- LowerQuantile + Quantile}}
 
-      ConventionLabel <- "X = liczba porażek przed pierwszym sukcesem"
-      if (Convention == "trials")
-        ConventionLabel <- "X = numer próby pierwszego sukcesu"
       InputLabel1 <- paste("Prawdopodb. = ", DP1, "; ", ConventionLabel, sep = "")
       DistributionFunctionTypeLabel <- ""
       QuantileFunctionTypeLabel <- ""
@@ -109,6 +119,12 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Outputs$setRow(rowNo = 1, values = list(
         DistributionResultColumn = OutputLabel11,
         QuantileResultColumn = OutputLabel12))
+      if (!is.null(EmpX) && DistributionFunction == "TRUE") {
+        Outputs$setRow(rowNo = 1, values = list(
+          EmpiricalResultColumn = empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2)))
+      } else {
+        Outputs$getColumn("EmpiricalResultColumn")$setVisible(FALSE)
+      }
       if((QuantileFunction == "TRUE") & (QuantileFunctionType == "central"))
         Outputs$addRow(rowKey = 2, values = list(
           DistributionResultColumn = "",
@@ -182,6 +198,21 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           HigherSegment <- qGeom(HigherQuantile)
           HigherSegmentLength <- max(Datas$Prob) * 0.8}}
 
+      # Empirical data: tables on a support covering every observed value,
+      # the mass beyond it in the end classes ("≤ k" / "≥ k")
+      EmpPlot <- NULL
+      if (!is.null(EmpX)) {
+        EmpLo <- max(SupportStart, min(x[1], min(EmpX)) - 1)
+        EmpHi <- max(x[length(x)], max(EmpX)) + 1
+        EmpSupport <- seq(EmpLo, EmpHi, by = 1)
+        EmpPmf <- dGeom(EmpSupport)
+        EmpPmf[1] <- EmpPmf[1] + pGeom(EmpLo - 1)
+        EmpPmf[length(EmpPmf)] <- EmpPmf[length(EmpPmf)] + (1 - pGeom(EmpHi))
+        ModelMean <- if (Convention == "trials") 1 / DP1 else (1 - DP1) / DP1
+        EmpPlot <- empFillResults(self$results, EmpX, EmpSupport, EmpPmf,
+                                  modelMean = ModelMean, modelVar = (1 - DP1) / DP1^2)
+      }
+
       # Pack data for plot
       PlotDataset <- list(
         Datas = Datas,
@@ -193,7 +224,8 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         QuantileAlphaLow = QuantileAlphaLow,
         QuantileAlphaHigh = QuantileAlphaHigh,
         QuantileLabel = QuantileLabel,
-        Textsize = Textsize)
+        Textsize = Textsize,
+        emp = EmpPlot)
 
       image <- self$results$plot
       image$setState(PlotDataset)
@@ -204,6 +236,10 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
     .plot = function(image, ggtheme, theme, ...) {
       state <- image$state
+      # no state when .run stopped with an error (a variable of the wrong
+      # format): draw nothing, so the error of .run stays visible
+      if (is.null(state))
+        return(FALSE)
       Datas <- state$Datas
       BarColors <- state$BarColors
 
@@ -241,6 +277,10 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             alpha = state$QuantileAlphaHigh) +
           scale_linetype_manual(values = TypeOfLine)
       }
+
+      # empirical data: points = observed relative frequency
+      if (!is.null(state$emp))
+        Plot <- Plot + empPlotLayers(state$emp, theme)
 
       Plot <- Plot +
         theme(legend.text = element_text(size = as.numeric(state$Textsize)))

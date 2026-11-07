@@ -147,3 +147,24 @@ test_that("end classes are not drawn as single values", {
   expect_true(any(grepl("^≥", res$EmpTable$asDF$x)))
   expect_equal(max(res$plot$state$emp$X), 10)
 })
+
+# Geometric: X read in the convention chosen in the parameters.
+test_that("geometric: data in the trials convention next to the model", {
+  d <- data.frame(rzuty = c(1, 1, 2, 2, 3, 4, 5, 7, 9, 12), zero = c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+  res <- distrACTION::GeometricDistribution(
+    data = d, empVar = "rzuty", dp1 = 0.25, RandomVariable = "trials",
+    DistributionFunction = TRUE, DistributionFunctionType = "lower", x1 = 2)
+  mom <- res$EmpMoments$asDF
+  expect_equal(mom$data, c(mean(d$rzuty), var(d$rzuty)))
+  expect_equal(mom$model, c(1 / 0.25, 0.75 / 0.25^2))
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, "0.4 (4 z 10)")
+  tab <- res$EmpTable$asDF
+  expect_equal(tail(tab$exp, 1), 10, tolerance = 1e-9)
+  expect_equal(tab$exp[tab$x == "1"], 10 * 0.25, tolerance = 1e-9)
+  # 0 is outside the trials support, fine for the failures convention
+  expect_error(distrACTION::GeometricDistribution(data = d, empVar = "zero", dp1 = 0.25,
+                                                  RandomVariable = "trials"),
+               "mniejsze niż 1")
+  res <- distrACTION::GeometricDistribution(data = d, empVar = "zero", dp1 = 0.25)
+  expect_equal(res$EmpMoments$asDF$model[1], 0.75 / 0.25)
+})

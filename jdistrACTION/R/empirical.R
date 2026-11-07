@@ -28,9 +28,13 @@ empReadCounts <- function(data, name, lower = 0, upper = Inf, what = "") {
         stop(sprintf("Zmienna „%s” ma wartości niecałkowite — rozkład dyskretny opisuje liczby całkowite.", name),
              call. = FALSE)
     x <- round(x)
-    if (any(x < lower) || any(x > upper))
-        stop(sprintf("Zmienna „%s” ma wartości spoza zakresu %s–%s%s.",
-                     name, lower, upper, what), call. = FALSE)
+    if (any(x < lower) || any(x > upper)) {
+        if (is.finite(upper))
+            stop(sprintf("Zmienna „%s” ma wartości spoza zakresu %s–%s%s.",
+                         name, lower, upper, what), call. = FALSE)
+        stop(sprintf("Zmienna „%s” ma wartości mniejsze niż %s%s.",
+                     name, lower, what), call. = FALSE)
+    }
     x
 }
 

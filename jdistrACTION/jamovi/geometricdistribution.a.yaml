@@ -84,4 +84,20 @@ options:
       name: showVariance
       type: Bool
       default: FALSE
+
+    - name: data
+      type: Data
+
+    # every row = X in the convention chosen above (failures before the
+    # first success, or the trial number of the first success)
+    - name: empVar
+      title: Dane empiryczne
+      type: Variable
+      suggested:
+        - continuous
+        - ordinal
+      permitted:
+        - numeric
+        - factor
+      default: null
 ...
