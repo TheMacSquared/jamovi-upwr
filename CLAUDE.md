@@ -1118,5 +1118,8 @@ jedną wartość nośnika). Geometryczny ZROBIONY (2026-11-07): dane w konwencji
 `RandomVariable` z panelu (porażki od 0 / numer próby od 1), momenty z modelu tej
 konwencji; wartość spoza nośnika → „ma wartości mniejsze niż 1 (X = …)”. Ujemny
 dwumianowy ZROBIONY (2026-11-07) tak samo (konwencja z panelu, nośnik od 0 albo od r).
-Dalej: ciągłe (wykładniczy, gamma, Weibull — wzór: normalny); t, χ², F — nie. Etap 2: „Podziel według” (różne p w grupach → nadmierna
+Wykładniczy ZROBIONY (2026-11-07) wg wzoru normalnego: momenty 1/λ, 1/λ², 1/λ;
+wartości < 0 → „ma wartości mniejsze niż 0 (rozkład wykładniczy: X ≥ 0)”
+(`empReadContinuous(lower =)`), krzywa sięga największej obserwacji; legenda pola
+„P (Pole)” zamiast angielskiego „P (Area)”. Dalej: gamma, Weibull; t, χ², F — nie. Etap 2: „Podziel według” (różne p w grupach → nadmierna
 dyspersja).

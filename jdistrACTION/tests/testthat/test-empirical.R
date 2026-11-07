@@ -189,3 +189,22 @@ test_that("negative binomial: data in the trials convention next to the model", 
                                               RandomVariable = "failures")
   expect_equal(res$EmpMoments$asDF$model[1], 3 * 0.8 / 0.2)
 })
+
+# Exponential: a non-negative continuous variable next to Exp(lambda).
+test_that("exponential: moments, event frequency and the support check", {
+  d <- data.frame(czas = c(0.2, 0.5, 0.8, 1.1, 1.5, 2.0, 2.6, 3.5, 4.2, 6.0),
+                  ujemne = c(-1, 0.5, 0.8, 1.1, 1.5, 2.0, 2.6, 3.5, 4.2, 6.0))
+  res <- distrACTION::ExponentialDistribution(
+    data = d, empVar = "czas", dp1 = 0.5,
+    DistributionFunction = TRUE, DistributionFunctionType = "higher", x1 = 3)
+  mom <- res$EmpMoments$asDF
+  expect_equal(mom$data, c(mean(d$czas), var(d$czas), sd(d$czas)))
+  expect_equal(mom$model, c(2, 4, 2))
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, "0.3 (3 z 10)")
+  expect_error(distrACTION::ExponentialDistribution(data = d, empVar = "ujemne", dp1 = 0.5),
+               "mniejsze niż 0")
+  # the curve reaches the largest observation
+  far <- data.frame(czas = c(0.1, 1, 50))
+  res <- distrACTION::ExponentialDistribution(data = far, empVar = "czas", dp1 = 0.5)
+  expect_equal(max(res$plot$state$Dataset[[1]]), 50)
+})

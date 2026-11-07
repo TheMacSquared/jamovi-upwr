@@ -14,8 +14,17 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       XValue2 <- self$options$x2
       DP1 <- self$options$dp1  # rate
 
+      # Empirical data (optional): a non-negative continuous variable drawn as
+      # a density histogram under the curve from the parameters
+      EmpX <- NULL
+      if (!is.null(self$options$empVar))
+        EmpX <- empReadContinuous(self$data, self$options$empVar, 0,
+                                  " (rozkład wykładniczy: X ≥ 0)")
+
       LowerTail <- 0
       UpperTail <- qexp(0.999, DP1)
+      # the axis reaches the largest observation
+      if (!is.null(EmpX)) UpperTail <- max(UpperTail, max(EmpX))
       N <- 1000
       Columnames <- c("X", "Prob")
 
@@ -85,6 +94,13 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Outputs$setRow(rowNo = 1, values = list(
         DistributionResultColumn = OutputLabel11,
         QuantileResultColumn = OutputLabel12))
+      if (!is.null(EmpX) && DistributionFunction == "TRUE") {
+        Outputs$setRow(rowNo = 1, values = list(
+          EmpiricalResultColumn = empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2,
+                                               discrete = FALSE)))
+      } else {
+        Outputs$getColumn("EmpiricalResultColumn")$setVisible(FALSE)
+      }
       if((QuantileFunction == "TRUE") & (QuantileFunctionType == "central"))
         Outputs$addRow(rowKey = 2, values = list(
           DistributionResultColumn = "",
@@ -111,6 +127,20 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         }
       } else {
         MomentsTable$setVisible(visible = FALSE)
+      }
+
+      # Empirical data: moments and histogram
+      EmpHist <- NULL
+      if (!is.null(EmpX)) {
+        EmpVar <- if (length(EmpX) > 1) stats::var(EmpX) else NaN
+        mom <- self$results$EmpMoments
+        mom$addRow(rowKey = "mean", values = list(
+          stat = "Średnia", data = mean(EmpX), model = 1 / DP1))
+        mom$addRow(rowKey = "var", values = list(
+          stat = "Wariancja", data = EmpVar, model = 1 / DP1^2))
+        mom$addRow(rowKey = "sd", values = list(
+          stat = "Odch. std.", data = sqrt(EmpVar), model = 1 / DP1))
+        EmpHist <- empHistogram(EmpX, self$options$empBins)
       }
 
       Datas <- data.frame(x, Density)
@@ -183,7 +213,7 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       Dataset[8, 4] <- Textsize
       Dataset[1:(length(AxisSegments)), 5] <- AxisSegments
       image <- self$results$plot
-      image$setState(Dataset)
+      image$setState(list(Dataset = Dataset, hist = EmpHist))
 
       if(((DistributionFunction == "TRUE") & (DistributionFunctionType == "interval")) & (XValue >= XValue2)){
         Inputs$setError("x2 musi być większe od x1.")
@@ -193,7 +223,19 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         Outputs$setVisible(visible = FALSE)}},
 
     .plot = function(image, ggtheme, theme, ...) {
-      Dataset <- image$state
+      State <- image$state
+      # no state when .run stopped with an error (a variable of the wrong
+      # format): draw nothing, so the error of .run stays visible
+      if (is.null(State))
+        return(FALSE)
+      # states saved before the empirical-data option are plain data frames
+      EmpHist <- NULL
+      if (is.data.frame(State)) {
+        Dataset <- State
+      } else {
+        Dataset <- State$Dataset
+        EmpHist <- State$hist
+      }
       PlotData <- Dataset[, c(1:3, 6)]
       colnames(PlotData) <- c("X", "Prob", "CurveProb", "QuantileAreaProb")
       HigherSegment <- as.numeric(Dataset[1, 4])
@@ -226,8 +268,15 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
 
       if (DistributionFunction == "TRUE")
         Plot <- Plot +
-          geom_area(PlotData, mapping = aes(x = PlotData$X, y = PlotData$CurveProb, fill = " P (Area)")) +
-          scale_fill_manual(values = Color)
+          geom_area(PlotData, mapping = aes(x = PlotData$X, y = PlotData$CurveProb, fill = " P (Pole)"))
+
+      # the histogram is translucent and drawn over the area, so both show
+      if (!is.null(EmpHist)) {
+        Outline <- if (!is.null(theme$fill)) theme$fill[1] else "white"
+        Plot <- Plot + empHistogramLayer(EmpHist, Outline)
+      }
+      if (DistributionFunction == "TRUE" || !is.null(EmpHist))
+        Plot <- Plot + scale_fill_manual(values = c(" P (Pole)" = Color[1], "Dane (histogram)" = Color[3]))
 
       if (QuantileFunction == "TRUE")
         Plot <- Plot +

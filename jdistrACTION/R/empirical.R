@@ -40,8 +40,9 @@ empReadCounts <- function(data, name, lower = 0, upper = Inf, what = "") {
 
 # Reads a continuous variable for a continuous distribution; missing values
 # are dropped. Nominal / ordinal columns with numeric labels are read as
-# numbers, text categories are a wrong variable format.
-empReadContinuous <- function(data, name) {
+# numbers, text categories are a wrong variable format. `lower` = start of
+# the support (e.g. 0 for the exponential distribution), `what` describes it.
+empReadContinuous <- function(data, name, lower = -Inf, what = "") {
     x <- data[[name]]
     if (is.factor(x) || is.character(x)) {
         lab <- as.character(x)
@@ -55,6 +56,9 @@ empReadContinuous <- function(data, name) {
     x <- x[is.finite(x)]
     if (length(x) == 0)
         stop(sprintf("Zmienna „%s” nie ma żadnych wartości.", name), call. = FALSE)
+    if (any(x < lower))
+        stop(sprintf("Zmienna „%s” ma wartości mniejsze niż %s%s.", name, lower, what),
+             call. = FALSE)
     x
 }
 

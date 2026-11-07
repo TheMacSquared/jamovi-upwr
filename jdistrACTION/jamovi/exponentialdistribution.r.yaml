@@ -34,6 +34,10 @@ items:
           title: Kwantyl(e)
           type: text
           visible: (QuantileFunction)
+        - name: EmpiricalResultColumn
+          title: Częstość w danych
+          type: text
+          visible: (empVar)
 
     - name: MomentsTable
       title: Momenty
@@ -49,6 +53,22 @@ items:
         - name: ValueColumn
           title: Wartość
           type: text
+
+    - name: EmpMoments
+      title: Momenty z danych i z modelu
+      type: Table
+      rows: 0
+      visible: (empVar)
+      columns:
+        - name: stat
+          title: ""
+          type: text
+        - name: data
+          title: Dane
+          type: number
+        - name: model
+          title: Model
+          type: number
 
     - name: plot
       title: ""

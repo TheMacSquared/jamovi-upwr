@@ -71,4 +71,25 @@ options:
       name: showVariance
       type: Bool
       default: FALSE
+
+    - name: data
+      type: Data
+
+    - name: empVar
+      title: Dane empiryczne
+      type: Variable
+      suggested:
+        - continuous
+      permitted:
+        - numeric
+        - factor
+      default: null
+
+    # 0 = Sturges' rule
+    - name: empBins
+      title: Liczba klas histogramu (0 = automatycznie)
+      type: Integer
+      min: 0
+      max: 100
+      default: 0
 ...

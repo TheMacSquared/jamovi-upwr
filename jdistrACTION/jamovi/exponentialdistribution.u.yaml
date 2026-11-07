@@ -77,3 +77,23 @@ children:
         name: showMean
       - type: CheckBox
         name: showVariance
+  - type: CollapseBox
+    label: Dane empiryczne
+    collapsed: true
+    stretchFactor: 1
+    children:
+      - type: VariableSupplier
+        persistentItems: false
+        stretchFactor: 1
+        children:
+          - type: TargetLayoutBox
+            label: Zmienna
+            children:
+              - type: VariablesListBox
+                name: empVar
+                maxItemCount: 1
+                isTarget: true
+      - type: TextBox
+        name: empBins
+        format: number
+        enable: (empVar)
