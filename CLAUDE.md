@@ -1124,5 +1124,5 @@ wartości < 0 → „ma wartości mniejsze niż 0 (rozkład wykładniczy: X ≥ 
 „P (Pole)” zamiast angielskiego „P (Area)”. Gamma i Weibull ZROBIONE (2026-11-07) tak
 samo (momenty α/λ, α/λ²; η·Γ(1 + 1/β), η²·[Γ(1 + 2/β) − Γ(1 + 1/β)²]; zakres rozszerzany
 PRZED wyznaczeniem początku siatki dla kształtu < 1). ZADANIE 28 ZAMKNIĘTE dla rozkładów
-z planu; t, χ², F — świadomie bez danych empirycznych. Zostaje etap 2: „Podziel według”. Etap 2: „Podziel według” (różne p w grupach → nadmierna
-dyspersja).
+z planu; t, χ², F — świadomie bez danych empirycznych. „Podziel według” (grupy na jednym
+modelu, nadmierna dyspersja) — decyzja 2026-11-07: NIE robimy.

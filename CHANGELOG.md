@@ -3,6 +3,41 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## Niewydane (linia latest, po 1.4.0)
+
+Nowe:
+- Wygląd „Lekki, przyciemniony” (ustawienie „Interfejs”): wygląd Light (A)
+  z ciepłoszarym tłem za kartami i lekko złamaną bielą kart; wyniki i eksport
+  bez zmian. Classic i Light (A) bez zmian.
+- Palety wykresów Catppuccin Latte (jasna) i Catppuccin Mocha (ciemna), także
+  w mapach ciepła i gradientach (licencja MIT, tekst w
+  `jmvcore/inst/LICENSE-catppuccin.txt`; jmvcore 28.3.3). Warianty Frappé
+  i Macchiato pominięte — różnią się od Mocha prawie tylko tłem.
+- Rozkłady: „Dane empiryczne” w ośmiu rozkładach (distrACTION 1.5.0) — model
+  zawsze z parametrów panelu, dane rysowane na nim, porównanie wyłącznie
+  opisowe: częstość zdarzenia w danych obok P i momenty z danych obok modelu.
+  Dyskretne (dwumianowy, Poissona, geometryczny, ujemny dwumianowy): punkty
+  częstości na słupkach i tabela liczności obserwowanych i oczekiwanych;
+  w dwumianowym także zmienna zero-jedynkowa (jedna próba w wierszu, wybór
+  kategorii „sukces”) z rozkładem Bin(n, p̂) obok modelu; w geometrycznym
+  i ujemnym dwumianowym dane w konwencji zmiennej wybranej w panelu. Ciągłe
+  (normalny, wykładniczy, gamma, Weibulla): histogram gęstości pod krzywą
+  (klasy Sturgesa jak w Szeregu rozdzielczym albo liczba podana ręcznie)
+  i odchylenie standardowe obok modelu.
+
+Zmienione:
+- Rozkład dwumianowy: usunięte p oszacowane z danych, zakres 95% liczności
+  i test χ² zgodności z wersji 1.4.0 (przerabiane przed testami; testy są
+  w modułach testów). Stare pliki .omv liczą z p podanego w panelu.
+
+Poprawione:
+- Rozkłady: komunikat błędu (zły parametr, zła zawartość zmiennej — „Nieprawidłowy
+  format zmiennej.”) nie jest już zasłaniany błędem wykresu „colnames…”
+  (dwumianowy, ujemny dwumianowy, normalny, F i rozkłady z danymi empirycznymi).
+- Wykładniczy, gamma, Weibulla: legenda pola „P (Pole)” zamiast „P (Area)”.
+
+Wersje modułów: distrACTION 1.5.0, jmvcore 28.3.3.
+
 ## 1.4.0 — 2026-11-05 (linia latest, jamovi 28.17)
 
 Stan buildów (2026-11-05): Docker (`jupwr/jupwr:1.4.0`) zbudowany,
