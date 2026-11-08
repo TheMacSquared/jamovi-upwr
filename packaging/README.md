@@ -11,10 +11,10 @@ silnik C++ + runtime R + moduły. Szczegóły anatomii: [`00-architecture.md`](0
 
 ## Macierz deliverables
 
-| OS | Arch | Format | Status (2026-06) |
+| OS | Arch | Format | Status (2026-11-08) |
 |---|---|---|---|
 | macOS | arm64 (Apple Silicon) | `.dmg` | **Relokowalny build przetestowany** — wbudowany R + Python + dyliby; w trybie wymuszonego bundla silnik ładuje R+jmv z bundla, serwer+klient działają. `.dmg` ~517 MB. Pozostaje walidacja na fizycznie czystym Macu + eksport wektorowy wymaga X11. |
-| Windows | x64 | `.exe` (NSIS) + portable `.zip` | Udokumentowane (analogia macOS + Dockerfile). **Do przetestowania na maszynie Windows.** |
+| Windows | x64 | `.exe` (NSIS) + portable `.zip` | Udokumentowane (analogia macOS + Dockerfile). **1.4.0 zbudowany 2026-11-05**; instalację na czystej maszynie należy sprawdzić osobno. |
 
 Podpisywanie kodu: **na razie brak** — installki będą wywoływać ostrzeżenia Gatekeeper (macOS)
 i SmartScreen (Windows). Obejścia dla studentów: [`30-distribution.md`](30-distribution.md).
@@ -23,9 +23,10 @@ i SmartScreen (Windows). Obejścia dla studentów: [`30-distribution.md`](30-dis
 
 - [`00-architecture.md`](00-architecture.md) — z czego składa się aplikacja, układ bundla, `env.conf`.
 - [`10-build-macos.md`](10-build-macos.md) — build macOS arm64 krok po kroku (przetestowany).
-- [`20-build-windows.md`](20-build-windows.md) — build Windows x64 (do walidacji).
+- [`20-build-windows.md`](20-build-windows.md) — build Windows x64 (używany dla 1.4.0).
 - [`30-distribution.md`](30-distribution.md) — wydanie studentom, obejścia ostrzeżeń, instrukcja instalacji.
 - [`tests/manual/upstream-28.17.md`](tests/manual/upstream-28.17.md) — plan testów ręcznych po merge 28.17, dane wzorcowe i protokół wyników.
+- [`tests/manual/release-1.4.1.md`](tests/manual/release-1.4.1.md) — protokół Dockera, migracji OMV, dużych tabel i 17 wykresów wektorowych scatr; pozostałe kontrole natywne.
 
 ## Skrypty (macOS)
 
@@ -68,11 +69,12 @@ jRISK/jSpace dla win64 buduje się tą ścieżką (patrz macierz w `MODULES.md`)
 - **Walidacja na fizycznie czystym Macu** (bez Homebrew/R) — relokowalność potwierdzona w trybie
   wymuszonego bundla; do potwierdzenia na maszynie bez devtoolów.
 - **Eksport wykresów do SVG/PDF/EPS** — używa `cairo`→X11 (brak na czystym Macu); wyświetlanie PNG
-  (ragg) działa. Rozważyć `svglite` albo dobundlowanie XQuartz.
+  (ragg) działa, także jako awaryjny podgląd, gdy SVG nie może się uruchomić
+  (jmvcore 28.3.4). Jawny eksport SVG/PDF/EPS nadal wymaga działającego cairo;
+  rozważyć `svglite` albo dobundlowanie XQuartz.
 - **Podpis/notaryzacja** — instalki wywołują ostrzeżenia (świadomie pominięte; patrz `30-distribution.md`).
-- **Build Windows — instalator** — `build.ps1` przechodzi i produkuje `.jmo` (potwierdzone
-  2026-08-26, macierz w `MODULES.md`); pełny instalator NSIS wymaga jeszcze walidacji
-  na czystej maszynie Windows.
+- **Build Windows — instalator** — aplikacja i `.jmo` jRISK/jSpace dla 1.4.0 zbudowane
+  2026-11-05 (macierz w `MODULES.md`); instalację na czystej maszynie sprawdzać osobno.
 - **Optymalizacja rozmiaru** — przyciąć bibliotekę R do domknięcia zależności modułów (~886 MB → mniej).
 
 ## Szybki start (macOS arm64)

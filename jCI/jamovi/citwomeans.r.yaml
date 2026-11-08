@@ -15,9 +15,12 @@ items:
         - level2
         - ciWidth
         - ciMethod
+        - plot
         - effSize
         - nBoot
         - seed
+        - bootPlot
+        - metody
       columns:
         - name: var
           title: ''
@@ -81,4 +84,5 @@ items:
       title: Zastosowane metody
       type: Html
       visible: (metody)
+      clearWith: *cw
 ...

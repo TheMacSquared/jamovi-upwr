@@ -51,6 +51,14 @@ test_that("Lilliefors and Anderson-Darling reproduce nortest", {
 test_that("percentile list parsing", {
     expect_equal(parsePercentiles("25, 50; 75"), c(25, 50, 75))
     expect_equal(parsePercentiles("0,10,100,abc,10"), 10)
+    expect_equal(parsePercentiles("2,5; 97,5", ","), c(2.5, 97.5))
+    expect_equal(parsePercentiles("2,5", ","), 2.5)
+    expect_error(parsePercentiles("2,5; 97,5", "."), "kropkę dziesiętną")
+    expect_equal(parsePercentiles("2.5; 97.5", "."), c(2.5, 97.5))
+    expect_equal(parsePercentiles("25;50;75", ","), c(25, 50, 75))
+    expect_error(parsePercentiles("2.5; 97.5", ","), "przecinek dziesiętny")
+    expect_error(parsePercentiles("25,50,75", ","), "średnikami")
+    expect_equal(percentileLabels(c(2.5, 97.5), ","), c("P2,5", "P97,5"))
 })
 
 test_that("szereg: class construction and grouped statistics", {

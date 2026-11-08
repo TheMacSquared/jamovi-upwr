@@ -15,6 +15,10 @@ WeibullDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       DP1 <- self$options$dp1  # shape (beta)
       DP2 <- self$options$dp2  # scale (eta)
 
+      if (!is.finite(DP1) || DP1 <= 0 || !is.finite(DP2) || DP2 <= 0)
+        stop("Kształt β i skala η muszą być skończone i dodatnie.", call. = FALSE)
+      ModelMoments <- weibullMoments(DP1, DP2)
+
       UpperTail <- qweibull(0.999, DP1, DP2)
       if (DistributionFunction == "TRUE" && is.finite(XValue))
         UpperTail <- max(UpperTail, XValue)
@@ -60,10 +64,6 @@ WeibullDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         ParametersColumn = InputLabel1,
         DistributionFunctionColumn = paste("x1 = ", XValue, sep = ""),
         QuantileFunctionColumn = paste("p = ", Quantile, sep = "")))
-
-      x <- seq(LowerTail, UpperTail, length = N)
-      Density <- dweibull(x, DP1, DP2)
-      Density[!is.finite(Density)] <- NA
 
       if(DistributionFunction == "TRUE"){
         if (DistributionFunctionType == "lower")
@@ -124,14 +124,14 @@ WeibullDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           MomentsTable$addRow(rowKey = "mean", values = list(
             MomentColumn = "E[X]",
             FormulaColumn = "E[X] = η·Γ(1 + 1/β)",
-            ValueColumn = as.character(round(DP2 * gamma(1 + 1/DP1), 4))
+            ValueColumn = as.character(round(ModelMoments$mean, 4))
           ))
         }
         if (ShowVariance) {
           MomentsTable$addRow(rowKey = "var", values = list(
             MomentColumn = "Var[X]",
             FormulaColumn = "Var[X] = η²·[Γ(1 + 2/β) − Γ(1 + 1/β)²]",
-            ValueColumn = as.character(round(DP2^2 * (gamma(1 + 2/DP1) - gamma(1 + 1/DP1)^2), 4))
+            ValueColumn = as.character(round(ModelMoments$variance, 4))
           ))
         }
       } else {
@@ -142,16 +142,26 @@ WeibullDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       EmpHist <- NULL
       if (!is.null(EmpX)) {
         EmpVar <- if (length(EmpX) > 1) stats::var(EmpX) else NaN
-        ModelVar <- DP2^2 * (gamma(1 + 2/DP1) - gamma(1 + 1/DP1)^2)
+        ModelVar <- ModelMoments$variance
         mom <- self$results$EmpMoments
         mom$addRow(rowKey = "mean", values = list(
-          stat = "Średnia", data = mean(EmpX), model = DP2 * gamma(1 + 1/DP1)))
+          stat = "Średnia", data = mean(EmpX), model = ModelMoments$mean))
         mom$addRow(rowKey = "var", values = list(
           stat = "Wariancja", data = EmpVar, model = ModelVar))
         mom$addRow(rowKey = "sd", values = list(
           stat = "Odch. std.", data = sqrt(EmpVar), model = sqrt(ModelVar)))
         EmpHist <- empHistogram(EmpX, self$options$empBins)
       }
+
+      if (!is.finite(UpperTail) || UpperTail <= 0 || LowerTail >= UpperTail) {
+        # Keep probabilities, quantiles and moments available even when the
+        # requested plot range cannot be represented by finite doubles.
+        self$results$plot$setError("Zakres wykresu przekracza możliwości liczbowe. Prawdopodobieństwa i kwantyle są dostępne w tabeli.")
+        return()
+      }
+      x <- seq(LowerTail, UpperTail, length = N)
+      Density <- dweibull(x, DP1, DP2)
+      Density[!is.finite(Density)] <- NA
 
       Datas <- data.frame(x, Density)
       colnames(Datas) <- Columnames

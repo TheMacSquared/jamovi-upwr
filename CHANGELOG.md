@@ -3,15 +3,23 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
-## Niewydane (linia latest, po 1.4.0)
+## 1.4.1 — 2026-11-08 (linia latest, jamovi 28.17)
+
+Przygotowanie wydania; status weryfikacji: `packaging/tests/manual/release-1.4.1.md`.
 
 Nowe:
+- Wykresy wektorowe (SVG) w zakładce „Wykresy” (scatr 2.9.14): słupkowy,
+  histogram, słupkowy zmiennej dyskretnej, gęstości, ridgeline, mozaikowy,
+  skumulowany słupkowy, kolisty słupkowy, lizakowy, Pareto, mapa ciepła,
+  korelogram, hexbin, radarowy, mapa drzewa, waflowy i profil średnich.
+  Zachowane opcje, rozmiary i eksport PNG/SVG/PDF. Wykresy z punktami dla
+  pojedynczych obserwacji pozostają rastrowe.
 - Wygląd „Lekki, przyciemniony” (ustawienie „Interfejs”): wygląd Light (A)
   z ciepłoszarym tłem za kartami i lekko złamaną bielą kart; wyniki i eksport
   bez zmian. Classic i Light (A) bez zmian.
 - Palety wykresów Catppuccin Latte (jasna) i Catppuccin Mocha (ciemna), także
   w mapach ciepła i gradientach (licencja MIT, tekst w
-  `jmvcore/inst/LICENSE-catppuccin.txt`; jmvcore 28.3.3). Warianty Frappé
+  `jmvcore/inst/LICENSE-catppuccin.txt`; jmvcore 28.3.4). Warianty Frappé
   i Macchiato pominięte — różnią się od Mocha prawie tylko tłem.
 - Rozkłady: „Dane empiryczne” w ośmiu rozkładach (distrACTION 1.5.0) — model
   zawsze z parametrów panelu, dane rysowane na nim, porównanie wyłącznie
@@ -31,12 +39,39 @@ Zmienione:
   w modułach testów). Stare pliki .omv liczą z p podanego w panelu.
 
 Poprawione:
+- Wykresy wektorowe: awaryjny PNG, gdy urządzenie SVG/cairo nie może się
+  uruchomić; plik ma poprawną zawartość i rozszerzenie.
+- Rozkład F: kwantyle p = 0 i p = 1 bez awarii wykresu; pełne zacieniowanie
+  przy p = 1; gęstość dla df₁ < 2 bez sztucznego szczytu; zakres uwzględnia λ.
+- Weibull: bardzo mały kształt nie przerywa obliczeń prawdopodobieństw i kwantyli;
+  przy niereprezentowalnym zakresie wykres pokazuje komunikat. Wariancja bez Inf − Inf.
+- Nemenyi: kolumna q pokazuje nieujemną statystykę rozkładu rozstępu
+  studentyzowanego zamiast q/√2; wartości p pozostają takie same.
 - Rozkłady: komunikat błędu (zły parametr, zła zawartość zmiennej — „Nieprawidłowy
   format zmiennej.”) nie jest już zasłaniany błędem wykresu „colnames…”
   (dwumianowy, ujemny dwumianowy, normalny, F i rozkłady z danymi empirycznymi).
 - Wykładniczy, gamma, Weibulla: legenda pola „P (Pole)” zamiast „P (Area)”.
 
-Wersje modułów: distrACTION 1.5.0, jmvcore 28.3.3.
+- Windows: zapis dokumentu synchronizowany przez zapisywalny deskryptor
+  (`fsync` nie zgłasza już „Bad file descriptor”).
+- Lekki interfejs: ustawienia przewijają się przy małym oknie lub dużym powiększeniu.
+- distrACTION: tabele ponad 2000 wartości domyślnie grupowane (maks. 202
+  przedziały), z notą i wyborem „pokaż wszystkie wartości” pozwalającym wyłączyć
+  grupowanie. Dostępny też tryb pytania przed wyświetleniem dużej tabeli.
+  Momenty i częstości na wykresie nadal liczone z pojedynczych obserwacji.
+  Nieskończone liczności dają czytelny błąd.
+- Percentyle respektują „Symbol dziesiętny”: przecinek → „2,5; 97,5”,
+  kropka → „2.5; 97.5”. Domyślna lista „25;50;75” działa przy obu ustawieniach;
+  dawny separator listy przecinkiem działa przy kropce dziesiętnej. Zmiana
+  ustawienia przelicza percentyle i ich podpisy.
+- jCI, jTestyT, jperm: wykresy i tabele odświeżają się razem po zmianie opcji,
+  także przy losowym ziarnie 0 i przełączaniu widoczności wykresów.
+- jCzest: niecałkowite liczności odrzucane przed testami zamiast obcinania;
+  nieokreślone przedziały Walda OR/RR przy zerowych komórkach pomijane z notą.
+- Heatmapa: komórka z samymi brakami pozostaje brakiem także przy sumowaniu.
+
+Wersje modułów: distrACTION 1.5.1, jmvcore 28.3.4, jEksplor 0.1.11,
+jANOVA 0.5.7, jCI 0.3.9, jTestyT 0.4.7, jperm 0.2.9, jCzest 0.2.8, scatr 2.9.14.
 
 ## 1.4.0 — 2026-11-05 (linia latest, jamovi 28.17)
 

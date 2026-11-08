@@ -208,9 +208,9 @@ options:
       default: false
 
     - name: pcValues
-      title: Percentyle (lista)
+      title: Percentyle (oddziel średnikami)
       type: String
-      default: "25,50,75"
+      default: "25;50;75"
 
     - name: pcEqGr
       title: Punkty podziału na równe grupy

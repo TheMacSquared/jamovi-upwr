@@ -61,9 +61,11 @@ jobs:
           cache-dependency-path: jamovi-compiler/package-lock.json
       - name: Zależności kompilatora
         run: npm ci --prefix jamovi-compiler
+      - name: Protobuf dla testów odtwarzania wyników
+        run: sudo apt-get update && sudo apt-get install -y libprotobuf-dev protobuf-compiler
       - name: Zależności R
         shell: Rscript {0}
         run: |
-          install.packages(c("testthat", "R6", "rlang", "jsonlite", "base64enc", "car", "ggplot2", "boot", "lpSolve"))
-      - name: Kompilacja i testy jperm, jCI, jRegr
+          install.packages(c("testthat", "R6", "rlang", "jsonlite", "base64enc", "car", "ggplot2", "boot", "lpSolve", "nortest", "RProtoBuf", "ggridges", "hexbin", "dplyr", "scales"))
+      - name: Kompilacja i testy modułów statystycznych
         run: bash packaging/scripts/test-statistics.sh

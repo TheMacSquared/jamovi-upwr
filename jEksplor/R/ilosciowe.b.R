@@ -23,8 +23,8 @@ ilosciowe_statDefs <- function(o) {
         list("kurt", "Kurtoza", o$kurt, NULL), list("seKurt", "SE kurtozy", o$kurt, NULL),
         list("skewPearson", "Skośność Pearsona", o$skewPearson, "skośność Pearsona = 3 (średnia − mediana) / SD"),
         list("skewQuart", "Skośność kwartylowa", o$skewQuart, "skośność kwartylowa (Bowleya) = (Q3 + Q1 − 2 · mediana) / (Q3 − Q1)"))
-    if (isTRUE(o$pc)) for (p in parsePercentiles(o$pcValues))
-        defs[[length(defs) + 1]] <- list(paste0("pc", p), sprintf("P%g", p), TRUE, NULL)
+    if (isTRUE(o$pc)) for (p in parsePercentiles(o$pcValues, o$decSymbol))
+        defs[[length(defs) + 1]] <- list(paste0("pc", p), percentileLabels(p, o$decSymbol), TRUE, NULL)
     if (isTRUE(o$pcEqGr) && o$pcNEqGr >= 2) for (i in seq_len(o$pcNEqGr - 1))
         defs[[length(defs) + 1]] <- list(paste0("cut", i), sprintf("%d/%d", i, o$pcNEqGr), TRUE, NULL)
     Filter(function(d) isTRUE(d[[3]]), defs)
@@ -32,7 +32,7 @@ ilosciowe_statDefs <- function(o) {
 
 ilosciowe_extraStats <- function(x, o) {
     out <- list()
-    if (isTRUE(o$pc)) for (p in parsePercentiles(o$pcValues)) out[[paste0("pc", p)]] <- unname(stats::quantile(x, p / 100, type = 7))
+    if (isTRUE(o$pc)) for (p in parsePercentiles(o$pcValues, o$decSymbol)) out[[paste0("pc", p)]] <- unname(stats::quantile(x, p / 100, type = 7))
     if (isTRUE(o$pcEqGr) && o$pcNEqGr >= 2) for (i in seq_len(o$pcNEqGr - 1))
         out[[paste0("cut", i)]] <- unname(stats::quantile(x, i / o$pcNEqGr, type = 7))
     out
@@ -105,7 +105,9 @@ iloscioweClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                   if (split) " (obserwacja z brakiem w zmiennej grupującej pominięta)" else "")
             m$add("Dane", "Układ tabeli: %s.", if (o$layout == "rows") "zmienne w wierszach, statystyki w kolumnach" else "statystyki w wierszach, zmienne w kolumnach")
             for (d in defs) if (!is.null(d[[4]])) m$add("Statystyki", paste0(sub("^(.)", "\\U\\1", d[[4]], perl = TRUE), "."))
-            m$addIf(o$pc, "Statystyki", "Percentyle P%s (kwantyle typu 7).", paste(parsePercentiles(o$pcValues), collapse = ", P"))
+            if (isTRUE(o$pc)) m$add("Statystyki", "Percentyle %s (kwantyle typu 7).",
+                paste(percentileLabels(parsePercentiles(o$pcValues, o$decSymbol), o$decSymbol),
+                      collapse = if (o$decSymbol == ",") "; " else ", "))
             m$addIf(o$pcEqGr, "Statystyki", "Punkty podziału na grupy równoliczne, liczba grup: %d (kwantyle typu 7).", o$pcNEqGr)
             m$addIf(o$extreme, "Statystyki", "Wartości skrajne: po %d wartości najmniejszych i po %d największych, z numerem wiersza w arkuszu (bez podziału na grupy).", o$extremeN, o$extremeN)
             m$addIf(o$gini, "Koncentracja", "Współczynnik Giniego G = 2 Σ i·x(i) / (n Σ x) − (n + 1)/n na wartościach uporządkowanych rosnąco; wymaga wartości nieujemnych; 0 = równy rozkład, 1 = pełna koncentracja.")

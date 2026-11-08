@@ -112,13 +112,34 @@ adTest <- function(x) {
 }
 
 # ---------------------------------------------------------------------------
-# Percentiles and cut points requested as text ("25,50,75") / k groups
+# Percentiles and cut points requested as text ("25;50;75") / k groups
 # ---------------------------------------------------------------------------
 
-parsePercentiles <- function(txt) {
-    v <- suppressWarnings(as.numeric(trimws(strsplit(as.character(txt), "[,;]")[[1]])))
+parsePercentiles <- function(txt, decSymbol = ".") {
+    # The app's decimal symbol determines whether a comma is a decimal mark
+    # or a list separator. Semicolons work as separators with either setting.
+    txt <- as.character(txt)
+    if (identical(decSymbol, ",")) {
+        tokens <- trimws(strsplit(txt, ";", fixed = TRUE)[[1]])
+        if (any(grepl(".", tokens, fixed = TRUE)) || any(lengths(regmatches(tokens, gregexpr(",", tokens, fixed = TRUE))) > 1))
+            stop("Wybrano przecinek dziesiętny: wpisz np. 2,5; 97,5. Percentyle oddzielaj średnikami.", call. = FALSE)
+        tokens <- gsub(",", ".", tokens, fixed = TRUE)
+    } else {
+        # Historical comma-separated integer lists remain valid with a dot.
+        # In a semicolon-separated list a decimal comma is a wrong symbol,
+        # not a request for several different percentiles.
+        if (grepl(";", txt, fixed = TRUE) && grepl("[0-9],[0-9]", txt))
+            stop("Wybrano kropkę dziesiętną: wpisz np. 2.5; 97.5. Percentyle oddzielaj średnikami.", call. = FALSE)
+        tokens <- trimws(strsplit(txt, "[,;]")[[1]])
+    }
+    v <- suppressWarnings(as.numeric(tokens))
     v <- v[is.finite(v) & v > 0 & v < 100]
     unique(v)
+}
+
+percentileLabels <- function(p, decSymbol = ".") {
+    vapply(p, function(value) paste0("P", base::format(value, trim = TRUE,
+        scientific = FALSE, decimal.mark = decSymbol)), "")
 }
 
 # ---------------------------------------------------------------------------

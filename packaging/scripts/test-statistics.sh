@@ -11,11 +11,16 @@ cp "$ROOT/platform/jamovi" "$WORK/app/bin/jamovi"
 R CMD INSTALL --library="$WORK/library" "$ROOT/jmvcore"
 RHOME="$(R RHOME)"
 RLIBS="$(Rscript -e 'cat(paste(.libPaths(), collapse=.Platform$path.sep))')"
-for module in jperm jCI jRegr; do
+for module in jperm jCI jRegr jdistrACTION jEksplor jTestyT jCzest plots; do
     mkdir -p "$WORK/source/$module"
     # Only sources; stale generated headers/build directories must not affect CI.
     cp "$ROOT/$module/DESCRIPTION" "$WORK/source/$module/"
     cp -R "$ROOT/$module/R" "$ROOT/$module/jamovi" "$WORK/source/$module/"
+    for extra in NAMESPACE inst; do
+        if [ -e "$ROOT/$module/$extra" ]; then
+            cp -R "$ROOT/$module/$extra" "$WORK/source/$module/"
+        fi
+    done
     find "$WORK/source/$module/R" -name '*.h.R' -delete
     node "$ROOT/jamovi-compiler/index.js" --install "$WORK/source/$module" \
         --to "$WORK/modules" --home "$WORK/app" --rhome "$RHOME" --rlibs "$WORK/library:$RLIBS" \

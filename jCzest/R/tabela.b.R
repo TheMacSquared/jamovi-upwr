@@ -310,6 +310,8 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 return()
             }
             m <- twoByTwo(tab, level = o$ciWidth / 100, compare = o$compare)
+            if (any(tab == 0) && (isTRUE(o$odds) || isTRUE(o$relRisk)))
+                t$setNote("zero", "Zerowa komórka: pominięto nieokreślone przedziały Walda dla OR lub RR; nie stosowano poprawki liczności.")
             add <- function(key, lab, x)
                 t$addRow(rowKey = private$.rk(lay, key), values = private$.lv(lay, list(measure = lab, value = x$est,
                                                      lower = x$lower, upper = x$upper)))

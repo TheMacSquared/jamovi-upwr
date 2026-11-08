@@ -22,6 +22,8 @@ empReadCounts <- function(data, name, lower = 0, upper = Inf, what = "") {
         x <- jmvcore::toNumeric(x)
     }
     x <- x[!is.na(x)]
+    if (any(!is.finite(x)))
+        stop("Nieprawidłowy format zmiennej.", call. = FALSE)
     if (length(x) == 0)
         stop(sprintf("Zmienna „%s” nie ma żadnych wartości.", name), call. = FALSE)
     if (any(abs(x - round(x)) > 1e-8))
@@ -111,7 +113,7 @@ empReadBinary <- function(data, name, level) {
 # `support` = all values with non-zero probability, `pmf` = P(X = support).
 empClasses <- function(x, support, pmf) {
     N <- length(x)
-    obsAll <- vapply(support, function(v) sum(x == v), numeric(1))
+    obsAll <- tabulate(match(x, support), nbins = length(support))
     big <- support[N * pmf >= 1]
     lo <- min(c(x, big))
     hi <- max(c(x, big))
@@ -139,6 +141,42 @@ empClasses <- function(x, support, pmf) {
     out
 }
 
+# Keep the usual per-value table, but group a wide support before allocating
+# any integer sequence. CDF differences include both tails and never need
+# work proportional to the largest observation.
+empDiscreteClasses <- function(x, range, density, cdf, lower = 0, upper = Inf, mode = "grouped") {
+    lo <- max(lower, min(range[1], min(x)) - 1)
+    hi <- min(upper, max(range[2], max(x)) + 1)
+    if (hi - lo >= 2000 && mode == "individual")
+        return(NULL)
+    if (hi - lo < 2000 || mode == "full") {
+        support <- seq(lo, hi)
+        pmf <- density(support)
+        pmf[1] <- pmf[1] + cdf(lo - 1)
+        pmf[length(pmf)] <- pmf[length(pmf)] + cdf(hi, lower.tail = FALSE)
+        return(empClasses(x, support, pmf))
+    }
+    # At most 200 finite intervals, plus the two end classes.
+    edges <- unique(floor(seq(lo, hi + 1, length.out = 201)))
+    left <- edges[-length(edges)]
+    right <- edges[-1] - 1
+    labels <- paste0(left, "–", right)
+    if (lo > lower) {
+        left <- c(lower, left); right <- c(lo - 1, right)
+        labels <- c(paste0("≤ ", lo - 1), labels)
+    }
+    if (hi < upper) {
+        left <- c(left, hi + 1); right <- c(right, upper)
+        labels <- c(labels, paste0("≥ ", hi + 1))
+    }
+    p <- ifelse(cdf(left - 1) > 0.5,
+                cdf(left - 1, lower.tail = FALSE) - cdf(right, lower.tail = FALSE),
+                cdf(right) - cdf(left - 1))
+    obs <- tabulate(findInterval(x, left), nbins = length(left))
+    data.frame(label = labels, lo = left, hi = right, obs = obs,
+               P = pmax(0, p), exp = length(x) * pmax(0, p))
+}
+
 # Observed relative frequency of the event selected in the distribution
 # function, using the same rounding of x1 / x2 as the model probability
 # (no rounding for a continuous distribution).
@@ -158,18 +196,31 @@ empEventFreq <- function(x, type, x1, x2, discrete = TRUE) {
 
 # Fills the observed / expected table and the moments table; returns the
 # per-value data for the plot.
-empFillResults <- function(results, x, support, pmf, modelMean, modelVar) {
-    cls <- empClasses(x, support, pmf)
+empFillResults <- function(results, x, cls, modelMean, modelVar) {
     tab <- results$EmpTable
-    for (i in seq_len(nrow(cls))) {
-        tab$addRow(rowKey = i, values = list(
-            x = cls$label[i], obs = cls$obs[i], obsPct = cls$obs[i] / length(x),
-            exp = cls$exp[i], diff = cls$obs[i] - cls$exp[i]))
+    if (is.null(cls)) {
+        tab$setVisible(FALSE)
+        results$empTableNotice$setContent(paste(
+            "<p>Tabela obejmuje ponad 2000 pojedynczych wartości.",
+            "W sekcji „Dane empiryczne → Tabela liczności” wybierz",
+            "„pokaż wszystkie wartości” (może wymagać czasu i pamięci)",
+            "albo „grupuj duży zakres w przedziały”. Podziału nie zmieniono.</p>"))
+    } else {
+        results$empTableNotice$setVisible(FALSE)
     }
-    tab$addRow(rowKey = "total", values = list(
-        x = "Razem", obs = length(x), obsPct = 1,
-        exp = sum(cls$exp), diff = length(x) - sum(cls$exp)))
-    tab$addFormat(rowKey = "total", col = 1, jmvcore::Cell.BEGIN_END_GROUP)
+    if (!is.null(cls) && any(grepl("–", cls$label, fixed = TRUE)))
+        tab$setNote("grouped", "Duży zakres danych: liczności połączono w przedziały. Aby zobaczyć każdą wartość, wybierz „Dane empiryczne → Tabela liczności → pokaż wszystkie wartości”. Punkty na wykresie pokazują częstości pojedynczych wartości.")
+    if (!is.null(cls)) {
+        for (i in seq_len(nrow(cls))) {
+            tab$addRow(rowKey = i, values = list(
+                x = cls$label[i], obs = cls$obs[i], obsPct = cls$obs[i] / length(x),
+                exp = cls$exp[i], diff = cls$obs[i] - cls$exp[i]))
+        }
+        tab$addRow(rowKey = "total", values = list(
+            x = "Razem", obs = length(x), obsPct = 1,
+            exp = sum(cls$exp), diff = length(x) - sum(cls$exp)))
+        tab$addFormat(rowKey = "total", col = 1, jmvcore::Cell.BEGIN_END_GROUP)
+    }
 
     mom <- results$EmpMoments
     mom$addRow(rowKey = "mean", values = list(
@@ -180,6 +231,10 @@ empFillResults <- function(results, x, support, pmf, modelMean, modelVar) {
 
     # single values only: an end class ("≤ k" / "≥ k") may cover just one
     # value of the support, but it stands for the whole tail
+    if (is.null(cls) || any(grepl("–", cls$label, fixed = TRUE))) {
+        values <- sort(unique(x))
+        return(data.frame(X = values, Freq = tabulate(match(x, values)) / length(x)))
+    }
     single <- cls[!grepl("^[≤≥]", cls$label), ]
     data.frame(X = single$lo, Freq = single$obs / length(x))
 }

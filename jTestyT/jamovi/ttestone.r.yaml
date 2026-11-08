@@ -12,7 +12,13 @@ items:
         - vars
         - testValue
         - hypothesis
+        - student
         - nonpar
+        - plot
+        - desc
+        - norm
+        - qq
+        - metody
       columns:
         - name: var
           title: ''
@@ -94,9 +100,7 @@ items:
       title: Wykresy
       type: Array
       visible: (plot)
-      clearWith:
-        - vars
-        - testValue
+      clearWith: *cw
       template:
         title: ''
         type: Image
@@ -122,4 +126,5 @@ items:
       title: Zastosowane metody
       type: Html
       visible: (metody)
+      clearWith: *cw
 ...

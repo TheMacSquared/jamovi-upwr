@@ -173,13 +173,11 @@ PoissonDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       # the mass beyond it in the end classes ("≤ k" / "≥ k")
       EmpPlot <- NULL
       if (!is.null(EmpX)) {
-        EmpLo <- max(0, min(x[1], min(EmpX)) - 1)
-        EmpHi <- max(x[length(x)], max(EmpX)) + 1
-        EmpSupport <- seq(EmpLo, EmpHi, by = 1)
-        EmpPmf <- dpois(EmpSupport, DP1)
-        EmpPmf[1] <- EmpPmf[1] + ppois(EmpLo - 1, DP1)
-        EmpPmf[length(EmpPmf)] <- EmpPmf[length(EmpPmf)] + ppois(EmpHi, DP1, lower.tail = FALSE)
-        EmpPlot <- empFillResults(self$results, EmpX, EmpSupport, EmpPmf,
+        EmpClasses <- empDiscreteClasses(EmpX, range(x),
+          function(k) dpois(k, DP1),
+          function(k, lower.tail = TRUE) ppois(k, DP1, lower.tail = lower.tail),
+          lower = 0, upper = Inf, mode = self$options$empTableMode)
+        EmpPlot <- empFillResults(self$results, EmpX, EmpClasses,
                                   modelMean = DP1, modelVar = DP1)
       }
 

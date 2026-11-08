@@ -77,7 +77,7 @@ options:
     - name: data
       type: Data
 
-    # every row = number of events (0, 1, 2, ...)
+    # Every row is a count of events.
     - name: empVar
       title: Dane empiryczne
       type: Variable
@@ -88,4 +88,15 @@ options:
         - numeric
         - factor
       default: null
+    - name: empTableMode
+      title: Tabela liczności
+      type: List
+      options:
+        - name: individual
+          title: pojedyncze wartości (zapytaj przy dużej tabeli)
+        - name: full
+          title: pokaż wszystkie wartości
+        - name: grouped
+          title: automatycznie grupuj duże tabele
+      default: grouped
 ...

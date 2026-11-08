@@ -10,7 +10,7 @@ Budowanie przez Docker: `docker compose --profile main build && docker compose -
 Aplikacja dostępna pod http://localhost:41337 po zbudowaniu (nie `127.0.0.1` — serwer
 przyjmuje tylko origin `localhost`, `JAMOVI_HOST_A` w `docker-compose.yaml`).
 
-## Linia wydań — TA GAŁĄŹ: `main` (kanał latest, jUPWR 1.3.x, jamovi 28.17)
+## Linia wydań — TA GAŁĄŹ: `main` (kanał latest, jUPWR 1.4.x, jamovi 28.17)
 - Tu trafiają nowe funkcje i nowy upstream. Stable to `release/1.0` (1.0.x,
   jamovi 28.2) — tylko poprawki, w katalogu `jamovi-upwr-stable` (ten katalog to `jamovi-upwr-latest`).
 - Poprawki robimy tylko tu (decyzja 2026-10-18: latest z czasem zastąpi stable).
@@ -1021,7 +1021,7 @@ zmian. Testy: `tests/testthat/test-utils-03.R`, `test-analyses-03.R`
 i `jrisk-pokrycie-zadan.md` (wskazanie na `eventtables`), klucz zad. 2.2
 (częstości na 10 000).
 
-### Zadanie 27: audyt kodu 2026-11-05 — pozostałe drobne (grupa 4) — DO ZROBIENIA
+### Zadanie 27: audyt kodu 2026-11-05 — pozostałe punkty — CZĘŚCIOWO (1.4.1)
 Audyt 10 agentami (moduły kursu, klient/serwer, scatr, opcjonalne). Grupy 1–3
 (błędne wyniki, awarie, wydajność) ZROBIONE 2026-11-05 i wypchnięte; poprawki
 błędnych wyników przeniesione na `release/1.0` (wersje `x.y.z.1`, GVIF
@@ -1030,43 +1030,39 @@ błędnych wyników przeniesione na `release/1.0` (wersje `x.y.z.1`, GVIF
 Świadomie bez zmian: wykres interakcji jANOVA przy wyłączonych interakcjach
 (równoległe linie = wartość dydaktyczna); kopia odzyskiwania NIE jest usuwana
 przy zamknięciu (close() woła się też po zerwaniu połączenia).
-Pozostaje (drobne, bez wpływu na wyniki, chyba że zaznaczono):
+Naprawione w 1.4.1 (zadanie 29): percentyle i ich symbol dziesiętny;
+clearWith jCI/jTestyT/jperm; niecałkowite liczności i granice OR/RR w jCzest;
+heatmapa z samymi brakami; q Nemenyiego; F przy p = 1 i df1 < 2, zakres F
+z niecentralnością i liczba etykiet osi; bardzo mały kształt Weibulla;
+awaryjny PNG dla niedostępnego urządzenia SVG/cairo.
+Pozostaje (priorytet zależy od wpływu na wynik i częstości użycia):
 - Wspólne: `format(x, big.mark = " ")` trafia w `jmvcore::format` i ignoruje
   separator („N = 1e+05”) — jperm `utils.R:195`, jCzest (tabela/zgodnosc/
   zalezne), jRISK (eventtables, relsystem, utils, fta); zamienić na `formatC`.
-- jCzest: zerowa komórka 2×2 → OR = Inf z dolną granicą NaN (Haldane +0,5
-  z notą albo puste komórki); Q Cochrana odrzuca pomiar z jedną kategorią
+- jCzest: Q Cochrana odrzuca pomiar z jedną kategorią
   (wziąć sumę poziomów jak `pairedTable`); opis metod „odwrotna kolejność
   odwraca OR i RR” — dla zamiany kolumn RR liczy się dla drugiej kategorii;
-  liczności niecałkowite obcinane `as.integer` w teście dwumianowym/McNemarze;
   miary 2×2 w warstwie, która stała się 2×2 po usunięciu pustych kolumn.
-- jEksplor: percentyle z przecinkiem dziesiętnym („2,5; 97,5” → P2, P5, P97);
-  Anderson-Darling traci ogon dla z > 8 (`pnorm(..., log.p = TRUE)`); wykresy
+- jEksplor: Anderson-Darling traci ogon dla z > 8 (`pnorm(..., log.p = TRUE)`); wykresy
   Lorenza/słupkowy/mozaikowy wysypują się na pustej zmiennej; brak informacji
   o kilku dominantach; skośność nieliczona dla n = 3.
-- jCI: wykresy nieaktualne przy ziarnie 0 (brak `metody`, `plot`, `bootPlot`
-  w clearWith obrazów); Wilson daje 2,8e-17 zamiast 0 (i 1 − 1e-16);
+- jCI: Wilson daje 2,8e-17 zamiast 0 (i 1 − 1e-16);
   nota „fallback” przy zdegenerowanym bootstrapie (stałe replikacje) myląca;
   stałe dane → NaN bez wyjaśnienia (citwomeans, cicorrelation).
 - jRegr: test jednostronny korelacji z przedziałem dwustronnym; panele
   macierzy rozrzutów na wierszach kompletnych we wszystkich zmiennych, a tytuły
   z korelacji parami.
-- jTestyT/jperm: brak części opcji w `clearWith` (`student`, `plot`, `metody`);
-  ta sama zmienna dwa razy w parze → błąd wykresu i zdublowane klucze.
+- jTestyT/jperm: ta sama zmienna dwa razy w parze → błąd wykresu i zdublowane klucze.
 - jANOVA: Dunnett (mvtnorm) daje nieznacznie różne p między uruchomieniami
-  (ziarno lub `GenzBretz`); kolumna „q” Nemenyiego pokazuje q/√2; brak jednego
+  (ziarno lub `GenzBretz`); brak jednego
   pomiaru blokuje całą ANOVA powtórzonych pomiarów (może świadome — do decyzji).
-- scatr: dumbbell bez kontroli duplikatów po `wrapLabels`; heatmap pokazuje
-  „0” dla komórki z samymi brakami (suma); stackbar i pareto wysypują się na
+- scatr: dumbbell bez kontroli duplikatów po `wrapLabels`; stackbar i pareto wysypują się na
   pustej zmiennej; stripmean nie podpisuje rodzaju słupków błędu; meanprofile
   bez komunikatu, gdy brak wierszy kompletnych.
-- distrACTION: F z p = 1 wysypuje się (`is.finite`); Weibull z kształtem
-  < 0,003 (`min` w .a.yaml); F dla df1 < 2 rysuje fałszywy szczyt
-  (`c(0,5, ...)`); zakresy F/χ² ignorują duże λ i przy df ≤ 4 dają setki
-  etykiet; literówki `LoweSegment`, `QuantAlpha*`.
+- distrACTION: zakres χ² ignoruje duże λ i przy małych df daje setki etykiet;
+  literówki `LoweSegment`, `QuantAlpha*` w pozostałych rozkładach.
 - jmvcore: `metody$add()` z wektorem (np. pusta zmienna opcjonalna) wysypuje się
-  dopiero przy renderowaniu; gałąź `mode: vector` w `analysis.R` bez
-  zapasowego PNG, gdy `svg()`/cairo niedostępne.
+  dopiero przy renderowaniu.
 - jSpace: luki w `clearWith` (geomap, tleorbit, satgroups, satclassify);
   `rasterstats` w trybie kolumn zawsze EPSG:4326 (metry jako stopnie);
   k w k-NN po cichu obcinane do wielkości zbioru uczącego; kartogram przy samych
@@ -1126,3 +1122,35 @@ samo (momenty α/λ, α/λ²; η·Γ(1 + 1/β), η²·[Γ(1 + 2/β) − Γ(1 + 1
 PRZED wyznaczeniem początku siatki dla kształtu < 1). ZADANIE 28 ZAMKNIĘTE dla rozkładów
 z planu; t, χ², F — świadomie bez danych empirycznych. „Podziel według” (grupy na jednym
 modelu, nadmierna dyspersja) — decyzja 2026-11-07: NIE robimy.
+
+
+### Zadanie 29: stabilizacja przed jUPWR 1.4.1 — 2026-11-08
+- distrACTION 1.5.1: duże tabele automatycznie grupowane tylko z możliwością
+  przełączenia na pełną tabelę; dodatkowy tryb pytania, walidacja Inf.
+- CI obejmuje distrACTION, jEksplor, jTestyT i jCzest obok jperm/jCI/jRegr;
+  kopiuje źródłowy NAMESPACE. Testy cache protobuf i eksportu ośmiu rozkładów.
+- Z zadania 27 naprawione: percentyle z przecinkiem; clearWith w jCI/jTestyT/jperm;
+  obcinanie niecałkowitych liczności w jCzest; nieokreślone granice OR/RR przy zerach;
+  heatmapa z samymi brakami (scatr). Pozostałe punkty zadania 27 nadal otwarte.
+- Zgodność .omv: fixture z prawdziwego distrACTION 1.4.0 (źródła b2090c5c),
+  `packaging/tests/manual/distrACTION-1.4.0.omv`; generowanie i weryfikacja:
+  `packaging/scripts/test-release-141.py`. W 1.5.x model używa p z panelu,
+  zgodnie z decyzją zadania 28. Dane audytu w repo, nie tylko w Dokumentach hosta.
+- Protokół: `packaging/tests/manual/release-1.4.1.md`. Paczki natywne Windows/macOS
+  i `.jmo` jRISK/jSpace wymagają builda na właściwych maszynach; nie oznaczać ich
+  jako wykonane na podstawie testów Dockera/Linux.
+
+- Rozszerzenie zadania 29: 17 wykresów scatr używa `mode: vector` (jak jEksplor),
+  z weryfikacją zasobów SVG, eksportów PNG/SVG/PDF i zapisu/odczytu OMV.
+  Dane: `packaging/tests/manual/plots-vector-1.4.1.csv`; test: `test-release-141.py --plots-only`.
+
+- Doprecyzowanie percentyli: parser i podpisy respektują `self$options$decSymbol`;
+  separator listy `;` działa w obu trybach, dawne listy z przecinkami tylko
+  przy kropce dziesiętnej. `clearWith: decSymbol` unieważnia stare percentyle.
+
+- Dalsza stabilizacja 1.4.1: jmvcore 28.3.4 (fallback SVG → PNG), jANOVA 0.5.7
+  (q Nemenyiego na skali rozstępu studentyzowanego; p bez zmian), F (p = 0/1,
+  gęstość dla df1 < 2 i zakres z λ), Weibull (bardzo mały kształt, stabilne
+  momenty i komunikat przy niereprezentowalnym zakresie wykresu).
+  Testy: `test-vector-fallback.R`, `test-boundaries.R`, `test-nemenyi.R`;
+  silnik C++/R: `test-release-141.py --boundaries-only`, dane `nemenyi-1.4.1.csv`.

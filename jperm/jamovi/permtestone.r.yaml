@@ -12,9 +12,11 @@ items:
         - vars
         - testValue
         - hypothesis
+        - plot
         - nPerm
         - seed
         - exact
+        - metody
       columns:
         - name: var
           title: ''
@@ -47,4 +49,5 @@ items:
       title: Zastosowane metody
       type: Html
       visible: (metody)
+      clearWith: *cw
 ...

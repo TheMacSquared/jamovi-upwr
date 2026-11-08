@@ -5,27 +5,28 @@ w instalator, które doinstalowuje się osobno, w jakiej są wersji i pod któr�
 zostały ostatnio zbudowane*. Lista wydań: [`../CHANGELOG.md`](../CHANGELOG.md).
 Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 
-Stan wydania **jUPWR 1.4.0 / jamovi 28.17** (2026-11-05): wersja podbita;
-Docker, buildy Windows i macOS oraz natywne `.jmo` jRISK/jSpace zbudowane 2026-11-05
-(wiersze 1.4.0 poniżej). Wersji modułów nie
-podnosimy z powodu samej przebudowy; starsze `.jmo` nie stanowią potwierdzenia
-zgodności z nowym runtime.
+Stan przygotowania **jUPWR 1.4.1 / jamovi 28.17** (2026-11-08):
+Docker i testy — protokół w `tests/manual/release-1.4.1.md`.
+Buildy natywne Windows/macOS i ich `.jmo` jRISK/jSpace czekają na weryfikację
+na właściwych maszynach. Ostatnie potwierdzone paczki natywne: 1.4.0.
+Wersji modułów nie podnosimy z powodu samej przebudowy.
 
 ## Moduły
 
 | Moduł (katalog) | Nazwa w jamovi | Rola | Dystrybucja | Wersja |
 |---|---|---|---|---|
+| `jmvcore/` | jmvcore | wspólny runtime analiz, motywy i palety | wbudowany runtime | 28.3.4 |
 | `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.5 |
-| `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 30 wykresów, w tym 1 ukryty) | wbudowany | 2.9.13 |
-| `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.5.0 |
-| `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.8 |
-| `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.8 |
+| `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 30 wykresów, w tym 17 wektorowych i 1 ukryty) | wbudowany | 2.9.14 |
+| `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.5.1 |
+| `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.9 |
+| `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.9 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.8.2 |
-| `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.2.7 |
-| `jEksplor/` | jEksplor | eksploracja jUPWR: zmienne ilościowe (rdzeń N/braki/średnia/mediana/kwartyle/SD/min/max/V, miary pozycyjne, Gini i Lorenz, Lilliefors i Anderson-Darling), zmienne jakościowe (tabele liczności, także w grupach), szereg rozdzielczy; zastępuje w menu Eksploracja jmv::descriptives i jmv::qualitative (ukryte w kliencie) | wbudowany | 0.1.10 |
+| `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.2.8 |
+| `jEksplor/` | jEksplor | eksploracja jUPWR: zmienne ilościowe (rdzeń N/braki/średnia/mediana/kwartyle/SD/min/max/V, miary pozycyjne, Gini i Lorenz, Lilliefors i Anderson-Darling), zmienne jakościowe (tabele liczności, także w grupach), szereg rozdzielczy; zastępuje w menu Eksploracja jmv::descriptives i jmv::qualitative (ukryte w kliencie) | wbudowany | 0.1.11 |
 | `jRegr/` | jRegr | regresja jUPWR: korelacja (para = jeden wiersz, więcej = macierz), regresja liniowa, logistyczna dwumianowa; zastępuje w menu Regresja jmv::simpleCorr, corrMatrix, linReg, logRegBin (ukryte w kliencie) | wbudowany | 0.1.9 |
-| `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery (Tukey, Games-Howell, Dunnett); zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.5.6 |
-| `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem — tylko testowanie: statystyka, p, różnica i d Cohena jako punkty (przedziały ufności i wykres estymacyjny są w jCI); zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.4.6 |
+| `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery (Tukey, Games-Howell, Dunnett); zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.5.7 |
+| `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem — tylko testowanie: statystyka, p, różnica i d Cohena jako punkty (przedziały ufności i wykres estymacyjny są w jCI); zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.4.7 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.4.5 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.4 |
 | `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | wewnętrzny — poza wydaniem (zamrożony) | 0.1.3 |
@@ -88,6 +89,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.4.1 | 28.17 | 0.4.5 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.4.0 | 28.17 | 0.4.5 | ✅ 2026-11-05 | ✅ 2026-11-05 |
 | 1.3.1 | 28.17 | 0.4.4 | ✅ 2026-11-02 | ✅ 2026-11-02 |
 | 1.3.0 | 28.17 | 0.4.4 | ⬜ do zbudowania | ⬜ do zbudowania |
@@ -135,6 +137,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.4.1 | 28.17 | 0.3.4 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.4.0 | 28.17 | 0.3.4 | ✅ 2026-11-05 | ✅ 2026-11-05 |
 | 1.3.1 | 28.17 | 0.3.3 | ✅ 2026-11-02 | ✅ 2026-11-02 |
 | 1.3.0 | 28.17 | 0.3.3 | ⬜ do zbudowania | ⬜ do zbudowania |

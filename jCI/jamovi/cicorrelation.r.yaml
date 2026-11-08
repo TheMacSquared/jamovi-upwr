@@ -11,11 +11,14 @@ items:
       clearWith: &cw
         - var1
         - var2
-        - method
         - ciWidth
+        - method
         - ciMethod
+        - plot
         - nBoot
         - seed
+        - bootPlot
+        - metody
       columns:
         - name: var1
           title: Zmienna 1
@@ -62,4 +65,5 @@ items:
       title: Zastosowane metody
       type: Html
       visible: (metody)
+      clearWith: *cw
 ...

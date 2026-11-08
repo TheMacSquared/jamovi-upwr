@@ -269,7 +269,7 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # The highest segment of the x-axis is defined
         HigherAxisSegment <- DP1
         # The segments of the x-axis are defined
-        AxisSegments <- seq(LowerAxisSegment, HigherAxisSegment, by = 1)  
+        AxisSegments <- discreteAxisBreaks(x)
         # A variable for the position of the upper quantile is defined
         HigherSegment <- NA
         # A variable for the position of the lower quantile is defined
@@ -376,7 +376,8 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           mom$setNote("phat", sprintf("p̂ = %d sukcesów („%s”) / %d prób; n = %s z parametrów.",
                                       EmpBin$successes, EmpBin$level, EmpBin$N, DP1))
           # the points cover the plot range and every value Bin(n, p̂) reaches
-          EmpXs <- seq(min(x[1], qbinom(1e-4, DP1, ph)), max(x[length(x)], qbinom(1 - 1e-4, DP1, ph)), by = 1)
+          EmpRange <- discretePlotRange(0, DP1, function(p) qbinom(p, DP1, ph))
+          EmpXs <- seq(EmpRange[1], EmpRange[2], by = 1)
           EmpPlot <- data.frame(X = EmpXs, Freq = dbinom(EmpXs, DP1, ph))
           EmpLabel <- "Dane: Bin(n, p̂)"
         }
@@ -385,14 +386,12 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           # the tables need every observed value inside the support, and the
           # mass beyond the trimmed range goes to the (unobserved) end points,
           # which fall into the "≤ k" / "≥ k" classes
-          EmpLo <- max(0, min(x[1], min(EmpX)) - 1)
-          EmpHi <- min(DP1, max(x[length(x)], max(EmpX)) + 1)
-          EmpSupport <- seq(EmpLo, EmpHi, by = 1)
-          EmpPmf <- dbinom(EmpSupport, DP1, DP2)
-          EmpPmf[1] <- EmpPmf[1] + pbinom(EmpLo - 1, DP1, DP2)
-          EmpPmf[length(EmpPmf)] <- EmpPmf[length(EmpPmf)] + pbinom(EmpHi, DP1, DP2, lower.tail = FALSE)
+          EmpClasses <- empDiscreteClasses(EmpX, range(x),
+            function(k) dbinom(k, DP1, DP2),
+            function(k, lower.tail = TRUE) pbinom(k, DP1, DP2, lower.tail = lower.tail),
+            lower = 0, upper = DP1, mode = self$options$empTableMode)
           EmpPlot <- empFillResults(
-            self$results, EmpX, EmpSupport, EmpPmf,
+            self$results, EmpX, EmpClasses,
             modelMean = DP1 * DP2, modelVar = DP1 * DP2 * (1 - DP2))
           # only 0 and 1 with n > 1: most likely one trial per row
           if (DP1 > 1 && all(EmpX %in% c(0, 1)))

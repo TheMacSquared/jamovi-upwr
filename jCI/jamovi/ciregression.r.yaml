@@ -13,8 +13,11 @@ items:
         - pred
         - ciWidth
         - ciMethod
+        - plot
         - nBoot
         - seed
+        - bootPlot
+        - metody
       columns:
         - name: term
           title: ''
@@ -58,4 +61,5 @@ items:
       title: Zastosowane metody
       type: Html
       visible: (metody)
+      clearWith: *cw
 ...

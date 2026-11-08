@@ -119,3 +119,6 @@ children:
                 name: empLevel
                 defaultLevelIndex: 1
                 enable: (empVar && empType:binary)
+      - type: ComboBox
+        name: empTableMode
+        enable: (empVar)

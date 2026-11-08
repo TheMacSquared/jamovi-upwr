@@ -54,6 +54,11 @@ items:
           title: Wartość
           type: text
 
+    - name: empTableNotice
+      title: Tabela liczności
+      type: Html
+      visible: (empVar)
+
     - name: EmpTable
       title: Liczności obserwowane i oczekiwane
       type: Table

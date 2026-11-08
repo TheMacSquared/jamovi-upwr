@@ -42,6 +42,7 @@ items:
         - skewQuart
         - pc
         - pcValues
+        - decSymbol
         - pcEqGr
         - pcNEqGr
       columns: []

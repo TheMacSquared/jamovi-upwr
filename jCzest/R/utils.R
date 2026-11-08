@@ -4,13 +4,18 @@
 #' Czy opcja zmiennej jest ustawiona (jamovi daje NULL albo pusty łańcuch)
 optNonEmpty <- function(x) !is.null(x) && length(x) > 0 && nzchar(x[1])
 
+# Frequency counts describe numbers of observations, never fractional weights.
+validateCounts <- function(counts) {
+    if (any(!is.na(counts) & (!is.finite(counts) | counts < 0 | counts != round(counts))))
+        stop("Liczności muszą być skończonymi, nieujemnymi liczbami całkowitymi.", call. = FALSE)
+}
+
 #' Tabela kontyngencji z surowych danych; `counts` = zmienna z licznościami
 #' (dane zagregowane) albo NULL (jedna obserwacja = jeden wiersz).
 buildTable <- function(rows, cols, counts = NULL) {
     ok <- !is.na(rows) & !is.na(cols)
     if (!is.null(counts)) {
-        if (any(!is.na(counts) & (!is.finite(counts) | counts < 0)))
-            stop("Nie można obliczyć tabeli: liczności muszą być skończone i nieujemne.", call. = FALSE)
+        validateCounts(counts)
         ok <- ok & !is.na(counts)
     }
     rows <- droplevels(factor(rows[ok])); cols <- droplevels(factor(cols[ok]))
@@ -121,8 +126,10 @@ twoByTwo <- function(tab, level = 0.95, compare = "rows") {
     dp <- p1 - p2
     seDp <- sqrt(p1 * (1 - p1) / (a + b) + p2 * (1 - p2) / (c0 + d))
     list(
-        or = list(est = or, lower = exp(log(or) - z * seLogOr), upper = exp(log(or) + z * seLogOr)),
-        rr = list(est = rr, lower = exp(log(rr) - z * seLogRr), upper = exp(log(rr) + z * seLogRr)),
+        or = list(est = or, lower = if (all(m > 0)) exp(log(or) - z * seLogOr) else NA_real_,
+                  upper = if (all(m > 0)) exp(log(or) + z * seLogOr) else NA_real_),
+        rr = list(est = rr, lower = if (a > 0 && c0 > 0) exp(log(rr) - z * seLogRr) else NA_real_,
+                  upper = if (a > 0 && c0 > 0) exp(log(rr) + z * seLogRr) else NA_real_),
         dp = list(est = dp, lower = dp - z * seDp, upper = dp + z * seDp)
     )
 }
@@ -194,8 +201,7 @@ gofCounts <- function(x, counts = NULL) {
     if (!is.factor(x)) x <- factor(x)
     ok <- !is.na(x)
     if (!is.null(counts)) {
-        if (any(!is.na(counts) & (!is.finite(counts) | counts < 0)))
-            stop("Nie można obliczyć tabeli: liczności muszą być skończone i nieujemne.", call. = FALSE)
+        validateCounts(counts)
         ok <- ok & !is.na(counts)
     }
     x <- x[ok]
@@ -228,8 +234,9 @@ chiSqGof <- function(obs, e) {
 #' Dokładny test dwumianowy dla dwóch kategorii; p0 = oczekiwana proporcja
 #' PIERWSZEJ kategorii. `hypothesis`: notequal / greater / less.
 binomGof <- function(obs, p0, hypothesis = "notequal") {
+    validateCounts(obs)
     alt <- switch(hypothesis, greater = "greater", less = "less", "two.sided")
-    bt <- stats::binom.test(as.integer(obs[1]), as.integer(sum(obs)), p = p0, alternative = alt)
+    bt <- stats::binom.test(obs[1], sum(obs), p = p0, alternative = alt)
     list(stat = unname(bt$statistic), n = unname(bt$parameter), p = bt$p.value,
          estimate = unname(bt$estimate), p0 = p0)
 }
@@ -255,7 +262,8 @@ gofResiduals <- function(obs, e) {
 #' nie bardziej prawdopodobnych niż zaobserwowany. Wykonalny tylko dla małych
 #' n i k — zwraca NULL, gdy przestrzeń układów jest za duża.
 multinomExact <- function(obs, e, maxStates = 2e5) {
-    n <- as.integer(sum(obs)); k <- length(obs)
+    validateCounts(obs)
+    n <- sum(obs); k <- length(obs)
     if (k < 2) return(NULL)
     if (choose(n + k - 1, k - 1) > maxStates) return(NULL)
     p <- e / sum(e)
@@ -285,8 +293,7 @@ pairedTable <- function(v1, v2, counts = NULL) {
     f1 <- factor(v1, levels = lv); f2 <- factor(v2, levels = lv)
     ok <- !is.na(f1) & !is.na(f2)
     if (!is.null(counts)) {
-        if (any(!is.na(counts) & (!is.finite(counts) | counts < 0)))
-            stop("Nie można obliczyć tabeli: liczności muszą być skończone i nieujemne.", call. = FALSE)
+        validateCounts(counts)
         ok <- ok & !is.na(counts)
     }
     f1 <- f1[ok]; f2 <- f2[ok]
@@ -316,7 +323,8 @@ mcnemar <- function(tab, correct = FALSE) {
 #' Właściwy wybór, gdy par niezgodnych jest mało (przybliżenie χ² zawodzi).
 mcnemarExact <- function(tab) {
     if (!all(dim(tab) == c(2, 2))) return(NULL)
-    b <- as.integer(tab[1, 2]); c0 <- as.integer(tab[2, 1])
+    validateCounts(tab)
+    b <- tab[1, 2]; c0 <- tab[2, 1]
     if (b + c0 == 0) return(list(p = NA_real_, discordant = 0))
     list(p = stats::binom.test(b, b + c0, 0.5)$p.value, discordant = b + c0)
 }

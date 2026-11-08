@@ -11,12 +11,15 @@ items:
       clearWith: &cw
         - dep
         - group
-        - stat
-        - trimProp
         - ciWidth
         - ciMethod
+        - stat
+        - plot
         - nBoot
         - seed
+        - bootPlot
+        - trimProp
+        - metody
       columns:
         - name: var
           title: ''
@@ -70,4 +73,5 @@ items:
       title: Zastosowane metody
       type: Html
       visible: (metody)
+      clearWith: *cw
 ...

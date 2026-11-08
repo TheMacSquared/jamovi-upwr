@@ -49,6 +49,51 @@ test_that("advanced statistics, percentiles, cut points, extreme values, normali
     expect_lt(regexpr("<b>Statystyki</b>", h), regexpr("<b>Założenia</b>", h))
 })
 
+# Generated R wrappers omit app-wide settings; exercise the options path used
+# by the engine, which supplies decSymbol alongside the analysis options.
+runPercentiles <- function(data, ...) {
+    opts <- jEksplor:::iloscioweOptions$new(...)
+    analysis <- jEksplor:::iloscioweClass$new(options = opts, data = data)
+    analysis$run()
+    analysis$results
+}
+
+test_that("percentiles follow the app decimal symbol in both table layouts", {
+    data <- data.frame(x = 1:101)
+    comma <- runPercentiles(data = data, vars = "x", pc = TRUE,
+                                 pcValues = "2,5; 97,5", decSymbol = ",", metody = TRUE)
+    expect_equal(comma$desc$asDF[["pc2.5"]], 3.5)
+    expect_equal(comma$desc$asDF[["pc97.5"]], 98.5)
+    expect_equal(comma$desc$getColumn("pc2.5")$title, "P2,5")
+    expect_match(comma$metody$content, "P2,5; P97,5", fixed = TRUE)
+    dot <- runPercentiles(data = data, vars = "x", pc = TRUE,
+                               pcValues = "2.5; 97.5", decSymbol = ".")
+    expect_equal(dot$desc$asDF[["pc2.5"]], 3.5)
+    expect_equal(dot$desc$getColumn("pc2.5")$title, "P2.5")
+    cols <- runPercentiles(data = data, vars = "x", pc = TRUE,
+        pcValues = "2,5; 97,5", decSymbol = ",", layout = "columns")$desc$asDF
+    expect_true(all(c("P2,5", "P97,5") %in% cols$stat))
+    expect_equal(cols$v_x[cols$stat == "P2,5"], 3.5)
+    defaults <- runPercentiles(data = data, vars = "x", pc = TRUE, decSymbol = ",")
+    expect_equal(defaults$desc$asDF$pc25, 26)
+    expect_error(runPercentiles(data = data, vars = "x", pc = TRUE,
+        pcValues = "2.5; 97.5", decSymbol = ","), "przecinek dziesiętny")
+    expect_silent(runPercentiles(data = data, vars = "x", pc = FALSE,
+        pcValues = "2.5; 97.5", decSymbol = ","))
+})
+
+test_that("changing the decimal symbol discards cached percentile rows", {
+    jmvcore:::initProtoBuf()
+    data <- data.frame(x = 1:101)
+    old <- runPercentiles(data = data, vars = "x", pc = TRUE,
+        pcValues = "2,5", decSymbol = ".", layout = "columns")
+    fresh <- runPercentiles(data = data, vars = "x", pc = TRUE,
+        pcValues = "2,5", decSymbol = ",", layout = "columns")
+    fresh$desc$fromProtoBuf(old$desc$asProtoBuf(), "decSymbol", character())
+    expect_true("P2,5" %in% fresh$desc$asDF$stat)
+    expect_false(any(c("P2", "P5") %in% fresh$desc$asDF$stat))
+})
+
 test_that("szereg rozdzielczy analysis", {
     set.seed(7); s <- data.frame(w = round(rnorm(60, 50, 8)))
     res <- jEksplor:::szereg(data = s, var = "w", metody = TRUE, ogive = TRUE)

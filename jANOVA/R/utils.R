@@ -677,8 +677,10 @@ friedmanPairs <- function(m, alpha = 0.05) {
     out <- data.frame(g1 = pairs[, 1], g2 = pairs[, 2], stringsAsFactors = FALSE)
     out$diff <- Rmean[out$g1] - Rmean[out$g2]
     out$se <- sqrt(k * (k + 1) / (6 * n))
-    out$stat <- out$diff / out$se
-    out$p <- stats::ptukey(abs(out$stat) * sqrt(2), k, Inf, lower.tail = FALSE)
+    # q uses the studentized-range scale; the reported SE remains the
+    # standard error of a difference of mean ranks.
+    out$stat <- abs(out$diff) / out$se * sqrt(2)
+    out$p <- stats::ptukey(out$stat, k, Inf, lower.tail = FALSE)
     out$sig <- !is.na(out$p) & out$p < alpha
     rownames(out) <- NULL
     levelsTab <- data.frame(level = levs, n = n, median = apply(m, 2, stats::median),

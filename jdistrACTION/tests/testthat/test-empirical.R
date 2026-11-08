@@ -6,6 +6,51 @@ skip_if_not_installed("distrACTION")
 
 bananpol <- data.frame(kontrole = rep(0:5, c(19, 46, 47, 25, 11, 2)))
 
+test_that("wide empirical supports are bounded and preserve counts and model mass", {
+  for (fn in list(
+    function(d) distrACTION::PoissonDistribution(data = d, empVar = "v", dp1 = 2, empTableMode = "grouped"),
+    function(d) distrACTION::GeometricDistribution(data = d, empVar = "v", dp1 = 0.2, empTableMode = "grouped"),
+    function(d) distrACTION::NegBinomialDistribution(data = d, empVar = "v", dp1 = 3,
+                                                    RandomVariable = "failures", dp2 = 0.2, empTableMode = "grouped"),
+    function(d) distrACTION::BinomialDistribution(data = d, empVar = "v", dp1 = 1e7, dp2 = 0.5, empTableMode = "grouped"))) {
+    d <- data.frame(v = c(0, 1, 2, 1e7))
+    res <- fn(d)
+    tab <- res$EmpTable$asDF
+    expect_lte(nrow(tab), 203)
+    expect_equal(tail(tab$obs, 1), nrow(d))
+    expect_equal(sum(head(tab$obs, -1)), nrow(d))
+    expect_equal(tail(tab$exp, 1), nrow(d), tolerance = 1e-9)
+    expect_equal(res$EmpMoments$asDF$data[1], mean(d$v))
+    expect_match(res$EmpTable$asString(), "przedziały")
+  }
+})
+
+test_that("infinite empirical counts report the variable format", {
+  for (v in list(c(1, Inf), c(1, -Inf), factor(c("1", "Inf"))))
+    expect_error(distrACTION::PoissonDistribution(data = data.frame(v = v), empVar = "v"),
+                 "Nieprawidłowy format zmiennej")
+})
+
+test_that("all eight empirical plots render and export", {
+  d <- data.frame(v = rep(1:5, 2))
+  results <- list(
+    distrACTION::BinomialDistribution(data = d, empVar = "v", dp1 = 12, dp2 = 0.15),
+    distrACTION::PoissonDistribution(data = d, empVar = "v", dp1 = 2),
+    distrACTION::GeometricDistribution(data = d, empVar = "v", dp1 = 0.25),
+    distrACTION::NegBinomialDistribution(data = d, empVar = "v", dp1 = 3, dp2 = 0.2,
+                                        RandomVariable = "failures"),
+    distrACTION::Normaldistribution(data = d, empVar = "v", x1 = 0, dp1 = 3, dp2 = 1),
+    distrACTION::ExponentialDistribution(data = d, empVar = "v", dp1 = 0.5),
+    distrACTION::GammaDistribution(data = d, empVar = "v", dp1 = 2, dp2 = 0.5),
+    distrACTION::WeibullDistribution(data = d, empVar = "v", dp1 = 1.5, dp2 = 3))
+  for (res in results) for (ext in c("png", "svg", "pdf")) {
+    path <- tempfile(fileext = paste0(".", ext))
+    suppressWarnings(res$plot$saveAs(path))
+    expect_gt(file.info(path)$size, 100)
+    unlink(path)
+  }
+})
+
 test_that("observed / expected table reproduces the task 4.3 key", {
   res <- distrACTION::BinomialDistribution(
     data = bananpol, empVar = "kontrole", dp1 = 12, dp2 = 0.15,
@@ -235,4 +280,31 @@ test_that("weibull: moments next to the Gamma-function formulas", {
   far <- data.frame(zycie = c(10, 100, 9000))
   res <- distrACTION::WeibullDistribution(data = far, empVar = "zycie", dp1 = 1.5, dp2 = 1000)
   expect_equal(max(res$plot$state$Dataset[[1]]), 9000)
+})
+
+
+test_that("large tables wait for an explicit choice and can show all values", {
+  d <- data.frame(v = c(0, 1, 2000))
+  res <- distrACTION::PoissonDistribution(data = d, empVar = "v", dp1 = 2,
+                                         empTableMode = "individual")
+  expect_false(res$EmpTable$visible)
+  expect_match(res$empTableNotice$content, "Podziału nie zmieniono")
+  expect_equal(res$EmpMoments$asDF$data[1], mean(d$v))
+  expect_equal(max(res$plot$state$emp$X), 2000)
+  auto <- distrACTION::PoissonDistribution(data = d, empVar = "v", dp1 = 2)
+  expect_true(auto$EmpTable$visible)
+  expect_lte(nrow(auto$EmpTable$asDF), 203)
+  expect_match(auto$EmpTable$asString(), "pokaż wszystkie wartości")
+  # Check a full large support before the expensive R6 table rendering.
+  cls <- distrACTION:::empDiscreteClasses(d$v, c(0, 5),
+      function(k) dpois(k, 2),
+      function(k, lower.tail = TRUE) ppois(k, 2, lower.tail = lower.tail), mode = "full")
+  expect_true(all(as.character(0:2000) %in% cls$label))
+  expect_equal(sum(cls$obs), 3)
+  expect_equal(sum(cls$exp), 3, tolerance = 1e-9)
+  full <- distrACTION::PoissonDistribution(data = data.frame(v = c(0, 1, 20)),
+                                          empVar = "v", dp1 = 2, empTableMode = "full")
+  expect_false(full$empTableNotice$visible)
+  expect_true(full$EmpTable$visible)
+  expect_true(all(as.character(0:20) %in% full$EmpTable$asDF$x))
 })

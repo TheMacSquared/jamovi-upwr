@@ -100,4 +100,15 @@ options:
         - numeric
         - factor
       default: null
+    - name: empTableMode
+      title: Tabela liczności
+      type: List
+      options:
+        - name: individual
+          title: pojedyncze wartości (zapytaj przy dużej tabeli)
+        - name: full
+          title: pokaż wszystkie wartości
+        - name: grouped
+          title: automatycznie grupuj duże tabele
+      default: grouped
 ...

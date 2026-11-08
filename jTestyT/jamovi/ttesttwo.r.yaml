@@ -11,9 +11,16 @@ items:
       clearWith: &cw
         - vars
         - group
-        - hypothesis
         - welch
+        - hypothesis
+        - student
         - nonpar
+        - plot
+        - desc
+        - norm
+        - qq
+        - homog
+        - metody
       columns:
         - name: var
           title: ''
@@ -120,9 +127,7 @@ items:
       title: Wykresy
       type: Array
       visible: (plot)
-      clearWith:
-        - vars
-        - group
+      clearWith: *cw
       template:
         title: ''
         type: Image
@@ -148,4 +153,5 @@ items:
       title: Zastosowane metody
       type: Html
       visible: (metody)
+      clearWith: *cw
 ...

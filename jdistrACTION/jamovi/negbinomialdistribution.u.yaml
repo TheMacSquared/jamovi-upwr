@@ -109,3 +109,6 @@ children:
                 name: empVar
                 maxItemCount: 1
                 isTarget: true
+      - type: ComboBox
+        name: empTableMode
+        enable: (empVar)

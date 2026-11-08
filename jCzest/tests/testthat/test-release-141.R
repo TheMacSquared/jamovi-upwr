@@ -1,0 +1,22 @@
+test_that("fractional frequencies are rejected before exact tests", {
+    expect_error(binomGof(c(2.5, 4.5), 0.5), "całkowitymi")
+    expect_error(mcnemarExact(matrix(c(1, 2.5, 3.5, 4), 2)), "całkowitymi")
+    expect_error(multinomExact(c(2.5, 3.5, 4), c(3, 3, 4)), "całkowitymi")
+    expect_error(gofCounts(factor(c("a", "b")), c(2.5, 3.5)), "całkowitymi")
+    expect_error(pairedTable(c("a", "b"), c("b", "a"), c(2.5, 3.5)), "całkowitymi")
+    expect_error(buildTable(c("a", "b"), c("b", "a"), c(2.5, 3.5)), "całkowitymi")
+    expect_equal(binomGof(c(2, 5), 0.5)$p, binom.test(2, 7)$p.value)
+})
+
+test_that("zero cells preserve point estimates but omit undefined Wald intervals", {
+    tab <- matrix(c(10, 5, 0, 15), 2, byrow = TRUE)
+    r <- twoByTwo(tab)
+    expect_equal(r$or$est, Inf)
+    expect_true(is.na(r$or$lower) && is.na(r$or$upper))
+    expect_equal(r$rr$est, Inf)
+    expect_true(is.na(r$rr$lower) && is.na(r$rr$upper))
+    expect_true(is.finite(r$dp$lower) && is.finite(r$dp$upper))
+    flipped <- twoByTwo(tab[2:1, ])
+    expect_equal(flipped$or$est, 0)
+    expect_true(is.na(flipped$or$lower) && is.na(flipped$or$upper))
+})

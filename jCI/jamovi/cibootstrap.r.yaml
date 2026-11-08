@@ -8,8 +8,13 @@ items:
       title: Dane — podsumowanie
       type: Table
       rows: 0
-      clearWith:
+      clearWith: &cw
         - dep
+        - nBoot
+        - ciWidth
+        - seed
+        - showConvergence
+        - metody
       columns:
         - name: stat
           title: ''
@@ -22,11 +27,7 @@ items:
       title: Próby bootstrapowe
       type: Table
       rows: 0
-      clearWith: &cw
-        - dep
-        - nBoot
-        - seed
-        - ciWidth
+      clearWith: *cw
       columns:
         - name: sample
           title: Nr próby
@@ -60,10 +61,7 @@ items:
       rows: 0
       visible: (showConvergence)
       refs: boot
-      clearWith:
-        - dep
-        - seed
-        - ciWidth
+      clearWith: *cw
       columns:
         - name: b
           title: B
@@ -91,13 +89,11 @@ items:
       height: 380
       renderFun: .convPlot
       refs: [ggplot2, boot]
-      clearWith:
-        - dep
-        - seed
-        - ciWidth
+      clearWith: *cw
 
     - name: metody
       title: Zastosowane metody
       type: Html
       visible: (metody)
+      clearWith: *cw
 ...

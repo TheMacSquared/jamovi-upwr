@@ -11,6 +11,8 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           stop(sprintf("Nie można obliczyć rozkładu: df1 musi być dodatnie (podano %s).", self$options$dp1), call. = FALSE)
         if (is.na(self$options$dp2) || self$options$dp2 <= 0)
           stop(sprintf("Nie można obliczyć rozkładu: df2 musi być dodatnie (podano %s).", self$options$dp2), call. = FALSE)
+        if (!is.finite(self$options$dp3) || self$options$dp3 < 0)
+          stop("Parametr λ musi być skończony i nieujemny.", call. = FALSE)
 
         
         
@@ -41,12 +43,19 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         LowerTail <- 0
         # The upper End of the distribution
         UpperTail <- 10
-        SpecialWidth <- "FALSE"
         if(DP1<5){
           UpperTail <- 15}
         if(((UpperTail-LowerTail)/2)>((qf(.9999, DP1, DP2, DP3))-LowerTail)){
           UpperTail <- ceiling(qf(.9995, DP1, DP2, DP3)*2)/2
-          SpecialWidth <- "TRUE"}
+        }
+        # Include the shifted mass of a non-central distribution.
+        if (DP3 > 0) {
+          upper <- qf(0.99, DP1, DP2, DP3)
+          if (is.finite(upper)) UpperTail <- max(UpperTail, upper)
+        }
+        # An infinite density at zero is a boundary singularity, not a point
+        # that may be replaced with an arbitrary finite height.
+        if (DP1 < 2) LowerTail <- UpperTail / 10000
         #The number of values in the curve
         N <- 1000
         # Define a variable for the columname of dataframes
@@ -119,7 +128,8 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             DistributionResult <- DistributionResult2-DistributionResult1}}
         if(QuantileFunction=="TRUE"){
             # The x-value of the percentil is calculated
-          QuantileResult <- qf(Quantile, DP1, DP2, DP3)}
+          QuantileBoundary <- qf(Quantile, DP1, DP2, DP3)
+          QuantileResult <- QuantileBoundary}
         
         
         ##### 1.2.2) Output Table #####
@@ -184,9 +194,6 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         Datas <- data.frame(x, Density)
         # Names of the colums
         colnames(Datas) <-  Columnames
-        # An infinitive value is changes to the second highest value
-        if(max(Datas$Prob)=="Inf"){
-          Datas[(Datas[,2]==max(Datas$Prob)),] <- c(0,5, df(0.5, DP1, DP2, DP3))}
         # For calculating the searched area, a new variable is created  
         MainCurveData <- as.data.frame(Datas)
 
@@ -221,12 +228,7 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # The highest segment of the x-axis is defined
         HigherAxisSegment <- UpperTail
         # The segments of the x-axis are defined
-        AxisSegments <- seq(LowerAxisSegment, HigherAxisSegment, by = 1) 
-        if(SpecialWidth==TRUE){
-          # HigherAxisSegment <- ceiling(HigherAxisSegment)
-          AxisSegments <- seq(LowerAxisSegment, ceiling(HigherAxisSegment), by = 1)
-          if(length(AxisSegments)<5)
-            AxisSegments <- seq(LowerAxisSegment, ceiling(HigherAxisSegment), by = 0.25)}
+        AxisSegments <- pretty(c(0, HigherAxisSegment), n = 8)
         # A variable for the position of the upper quantile is defined
         HigherSegment <- NA
         # A variable for the position of the lower quantile is defined
@@ -236,44 +238,31 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # A variable for the length of the lower quantile is defined
         LowerSegmentLength <- NA
         # The position of the upper quantile is calculated
-        if(QuantileFunction=="TRUE"){
-          HigherSegment <- QuantileResult
-          HigherSegmentLength <- df(HigherSegment, DP1, DP2, DP3)
-          # The length of the quantile segment is changed if it is too short
-          if((HigherSegmentLength*18)<(max(Datas$Prob))){
-            HigherSegmentLength <- ((max(Datas$Prob))/18)}
-          # the position of the lower quantile is the same.
-          LowerSegment <- HigherSegment
-          LowerSegmentLength <- HigherSegmentLength
-        
-          
-          ##### 1.3.4) Improvements of the plot by conditions #####
-          # A value to check if the quantiles are within the x-axis is calculated      
-          HighLineCheck <- qf(Quantile, DP1, DP2, DP3)
-          # Changes are done if the quantile is outside the x-axis
-          if(HighLineCheck>HigherAxisSegment){
-            QuantileLabel <- "Kwantyl poza zakresem"
-            QuantileAlphaLow <- 0
-            QuantileAlphaHigh <- 0
-            Textsize <- 10
-            HigherSegment <- LowerAxisSegment
-            LowerSegment <- HigherAxisSegment}
-          if(HighLineCheck<LowerAxisSegment){
+        if (QuantileFunction == "TRUE") {
+          HigherSegment <- QuantileBoundary
+          if (!is.finite(HigherSegment) || HigherSegment > HigherAxisSegment || HigherSegment < LowerAxisSegment) {
             QuantileLabel <- "Kwantyl poza zakresem"
             QuantileAlphaLow <- 0
             QuantileAlphaHigh <- 0
             Textsize <- 10
             HigherSegment <- HigherAxisSegment
-            LowerSegment <- HigherAxisSegment}}
-
+            HigherSegmentLength <- 0
+          } else {
+            HigherSegmentLength <- df(HigherSegment, DP1, DP2, DP3)
+            if (!is.finite(HigherSegmentLength) || HigherSegmentLength < max(Datas$Prob) / 18)
+              HigherSegmentLength <- max(Datas$Prob) / 18
+          }
+          LowerSegment <- HigherSegment
+          LowerSegmentLength <- HigherSegmentLength
+        }
 
         ##### 1.3.4b) Shaded area for the quantile #####
         # Shaded area under the density up to the quantile, so students
         # can see p as an area rather than just the dashed line
         QuantileAreaData <- as.data.frame(Datas)
         if (QuantileFunction=="TRUE") {
-          QuantileAreaData$Prob[QuantileAreaData$X > HigherSegment] <- NA
-          QuantileAreaData$X[QuantileAreaData$X > HigherSegment] <- NA
+          QuantileAreaData$Prob[QuantileAreaData$X > QuantileBoundary] <- NA
+          QuantileAreaData$X[QuantileAreaData$X > QuantileBoundary] <- NA
         } else {
           QuantileAreaData$Prob <- NA
           QuantileAreaData$X <- NA

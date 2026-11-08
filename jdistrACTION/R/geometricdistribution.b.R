@@ -202,14 +202,12 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       # the mass beyond it in the end classes ("≤ k" / "≥ k")
       EmpPlot <- NULL
       if (!is.null(EmpX)) {
-        EmpLo <- max(SupportStart, min(x[1], min(EmpX)) - 1)
-        EmpHi <- max(x[length(x)], max(EmpX)) + 1
-        EmpSupport <- seq(EmpLo, EmpHi, by = 1)
-        EmpPmf <- dGeom(EmpSupport)
-        EmpPmf[1] <- EmpPmf[1] + pGeom(EmpLo - 1)
-        EmpPmf[length(EmpPmf)] <- EmpPmf[length(EmpPmf)] + (1 - pGeom(EmpHi))
+        EmpClasses <- empDiscreteClasses(EmpX, range(x),
+          dGeom,
+          function(k, lower.tail = TRUE) pgeom(k - Offset, DP1, lower.tail = lower.tail),
+          lower = SupportStart, upper = Inf, mode = self$options$empTableMode)
         ModelMean <- if (Convention == "trials") 1 / DP1 else (1 - DP1) / DP1
-        EmpPlot <- empFillResults(self$results, EmpX, EmpSupport, EmpPmf,
+        EmpPlot <- empFillResults(self$results, EmpX, EmpClasses,
                                   modelMean = ModelMean, modelVar = (1 - DP1) / DP1^2)
       }
 

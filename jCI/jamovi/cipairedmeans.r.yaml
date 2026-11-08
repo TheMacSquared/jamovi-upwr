@@ -13,9 +13,12 @@ items:
         - var2
         - ciWidth
         - ciMethod
+        - plot
         - effSize
         - nBoot
         - seed
+        - bootPlot
+        - metody
       columns:
         - name: var1
           title: Pomiar 1
@@ -79,4 +82,5 @@ items:
       title: Zastosowane metody
       type: Html
       visible: (metody)
+      clearWith: *cw
 ...

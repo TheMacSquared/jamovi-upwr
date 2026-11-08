@@ -483,12 +483,28 @@ Analysis <- R6::R6Class('Analysis',
                 if (vector) {
                     # jUPWR: lets cairo find the bundled fonts (macOS)
                     jupwrRegisterFonts()
-                    grDevices::svg(
+                    device <- grDevices::dev.cur()
+                    opened <- tryCatch({
+                        suppressWarnings(grDevices::svg(
                         filename=fullPath,
                         width=width/ppi,
                         height=height/ppi,
-                        bg='transparent')
-                } else if (requireNamespace('ragg', quietly=TRUE)) {
+                        bg='transparent'))
+                        grDevices::dev.cur() != device
+                    }, error=function(e) FALSE)
+                    if (! opened) {
+                        # A missing cairo/X11 must not remove the analysis plot.
+                        # Keep the resource extension consistent with its bytes.
+                        if (grDevices::dev.cur() != device)
+                            grDevices::dev.off()
+                        if (file.exists(fullPath))
+                            unlink(fullPath)
+                        vector <- FALSE
+                        paths <- private$.resourcesPathSource(name, 'png')
+                        fullPath <- paste0(paths$rootPath, '/', paths$relPath)
+                    }
+                }
+                if (! vector && requireNamespace('ragg', quietly=TRUE)) {
                     ragg::agg_png(
                         filename=fullPath,
                         width=width,
@@ -496,7 +512,7 @@ Analysis <- R6::R6Class('Analysis',
                         units='px',
                         background='transparent',
                         res=ppi)
-                } else {
+                } else if (! vector) {
                     grDevices::png(type=grType,
                         filename=fullPath,
                         width=width,
