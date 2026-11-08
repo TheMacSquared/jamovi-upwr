@@ -5,7 +5,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## 1.4.1 — 2026-11-08 (linia latest, jamovi 28.17)
 
-Przygotowanie wydania; status weryfikacji: `packaging/tests/manual/release-1.4.1.md`.
+Stan buildów (2026-11-08): Docker (`jupwr/jupwr:1.4.1`) zbudowany;
+Windows i macOS: binarki aplikacji oraz pliki `.jmo` jRISK 0.4.5 i jSpace 0.3.4
+zbudowane — potwierdzenie użytkownika. Status testów:
+`packaging/tests/manual/release-1.4.1.md`.
 
 Nowe:
 - Wykresy wektorowe (SVG) w zakładce „Wykresy” (scatr 2.9.14): słupkowy,

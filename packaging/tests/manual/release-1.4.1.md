@@ -1,7 +1,10 @@
 # Weryfikacja jUPWR 1.4.1 — 2026-11-08
 
 Maszyna: Linux/WSL, Docker. Źródła w lokalnym drzewie roboczym, bez tagu wydania.
-Paczki Windows native i macOS nie były tu budowane ani weryfikowane.
+Binarki aplikacji i pliki `.jmo` jRISK 0.4.5 oraz jSpace 0.3.4 zostały
+zbudowane natywnie na Windowsie i macOS — potwierdzenie użytkownika
+z 2026-11-08. Poniższe testy automatyczne wykonano w Dockerze; potwierdzenie
+buildów natywnych nie określa zakresu testów na tych platformach.
 
 ## Sprawdzone automatycznie
 
@@ -148,13 +151,10 @@ docker run --rm --network none -v "$PWD:/source:ro" --entrypoint python3 \
 
 ## Warunki pozostałe przed publikacją
 
-- Windows: natywny build aplikacji, instalator i `.jmo` jRISK/jSpace; rzeczywisty
-  zapis/otwarcie OMV, także kopii odzyskiwania.
-- macOS: natywny build aplikacji i `.jmo` jRISK/jSpace; sprawdzenie eksportu
-  wektorowego na maszynie docelowej.
+- Windows: potwierdzić rzeczywisty zapis/otwarcie OMV, także kopii odzyskiwania.
+- macOS: sprawdzić eksport wektorowy na maszynie docelowej.
 - Pełny `release-check.sh` na Linuxie obecnie zgłasza dwa braki: pliki
   `jRISK_0.4.5-linux.jmo` i `jSpace_0.3.4-linux.jmo`. Kontrola metadanych jest zielona;
   nie traktować jej jako potwierdzenia gotowych artefaktów opcjonalnych.
-- Przed commitem głównego repo zapisać i wypchnąć zmiany submodułu `plots`
-  na jego gałęzi `main`, potem zaktualizować wskaźnik w repo głównym.
-- Tag i publikacja wydania dopiero po uzupełnieniu macierzy artefaktów.
+- Zmiany submodułu `plots` i repo głównego wypchnięte na `main`; macierz
+  artefaktów Windows/macOS uzupełniona. Tag i publikacja wydania pozostają osobnym krokiem.
