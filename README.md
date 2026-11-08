@@ -137,7 +137,7 @@ z obrazu `jamovi/jamovi-deps`. Szczegóły: [`packaging/README.md`](packaging/RE
 - [`CHANGELOG.md`](CHANGELOG.md) — historia wydań jUPWR
 - [`packaging/MODULES.md`](packaging/MODULES.md) — rejestr modułów, macierz zgodności, procedura wydania
 - [`packaging/README.md`](packaging/README.md) — buildy natywne, znane ograniczenia
-- [`CLAUDE.md`](CLAUDE.md) — architektura i konwencje dla agentów/współautorów
+- [`AGENTS.md`](AGENTS.md) — architektura i konwencje dla agentów/współautorów
 
 ---
 
