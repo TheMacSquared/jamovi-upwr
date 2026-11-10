@@ -560,6 +560,14 @@ class Call(ast.Call, Node):
             return [ ]
         if len(self.args) == 0:
             return [ ]
+        if (self.data_type is DataType.INTEGER
+                and self.func.id in ('_RULES', '_RULES_NOM', '_RULES_ORD')
+                and self.measure_type in (MeasureType.NOMINAL, MeasureType.ORDINAL)):
+            # jUPWR: whole numbers from rules. Without levels given here the
+            # column made them as the values turned up, row by row, so 3
+            # came before 1 if the data happened to start with a 3 -- the
+            # wrong order for an ordinal scale
+            return self._rule_integer_levels(row_count, filt)
         if self.data_type is not DataType.TEXT:
             return [ ]
         if self.measure_type is MeasureType.ID:
@@ -613,6 +621,21 @@ class Call(ast.Call, Node):
         elif node.has_levels:
             for level in node.get_levels(row_count, filt):
                 out.append(level[1])
+
+    def _rule_integer_levels(self, row_count, filt):
+        # ascending by value; a category passed through from a column (a
+        # (code, label) tuple) keeps its label
+        labels = { }
+        for value in self.fvalues(row_count, filt):
+            if is_missing(value):
+                continue
+            if isinstance(value, tuple):
+                code, label = value[0], convert(value, str)
+            else:
+                code, label = value, convert(value, str)
+            if isinstance(code, int) and not isinstance(code, bool):
+                labels.setdefault(code, label)
+        return [ (code, labels[code]) for code in sorted(labels) ]
 
     def _rule_levels(self, row_count, filt, label_args):
         # jUPWR: with the same filter as the cells, or values from column

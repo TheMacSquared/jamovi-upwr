@@ -356,6 +356,36 @@ function termsProblem(terms: Term[], decSymbol: string): string {
     return '';
 }
 
+// whether anything has been entered in the terms, and whether any clause
+// lacks its variable or its value
+function termsState(terms: Term[]): { started: boolean, incomplete: boolean } {
+    let state = { started: false, incomplete: terms.length === 0 };
+    for (let t of terms) {
+        if (isGroup(t)) {
+            let sub = termsState(t.terms);
+            state.started = state.started || sub.started;
+            state.incomplete = state.incomplete || sub.incomplete;
+        }
+        else {
+            let hasVariable = t.variable !== '';
+            let hasValue = t.value.trim() !== '';
+            state.started = state.started || hasVariable || hasValue;
+            state.incomplete = state.incomplete || ! hasVariable || ! hasValue;
+        }
+    }
+    return state;
+}
+
+// A rule that has been started but whose condition is not complete. Such a
+// rule used to be left out of the formula without a word, while still shown
+// in the editor: every row then got the "else" value. An untouched empty
+// row (as after "Add rule") is not a rule yet. To compare with a missing
+// value the user types NA.
+export function rowIncomplete(row: Row): boolean {
+    let state = termsState(row.clauses);
+    return (state.started || row.value.trim() !== '') && state.incomplete;
+}
+
 // why the rules cannot be saved (the first problem found), or ''
 export function chainProblem(chain: Chain, decSymbol: string): string {
     for (let r of chain.rows) {
@@ -363,7 +393,12 @@ export function chainProblem(chain: Chain, decSymbol: string): string {
         if (problem !== '')
             return problem;
     }
-    return valueProblem(chain.elseValue, decSymbol);
+    let problem = valueProblem(chain.elseValue, decSymbol);
+    if (problem !== '')
+        return problem;
+    if (chain.rows.some(rowIncomplete))
+        return _('Incomplete rule: choose a variable and enter a value');
+    return '';
 }
 
 export class ConditionsBuilder extends HTMLElement {

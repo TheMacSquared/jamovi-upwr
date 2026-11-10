@@ -307,6 +307,7 @@ wskazane dla niego w spisie. Nowe zadania i zmiany statusu wpisuj w
 | 27 | Audyt kodu 2026-11-05 | wszystkie | OTWARTE: lista pozostałych punktów |
 | 28 | Dane empiryczne obok rozkładu | distrACTION | zrobione |
 | 29 | Stabilizacja przed 1.4.1 | wiele | zrobione |
+| 30 | Audyt zmiennej przekształconej 2026-11-10 | klient, serwer | zrobione (2 poprawki; 2 punkty świadomie bez zmian; lista słabszych otwarta) |
 
 ### Spis zadań technicznych
 

@@ -326,3 +326,47 @@ describe('audit 2026-10-18', () => {
         expect(formatValue('01,5', cols, ',')).toBe('"01,5"');
     });
 });
+
+describe('incomplete rules', () => {
+
+    const clause = (variable: string, value: string) => ({ variable, op: '==', value });
+    const chainOf = (clauses: any[], use: string, elseValue = 'y') =>
+        ({ rows: [ { clauses, joins: clauses.slice(1).map(() => 'and' as const), value: use } ], elseValue });
+
+    it('reports a started rule whose condition is not complete', async () => {
+        const { chainProblem } = await mod();
+        // a variable and "use" but no value to compare with: this rule was
+        // left out without a word and every row got the else value
+        expect(chainProblem(chainOf([ clause('a', '') ], 'x'), '.')).not.toBe('');
+        expect(chainProblem(chainOf([ clause('', '5') ], 'x'), '.')).not.toBe('');
+        expect(chainProblem(chainOf([ clause('', '') ], 'x'), '.')).not.toBe('');
+        expect(chainProblem(chainOf([ clause('a', '1'), clause('', '') ], 'x'), '.')).not.toBe('');
+        expect(chainProblem(chainOf([ clause('a', '1'), { terms: [ clause('b', '') ], joins: [] } ], 'x'), '.')).not.toBe('');
+    });
+
+    it('accepts complete rules, an untouched empty row and an empty "use"', async () => {
+        const { chainProblem } = await mod();
+        expect(chainProblem(chainOf([ clause('a', '1') ], 'x'), '.')).toBe('');
+        expect(chainProblem(chainOf([ clause('a', '1') ], ''), '.')).toBe('');     // use nothing = missing
+        expect(chainProblem(chainOf([ clause('a', 'NA') ], 'x'), '.')).toBe('');   // compare with missing
+        expect(chainProblem(chainOf([ clause('', '') ], ''), '.')).toBe('');       // as after "Add rule"
+        expect(chainProblem({ rows: [], elseValue: 'y' }, '.')).toBe('');
+    });
+
+    it('does not save while a rule is incomplete', async () => {
+        const { ConditionsBuilder } = await mod();
+        if ( ! customElements.get('jmv-conditions-builder-test-incomplete'))
+            customElements.define('jmv-conditions-builder-test-incomplete', class extends ConditionsBuilder {});
+        const saved: string[] = [];
+        const Builder = customElements.get('jmv-conditions-builder-test-incomplete') as any;
+        const builder = new Builder(() => cols.map(name => ({ name })), () => 'r', (f: string) => saved.push(f));
+        builder.setFormula('IF(a == 1, "x", "y")');
+        builder.chain.rows.push({ clauses: [ { variable: 'b', op: '==', value: '' } ], joins: [], value: 'z' });
+        builder._commit();
+        expect(saved).toEqual([]);
+        expect(builder.validationMessage()).not.toBe('');
+        builder.chain.rows[1].clauses[0].value = '2';
+        builder._commit();
+        expect(saved).toEqual([ 'IF(a == 1, "x", IF(b == 2, "z", "y"))' ]);
+    });
+});

@@ -937,6 +937,43 @@ modelu, nadmierna dyspersja) — decyzja 2026-11-07: NIE robimy.
   Testy: `test-vector-fallback.R`, `test-boundaries.R`, `test-nemenyi.R`;
   silnik C++/R: `test-release-141.py --boundaries-only`, dane `nemenyi-1.4.1.csv`.
 
+### Zadanie 30: audyt zmiennej przekształconej (2026-11-10) — ZROBIONE (punkty 3 i 4; 1 i 2 świadomie bez zmian)
+Audyt po przeglądzie 17 commitów funkcji: 46 formuł na modelu serwera w obrazie
+1.4.1, 63 przypadki zapisu/odczytu reguł w kreatorze, scenariusz w aplikacji.
+Potwierdzone jako działające: ukryta kolumna źródłowa nie jest zależnością
+(reguła zależy tylko od kolumn z formuły), logika trójwartościowa braków
+(brak or prawda = prawda), porównanie z NA, cudzysłowy/przecinki/nawiasy
+w tekście, kody „01”/„1e5” jako tekst, etykieta i kod kolumny z etykietami.
+ZROBIONE (niewydane): (3) niepełna reguła zgłaszana zamiast pomijana
+(`rowIncomplete`, `chainProblem` w `conditionsbuilder.ts`; reguła rozpoczęta =
+cokolwiek wpisane w warunku albo w „użyj”; pusty wiersz po „Dodaj regułę” nie
+jest regułą); (4) poziomy wyników całkowitych rosnąco
+(`Call._rule_integer_levels`, `compute/nodes.py`; wcześniej `get_levels` zwracał
+[] dla typu INTEGER i poziomy powstawały przy `set_value` w kolejności wierszy;
+gałąź „same liczby rosnąco” w `_rule_levels` dotyczyła tylko dziesiętnych).
+DECYZJA 2026-11-10 — ZOSTAJE BEZ ZMIAN (kultura pracy jak w R, nie błąd):
+(1) wartość równa nazwie kolumny jest odwołaniem do kolumny (`formatValue`;
+punkt 4 zadania 24 zamknięty tą decyzją) — nazwy kolumn pisze się bez niczego,
+a gdyby kiedyś to zmieniać, to raczej wymuszając cudzysłów przy tekście, nie
+grawisy przy kolumnach; (2) zmiana etykiety poziomu w kolumnie użytej w regule
+wymaga ręcznego poprawienia reguły przez użytkownika (reguła ma starą etykietę
+i wszystko trafia do „w przeciwnym razie”) — bez przepisywania reguł i bez
+ostrzeżeń.
+Otwarte, słabsze: porównanie niezgodnych typów nigdy nie pasuje i nie ostrzega
+(kolumna liczbowa z tekstem, np. „1 000”; tekstowa z liczbą); poziom „ciągła”
+z wartością tekstową daje braki bez komunikatu; `Transform.formula` zwija
+białe znaki także wewnątrz cudzysłowów („M  K” → „M K”); brak w kolumnie
+tekstowej spełnia `!=` (w liczbowej daje brak); wyrażenie w „użyj” staje się
+tekstem; zmiana nazwy kolumny z reguły → błąd i same braki (zadanie 24, pkt 7);
+automatyczna nazwa „A - A (2)” po pierwszym zapisie reguł (pkt 10); kolumny
+`and`/`or`/`not` nie działają nawet w grawisach (`Parser.escape_chunk`),
+kolumna `NA` czytana jako brak, nazwa z grawisem; stare jednoelementowe
+przekształcenie bez `$source` liczone jako reguły. Niesprawdzone: cofanie,
+zapis/odczyt .omv, edycja kilku zmiennych naraz, otwarcie w zwykłym jamovi.
+Sondy były skryptami tymczasowymi; wzorzec pełnej ścieżki RECODED + Transform
+na modelu: `append_transform`, `column.transform = t.id`, `set_needs_parse`,
+`parse_formula`, `_recalc_all`.
+
 ## Zadania techniczne
 
 ### Zadanie techniczne 8: Niezawodność obsługi analiz po merge 28.17

@@ -181,3 +181,19 @@ def test_quoted_text_is_literal(formula, value):
     from jamovi.server.compute.parser import Parser
     node = Parser.parse(formula)
     assert node.value == value
+
+
+@pytest.mark.parametrize('function', [ '_RULES_ORD', '_RULES_NOM', '_RULES' ])
+def test_rule_levels_of_whole_numbers_ascend(dataset_model: DataSetModel, function):
+    # the levels used to be made as the values turned up row by row: with the
+    # data starting at 3 the ordinal scale read 3, 1, 2
+    r = _rules_column(dataset_model,
+        function + '(IF(ROW() == 1, 3, IF(ROW() == 2, 1, 2)))', [ 1, 1, 1 ])
+    assert [ r[i] for i in range(3) ] == [ 3, 1, 2 ]
+    assert [ (level[0], level[1]) for level in r.levels ] == [ (1, '1'), (2, '2'), (3, '3') ]
+
+
+def test_rule_levels_of_whole_numbers_keep_passed_labels(dataset_model: DataSetModel):
+    # a category passed through from a labelled column keeps its label
+    r = _rules_column(dataset_model, '_RULES_NOM(IF(ROW() <= 2, b, 7))', [ 2, 1, 1 ])
+    assert [ (level[0], level[1]) for level in r.levels ] == [ (1, 'kot'), (2, 'pies'), (7, '7') ]
