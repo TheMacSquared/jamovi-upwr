@@ -26,6 +26,10 @@ Poprawki błędnych wyników z audytu kodu (przeniesione z linii latest):
 Wersje modułów: jANOVA 0.5.1.2, jCzest 0.2.3.2, jCI 0.3.4.2, jEksplor 0.1.4.2.
 
 ## 1.0.10 — 2026-11-05
+Stan buildów: binarki aplikacji Windows i macOS oraz pliki `.jmo` jRISK 0.4.1
+i jSpace 0.3.2.1 zbudowane 2026-11-05 — potwierdzenie użytkownika, odnotowane
+2026-11-10.
+
 Poprawki błędnych wyników z audytu kodu (przeniesione z 1.4.0): ANOVA
 powtórzonych pomiarów z kowariantą i stopnie swobody porównań, przedziały
 współczynników regresji przy współliniowości i GVIF dla czynników, zapis reszt

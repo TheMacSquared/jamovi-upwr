@@ -81,7 +81,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 |---|---|---|---|---|
 | 1.0.9 | 28.2 | 0.4.4 | ⬜ do zbudowania | ✅ 2026-10-24 (ze źródeł main) |
 | 1.0.11 | 28.2 | 0.4.1 | ⬜ do zbudowania | ⬜ do zbudowania |
-| 1.0.10 | 28.2 | 0.4.1 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.10 | 28.2 | 0.4.1 | ✅ 2026-11-05 (odnotowane 2026-11-10) | ✅ 2026-11-05 (odnotowane 2026-11-10) |
 | 1.0.9 | 28.2 | 0.4.1 | ✅ 2026-10-18 | ⬜ do zbudowania |
 | 1.0.8 | 28.2 | 0.4.1 | ✅ 2026-10-13 | ✅ 2026-10-13 |
 | 1.0.7 | 28.2 | 0.4.1 | ✅ 2026-10-13 | ✅ 2026-10-13 |
@@ -116,7 +116,7 @@ nie zmienił. Ta tabela mówi, czy to zrobiono.
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
 | 1.0.11 | 28.2 | 0.3.2.1 | ⬜ do zbudowania | ⬜ do zbudowania |
-| 1.0.10 | 28.2 | 0.3.2.1 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.0.10 | 28.2 | 0.3.2.1 | ✅ 2026-11-05 (odnotowane 2026-11-10) | ✅ 2026-11-05 (odnotowane 2026-11-10) |
 | 1.0.9 | 28.2 | 0.3.2 | ✅ 2026-10-18 | ⬜ do zbudowania |
 | 1.0.8 | 28.2 | 0.3.2 | ✅ 2026-10-13 | ✅ 2026-10-13 |
 | 1.0.7 | 28.2 | 0.3.2 | ✅ 2026-10-11 | ✅ 2026-10-11 |
