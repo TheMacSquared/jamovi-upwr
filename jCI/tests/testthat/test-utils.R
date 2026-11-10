@@ -100,3 +100,10 @@ test_that("BCa: boot.ci for continuous statistics, ties counted half, fast (audi
     bootCI(rnorm(2000), function(d, i) mean(d[i]), 20000, 1, "bca")
     expect_lt(proc.time()[["elapsed"]] - t0, 5)
 })
+
+test_that("Wilson limits are exactly 0 and 1 at the boundary counts", {
+    for (n in c(5, 12, 20, 137)) {
+        expect_identical(ciProportion(0, n, 0.95, "wilson")$lower, 0)
+        expect_identical(ciProportion(n, n, 0.95, "wilson")$upper, 1)
+    }
+})

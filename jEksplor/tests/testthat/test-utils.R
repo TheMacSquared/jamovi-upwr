@@ -113,3 +113,14 @@ test_that("classes keep every observation and the [a; b) rule (audit 2026-11-05)
         expect_equal(tab$n, tabulate(findInterval(round(x, 9), round(b, 9), rightmost.closed = m != "width"), k))
     }
 })
+
+test_that("Anderson-Darling keeps the upper tail for an extreme observation", {
+    set.seed(1); x <- c(rnorm(200), 40); n <- length(x)
+    z <- (sort(x) - mean(x)) / sd(x)
+    expect_gt(max(z), 8)
+    # log(1 - pnorm(z)) = log(pnorm(-z)): reference without the lost tail
+    ref <- -n - mean((2 * seq_len(n) - 1) * (log(pnorm(z)) + log(pnorm(-rev(z)))))
+    expect_equal(adTest(x)$stat, ref)
+    clipped <- -n - mean((2 * seq_len(n) - 1) * (log(pnorm(z)) + log(pmax(1 - pnorm(rev(z)), 1e-16))))
+    expect_gt(adTest(x)$stat, clipped)
+})

@@ -167,3 +167,27 @@ test_that("kategoria „wystąpiło” steruje udzialami, wykresem i opisem meto
                            plot = TRUE, event = "brak")
     expect_equal(x2$plot$state$level, "tak")
 })
+
+test_that("Q Cochrana przyjmuje pomiar, w ktorym wystapila jedna kategoria", {
+    stale <- trzy
+    stale$p3 <- factor(rep("tak", nrow(stale)))          # jeden poziom
+    res <- jCzest:::zalezne(data = stale, vars = c("p1", "p2", "p3"), props = TRUE)
+    m <- cbind(as.integer(stale$p1 == "tak"), as.integer(stale$p2 == "tak"), 1L)
+    expect_equal(res$tests$asDF$stat[1], cochranQ(m)$stat)
+    expect_equal(res$marg$asDF$prop[3], 1)
+
+    # trzecia kategoria w ktoryms pomiarze nadal wyklucza test
+    trzyKat <- trzy
+    trzyKat$p3 <- factor(rep(c("tak", "nie", "moze"), length.out = nrow(trzyKat)))
+    out <- jCzest:::zalezne(data = trzyKat, vars = c("p1", "p2", "p3"))
+    expect_equal(nrow(out$tests$asDF), 0)
+})
+
+test_that("duze licznosci bez notacji naukowej", {
+    duze <- data.frame(przed = factor(c("tak", "tak", "nie", "nie")),
+                       po    = factor(c("tak", "nie", "tak", "nie")),
+                       n     = c(40000, 25000, 10000, 25000))
+    res <- jCzest:::zalezne(data = duze, vars = c("przed", "po"), counts = "n", metody = TRUE)
+    expect_true(grepl("N = 100 000 par", res$metody$content, fixed = TRUE))
+    expect_false(grepl("e+", txt(res), fixed = TRUE))
+})

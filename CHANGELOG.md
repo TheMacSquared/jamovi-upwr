@@ -3,6 +3,37 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## Niewydane (linia latest, po 1.4.1)
+
+Naprawione:
+- Duże liczby w opisach i notach nie są już zapisywane w notacji naukowej
+  („N = 100 000” zamiast „N = 1e+05”): liczba obserwacji i par w jCzest
+  (tabela, zgodność, próby zależne, także komórki tabeli par), liczba
+  permutacji w jperm, liczba replikacji bootstrapu w jCI, liczności na
+  drzewie częstości w jRISK.
+- Eksploracja, test Andersona-Darlinga: statystyka A była zaniżona, gdy
+  w danych była obserwacja odległa od średniej o więcej niż około 8 odchyleń
+  standardowych (utrata górnego ogona rozkładu normalnego). Wartość p w takich
+  danych była i jest bliska zera; dla pozostałych danych wynik bez zmian.
+- Przedziały ufności, metoda Wilsona: dolna granica przy 0 sukcesach to
+  dokładnie 0, a górna przy samych sukcesach dokładnie 1 (wcześniej resztki
+  zaokrągleń rzędu 1e-17). Dotyczy też metody Newcombe'a dla różnicy proporcji.
+- Częstości, próby zależne: Q Cochrana liczy się także wtedy, gdy w którymś
+  pomiarze wystąpiła tylko jedna z dwóch kategorii (np. same „tak”). Kategorie
+  pomiarów są łączone jak w teście McNemara; pomiary muszą mieć te same dwie
+  kategorie.
+
+- ANOVA, test Dunnetta (także z osobnymi wariancjami): te same dane dają
+  zawsze te same p i różnice graniczne. Wielowymiarowy rozkład t jest liczony
+  numerycznie i wcześniej wynik wahał się między uruchomieniami na czwartym
+  miejscu po przecinku; teraz obliczenie ma stałe ziarno generatora (1),
+  odnotowane w opisie metod. Stan generatora użytkownika jest przywracany.
+
+Wersje modułów: jANOVA 0.5.8, jCzest 0.2.9, jCI 0.3.10, jEksplor 0.1.12,
+jperm 0.2.10, jRISK 0.4.6 (`.jmo` do zbudowania).
+
+CI: testy klienta (vitest) i serwera (pytest) oraz pełne testy jANOVA i jRISK.
+
 ## 1.4.1 — 2026-11-08 (linia latest, jamovi 28.17)
 
 Stan buildów (2026-11-08): Docker (`jupwr/jupwr:1.4.1`) zbudowany;

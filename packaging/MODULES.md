@@ -19,15 +19,15 @@ Wersji modułów nie podnosimy z powodu samej przebudowy.
 | `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.5 |
 | `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 30 wykresów, w tym 17 wektorowych i 2 ukryte) | wbudowany | 2.9.14 |
 | `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.5.1 |
-| `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.9 |
-| `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.9 |
+| `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.10 |
+| `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.10 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.8.2 |
-| `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.2.8 |
-| `jEksplor/` | jEksplor | eksploracja jUPWR: zmienne ilościowe (rdzeń N/braki/średnia/mediana/kwartyle/SD/min/max/V, miary pozycyjne, Gini i Lorenz, Lilliefors i Anderson-Darling), zmienne jakościowe (tabele liczności, także w grupach), szereg rozdzielczy; zastępuje w menu Eksploracja jmv::descriptives i jmv::qualitative (ukryte w kliencie) | wbudowany | 0.1.11 |
+| `jCzest/` | jCzest | częstości: tabela kontyngencji, test zgodności, próby zależne (McNemar, Q Cochrana) | wbudowany | 0.2.9 |
+| `jEksplor/` | jEksplor | eksploracja jUPWR: zmienne ilościowe (rdzeń N/braki/średnia/mediana/kwartyle/SD/min/max/V, miary pozycyjne, Gini i Lorenz, Lilliefors i Anderson-Darling), zmienne jakościowe (tabele liczności, także w grupach), szereg rozdzielczy; zastępuje w menu Eksploracja jmv::descriptives i jmv::qualitative (ukryte w kliencie) | wbudowany | 0.1.12 |
 | `jRegr/` | jRegr | regresja jUPWR: korelacja (para = jeden wiersz, więcej = macierz), regresja liniowa, logistyczna dwumianowa; zastępuje w menu Regresja jmv::simpleCorr, corrMatrix, linReg, logRegBin (ukryte w kliencie) | wbudowany | 0.1.9 |
-| `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery (Tukey, Games-Howell, Dunnett); zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.5.7 |
+| `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery (Tukey, Games-Howell, Dunnett); zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.5.8 |
 | `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem — tylko testowanie: statystyka, p, różnica i d Cohena jako punkty (przedziały ufności i wykres estymacyjny są w jCI); zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.4.7 |
-| `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.4.5 |
+| `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.4.6 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.4 |
 | `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | wewnętrzny — poza wydaniem (zamrożony) | 0.1.3 |
 | `jPomiar/` | jPomiar | powtarzane pomiary, budżet niepewności, propagacja z korelacją, kowariancja i elipsy 2D; pilotaż międzykierunkowy | wewnętrzny — poza wydaniem (zamrożony) | 0.3.0 |
@@ -89,6 +89,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.4.1 | 28.17 | 0.4.6 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.4.1 | 28.17 | 0.4.5 | ✅ 2026-11-08 | ✅ 2026-11-08 |
 | 1.4.0 | 28.17 | 0.4.5 | ✅ 2026-11-05 | ✅ 2026-11-05 |
 | 1.3.1 | 28.17 | 0.4.4 | ✅ 2026-11-02 | ✅ 2026-11-02 |

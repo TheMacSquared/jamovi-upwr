@@ -147,7 +147,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     "Warstwy według „%s” (%s): tabela, testy i miary osobno w każdej warstwie oraz dla wszystkich warstw razem („Ogółem”).",
                     o$layer, paste0("„", private$.layerLevels(), "”", collapse = ", "))
             m$add("Dane", "N = %s; pominięto obserwacje z brakiem w którejkolwiek ze zmiennych.",
-                  format(sum(tab), big.mark = " "))
+                  base::format(sum(tab), big.mark = " ", scientific = FALSE))
             m$add("Dane", switch(o$pc,
                 row = "Procenty liczone wierszami (mianownik: suma wiersza).",
                 col = "Procenty liczone kolumnami (mianownik: suma kolumny).",
@@ -274,7 +274,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             }
             # N w nocie, nie jako wiersz: liczebnosc dzielilaby kolumne ze statystykami
             # testowymi i dziedziczyla ich format (80.00000), a nie jest testem
-            if (is.null(lay) || lay == "Ogółem") t$setNote("N", sprintf("N = %s.", format(n, big.mark = " ")))
+            if (is.null(lay) || lay == "Ogółem") t$setNote("N", sprintf("N = %s.", base::format(n, big.mark = " ", scientific = FALSE)))
         },
 
         .fillEffSize = function(tab, lay = NULL) {

@@ -349,6 +349,12 @@ checkMcnemar <- function(tab) {
     list(discordant = m$discordant, ok = m$discordant >= 25)
 }
 
+#' Wspólne kategorie kilku pomiarów (suma poziomów, jak w pairedTable):
+#' pomiar, w którym wystąpiła tylko jedna z dwóch kategorii, nadal jest binarny.
+measurementLevels <- function(cols) {
+    Reduce(union, lapply(cols, function(x) levels(factor(x))), character(0))
+}
+
 #' Q Cochrana dla k pomiarów binarnych na tych samych jednostkach.
 #' `mat` = macierz 0/1 (wiersze = jednostki, kolumny = pomiary), bez braków.
 #' Dla k = 2 równoważne testowi McNemara bez poprawki.

@@ -788,6 +788,17 @@ clearWith jCI/jTestyT/jperm; niecałkowite liczności i granice OR/RR w jCzest;
 heatmapa z samymi brakami; q Nemenyiego; F przy p = 1 i df1 < 2, zakres F
 z niecentralnością i liczba etykiet osi; bardzo mały kształt Weibulla;
 awaryjny PNG dla niedostępnego urządzenia SVG/cairo.
+Naprawione po 1.4.1 (2026-11-10, niewydane): notacja naukowa dużych liczb
+(`base::format(..., scientific = FALSE)` w jperm, jCzest, jCI, jRISK — przyczyną
+był sam `format()`, nie przesłanianie przez jmvcore); Anderson-Darling w ogonie
+(logarytmy ogonów przez `pnorm(log.p = TRUE)`); Wilson przy 0 i n (dokładnie
+0 i 1); Q Cochrana z pomiarem o jednej kategorii (`measurementLevels`, suma
+poziomów; różne etykiety pomiarów dają notę jak w McNemarze); Dunnett w jANOVA
+(decyzja: stałe ziarno 1 przez `withFixedSeed`, stan generatora przywracany,
+dokładność mvtnorm bez zmian). Wersje: jANOVA 0.5.8, jCzest 0.2.9, jCI 0.3.10,
+jEksplor 0.1.12, jperm 0.2.10, jRISK 0.4.6. Nie przeniesione na stable.
+Te punkty na liście niżej są nieaktualne. Doszło: granice klas w „Szeregu
+rozdzielczym” jEksplor (`format(signif(...))`) dają „1e+05” od 100 000.
 Pozostaje (priorytet zależy od wpływu na wynik i częstości użycia):
 - Wspólne: `format(x, big.mark = " ")` trafia w `jmvcore::format` i ignoruje
   separator („N = 1e+05”) — jperm `utils.R:195`, jCzest (tabela/zgodnosc/

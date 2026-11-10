@@ -195,7 +195,7 @@ metodyPerm <- function(m, o, kind, diffLab) {
     if (isTRUE(o$exact))
         m$add("Testy", "Test dokładny: wyliczenie wszystkich układów, gdy jest ich najwyżej %s; w przeciwnym razie Monte Carlo jak niżej.",
               if (kind == "two") "100 000 (liczba podziałów na grupy)" else "2²⁰ (n ≤ 20 obserwacji)")
-    m$add("Testy", "Monte Carlo: B = %s losowych układów%s.", format(o$nPerm, big.mark = " "),
+    m$add("Testy", "Monte Carlo: B = %s losowych układów%s.", base::format(o$nPerm, big.mark = " ", scientific = FALSE),
           if (o$seed > 0) sprintf(", ziarno generatora %d (wynik powtarzalny)", o$seed) else ", bez ustawionego ziarna (wynik zmienia się między uruchomieniami)")
     m$addIf(o$plot, "Wykres", "Histogram rozkładu permutacyjnego statystyki; linia przerywana = wartość obserwowana, słupki zaznaczone = układy co najmniej tak skrajne (obszar liczony do p).")
     invisible(m)

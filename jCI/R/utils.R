@@ -134,7 +134,10 @@ ciProportion <- function(x, n, ciWidth, method) {
         z2 <- z^2; denom <- 1 + z2 / n
         centre <- (phat + z2 / (2 * n)) / denom
         margin <- z * sqrt((phat * (1 - phat) / n + z2 / (4 * n^2))) / denom
-        lower <- max(0, centre - margin); upper <- min(1, centre + margin)
+        # The limits at x = 0 and x = n are exactly 0 and 1; the formula
+        # leaves rounding residue (about 1e-17) there.
+        lower <- if (x == 0) 0 else max(0, centre - margin)
+        upper <- if (x == n) 1 else min(1, centre + margin)
     } else if (method == "clopperPearson") {
         lower <- if (x == 0) 0 else stats::qbeta(alpha / 2, x, n - x + 1)
         upper <- if (x == n) 1 else stats::qbeta(1 - alpha / 2, x + 1, n - x)
@@ -177,7 +180,7 @@ metodyPrzedzial <- function(m, o, method, classic, scheme, extra = NULL) {
     if (isBoot(method)) {
         m$add("Przedział ufności", "%s (poziom %g%%): B = %s losowań, %s; SE = odchylenie standardowe replikacji.",
               if (method == "bca") "Bootstrap BCa (korekta obciążenia z replikacji, remisy z estymatorem liczone po połowie; przyspieszenie z jackknife)" else "Bootstrap percentylowy (kwantyle replikacji)",
-              o$ciWidth, format(o$nBoot, big.mark = " "), scheme)
+              o$ciWidth, base::format(o$nBoot, big.mark = " ", scientific = FALSE), scheme)
         m$add("Przedział ufności", if (o$seed > 0) sprintf("Ziarno generatora %d — wynik powtarzalny.", o$seed)
               else "Bez ustawionego ziarna — granice zmieniają się nieznacznie między uruchomieniami.")
     } else {
@@ -188,7 +191,7 @@ metodyPrzedzial <- function(m, o, method, classic, scheme, extra = NULL) {
 }
 
 ciNote <- function(table, o, method, classicLabel, fallback = FALSE) {
-    txt <- if (isBoot(method)) sprintf("%g%% CI: %s, B = %s.", o$ciWidth, bootLabel(method), format(o$nBoot, big.mark = " "))
+    txt <- if (isBoot(method)) sprintf("%g%% CI: %s, B = %s.", o$ciWidth, bootLabel(method), base::format(o$nBoot, big.mark = " ", scientific = FALSE))
            else sprintf("%g%% CI: %s.", o$ciWidth, classicLabel)
     table$setNote("ci", txt)
     # cite the boot package only when the interval in this table comes from it

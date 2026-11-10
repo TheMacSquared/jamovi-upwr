@@ -99,9 +99,11 @@ lillieTest <- function(x) {
 adTest <- function(x) {
     n <- length(x)
     if (n < 8 || stats::sd(x) == 0) return(list(stat = NA_real_, p = NA_real_))
-    p <- stats::pnorm((sort(x) - mean(x)) / stats::sd(x))
-    p <- pmin(pmax(p, 1e-300), 1 - 1e-16)
-    h <- (2 * seq_len(n) - 1) * (log(p) + log(1 - rev(p)))
+    # Log tail probabilities directly: log(1 - pnorm(z)) loses the upper
+    # tail beyond z of about 8, which understates A for extreme observations.
+    z <- (sort(x) - mean(x)) / stats::sd(x)
+    h <- (2 * seq_len(n) - 1) * (stats::pnorm(z, log.p = TRUE) +
+                                 stats::pnorm(rev(z), lower.tail = FALSE, log.p = TRUE))
     A <- -n - mean(h); AA <- (1 + 0.75 / n + 2.25 / n^2) * A
     pv <- if (AA < 0.2) 1 - exp(-13.436 + 101.14 * AA - 223.73 * AA^2)
           else if (AA < 0.34) 1 - exp(-8.318 + 42.796 * AA - 59.938 * AA^2)

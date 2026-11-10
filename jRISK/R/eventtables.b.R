@@ -158,7 +158,7 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       s <- image$state
       if (is.null(s))
         return(FALSE)
-      fmt <- function(v) format(round(v, 2), big.mark = " ")
+      fmt <- function(v) base::format(round(v, 2), big.mark = " ", scientific = FALSE)
       s[c("n", "nA", "nnA", "nAB", "nAnB", "nnAB", "nnAnB")] <-
         lapply(s[c("n", "nA", "nnA", "nAB", "nAnB", "nnAB", "nnAnB")], fmt)
       nodes <- data.frame(

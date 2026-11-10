@@ -39,15 +39,10 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         },
 
         #' Kodowanie 0/1: kategoria „wystąpiło" = 1, druga = 0.
-        .binary = function(vars, event) {
-            d <- lapply(vars, function(v) {
-                x <- self$data[[v]]
-                if (!is.factor(x)) x <- factor(x)
-                lv <- levels(x)
-                if (length(lv) != 2) return(NULL)
-                as.integer(x == (if (event %in% lv) event else lv[2]))
-            })
-            if (any(vapply(d, is.null, logical(1)))) return(NULL)
+        #' lv = wspólne kategorie wszystkich pomiarów; muszą być dokładnie dwie.
+        .binary = function(vars, event, lv) {
+            if (length(lv) != 2) return(NULL)
+            d <- lapply(vars, function(v) as.integer(as.character(self$data[[v]]) == event))
             m <- do.call(cbind, d)
             colnames(m) <- vars
             m
@@ -79,7 +74,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             i <- match(ev, rownames(tab))
             m <- private$.metody
             m$add("Dane", "Dwa pomiary tych samych jednostek: pierwszy „%s”, drugi „%s”; jednostka = wiersz arkusza; N = %s par kompletnych.",
-                  vars[1], vars[2], format(sum(tab), big.mark = " "))
+                  vars[1], vars[2], base::format(sum(tab), big.mark = " ", scientific = FALSE))
             m$addIf(optNonEmpty(o$counts), "Dane", "Dane zagregowane: liczności par z kolumny „%s”.", o$counts)
             m$add("Dane", "Kategoria traktowana jako „wystąpiło”: „%s” (wybór w panelu, domyślnie druga) — jej dotyczą udziały i wykres.",
                   ev)
@@ -138,10 +133,11 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         .runCochran = function(vars) {
             o <- self$options
             t <- self$results$tests
-            ev <- private$.eventLevel(levels(factor(self$data[[vars[1]]])))
-            m <- private$.binary(vars, ev)
+            lv <- measurementLevels(lapply(vars, function(v) self$data[[v]]))
+            ev <- private$.eventLevel(lv)
+            m <- private$.binary(vars, ev, lv)
             if (is.null(m)) {
-                t$setNote("b", "Q Cochrana wymaga, żeby każdy pomiar miał dokładnie 2 kategorie.")
+                t$setNote("b", "Q Cochrana wymaga pomiarów o tych samych dwóch kategoriach.")
                 return()
             }
             if (optNonEmpty(o$counts))
@@ -152,7 +148,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             md <- private$.metody
             md$add("Dane", "Liczba pomiarów: %d — %s; te same jednostki, jednostka = wiersz arkusza; N = %d (jednostki bez braków).",
                    length(vars), jmvcore::metodyCyt(vars), q$n)
-            md$add("Dane", "Kategoria traktowana jako „wystąpiło”: „%s” (wybór w panelu, domyślnie druga w pierwszym pomiarze) — jej dotyczą udziały i wykres.",
+            md$add("Dane", "Kategoria traktowana jako „wystąpiło”: „%s” (wybór w panelu, domyślnie druga) — jej dotyczą udziały i wykres.",
                    ev)
             md$add("Testy", "Trzy i więcej pomiarów → Q Cochrana, df = k − 1 = %d (dla k = 2 równoważne testowi McNemara).",
                    q$df)
@@ -175,7 +171,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             for (col in c("or", "lower", "upper")) t$getColumn(col)$setVisible(FALSE)
 
             if (isTRUE(o$posthoc)) {
-                lv1 <- levels(factor(self$data[[vars[1]]]))
+                lv1 <- lv
                 pw <- pairwiseMcnemar(m, vars, level = o$ciWidth / 100, eventIsSecond = identical(ev, lv1[2]))
                 ph <- self$results$posthoc
                 if (!is.null(pw)) {
@@ -247,7 +243,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             n <- sum(tab)
 
             # liczba bez zbednych zer; caloscia steruje .b.R, bo kolumny sa tekstowe
-            num <- function(x) if (abs(x - round(x)) < 1e-9) format(round(x)) else sprintf("%.1f", x)
+            num <- function(x) if (abs(x - round(x)) < 1e-9) base::format(round(x), scientific = FALSE) else sprintf("%.1f", x)
             # brzeg = liczność z udziałem w nawiasie, zeby rozklady obu pomiarow
             # byly widoczne wprost w tabeli, a nie w nocie
             marg <- function(x) sprintf("%s (%.1f%%)", num(x), 100 * x / n)
