@@ -476,6 +476,29 @@
     padding: 8px 44px 10px 44px;
 }
 
+/* The "retain unused levels" switch of transformed and computed variables
+   sits in the top right corner (recodedvarwidget.css, computedvarwidget.css).
+   In a narrow card it ran into the widget's title: keep it clear of the
+   title (320px = side padding + the longest title + the hide button) and let
+   its caption wrap upwards into a second line instead. */
+[data-ui-style="a"] #main-table > .jmv-variable-editor .jmv-variable-editor-main:is([data-type='recoded'], [data-type='computed']) .jmv-variable-editor-widget-footer {
+    top: auto;
+    bottom: calc(100% - 32px);
+    max-width: calc(100% - 320px);
+}
+
+[data-ui-style="a"] #main-table > .jmv-variable-editor .jmv-variable-editor-main:is([data-type='recoded'], [data-type='computed']) .jmv-variable-editor-widget-footer > .status-box > .status {
+    height: auto;
+    min-height: 18px;
+    line-height: 1.15;
+    flex-wrap: nowrap;
+}
+
+/* the list of rules scrolls inside the editor: a scrollbar that can be seen */
+[data-ui-style="a"] .jmv-conditions-builder > .rows {
+    scrollbar-color: var(--jupwr-text-faint) transparent;
+}
+
 [data-ui-style="a"] #main-table > #spreadsheet {
     transition: top 0.2s, height 0.2s;
 }

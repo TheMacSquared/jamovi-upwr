@@ -12,7 +12,7 @@
     box-sizing: border-box;
 }
 
-/* everything scrolls together — the conditions and the trailing else row */
+/* the conditions scroll; the trailing else row stays in view (see below) */
 .jmv-conditions-builder > .rows {
     display: flex;
     flex-direction: column;
@@ -70,6 +70,12 @@
 
 .jmv-conditions-builder .row.else-row {
     align-items: center;
+    /* with several rules the list scrolls: keep "otherwise use" at its lower
+       edge, so it is not lost below the fold and shows there is more above */
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    box-shadow: 0 -3px 4px -2px rgba(0, 0, 0, 0.18);
 }
 
 .jmv-conditions-builder .clauses {

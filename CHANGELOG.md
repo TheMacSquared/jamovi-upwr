@@ -75,6 +75,13 @@ Naprawione:
   powrotu. Karta danych mieści się teraz w oknie razem z paskiem stanu
   arkusza, a w bardzo niskim oknie edytor zmiennej przewija się w środku.
   Wygląd klasyczny bez zmian.
+- Zmienna przekształcona, reguły: wiersz „w przeciwnym razie użyj” zostaje
+  widoczny u dołu listy, gdy reguł jest więcej, niż mieści edytor (wcześniej
+  znikał poniżej i nic nie wskazywało, że lista się przewija); w wyglądzie
+  lekkim pasek przewijania listy reguł jest wyraźniejszy.
+- Wygląd lekki, wąska karta danych: podpis przełącznika „Zachowaj w analizach
+  niewykorzystane poziomy” nie nachodzi już na tytuł edytora zmiennej
+  przekształconej i wyliczonej — łamie się na dwie linie.
 - Opis zastosowanych metod (jmvcore): zdanie z listą wartości (np. kilka
   zmiennych albo pusta zmienna opcjonalna) nie powoduje błędu.
 
