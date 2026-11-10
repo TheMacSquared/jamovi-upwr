@@ -18,7 +18,7 @@ jUPWR to narzędzie do NAUKI statystyki (UPWr). Zasady, których redesign nie mo
   i ma zostać: kategoria na wstążce → rozwijane menu → analiza oraz rdzeń panelu
   → zwinięte sekcje „Założenia” / „Zaawansowane”. Nie dokładamy nowych poziomów.
 - **Bez asystentów i podpowiedzi interpretacyjnych.** Aplikacja nie mówi studentowi, co ma
-  wywnioskować (por. zasada „co i jak, nigdy dlaczego” z zadania 19 w `AGENTS.md`).
+  wywnioskować (por. zasada „co i jak, nigdy dlaczego” z zadania 19 w `docs/DECYZJE.md`).
 - **Trzy typy okien:** (1) dane (arkusz), (2) panel wyboru opcji analizy, (3) wyniki. Do tego
   doraźnie (4) edytor zmiennej (dziś pas na górze, który przesuwa cały widok w dół)
   i (5) panel ustawień aplikacji (prawa szuflada otwierana przyciskiem ⋮: powiększenie,

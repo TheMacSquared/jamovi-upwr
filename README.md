@@ -2,49 +2,74 @@
 
 Fork [jamovi](https://www.jamovi.org) przygotowany na potrzeby dydaktyki statystyki na **Uniwersytecie Przyrodniczym we Wrocławiu**.
 
+Bieżąca wersja dystrybucji: [`client/common/jupwr.ts`](client/common/jupwr.ts).
+Wersje modułów i skład wydania: [`packaging/MODULES.md`](packaging/MODULES.md).
+Historia wydań: [`CHANGELOG.md`](CHANGELOG.md).
+
 ## Co dodaje ten fork?
 
-### Modyfikacje jmv (moduł analityczny)
-- **Boxplot** — opcja wyświetlania średniej jako kwadratu (`boxMean`)
-- **Statystyki opisowe** — współczynnik zmienności V (%)
-- **Zmienne obliczane** — tryb „Warunki" (strukturalny kreator wyrażeń warunkowych)
+### Analizy kursu podstawowego w modułach jUPWR
+Każde menu kursu podstawowego ma własne analizy jUPWR. Panel pokazuje od razu
+opcje potrzebne na zajęciach, a pozostałe grupuje w sekcji „Zaawansowane”.
+Każda analiza może dopisać do wyników „Opis zastosowanych metod”: co policzono,
+z jakimi parametrami i jak przedstawiono.
 
-> Facetowanie histogramów zapewnia wbudowany mechanizm „Podziel według" upstreamu —
-> osobna opcja `histFacet` okazała się zbędna i nie istnieje.
+Analizy jmv zastąpione przez moduły jUPWR są ukryte w menu, ale ich kod zostaje,
+więc zapisane wcześniej pliki `.omv` nadal się otwierają. Analizy spoza kursu
+(np. MANCOVA, regresja wielomianowa i porządkowa, modele log-liniowe) pozostają
+widoczne jako jmv.
+
+### Moduły preinstalowane
+| Moduł | Menu | Opis |
+|---|---|---|
+| **jEksplor** | Eksploracja | Zmienne ilościowe (miary położenia, rozproszenia, kształtu, koncentracji; testy normalności), zmienne jakościowe (tabele liczności, także krzyżowe i w warstwach), szereg rozdzielczy |
+| **jTestyT** | Testy t | Jedna próba, dwie grupy, próby sparowane: t Studenta, t Welcha, Mann-Whitney / Wilcoxon. Tylko testowanie; przedziały ufności są w jCI |
+| **jANOVA** | ANOVA | ANOVA (czynniki, bloki, kowarianty) i ANOVA powtórzonych pomiarów na danych w formacie długim. Przełączniki „Nierówne wariancje” (Welch, Welch-James) i „Nieparametrycznie” (Kruskal-Wallis, ART, Friedman). Porównania wielokrotne z literami grup jednorodnych |
+| **jRegr** | Regresja | Korelacja, regresja liniowa, regresja logistyczna dwumianowa z diagnostyką |
+| **jCzest** | Częstości | Tabela kontyngencji z kontrolą liczebności oczekiwanych i miarami siły związku, test zgodności, próby zależne (McNemar, Q Cochrana) |
+| **jCI** | Przedziały ufności | Przedziały klasyczne i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji i regresji; d Cohena z przedziałem; analiza „Jak działa bootstrap”. Zawiera dawny moduł jboot |
+| **jperm** | Testy permutacyjne | Testy permutacyjne |
+| **distrACTION** | Rozkłady | 11 rozkładów prawdopodobieństwa po polsku, z E[X] i Var[X]; dane empiryczne można nałożyć na model |
+| **scatr** | Wykresy | 30 wykresów w kategoriach dydaktycznych (patrz niżej) |
+| **jDane** | Otwórz → Biblioteka | Zbiory danych do zajęć z tagami tematycznymi i cytowaniami. Bez analiz |
+| **jmv** | pozostałe | Analizy jamovi spoza kursu podstawowego |
 
 ### Wykresy w kategoriach dydaktycznych
 Zakładka **Wykresy** jest podzielona na kategorie według zastosowań (wzorzec:
-[r-graph-gallery.com](https://r-graph-gallery.com)), łącznie **26 wykresów**:
+[r-graph-gallery.com](https://r-graph-gallery.com)). O kategorii rozkładu
+decyduje typ zmiennej głównej.
 
 | Kategoria | Wykresy |
 |---|---|
-| **Rozkład** | histogram, gęstość, Q–Q, raincloud, ridgeline |
-| **Porównania** | boxplot, skrzypce, punkty ze średnią |
-| **Ranking** | słupkowy, lollipop, radar, współrzędne równoległe, chmura słów, słupki kołowe |
-| **Zależności** | rozrzutu, bąbelkowy, mapa ciepła, korelogram, mozaikowy, hexbin |
+| **Rozkład ilościowe** | histogram, słupkowy dla zmiennej dyskretnej, gęstość, Q–Q, raincloud |
+| **Rozkład jakościowe** | słupki skumulowane, waffle, treemap, mozaikowy |
+| **Porównania** | pudełkowy, skrzypcowy, punktowy grup |
+| **Ranking** | słupkowy, lollipop, chmura słów, kolisty słupkowy |
+| **Profile** | radar, profil średnich, hantlowy, nachylenia |
+| **Zależności** | rozrzutu, bąbelkowy, mapa ciepła, korelogram, hexbin |
 | **Trendy** | liniowy, warstwowy |
-| **Części całości** | słupki skumulowane, waffle, treemap |
 | **Inne** | Pareto |
+
+Dwa wykresy (ridgeline, współrzędne równoległe) są ukryte w menu i działają
+tylko w zapisanych plikach. Wykresy pudełkowy, skrzypcowy, raincloud i punktowy
+grup przyjmują też dane w formacie szerokim (kilka kolumn obok siebie).
 
 Świadome decyzje dydaktyczne: **brak wykresu kołowego** (oduczamy go), a boxplot
 występuje tylko w Porównaniach — rolę rozkładową pełni raincloud.
 
-### Motywy i palety
+### Motywy, palety i wygląd
 Motywy wykresów w stylu wykładowym oraz palety kuratorowane: barwy UPWr,
-palety bezpieczne dla daltonistów (CVD-safe) i viridis. Skale ciągłe podążają
-za wybraną paletą. Czcionki dołączone do dystrybucji.
+palety bezpieczne dla daltonistów (CVD-safe), viridis i Catppuccin. Skale ciągłe
+podążają za wybraną paletą. Czcionki dołączone do dystrybucji. Wygląd interfejsu
+wybiera się w ustawieniach: klasyczny (jak w jamovi), lekki albo lekki przyciemniony.
 
-### Moduły preinstalowane
-| Moduł | Opis |
-|-------|------|
-| **scatr** | Wykresy — 26 pozycji w kategoriach dydaktycznych (patrz wyżej) |
-| **distrACTION** | Rozkłady prawdopodobieństwa (ciągłe i dyskretne). Pełny interfejs po polsku, wartość oczekiwana E[X] i wariancja Var[X] ze wzorami dla wszystkich 11 rozkładów (w tym gamma, Weibulla i ujemny dwumianowy z wyborem konwencji zmiennej losowej) |
-| **jboot** | Metody bootstrapowe (przedziały ufności, korelacje, regresja, porównania grup) |
-| **jperm** | Testy permutacyjne |
-| **jCI** | Przedziały ufności z wykresami dydaktycznymi (waffle, Gardner–Altman, scatter + regresja); wybór 2 kategorii z wielu poziomów; grupowanie |
-| **jDane** | Zbiory danych do zajęć, z tagami tematycznymi (Otwórz → Biblioteka). Sam moduł nie wnosi analiz |
-| **jANOVA** | ANOVA w jednym miejscu, na danych w formacie długim, z panelem pod dydaktyczną prostotę: „ANOVA" (czynniki; w „Zaawansowanych" czynniki blokujące, kowarianty, typ SS I/II/III, kontrasty) i „ANOVA powtórzonych pomiarów" (afex: test Mauchly'ego, poprawki GG/HF, split-plot). Przełącznik „Nierówne wariancje" daje Welcha lub Welcha-Jamesa, przełącznik „Nieparametrycznie" Kruskala-Wallisa z Dunnem, ART (aligned rank transform) dla układów czynnikowych albo Friedmana z Nemenyim. Porównania wielokrotne (Tukey, NIR, Holm, Dunnett, Scheffé) z grupami jednorodnymi (litery) i różnicą graniczną, wykresy średnich z literami. Analizy ANOVA z jmv (jednoczynnikowa, ANOVA, ANCOVA, powtórzonych pomiarów, Kruskal-Wallis, Friedman) są ukryte w menu, ale nadal otwierają się z zapisanych plików |
-| **jTestyT** | Testy t (jedna próba, dwie grupy, próby sparowane) z płaskim panelem jak w jmv: osobne checkboxy t Studenta, t Welcha i Manna-Whitneya / Wilcoxona, hipoteza z listy, zawsze różnica z przedziałem ufności i d Cohena z przedziałem, czytelne wykresy grup i różnicy (Gardner-Altman z osią różnicy), par z liniami oraz średniej z linią H₀. Testy t z jmv są ukryte w menu |
+### Dane, dokumenty i bibliografia
+- **Zmienne przekształcone** — tryb „Warunki” (kreator reguł bez pisania formuł).
+- **Kopie odzyskiwania** dokumentów w wybranym odstępie czasu, atomowy zapis plików.
+- **Bibliografia** zawiera cytowania pakietów R użytych w widocznych wynikach
+  oraz źródeł zbiorów z biblioteki.
+- **Statystyki opisowe jmv** (dla starych plików) zachowują średnią na boxplocie
+  (`boxMean`) i współczynnik zmienności V (%).
 
 ### Moduły opcjonalne (`.jmo`, sideload)
 Moduł obsługujący **jeden kurs** nie jest preinstalowany — studenci tego kursu
@@ -110,14 +135,19 @@ i18n/            # tłumaczenia (submoduł)
 docker/          # Dockerfile'e
 packaging/       # buildy natywne Windows/macOS, rejestr modułów
 jamovi-compiler/ # kompilator modułów (jmc)
-jmvcore/         # biblioteka R modułów (motywy, palety)
+jmvcore/         # biblioteka R modułów (motywy, palety, opis metod)
+docs/            # historia decyzji, instrukcje buildów, audyty
 
 jmv/             # moduł analityczny (submoduł)
 plots/           # moduł wykresów — scatr (submoduł)
-jdistrACTION/    # rozkłady prawdopodobieństwa
-jboot/           # bootstrap
+jEksplor/        # eksploracja
+jTestyT/         # testy t
+jANOVA/          # ANOVA
+jRegr/           # korelacja i regresja
+jCzest/          # częstości
+jCI/             # przedziały ufności (klasyczne i bootstrap)
 jperm/           # testy permutacyjne
-jCI/             # przedziały ufności
+jdistrACTION/    # rozkłady prawdopodobieństwa
 jDane/           # zbiory danych do zajęć
 jRISK/           # ryzyko i niezawodność (opcjonalny — .jmo)
 jSpace/          # statystyka danych kosmicznych (opcjonalny — .jmo)
@@ -137,7 +167,9 @@ z obrazu `jamovi/jamovi-deps`. Szczegóły: [`packaging/README.md`](packaging/RE
 - [`CHANGELOG.md`](CHANGELOG.md) — historia wydań jUPWR
 - [`packaging/MODULES.md`](packaging/MODULES.md) — rejestr modułów, macierz zgodności, procedura wydania
 - [`packaging/README.md`](packaging/README.md) — buildy natywne, znane ograniczenia
-- [`AGENTS.md`](AGENTS.md) — architektura i konwencje dla agentów/współautorów
+- [`packaging/CHANNELS.md`](packaging/CHANNELS.md) — kanały wydań latest i stable
+- [`AGENTS.md`](AGENTS.md) — architektura i zasady pracy dla agentów/współautorów
+- [`docs/DECYZJE.md`](docs/DECYZJE.md) — kolejka zadań i historia decyzji
 
 ---
 

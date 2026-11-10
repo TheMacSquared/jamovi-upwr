@@ -26,7 +26,7 @@ także poprawkowe z nowymi funkcjami, a poważne błędy wychodziły po kilku dn
 
 1. **Ogłoszenie kandydata** (decyzja kalendarzowa): „seria X.Y jest kandydatem”. Od
    tej chwili na `main` tylko poprawki błędów — bez nowych funkcji i bez nowego
-   upstreamu; pomysły idą do AGENTS.md jako zadania na później. Kolejne wydania
+   upstreamu; pomysły idą do docs/DECYZJE.md jako zadania na później. Kolejne wydania
    podbijają tylko ostatnią cyfrę (X.Y.1, X.Y.2…).
 2. **Zegar**: 2–3 tygodnie normalnego użycia albo pełny cykl zajęć na kandydacie.
 3. **Przy każdym znalezionym błędzie jedno pytanie** — czy jest krytyczny (utrata lub
@@ -45,7 +45,7 @@ także poprawkowe z nowymi funkcjami, a poważne błędy wychodziły po kilku dn
 
 Uprzedzić prowadzących: pliki .omv z nowej stable nie otworzą się w starej (wyższa
 wersja jamovi), a część starszych analiz zmieniła tabele (CHANGELOG, wpisy
-„Stare .omv…” w AGENTS.md).
+„Stare .omv…” w docs/DECYZJE.md).
 
 `readstat` jest wspólny dla wszystkich linii (gałąź `sync-28`).
 
