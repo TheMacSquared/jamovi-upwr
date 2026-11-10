@@ -796,7 +796,9 @@ był sam `format()`, nie przesłanianie przez jmvcore); Anderson-Darling w ogoni
 poziomów; różne etykiety pomiarów dają notę jak w McNemarze); Dunnett w jANOVA
 (decyzja: stałe ziarno 1 przez `withFixedSeed`, stan generatora przywracany,
 dokładność mvtnorm bez zmian). Wersje: jANOVA 0.5.8, jCzest 0.2.9, jCI 0.3.10,
-jEksplor 0.1.12, jperm 0.2.10, jRISK 0.4.6. Nie przeniesione na stable.
+jEksplor 0.1.12, jperm 0.2.10, jRISK 0.4.6. Na `release/1.0` przeniesione ręcznie
+cztery poprawki błędnych wyników (bez notacji naukowej, która jest tylko
+wyświetlaniem): jANOVA 0.5.1.2, jCzest 0.2.3.2, jCI 0.3.4.2, jEksplor 0.1.4.2.
 Te punkty na liście niżej są nieaktualne. Doszło: granice klas w „Szeregu
 rozdzielczym” jEksplor (`format(signif(...))`) dają „1e+05” od 100 000.
 Pozostaje (priorytet zależy od wpływu na wynik i częstości użycia):
