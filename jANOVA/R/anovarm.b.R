@@ -83,10 +83,23 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             }
             wcells <- cellsFactor(d, within)
             tab <- table(d[[subject]], wcells)
+            nDropped <- 0L
             if (any(tab == 0)) {
-                at$setNote("err", paste0("Dane niekompletne: każda jednostka musi mieć obserwację w każdej ",
-                    "kombinacji czynników wewnątrzobiektowych (", sum(tab == 0), " brakujących komórek)."))
-                return()
+                # units without an observation in every within-subject cell are
+                # left out (and counted), instead of stopping the whole analysis
+                incomplete <- rownames(tab)[rowSums(tab == 0) > 0]
+                nDropped <- length(incomplete)
+                d <- d[!(as.character(d[[subject]]) %in% incomplete), , drop = FALSE]
+                for (v in c(subject, within, between)) d[[v]] <- droplevels(d[[v]])
+                tooFew <- nlevels(d[[subject]]) < 2 || any(vapply(c(within, between), function(v) nlevels(d[[v]]) < 2, logical(1)))
+                if (tooFew) {
+                    at$setNote("err", sprintf(paste0("Dane niekompletne: po pominięciu jednostek bez obserwacji w każdej ",
+                        "kombinacji czynników wewnątrzobiektowych (%d) zostało za mało danych."), nDropped))
+                    return()
+                }
+                at$setNote("incomplete", sprintf("Pominięto jednostki bez obserwacji w każdej kombinacji czynników wewnątrzobiektowych: %d.", nDropped))
+                wcells <- cellsFactor(d, within)
+                tab <- table(d[[subject]], wcells)
             }
             if (any(tab > 1))
                 at$setNote("agg", "Powtórzone obserwacje w tej samej komórce jednostki uśredniono.")
@@ -110,6 +123,7 @@ anovarmClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                   dep, subject, nlevels(d[[subject]]), nrow(d), jmvcore::metodyCyt(within),
                   if (length(between)) paste0("; międzyobiektowe: ", jmvcore::metodyCyt(between)) else "",
                   if (length(covs)) paste0("; kowarianty: ", jmvcore::metodyCyt(covs)) else "")
+            md$addIf(nDropped > 0, "Dane", "Pominięto jednostki bez obserwacji w każdej kombinacji czynników wewnątrzobiektowych: %d.", nDropped)
             md$addIf(any(tab > 1), "Dane", "Powtórzone obserwacje w tej samej komórce jednostki uśredniono.")
             md$addIf(length(covs) > 0, "Model", "Kowarianty wycentrowane (średnia jednostek = 0): efekty czynników oceniane przy średniej wartości kowarianty.")
             md$add("Model", "ANOVA powtórzonych pomiarów (afex::aov_ez): każdy efekt testowany wobec błędu swojej warstwy; sumy kwadratów typu %s; sferyczność: %s.",

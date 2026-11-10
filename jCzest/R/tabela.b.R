@@ -113,7 +113,7 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 if (!is.null(w)) warn <- c(warn, if (is.null(pt$lay)) w else sprintf("Warstwa „%s”: %s", pt$lay, w))
                 private$.fillTests(pt$tab, pt$lay)
                 private$.fillEffSize(pt$tab, pt$lay)
-                private$.fillMeasures(pt$tab, pt$lay)
+                private$.fillMeasures(pt$tab, pt$lay, ref = tab)
                 private$.fillOrdinal(pt$tab, pt$lay)
                 private$.fillTrend(pt$tab, pt$lay)
                 private$.fillResid(pt$tab, pt$lay)
@@ -301,11 +301,14 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 "przeliczone na V = √(λ / (N · (min(r, c) − 1)))."), o$ciWidth)
         },
 
-        .fillMeasures = function(tab, lay = NULL) {
+        # ref: tabela łączna. Miary liczymy tylko wtedy, gdy ONA jest 2×2 — warstwa,
+        # która stała się 2×2 po zniknięciu kategorii, porównywałaby inne kategorie
+        # niż pozostałe warstwy i niż opis metod.
+        .fillMeasures = function(tab, lay = NULL, ref = tab) {
             o <- self$options
             if (!(isTRUE(o$odds) || isTRUE(o$relRisk) || isTRUE(o$diffProp))) return()
             t <- self$results$measures
-            if (!all(dim(tab) == c(2, 2))) {
+            if (!all(dim(ref) == c(2, 2)) || !all(dim(tab) == c(2, 2))) {
                 t$setNote("d", "Te miary są określone tylko dla tabel 2×2.")
                 return()
             }

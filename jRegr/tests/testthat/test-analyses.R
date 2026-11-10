@@ -132,3 +132,17 @@ test_that("saved values carry the spreadsheet row numbers (audit 2026-11-05)", {
     rl <- run("logistyczna", dl, "predictOV", dep = "y", covs = "x")
     expect_equal(rn(rl$predictOV), c(2:7, 10:15))
 })
+
+test_that("correlation: two-sided interval is stated, matrix panels use pairwise-complete rows", {
+    set.seed(4)
+    m <- data.frame(a = rnorm(30), b = rnorm(30), c = rnorm(30)); m$c[1:10] <- NA
+    one <- jRegr:::korelacja(data = m, vars = c("a", "b"), hypothesis = "pos", ci = TRUE, metody = TRUE)$metody$content
+    expect_true(grepl("dwustronny niezależnie od wybranej hipotezy", one, fixed = TRUE))
+    two <- jRegr:::korelacja(data = m, vars = c("a", "b"), ci = TRUE, metody = TRUE)$metody$content
+    expect_false(grepl("dwustronny niezależnie", two, fixed = TRUE))
+    st <- jRegr:::korelacja(data = m, vars = c("a", "b", "c"), plot = TRUE)$plotMatrix$state
+    expect_equal(nrow(st$d), 30)
+    p <- jRegr:::scatterMatrixPlot(st$d, st$coefs, "pearson", ggplot2::theme_gray(), list(color = "black"))
+    n <- table(p$data$pair)
+    expect_equal(as.integer(n), c(30L, 20L, 20L))   # a~b uses all rows, pairs with c the 20 complete ones
+})

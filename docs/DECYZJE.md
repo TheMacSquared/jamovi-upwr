@@ -811,9 +811,12 @@ meanprofile z komunikatem przy braku danych, dumbbell bez sklejania etykiet,
 domyślny podpis słupków błędu w stripmean; distrACTION 1.5.2 — zakres i etykiety
 osi χ² przy λ > 0, literówki `QuantAlpha*` (dwumianowy) i `LoweSegment` (χ²);
 jmvcore 28.3.5 — `metody$add()` łączy wektor. Te punkty na liście niżej są
-nieaktualne. DO DECYZJI (nieruszone): jCzest miary 2×2 w warstwie, jRegr
-przedział przy teście jednostronnym i panele macierzy rozrzutów, jANOVA brakujący
-pomiar w powtórzonych pomiarach. Poza zakresem tej tury: jSpace, klient/serwer.
+nieaktualne. DECYZJE 2026-11-10: jCzest — miary 2×2 w warstwach tylko, gdy
+tabela łączna jest 2×2 (`ref` w `.fillMeasures`); jRegr 0.1.10 — przedział
+korelacji zostaje dwustronny przy hipotezie jednostronnej (zdanie w opisie
+metod), panele macierzy rozrzutów z par kompletnych; jANOVA — w powtórzonych
+pomiarach jednostki bez pomiaru w każdej komórce są pomijane i liczone w nocie
+(wcześniej błąd „Dane niekompletne”). Poza zakresem tej tury: jSpace, klient/serwer.
 Pozostaje (priorytet zależy od wpływu na wynik i częstości użycia):
 - Wspólne: `format(x, big.mark = " ")` trafia w `jmvcore::format` i ignoruje
   separator („N = 1e+05”) — jperm `utils.R:195`, jCzest (tabela/zgodnosc/

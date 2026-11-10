@@ -38,7 +38,9 @@ scatterMatrixPlot <- function(d, coefs, method, ggtheme, theme) {
     vars <- names(d); pairs <- utils::combn(length(vars), 2)
     long <- do.call(rbind, lapply(seq_len(ncol(pairs)), function(k) {
         i <- pairs[1, k]; j <- pairs[2, k]
-        data.frame(pair = sprintf("%s ~ %s: %.2f", vars[j], vars[i], coefs[[paste(vars[i], vars[j])]]), x = d[[i]], y = d[[j]])
+        ok <- !is.na(d[[i]]) & !is.na(d[[j]])   # the same pairs the coefficient is computed from
+        data.frame(pair = rep(sprintf("%s ~ %s: %.2f", vars[j], vars[i], coefs[[paste(vars[i], vars[j])]]), sum(ok)),
+                   x = d[[i]][ok], y = d[[j]][ok])
     }))
     long$pair <- factor(long$pair, levels = unique(long$pair))
     p <- ggplot2::ggplot(long, ggplot2::aes(x = x, y = y)) + ggplot2::geom_point(alpha = 0.5, size = 1.6, colour = theme$color[1])

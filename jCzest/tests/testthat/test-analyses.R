@@ -171,3 +171,17 @@ test_that("V Craméra: nota, gdy V jest powyżej górnej granicy (audyt 2026-11-
     txt <- gsub("\\s+", " ", paste(capture.output(print(res$effsize)), collapse = " "))
     expect_true(grepl("obciążone w górę", txt))
 })
+
+test_that("miary 2x2 w warstwach tylko wtedy, gdy tabela laczna jest 2x2", {
+    # lacznie 2 x 3; w warstwie "m" nie ma kategorii "c", wiec sama warstwa jest 2 x 2
+    w <- data.frame(r = factor(rep(c("a", "b"), 30)),
+                    k = factor(c(rep(c("x", "x", "y", "y"), 5), rep(c("x", "y", "z", "z", "x", "z", "y", "x"), 5))),
+                    l = factor(c(rep("m", 20), rep("n", 40))))
+    expect_equal(dim(table(w$r[w$l == "m"], droplevels(w$k[w$l == "m"]))), c(2L, 2L))
+    res <- jCzest:::tabela(data = w, rows = "r", cols = "k", layer = "l", odds = TRUE, relRisk = TRUE)
+    expect_equal(nrow(res$measures$asDF), 0)
+    # tabela laczna 2 x 2: miary w kazdej warstwie i lacznie
+    w2 <- w[w$k != "z", ]; w2$k <- droplevels(w2$k)
+    r2 <- jCzest:::tabela(data = w2, rows = "r", cols = "k", layer = "l", odds = TRUE)$measures$asDF
+    expect_equal(r2$layer, c("m", "n", "Ogółem"))
+})

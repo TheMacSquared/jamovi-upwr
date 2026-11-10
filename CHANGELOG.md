@@ -5,6 +5,21 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## Niewydane (linia latest, po 1.4.1)
 
+Zmienione:
+- ANOVA powtórzonych pomiarów: jednostka, której brakuje pomiaru w którejś
+  kombinacji czynników wewnątrzobiektowych, jest pomijana, a liczba pominiętych
+  jednostek jest podana w nocie pod tabelą i w opisie metod. Wcześniej jeden
+  brak zatrzymywał całą analizę komunikatem „Dane niekompletne”.
+- Korelacja, macierz rozrzutów: każdy panel rysuje obserwacje bez braków
+  w swojej parze zmiennych, czyli te same, z których liczony jest współczynnik
+  w tytule panelu i w tabeli. Wcześniej panele pokazywały tylko wiersze
+  kompletne we wszystkich zmiennych.
+- Korelacja: opis metod podaje, że przedział ufności jest dwustronny także
+  przy hipotezie jednostronnej (liczby bez zmian).
+- Tabela kontyngencji z warstwami: OR, RR i różnica proporcji są liczone tylko
+  wtedy, gdy tabela łączna jest 2×2. Warstwa, która stała się 2×2, bo zabrakło
+  w niej kategorii, nie dostaje już własnych miar.
+
 Naprawione:
 - Duże liczby w opisach i notach nie są już zapisywane w notacji naukowej
   („N = 100 000” zamiast „N = 1e+05”): liczba obserwacji i par w jCzest
@@ -58,7 +73,7 @@ Naprawione:
   zmiennych albo pusta zmienna opcjonalna) nie powoduje błędu.
 
 Wersje modułów: jANOVA 0.5.8, jCzest 0.2.9, jCI 0.3.10, jEksplor 0.1.12,
-jperm 0.2.10, jTestyT 0.4.8, scatr 2.9.15, distrACTION 1.5.2, jmvcore 28.3.5,
+jperm 0.2.10, jRegr 0.1.10, jTestyT 0.4.8, scatr 2.9.15, distrACTION 1.5.2, jmvcore 28.3.5,
 jRISK 0.4.6 (`.jmo` do zbudowania).
 
 CI: testy klienta (vitest) i serwera (pytest) oraz pełne testy jANOVA i jRISK.

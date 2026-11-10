@@ -195,3 +195,21 @@ test_that("crash cases give notes (audit 2026-11-05, group 3)", {
     txt <- gsub("\\s+", " ", paste(capture.output(print(rw$means$get(key = "g"))), collapse = " "))
     expect_true(grepl("co najmniej 2 obserwacji", txt))
 })
+
+test_that("repeated measures: a unit with a missing measurement is left out and counted", {
+    set.seed(8)
+    d <- data.frame(id = factor(rep(1:10, 3)), czas = factor(rep(c("t1", "t2", "t3"), each = 10)))
+    d$y <- 10 + as.integer(d$czas) + rnorm(30)
+    gap <- d; gap$y[gap$id == "4" & gap$czas == "t2"] <- NA
+    res <- jANOVA:::anovarm(data = gap, dep = "y", subject = "id", within = "czas", metody = TRUE)
+    ref <- jANOVA:::anovarm(data = d[d$id != "4", ], dep = "y", subject = "id", within = "czas")
+    expect_equal(res$anova$asDF$F, ref$anova$asDF$F)
+    expect_equal(res$anova$asDF$df2, ref$anova$asDF$df2)
+    expect_true(grepl("Pominięto jednostki bez obserwacji", res$metody$content, fixed = TRUE))
+    full <- jANOVA:::anovarm(data = d, dep = "y", subject = "id", within = "czas", metody = TRUE)$metody$content
+    expect_false(grepl("Pominięto jednostki", full, fixed = TRUE))
+    # nothing left to analyse: a message instead of a model
+    none <- d; none$y[none$czas == "t2"][-1] <- NA
+    out <- jANOVA:::anovarm(data = none, dep = "y", subject = "id", within = "czas")
+    expect_equal(nrow(out$anova$asDF), 0)
+})

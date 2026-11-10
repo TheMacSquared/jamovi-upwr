@@ -33,9 +33,10 @@ korelacjaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                   switch(o$hypothesis, pos = "korelacja > 0", neg = "korelacja < 0", "korelacja ≠ 0 (dwustronna)"))
             m$addIf(o$ci && o$method != "kendall", "Testy", "Przedział ufności %g%%: transformacja Fishera z%s.", o$ciWidth,
                     if (o$method == "spearman") " z błędem standardowym Bonetta-Wrighta √((1 + ρ²/2)/(n − 3))" else ", błąd 1/√(n − 3)")
+            m$addIf(o$ci && o$method != "kendall" && o$hypothesis != "corr", "Testy", "Przedział ufności jest dwustronny niezależnie od wybranej hipotezy jednostronnej.")
             m$addIf(o$ci && o$method == "kendall", "Testy", "Dla τ-b Kendalla przedział ufności nie jest liczony.")
             m$addIf(o$flag && !pairMode, "Testy", "Gwiazdki w macierzy: * p < 0.05, ** p < 0.01, *** p < 0.001.")
-            m$addIf(o$plot, "Wykres", if (pairMode) "Rozrzut%s." else "Macierz rozrzutów: jeden panel na parę, w tytule współczynnik%s.",
+            m$addIf(o$plot, "Wykres", if (pairMode) "Rozrzut%s." else "Macierz rozrzutów: jeden panel na parę (obserwacje bez braków w tej parze), w tytule współczynnik%s.",
                     if (o$method == "pearson") " z prostą regresji MNK" else " (bez prostej — współczynnik rangowy)")
             m$render(self$results$metody)
 
@@ -73,7 +74,8 @@ korelacjaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                     t$addRow(rowKey = paste(vars[i], kk), values = vals)
                 }
                 t$setNote("tri", "Dolny trójkąt macierzy; p pod współczynnikiem.")
-                dd <- data.frame(d, check.names = FALSE); dd <- dd[stats::complete.cases(dd), , drop = FALSE]
+                # every panel uses the complete pairs of its two variables, as its coefficient does
+                dd <- data.frame(d, check.names = FALSE)
                 self$results$plotMatrix$setState(list(d = dd, coefs = coefs, method = o$method))
             }
         },
