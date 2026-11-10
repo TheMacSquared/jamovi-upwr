@@ -799,8 +799,21 @@ dokładność mvtnorm bez zmian). Wersje: jANOVA 0.5.8, jCzest 0.2.9, jCI 0.3.10
 jEksplor 0.1.12, jperm 0.2.10, jRISK 0.4.6. Na `release/1.0` przeniesione ręcznie
 cztery poprawki błędnych wyników (bez notacji naukowej, która jest tylko
 wyświetlaniem): jANOVA 0.5.1.2, jCzest 0.2.3.2, jCI 0.3.4.2, jEksplor 0.1.4.2.
-Te punkty na liście niżej są nieaktualne. Doszło: granice klas w „Szeregu
-rozdzielczym” jEksplor (`format(signif(...))`) dają „1e+05” od 100 000.
+Druga tura (2026-11-10, niewydane; moduły kursu, scatr, distrACTION, jmvcore):
+jEksplor — zmienna bez obserwacji nie przerywa analizy (stan wykresu tylko przy
+N > 0; PUŁAPKA: `factor(v)` nie da się przypisać do zera wierszy), skośność od
+n = 3, nota o kilku dominantach (`modeCount`), `fmtNum` zamiast `format(signif())`
+w szeregu; jCI — `fallback = NA` w `bootCI` = wszystkie replikacje równe (osobna
+nota), komunikaty dla stałych danych w `citwomeans` i `cicorrelation`; jTestyT
+i jperm — `.validPairs` (para zmiennej z nią samą pomijana, duplikaty raz);
+jCzest — zdanie o OR/RR w opisie metod; scatr 2.9.15 — stackbar/pareto/
+meanprofile z komunikatem przy braku danych, dumbbell bez sklejania etykiet,
+domyślny podpis słupków błędu w stripmean; distrACTION 1.5.2 — zakres i etykiety
+osi χ² przy λ > 0, literówki `QuantAlpha*` (dwumianowy) i `LoweSegment` (χ²);
+jmvcore 28.3.5 — `metody$add()` łączy wektor. Te punkty na liście niżej są
+nieaktualne. DO DECYZJI (nieruszone): jCzest miary 2×2 w warstwie, jRegr
+przedział przy teście jednostronnym i panele macierzy rozrzutów, jANOVA brakujący
+pomiar w powtórzonych pomiarach. Poza zakresem tej tury: jSpace, klient/serwer.
 Pozostaje (priorytet zależy od wpływu na wynik i częstości użycia):
 - Wspólne: `format(x, big.mark = " ")` trafia w `jmvcore::format` i ignoruje
   separator („N = 1e+05”) — jperm `utils.R:195`, jCzest (tabela/zgodnosc/

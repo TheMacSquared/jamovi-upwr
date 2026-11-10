@@ -7,7 +7,7 @@ ilosciowe_statDefs <- function(o) {
         list("q1", "Q1", o$quart, "kwartyle Q1 i Q3 = kwantyle 0.25 i 0.75 (definicja typu 7 jak w R: interpolacja liniowa)"), list("q3", "Q3", o$quart, NULL),
         list("sd", "SD", o$sd, "SD = odchylenie standardowe z próby (dzielnik n − 1)"), list("min", "Min", o$min, NULL), list("max", "Max", o$max, NULL),
         list("v", "V (%)", o$v, "V = SD / średnia · 100%"),
-        list("mode", "Dominanta", o$mode, "dominanta = wartość najczęstsza (brak, gdy każda wartość występuje raz)"),
+        list("mode", "Dominanta", o$mode, "dominanta = wartość najczęstsza (brak, gdy każda wartość występuje raz; przy kilku równie częstych najmniejsza)"),
         list("sum", "Suma", o$sum, NULL),
         list("gmean", "Śr. geometryczna", o$gmean, "średnia geometryczna i harmoniczna tylko dla wartości dodatnich"),
         list("hmean", "Śr. harmoniczna", o$hmean, NULL),
@@ -122,8 +122,11 @@ iloscioweClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             m$addIf(o$ecdf, "Wykres", "Dystrybuanta empiryczna: udział obserwacji ≤ x%s.", if (split) ", linie = grupy" else "")
             m$render(self$results$metody)
 
+            manyModes <- character(0)
             fillRow <- function(v, gi, x, missing) {
                 st <- if (length(x)) c(descStats(x, o$trimProp), ilosciowe_extraStats(x, o)) else list()
+                if (isTRUE(o$mode) && modeCount(x) > 1)
+                    manyModes <<- c(manyModes, if (split) sprintf("%s (%s)", v, groupLabel(gi)) else v)
                 st$n <- length(x); st$missing <- missing
                 vals <- st[intersect(keys, names(st))]
                 if (o$layout == "rows") {
@@ -150,12 +153,15 @@ iloscioweClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 } else {
                     x <- raw[!is.na(raw)]; fillRow(v, 1, x, sum(is.na(raw)))
                     private$.fillNorm(v, "", x); private$.fillConc(v, "", x)
-                    d <- data.frame(y = x, group = factor(v))
+                    d <- data.frame(y = x, group = factor(rep(v, length(x)), levels = v))
                 }
                 private$.fillExtreme(v, raw)
-                for (arr in c("hist", "box", "qq", "ecdf", "lorenz")) if (isTRUE(plotOn[[arr]]))
+                # no observations: no state, so the plot stays empty instead of failing
+                if (nrow(d) > 0) for (arr in c("hist", "box", "qq", "ecdf", "lorenz")) if (isTRUE(plotOn[[arr]]))
                     self$results[[arr]]$get(key = v)$setState(list(d = d, label = v))
             }
+            if (length(manyModes) > 0)
+                t$setNote("modes", sprintf("Kilka równie częstych wartości — jako dominantę podano najmniejszą: %s.", paste(manyModes, collapse = ", ")))
             if (isTRUE(o$gini)) self$results$conc$setNote("g", "G tylko dla wartości nieujemnych.")
         },
         .fillNorm = function(v, lab, x) {

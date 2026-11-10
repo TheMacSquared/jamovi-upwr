@@ -14,6 +14,17 @@ modeValue <- function(x) {
     as.numeric(names(tb)[which.max(tb)])    # first of the tied most frequent
 }
 
+# number of values tied for the highest frequency (0 = no mode)
+modeCount <- function(x) {
+    if (length(x) == 0) return(0L)
+    tb <- table(x)
+    if (max(tb) == 1) 0L else sum(tb == max(tb))
+}
+
+# plain number for labels: format() alone switches round values from
+# 100 000 upwards to scientific notation ("1e+05")
+fmtNum <- function(v, digits = 6) base::format(signif(v, digits), scientific = FALSE)
+
 winsorMean <- function(x, trim = 0.1) {
     n <- length(x); k <- floor(n * trim)
     if (k == 0) return(mean(x))
@@ -24,11 +35,13 @@ winsorMean <- function(x, trim = 0.1) {
 # Sample skewness G1 and excess kurtosis G2 with standard errors (SPSS/jmv formulas)
 skewKurt <- function(x) {
     n <- length(x)
-    if (n < 4) return(list(skew = NA_real_, seSkew = NA_real_, kurt = NA_real_, seKurt = NA_real_))
+    # G1 and its standard error exist from n = 3, G2 from n = 4
+    if (n < 3) return(list(skew = NA_real_, seSkew = NA_real_, kurt = NA_real_, seKurt = NA_real_))
     d <- x - mean(x); s2 <- sum(d^2); s4 <- sum(d^4); v <- s2 / (n - 1)
     skew <- sqrt(n * (n - 1)) / (n - 2) * sqrt(n) * sum(d^3) / s2^1.5
-    kurt <- (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3)) * s4 / v^2 - 3 * (n - 1)^2 / ((n - 2) * (n - 3))
     varSkew <- 6 * n * (n - 1) / ((n - 2) * (n + 1) * (n + 3))
+    if (n < 4) return(list(skew = skew, seSkew = sqrt(varSkew), kurt = NA_real_, seKurt = NA_real_))
+    kurt <- (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3)) * s4 / v^2 - 3 * (n - 1)^2 / ((n - 2) * (n - 3))
     list(skew = skew, seSkew = sqrt(varSkew), kurt = kurt, seKurt = sqrt(4 * (n^2 - 1) * varSkew / ((n - 3) * (n + 5))))
 }
 
@@ -192,6 +205,7 @@ lorenzPlot <- function(d, label, ggtheme, theme) {
         if (length(v) == 0 || any(v < 0)) return(NULL)
         cbind(lorenz(v), group = g)
     }))
+    if (is.null(lz)) return(NULL)
     lz$group <- factor(lz$group, levels = levels(d$group))
     p <- ggplot2::ggplot(lz, ggplot2::aes(x = p, y = L)) +
         ggplot2::geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "grey50")
@@ -270,12 +284,12 @@ groupedStats <- function(tab) {
     list(mean = m, var = v, sd = sqrt(v), mode = mode, median = med, modalClass = i, medianClass = j)
 }
 
-fmtClass <- function(lower, upper, last = FALSE) sprintf("[%s; %s%s", format(signif(lower, 6)), format(signif(upper, 6)), if (last) "]" else ")")
+fmtClass <- function(lower, upper, last = FALSE) sprintf("[%s; %s%s", fmtNum(lower), fmtNum(upper), if (last) "]" else ")")
 
 classHistPlot <- function(tab, label, ggtheme, theme) {
     ggplot2::ggplot(tab) +
         ggplot2::geom_rect(ggplot2::aes(xmin = lower, xmax = upper, ymin = 0, ymax = n), fill = theme$fill[2], colour = theme$color[1]) +
-        ggplot2::scale_x_continuous(breaks = c(tab$lower, tab$upper[nrow(tab)]), labels = function(v) format(signif(v, 4))) +
+        ggplot2::scale_x_continuous(breaks = c(tab$lower, tab$upper[nrow(tab)]), labels = function(v) fmtNum(v, 4)) +
         ggplot2::labs(x = label, y = "Liczność") + ggtheme
 }
 
@@ -285,7 +299,7 @@ ogivePlot <- function(tab, label, ggtheme, theme) {
         ggplot2::geom_line(colour = accent(theme), linewidth = 1) + ggplot2::geom_point(colour = accent(theme), size = 2.5) +
         ggplot2::geom_hline(yintercept = 50, linetype = "dashed", colour = "grey50") +
         ggplot2::scale_y_continuous(labels = function(v) paste0(v, "%"), limits = c(0, 100)) +
-        ggplot2::scale_x_continuous(breaks = d$x, labels = function(v) format(signif(v, 4))) +
+        ggplot2::scale_x_continuous(breaks = d$x, labels = function(v) fmtNum(v, 4)) +
         ggplot2::labs(x = label, y = "Częstość skumulowana") + ggtheme
 }
 

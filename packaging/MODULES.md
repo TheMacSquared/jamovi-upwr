@@ -15,10 +15,10 @@ Wersji modułów nie podnosimy z powodu samej przebudowy.
 
 | Moduł (katalog) | Nazwa w jamovi | Rola | Dystrybucja | Wersja |
 |---|---|---|---|---|
-| `jmvcore/` | jmvcore | wspólny runtime analiz, motywy i palety | wbudowany runtime | 28.3.4 |
+| `jmvcore/` | jmvcore | wspólny runtime analiz, motywy i palety | wbudowany runtime | 28.3.5 |
 | `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.5 |
-| `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 30 wykresów, w tym 17 wektorowych i 2 ukryte) | wbudowany | 2.9.14 |
-| `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.5.1 |
+| `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 30 wykresów, w tym 17 wektorowych i 2 ukryte) | wbudowany | 2.9.15 |
+| `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.5.2 |
 | `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.10 |
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.10 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.8.2 |
@@ -26,7 +26,7 @@ Wersji modułów nie podnosimy z powodu samej przebudowy.
 | `jEksplor/` | jEksplor | eksploracja jUPWR: zmienne ilościowe (rdzeń N/braki/średnia/mediana/kwartyle/SD/min/max/V, miary pozycyjne, Gini i Lorenz, Lilliefors i Anderson-Darling), zmienne jakościowe (tabele liczności, także w grupach), szereg rozdzielczy; zastępuje w menu Eksploracja jmv::descriptives i jmv::qualitative (ukryte w kliencie) | wbudowany | 0.1.12 |
 | `jRegr/` | jRegr | regresja jUPWR: korelacja (para = jeden wiersz, więcej = macierz), regresja liniowa, logistyczna dwumianowa; zastępuje w menu Regresja jmv::simpleCorr, corrMatrix, linReg, logRegBin (ukryte w kliencie) | wbudowany | 0.1.9 |
 | `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery (Tukey, Games-Howell, Dunnett); zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.5.8 |
-| `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem — tylko testowanie: statystyka, p, różnica i d Cohena jako punkty (przedziały ufności i wykres estymacyjny są w jCI); zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.4.7 |
+| `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem — tylko testowanie: statystyka, p, różnica i d Cohena jako punkty (przedziały ufności i wykres estymacyjny są w jCI); zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.4.8 |
 | `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.4.6 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.4 |
 | `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | wewnętrzny — poza wydaniem (zamrożony) | 0.1.3 |

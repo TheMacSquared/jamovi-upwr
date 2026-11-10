@@ -14,6 +14,7 @@ citwomeansClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             keep <- g %in% sel; x <- x[keep]; g <- factor(g[keep], levels = sel)
             x1 <- x[g == sel[1]]; x2 <- x[g == sel[2]]
             if (length(x1) < 2 || length(x2) < 2) { t$setNote("err", "Każda grupa musi mieć co najmniej 2 obserwacje."); return() }
+            if (stats::var(x1) == 0 && stats::var(x2) == 0) { t$setNote("err", "Obie grupy mają stałe wartości — przedziału ufności i d Cohena nie da się wyznaczyć."); return() }
 
             m <- jmvcore::metodyNew()
             m$add("Dane", "Zmienna „%s”; grupy „%s” (n = %d) i „%s” (n = %d) ze zmiennej „%s”; różnica = „%s” − „%s”; braki pominięte.",

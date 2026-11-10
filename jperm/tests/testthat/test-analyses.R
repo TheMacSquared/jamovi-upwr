@@ -51,3 +51,12 @@ test_that("Monte Carlo with seed is reproducible; opis metod describes the schem
     one <- jperm:::permtestone(data = sleep, vars = "extra", testValue = 1, exact = TRUE, metody = TRUE)$metody$content
     expect_true(grepl("μ₀ = 1", one) && grepl("sign-flip", one) && grepl("Test dokładny", one))
 })
+
+test_that("a variable paired with itself and a repeated pair do not break the analysis", {
+    w <- data.frame(przed = c(5, 6, 7, 8, 9, 7), po = c(6, 6, 9, 9, 11, 8))
+    res <- jperm:::permtestpaired(data = w, pairs = list(list(i1 = "przed", i2 = "przed"), list(i1 = "przed", i2 = "po"),
+                                                         list(i1 = "przed", i2 = "po")), seed = 1, nPerm = 200, plot = TRUE)
+    expect_equal(nrow(res$table$asDF), 1)
+    expect_false(is.null(res$plots$get(key = "przed − po")$state))
+    expect_true(grepl("Pominięto parę zmiennej z nią samą", paste(capture.output(print(res$table)), collapse = "\n"), fixed = TRUE))
+})

@@ -124,3 +124,25 @@ test_that("Anderson-Darling keeps the upper tail for an extreme observation", {
     clipped <- -n - mean((2 * seq_len(n) - 1) * (log(pnorm(z)) + log(pmax(1 - pnorm(rev(z)), 1e-16))))
     expect_gt(adTest(x)$stat, clipped)
 })
+
+test_that("skewness is defined from n = 3, kurtosis from n = 4", {
+    v <- c(1, 2, 6); d <- v - mean(v)
+    sk <- skewKurt(v)
+    expect_equal(sk$skew, sqrt(3 * 2) / 1 * sqrt(3) * sum(d^3) / sum(d^2)^1.5)
+    expect_equal(sk$seSkew, sqrt(6 * 3 * 2 / (1 * 4 * 6)))
+    expect_true(is.na(sk$kurt)); expect_true(is.na(sk$seKurt))
+    expect_true(is.na(skewKurt(c(1, 2))$skew))
+})
+
+test_that("modeCount counts the tied most frequent values", {
+    expect_equal(modeCount(c(1, 2, 3)), 0L)
+    expect_equal(modeCount(c(1, 1, 2, 3)), 1L)
+    expect_equal(modeCount(c(1, 1, 2, 2, 3)), 2L)
+    expect_equal(modeCount(numeric(0)), 0L)
+})
+
+test_that("class labels stay out of scientific notation", {
+    expect_equal(fmtNum(100000), "100000")
+    expect_equal(fmtClass(100000, 200000), "[100000; 200000)")
+    expect_equal(fmtClass(0.5, 1.5, last = TRUE), "[0.5; 1.5]")
+})

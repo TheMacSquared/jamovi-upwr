@@ -121,3 +121,17 @@ test_that("regression survives singular bootstrap replicates and labels the band
         expect_match(paste(capture.output(print(res$table)), collapse = " "), "Predyktor musi być zmienny")
     }
 })
+
+test_that("constant data and constant replicates are explained instead of NaN", {
+    cg <- data.frame(y = c(5, 5, 5, 7, 7, 7), grp = factor(rep(c("A", "B"), each = 3)))
+    tw <- jCI:::citwomeans(data = cg, dep = "y", group = "grp", level1 = "A", level2 = "B", plot = FALSE)
+    out <- paste(capture.output(print(tw$table)), collapse = "\n")
+    expect_true(grepl("Obie grupy mają stałe wartości", out, fixed = TRUE))
+    cc <- data.frame(x = c(1, 2, 3, 4, 5), y = rep(3, 5))
+    co <- paste(capture.output(print(jCI:::cicorrelation(data = cc, var1 = "x", var2 = "y", plot = FALSE)$table)), collapse = "\n")
+    expect_true(grepl("współczynnik korelacji jest nieokreślony", co, fixed = TRUE))
+    one <- data.frame(y = rep(4, 12))
+    bo <- paste(capture.output(print(jCI:::cionemean(data = one, dep = "y", group = NULL, ciMethod = "perc", seed = 1, nBoot = 200, plot = FALSE)$table)), collapse = "\n")
+    expect_true(grepl("przedział ma zerową szerokość", bo, fixed = TRUE))
+    expect_false(grepl("Nie udało się wyznaczyć", bo, fixed = TRUE))
+})

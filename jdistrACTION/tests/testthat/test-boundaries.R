@@ -46,3 +46,17 @@ test_that("extreme Weibull shapes retain results and explain unrepresentable plo
     res <- distrACTION::WeibullDistribution(dp1 = 0.003, dp2 = 1)
     expect_true(all(is.finite(res$plot$state$Dataset[[1]])))
 })
+
+test_that("noncentral chi-squared: the axis covers the tail and keeps few labels", {
+    for (lambda in c(50, 500)) {
+        st <- distrACTION::Chi2Distribution(dp1 = 2, dp2 = lambda)$plot$state
+        x <- as.numeric(st[[1]]); x <- x[!is.na(x)]
+        expect_gte(max(x), qchisq(0.999, 2, lambda))
+        ticks <- as.numeric(st[[5]]); ticks <- ticks[!is.na(ticks)]
+        expect_lte(length(ticks), 25)
+        expect_true(all(ticks >= min(x) & ticks <= max(x)))
+    }
+    # the central case at small df keeps its integer labels
+    st0 <- distrACTION::Chi2Distribution(dp1 = 2, dp2 = 0)$plot$state
+    t0 <- as.numeric(st0[[5]]); expect_equal(t0[!is.na(t0)], 0:12)
+})

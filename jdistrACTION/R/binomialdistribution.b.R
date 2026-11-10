@@ -311,33 +311,33 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           if(QuantileFunctionType=="cumulative"){
             if(HighLineCheck>HigherAxisSegment){
               QuantileLabel <- "Kwantyl poza zakresem"
-              QuantAlphaLow <- 0
-              QuantAlphaHigh <- 0
+              QuantileAlphaLow <- 0
+              QuantileAlphaHigh <- 0
               Textsize <- 10
               HigherSegment <- HigherAxisSegment
               LowerSegment <- HigherAxisSegment}
             if(HighLineCheck<LowerAxisSegment){
               QuantileLabel <- "Kwantyl poza zakresem"
-              QuantAlphaLow <- 0
-              QuantAlphaHigh <- 0
+              QuantileAlphaLow <- 0
+              QuantileAlphaHigh <- 0
               Textsize <- 10
               HigherSegment <- HigherAxisSegment
               LowerSegment <- HigherAxisSegment}}
           if(QuantileFunctionType=="central"){
             if(HighLineCheck>HigherAxisSegment){
               QuantileLabel <- "(Górny) kwantyl poza zakresem"
-              QuantAlphaHigh <- 0
+              QuantileAlphaHigh <- 0
               Textsize <- 10
               HigherSegment <- HigherAxisSegment}
             if(LowLineCheck<LowerAxisSegment){
               QuantileLabel <- "(Dolny) kwantyl poza zakresem"
-              QuantAlphaLow <- 0
+              QuantileAlphaLow <- 0
               Textsize <- 10
               LowerSegment <- LowerAxisSegment}
             if((LowLineCheck<LowerAxisSegment)&(HighLineCheck>HigherAxisSegment)){
               QuantileLabel <- "Kwantyl poza zakresem"
-              QuantAlphaHigh <- 0
-              QuantAlphaLow <- 0
+              QuantileAlphaHigh <- 0
+              QuantileAlphaLow <- 0
               Textsize <- 10
               HigherSegment <- HigherAxisSegment
               LowerSegment <- LowerAxisSegment}}}

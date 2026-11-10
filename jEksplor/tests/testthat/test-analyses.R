@@ -143,3 +143,20 @@ test_that("extreme values report the spreadsheet row when rows are filtered (aud
     expect_equal(ex$row, c(5, 7))
     expect_equal(ex$value, c(1, 9))
 })
+
+test_that("variables without observations leave the plots empty instead of failing", {
+    e <- data.frame(x = rep(NA_real_, 6), k = factor(rep(NA, 6), levels = c("a", "b")))
+    res <- jEksplor:::ilosciowe(data = e, vars = "x", hist = TRUE, box = TRUE, qq = TRUE, ecdf = TRUE, lorenz = TRUE)
+    for (arr in c("hist", "box", "qq", "ecdf", "lorenz")) expect_null(res[[arr]]$get(key = "x")$state)
+    q <- jEksplor:::jakosciowe(data = e, vars = "k", bar = TRUE, mosaic = TRUE)
+    expect_null(q$bars$get(key = "k")$state); expect_null(q$mosaics$get(key = "k")$state)
+    expect_null(lorenzPlot(data.frame(y = numeric(0), group = factor(character(0), levels = "x")), "x", NULL, NULL))
+})
+
+test_that("several equally frequent values are reported in a note", {
+    two <- data.frame(x = c(1, 1, 2, 2, 3), y = c(1, 1, 1, 2, 3))
+    out <- paste(capture.output(print(jEksplor:::ilosciowe(data = two, vars = c("x", "y"), mode = TRUE)$desc)), collapse = "\n")
+    expect_true(grepl("jako dominantę podano najmniejszą: x.", gsub("\\s+", " ", out), fixed = TRUE))
+    none <- paste(capture.output(print(jEksplor:::ilosciowe(data = two, vars = "y", mode = TRUE)$desc)), collapse = "\n")
+    expect_false(grepl("jako dominantę", none, fixed = TRUE))
+})

@@ -139,6 +139,8 @@ jakoscioweClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
                 if (grouped) d$g <- gAll[base]
                 if (layered) d$l <- lAll[base]
                 s <- list(d = d, var = v, groupVar = if (grouped) o$splitBy else NULL, layerVar = if (layered) o$layer else NULL)
+                # no observations: no state, so the plots stay empty instead of failing
+                if (nrow(d) == 0) next
                 if (isTRUE(o$bar)) self$results$bars$get(key = v)$setState(s)
                 if (isTRUE(o$mosaic)) self$results$mosaics$get(key = v)$setState(s)
             }

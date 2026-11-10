@@ -13,7 +13,9 @@ bootLabel <- function(method) switch(method, perc = "bootstrap percentylowy", bc
 
 # data: vector or data.frame; statFun(data, idx) -> numeric (length 1 or k).
 # Returns for each statistic: est, se (sd of replicates), lower, upper, reps,
-# fallback (TRUE when boot.ci failed and percentile quantiles were used).
+# fallback: TRUE when the requested interval failed and percentile quantiles
+# were used; NA when every replicate has the same value (a zero-width
+# interval, nothing failed) — NA survives the callers' `||` and gets its own note.
 bootCI <- function(data, statFun, nBoot, seed, method = "perc", level = 0.95, strata = NULL, minValid = 2) {
     if (!is.null(seed) && seed > 0) set.seed(seed)
     b <- if (is.null(strata)) boot::boot(data, statFun, R = nBoot)
@@ -40,7 +42,8 @@ bootCI <- function(data, statFun, nBoot, seed, method = "perc", level = 0.95, st
         if (is.null(ci) || any(!is.finite(c(ci$lower, ci$upper)))) {
             a <- (1 - level) / 2
             ci <- list(lower = unname(stats::quantile(reps, a, na.rm = TRUE)),
-                       upper = unname(stats::quantile(reps, 1 - a, na.rm = TRUE)), fallback = TRUE)
+                       upper = unname(stats::quantile(reps, 1 - a, na.rm = TRUE)),
+                       fallback = if (length(unique(reps[is.finite(reps)])) < 2) NA else TRUE)
         }
         list(est = unname(b$t0[j]), se = stats::sd(reps, na.rm = TRUE), lower = ci$lower, upper = ci$upper,
              reps = reps, fallback = ci$fallback, nValid = nValid, nFailed = nBoot - nValid, sufficient = TRUE)
@@ -197,6 +200,7 @@ ciNote <- function(table, o, method, classicLabel, fallback = FALSE) {
     # cite the boot package only when the interval in this table comes from it
     table$setRefs(if (isBoot(method)) "boot" else character())
     if (isTRUE(fallback)) table$setNote("fb", sprintf("Nie udało się wyznaczyć przedziału metodą %s — użyto empirycznych kwantyli percentylowych.", bootLabel(method)))
+    else if (is.na(fallback)) table$setNote("fb", "Wszystkie replikacje bootstrapowe mają tę samą wartość — przedział ma zerową szerokość.")
 }
 
 # ---------------------------------------------------------------------------

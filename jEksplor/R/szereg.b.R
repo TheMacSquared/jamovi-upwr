@@ -13,16 +13,16 @@ szeregClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             if (!is.null(start) && start > min(x)) { ct$setNote("s", sprintf("Początek pierwszej klasy (%g) musi być ≤ minimum (%g).", start, min(x))); return() }
             br <- classBreaks(x, o$method, o$nClasses, o$width, start)
             if (is.null(br)) { ct$setNote("h", "Szerokość klasy musi być dodatnia (0 = automatyczna)."); return() }
-            if (br$k > 200) { ct$setNote("k", sprintf("Szerokość %s daje %d klas (limit 200) — zwiększ szerokość klasy.", format(signif(br$h, 6)), br$k)); return() }
+            if (br$k > 200) { ct$setNote("k", sprintf("Szerokość %s daje %d klas (limit 200) — zwiększ szerokość klasy.", fmtNum(br$h), br$k)); return() }
             tab <- classTable(x, br$breaks); k <- nrow(tab)
             if (sum(tab$n) != length(x))
                 ct$setNote("lost", sprintf("Uwaga: %d obserwacji poza klasami — wyniki niepełne.", length(x) - sum(tab$n)))
 
             m <- jmvcore::metodyNew()
-            m$add("Dane", "Zmienna „%s”; N = %d (braki pominięte); minimum %s, maksimum %s.", o$var, length(x), format(signif(min(x), 6)), format(signif(max(x), 6)))
+            m$add("Dane", "Zmienna „%s”; N = %d (braki pominięte); minimum %s, maksimum %s.", o$var, length(x), fmtNum(min(x)), fmtNum(max(x)))
             m$add("Klasy", "%s: liczba klas k = %d, szerokość klasy h = %s, od %s; przedziały lewostronnie domknięte [a; b), ostatni [a; b].",
                   switch(o$method, sturges = "Reguła Sturgesa k = ⌈log₂ n + 1⌉", count = "Zadana liczba klas", width = if (o$width == 0) "Szerokość klasy dobrana automatycznie (zakres / k Sturgesa zaokrąglony do 1, 2, 2,5 lub 5 × 10ⁿ)" else "Zadana szerokość klasy"),
-                  k, format(signif(br$h, 6)), if (is.null(start)) "minimum" else format(signif(start, 6)))
+                  k, fmtNum(br$h), if (is.null(start)) "minimum" else fmtNum(start))
             m$add("Klasy", "Środek klasy = (a + b)/2; częstość = n_i / N; skumulowane = suma do danej klasy włącznie.")
             m$add("Statystyki z szeregu", "Średnia = Σ środek·n_i / N; wariancja = Σ (środek − średnia)²·n_i / (N − 1).")
             m$add("Statystyki z szeregu", "Dominanta interpolowana w klasie modalnej: x₀ + h·(n_D − n_{D−1}) / ((n_D − n_{D−1}) + (n_D − n_{D+1})); mediana interpolowana w klasie zawierającej N/2: x₀ + h·(N/2 − cum_{poprz}) / n_Me.")

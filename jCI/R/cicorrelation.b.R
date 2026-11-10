@@ -10,6 +10,8 @@ cicorrelationClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Cla
             a <- jmvcore::toNumeric(self$data[[o$var1]]); b <- jmvcore::toNumeric(self$data[[o$var2]])
             ok <- !is.na(a) & !is.na(b); a <- a[ok]; b <- b[ok]; n <- length(a)
             if (n < 4) { t$setNote("err", "Potrzeba co najmniej 4 kompletnych obserwacji."); return() }
+            const <- c(o$var1, o$var2)[c(stats::sd(a) == 0, stats::sd(b) == 0)]
+            if (length(const) > 0) { t$setNote("err", sprintf("Stała wartość zmiennej (%s) — współczynnik korelacji jest nieokreślony.", paste0("„", const, "”", collapse = ", "))); return() }
             corLab <- if (o$method == "pearson") "r Pearsona" else "ρ Spearmana"
 
             m <- jmvcore::metodyNew()

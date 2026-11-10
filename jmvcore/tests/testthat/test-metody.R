@@ -29,3 +29,11 @@ test_that("pusty opis daje pusty lancuch, metodyCyt cytuje liste", {
     expect_identical(metodyNew()$html(), "")
     expect_identical(metodyCyt(c("a", "b")), "„a”, „b”")
 })
+
+test_that("add() joins a vector argument instead of failing at render", {
+    m <- metodyNew()
+    m$add("Dane", "Zmienne: %s; kowarianty: %s; liczba: %d.", c("a", "b<c"), character(0), 2L)
+    expect_equal(m$length(), 1)
+    html <- m$html()
+    expect_true(grepl("Zmienne: a, b&lt;c; kowarianty: ; liczba: 2.", html, fixed = TRUE))
+})

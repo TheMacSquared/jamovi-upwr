@@ -50,3 +50,13 @@ test_that("opis metod: ukryty domyslnie, po wlaczeniu opisuje testy i wykres bez
     pr <- jTestyT:::ttestpaired(data = w, pairs = list(list(i1 = "przed", i2 = "po")), nonpar = TRUE, metody = TRUE)$metody$content
     expect_true(grepl("„przed” − „po”", pr) && grepl("pseudomediana", pr) && grepl("SD różnic", pr))
 })
+
+test_that("a variable paired with itself and a repeated pair do not break the analysis", {
+    w <- data.frame(przed = c(5, 6, 7, 8, 9, 7), po = c(6, 6, 9, 9, 11, 8))
+    res <- jTestyT:::ttestpaired(data = w, pairs = list(list(i1 = "przed", i2 = "przed"), list(i1 = "przed", i2 = "po"),
+                                                        list(i1 = "przed", i2 = "po")), nonpar = FALSE)
+    expect_equal(nrow(res$ttest$asDF), 1)
+    expect_true(grepl("Pominięto parę zmiennej z nią samą", paste(capture.output(print(res$ttest)), collapse = "\n"), fixed = TRUE))
+    only <- jTestyT:::ttestpaired(data = w, pairs = list(list(i1 = "po", i2 = "po")))
+    expect_equal(nrow(only$ttest$asDF), 0)
+})

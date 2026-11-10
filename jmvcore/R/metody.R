@@ -33,8 +33,13 @@ metodyNew <- function(order = c("Dane", "Model", "Testy", "Wielkość efektu",
     self <- list()
 
     self$add <- function(section, fmt, ...) {
-        args <- lapply(list(...), function(a)
-            if (is.character(a) || is.factor(a)) esc(a) else a)
+        # one value per argument: a vector (several variables, or an empty
+        # optional variable) is joined, otherwise sprintf would return several
+        # texts and the item would only fail later, in render()
+        args <- lapply(list(...), function(a) {
+            if (is.character(a) || is.factor(a)) a <- esc(a)
+            if (length(a) == 1) a else paste(a, collapse = ", ")
+        })
         text <- if (length(args) == 0) fmt else do.call(sprintf, c(list(fmt), args))
         items[[length(items) + 1]] <<- list(section = section, text = text)
         invisible(self)

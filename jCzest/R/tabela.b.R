@@ -326,7 +326,8 @@ tabelaClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             m <- private$.metody
             m$add("Miary 2×2", paste(
                 "Porównanie: „%s” względem „%s” pod względem udziału kategorii „%s”;",
-                "poziomy w kolejności alfabetycznej — odwrotna kolejność odwraca OR i RR."),
+                "poziomy w kolejności alfabetycznej / zadeklarowanej: zamiana kolejności grup daje odwrotności OR i RR,",
+                "zamiana kolejności kategorii daje odwrotność OR, a RR dotyczy wtedy drugiej kategorii."),
                 grp[1], grp[2], ev[1])
             m$add("Miary 2×2", "Przedziały ufności %g%% metodą Walda: na skali logarytmicznej dla OR i RR, na skali proporcji dla różnicy.",
                   o$ciWidth)

@@ -50,7 +50,7 @@ test_that("bootstrap wrapper: reproducible with a seed, percentile limits are qu
     expect_false(bc$fallback); expect_true(bc$lower < mean(v) && mean(v) < bc$upper)
     # constant replicates -> boot.ci cannot compute BCa -> percentile fallback flagged
     cst <- bootCI(rep(2, 10), function(d, i) mean(d[i]), 200, 1, "bca", 0.95)
-    expect_true(cst$fallback)
+    expect_true(is.na(cst$fallback))   # NA = all replicates equal, zero-width interval
     # two statistics from one resample (regression style)
     d <- data.frame(x = 1:20, y = 2 * (1:20) + rnorm(20))
     r2 <- bootCI(d, function(dd, i) coef(lm(y ~ x, data = dd[i, ])), 300, 5, "perc", 0.95)

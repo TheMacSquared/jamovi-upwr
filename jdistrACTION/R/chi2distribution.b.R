@@ -35,10 +35,12 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         # Upper End of the distribution
         UpperTail <- DP1*6+DP2
         # These settings are changed for small values of DP1
-        if(DP1>4){
+        # A noncentral distribution (λ > 0) is centred at df + λ with a spread
+        # growing with λ, so the fixed rule for small df would cut its tail
+        if(DP1>4 || DP2>0){
           UpperTail <- ceiling(qchisq(0.9999, DP1, DP2))}
-        if(DP1>20){
-          LowerTail <- ceiling(qchisq(0.0001, DP1, DP2))}
+        if(DP1>20 || DP2>20){
+          LowerTail <- floor(qchisq(0.0001, DP1, DP2))}
         # The number of values in the curve
         N <- 1000
         # Define a variable for the columname of dataframes
@@ -196,6 +198,10 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         AxisSegments <- seq(LowerAxisSegment, HigherAxisSegment, by = 1)
         if(DP1>4){
           AxisSegments <- floor(seq(LowerAxisSegment, HigherAxisSegment, length.out =  10))}
+        # A wide range at small df (large λ) would label every integer
+        if(length(AxisSegments)>25){
+          AxisSegments <- pretty(c(LowerAxisSegment, HigherAxisSegment), n = 10)
+          AxisSegments <- AxisSegments[AxisSegments>=LowerAxisSegment & AxisSegments<=HigherAxisSegment]}
         # A variable for the position of the upper quantile is defined
         HigherSegment <- NA
         # A variable for the position of the lower quantile is defined
@@ -216,7 +222,7 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             if((HigherSegmentLength*18)<(max(Datas$Prob))){
               HigherSegmentLength <- ((max(Datas$Prob[Datas$Prob!=max(Datas$Prob)]))/18)}}
           # the position of the lower quantile is the same.
-          LoweSegment <- HigherSegment
+          LowerSegment <- HigherSegment
           LowerSegmentLength <- HigherSegmentLength
         
           

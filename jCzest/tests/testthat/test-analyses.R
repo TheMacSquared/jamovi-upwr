@@ -50,7 +50,7 @@ test_that("dane zagregowane i miary 2x2 z nota o kierunku", {
     expect_equal(m$value[1], (10 * 15) / (30 * 25))
     # kierunek OR opisuje opis metod, nie nota pod tabela
     expect_false(grepl("odwraca OR", paste(capture.output(print(res$measures)), collapse = "\n")))
-    expect_true(grepl("odwraca OR", res$metody$content))
+    expect_true(grepl("odwrotności OR i RR", res$metody$content, fixed = TRUE))
     expect_true(grepl("„A” względem „B”", res$metody$content))
 })
 

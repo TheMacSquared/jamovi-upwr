@@ -3,11 +3,13 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
     "ttestpairedClass",
     inherit = ttestpairedBase,
     private = list(
-        .pairKeys = function() {
-            keys <- character(0)
-            for (p in self$options$pairs) if (!is.null(p$i1) && !is.null(p$i2)) keys <- c(keys, paste(p$i1, "−", p$i2))
-            keys
+        # complete pairs of two different variables, each pair once: a variable
+        # paired with itself or a repeated pair would give duplicate keys
+        .validPairs = function() {
+            pairs <- Filter(function(p) !is.null(p$i1) && !is.null(p$i2) && p$i1 != p$i2, self$options$pairs)
+            pairs[!duplicated(vapply(pairs, function(p) paste(p$i1, "−", p$i2), ""))]
         },
+        .pairKeys = function() vapply(private$.validPairs(), function(p) paste(p$i1, "−", p$i2), ""),
         .init = function() {
             for (k in private$.pairKeys()) {
                 self$results$plots$addItem(key = k); self$results$qq$addItem(key = k)
@@ -15,9 +17,12 @@ ttestpairedClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class
         },
         .run = function() {
             o <- self$options
-            pairs <- Filter(function(p) !is.null(p$i1) && !is.null(p$i2), o$pairs)
-            if (length(pairs) == 0) return()
             tt <- self$results$ttest
+            same <- unique(unlist(lapply(o$pairs, function(p) if (!is.null(p$i1) && !is.null(p$i2) && p$i1 == p$i2) p$i1)))
+            if (length(same) > 0)
+                tt$setNote("same", sprintf("Pominięto parę zmiennej z nią samą: %s.", paste0("„", same, "”", collapse = ", ")))
+            pairs <- private$.validPairs()
+            if (length(pairs) == 0) return()
             m <- jmvcore::metodyNew()
             m$add("Dane", "Pary: %s; różnica = pierwsza − druga zmienna; tylko pary bez braków.",
                   paste(vapply(pairs, function(p) sprintf("„%s” − „%s”", jmvcore::htmlEscape(p$i1), jmvcore::htmlEscape(p$i2)), ""), collapse = ", "))

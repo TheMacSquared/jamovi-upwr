@@ -28,9 +28,38 @@ Naprawione:
   numerycznie i wcześniej wynik wahał się między uruchomieniami na czwartym
   miejscu po przecinku; teraz obliczenie ma stałe ziarno generatora (1),
   odnotowane w opisie metod. Stan generatora użytkownika jest przywracany.
+- Eksploracja, zmienne ilościowe i jakościowe: zmienna bez żadnej obserwacji
+  nie przerywa już analizy — tabela pokazuje N = 0, a wykresy tej zmiennej
+  pozostają puste.
+- Eksploracja: skośność i jej błąd standardowy są liczone już od 3 obserwacji
+  (kurtoza nadal od 4); gdy kilka wartości jest równie częstych, nota pod
+  tabelą informuje, że jako dominantę podano najmniejszą.
+- Szereg rozdzielczy: granice klas, szerokość klasy i etykiety osi bez
+  notacji naukowej („[100000; 200000)” zamiast „[1e+05; 2e+05)”).
+- Przedziały ufności: gdy wszystkie replikacje bootstrapowe mają tę samą
+  wartość, nota mówi o przedziale zerowej szerokości (wcześniej o nieudanej
+  metodzie); stałe wartości w obu grupach (różnica średnich) albo stała
+  zmienna (korelacja) dają wyjaśnienie zamiast pustych komórek.
+- Testy t i testy permutacyjne dla par: para zmiennej z nią samą jest pomijana
+  z notą, a ta sama para podana dwa razy liczy się raz (wcześniej błąd wykresu).
+- Częstości, tabela kontyngencji: opis metod precyzuje, że zamiana kolejności
+  grup daje odwrotności OR i RR, a zamiana kolejności kategorii odwraca OR
+  i zmienia kategorię, której dotyczy RR.
+- Wykresy: skumulowany słupkowy i Pareto przy zmiennej bez obserwacji oraz
+  profil średnich bez wierszy kompletnych pokazują komunikat zamiast błędu;
+  wykres hantlowy nie skleja kategorii, których długie nazwy skracają się do
+  tego samego tekstu; wykres punktowy grup podpisuje w domyślnym podpisie, co
+  pokazują słupki błędu (przedział ufności, błąd standardowy albo odchylenie
+  standardowe).
+- Rozkłady: χ² z dużym parametrem niecentralności λ pokazuje cały rozkład
+  i kilkanaście etykiet osi zamiast kilkuset; w rozkładzie dwumianowym kwantyl
+  poza zakresem osi nie jest już rysowany.
+- Opis zastosowanych metod (jmvcore): zdanie z listą wartości (np. kilka
+  zmiennych albo pusta zmienna opcjonalna) nie powoduje błędu.
 
 Wersje modułów: jANOVA 0.5.8, jCzest 0.2.9, jCI 0.3.10, jEksplor 0.1.12,
-jperm 0.2.10, jRISK 0.4.6 (`.jmo` do zbudowania).
+jperm 0.2.10, jTestyT 0.4.8, scatr 2.9.15, distrACTION 1.5.2, jmvcore 28.3.5,
+jRISK 0.4.6 (`.jmo` do zbudowania).
 
 CI: testy klienta (vitest) i serwera (pytest) oraz pełne testy jANOVA i jRISK.
 
