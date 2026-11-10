@@ -3,7 +3,13 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
-## Niewydane (linia latest, po 1.4.1)
+## 1.4.2 — 2026-11-10 (linia latest, jamovi 28.17)
+
+Stan buildów (2026-11-10): obraz Dockera, binarki Windows i macOS oraz pliki
+`.jmo` jRISK 0.4.6 i jSpace 0.3.4 — do zbudowania. Testy automatyczne (R,
+klient, serwer) przechodzą w CI; poprawki wyglądu lekkiego sprawdzone
+w przeglądarce na kliencie 1.4.1 z wstrzykniętymi stylami, nie na
+przebudowanym kliencie.
 
 Zmienione:
 - ANOVA powtórzonych pomiarów: jednostka, której brakuje pomiaru w którejś
@@ -75,6 +81,16 @@ Naprawione:
   powrotu. Karta danych mieści się teraz w oknie razem z paskiem stanu
   arkusza, a w bardzo niskim oknie edytor zmiennej przewija się w środku.
   Wygląd klasyczny bez zmian.
+- Zmienna przekształcona: reguła z niepełnym warunkiem (wybrana zmienna albo
+  „użyj”, ale bez wartości do porównania) nie jest już po cichu pomijana —
+  edytor pokazuje „Niepełna reguła: wybierz zmienną i wpisz wartość” i nie
+  zapisuje reguł, dopóki nie zostanie uzupełniona. Wcześniej taka reguła była
+  widoczna w edytorze, a wszystkie wiersze dostawały wartość „w przeciwnym
+  razie”. Porównanie z brakiem danych wpisuje się jako NA.
+- Zmienna przekształcona: gdy reguły dają liczby całkowite, poziomy zmiennej
+  nominalnej i porządkowej są ułożone rosnąco. Wcześniej powstawały w kolejności
+  pierwszego wystąpienia w danych (np. 3, 1, 2), co dla skali porządkowej
+  dawało zły porządek kategorii.
 - Zmienna przekształcona, reguły: wiersz „w przeciwnym razie użyj” zostaje
   widoczny u dołu listy, gdy reguł jest więcej, niż mieści edytor (wcześniej
   znikał poniżej i nic nie wskazywało, że lista się przewija); w wyglądzie

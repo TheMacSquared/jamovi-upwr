@@ -5,10 +5,10 @@ w instalator, które doinstalowuje się osobno, w jakiej są wersji i pod któr�
 zostały ostatnio zbudowane*. Lista wydań: [`../CHANGELOG.md`](../CHANGELOG.md).
 Automatyczna kontrola spójności: `packaging/scripts/release-check.sh`.
 
-Stan buildów **jUPWR 1.4.1 / jamovi 28.17** (2026-11-08):
-Docker i testy — protokół w `tests/manual/release-1.4.1.md`.
-Binarki aplikacji Windows/macOS oraz ich `.jmo` jRISK/jSpace zbudowane
-na właściwych platformach — potwierdzenie użytkownika z 2026-11-08.
+Stan buildów **jUPWR 1.4.2 / jamovi 28.17** (2026-11-10):
+obraz Dockera, binarki aplikacji Windows/macOS oraz `.jmo` jRISK 0.4.6
+i jSpace 0.3.4 — do zbudowania. Poprzednie wydanie 1.4.1 (2026-11-08) było
+zbudowane w całości; protokół jego testów: `tests/manual/release-1.4.1.md`.
 Wersji modułów nie podnosimy z powodu samej przebudowy.
 
 ## Moduły
@@ -89,7 +89,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.4.1 | 28.17 | 0.4.6 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.4.2 | 28.17 | 0.4.6 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.4.1 | 28.17 | 0.4.5 | ✅ 2026-11-08 | ✅ 2026-11-08 |
 | 1.4.0 | 28.17 | 0.4.5 | ✅ 2026-11-05 | ✅ 2026-11-05 |
 | 1.3.1 | 28.17 | 0.4.4 | ✅ 2026-11-02 | ✅ 2026-11-02 |
@@ -138,6 +138,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jSpace | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.4.2 | 28.17 | 0.3.4 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.4.1 | 28.17 | 0.3.4 | ✅ 2026-11-08 | ✅ 2026-11-08 |
 | 1.4.0 | 28.17 | 0.3.4 | ✅ 2026-11-05 | ✅ 2026-11-05 |
 | 1.3.1 | 28.17 | 0.3.3 | ✅ 2026-11-02 | ✅ 2026-11-02 |
