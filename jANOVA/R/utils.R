@@ -120,6 +120,19 @@ termMeans <- function(fit, term, alpha = 0.05) {
     list(means = out, vcov = V, emm = emm)
 }
 
+# mvtnorm integrates the multivariate t by randomised quasi-Monte Carlo, so
+# p and the critical value differ slightly between runs. A fixed seed makes
+# the same data give the same result; the caller's RNG state is restored.
+withFixedSeed <- function(expr, seed = 1L) {
+    env <- globalenv()
+    old <- if (exists(".Random.seed", envir = env, inherits = FALSE)) get(".Random.seed", envir = env) else NULL
+    on.exit(if (is.null(old)) {
+        if (exists(".Random.seed", envir = env, inherits = FALSE)) rm(".Random.seed", envir = env)
+    } else assign(".Random.seed", old, envir = env), add = TRUE)
+    set.seed(seed)
+    force(expr)
+}
+
 dunnettCorrFromV <- function(V, idx, ctrl) {
     # correlation of the contrasts (level_i - control)
     n <- length(idx); R <- matrix(0, n, n)
@@ -170,12 +183,12 @@ pairwiseFromEmm <- function(means, V, method, alpha, control = NULL, mse = NULL,
     } else if (method == "dunnett") {
         R <- dunnettCorrFromV(V, match(out$g1, levs), match(control, levs))
         # one df per comparison (equal in a between-subjects model)
-        for (i in seq_len(n)) {
+        withFixedSeed(for (i in seq_len(n)) {
             dfi <- max(1L, as.integer(round(dfp[i])))
             out$p[i] <- 1 - mvtnorm::pmvt(lower = rep(-abs(t[i]), n), upper = rep(abs(t[i]), n),
                 df = dfi, corr = R)[1]
             out$crit[i] <- mvtnorm::qmvt(1 - alpha, tail = "both.tails", df = dfi, corr = R)$quantile * se[i]
-        }
+        })
     }
     out$lower <- out$diff - out$crit
     out$upper <- out$diff + out$crit
@@ -273,12 +286,12 @@ welchPairs <- function(means, method, alpha, control = NULL, mse = NULL) {
         V <- diag(unname(w), k); dimnames(V) <- list(levs, levs)
         R <- dunnettCorrFromV(V, match(out$g1, levs), match(control, levs))
         q <- nrow(out)
-        for (i in seq_len(q)) {
+        withFixedSeed(for (i in seq_len(q)) {
             dfi <- max(1L, as.integer(floor(dfp[i])))
             out$p[i] <- 1 - mvtnorm::pmvt(lower = rep(-abs(t[i]), q), upper = rep(abs(t[i]), q),
                 df = dfi, corr = R)[1]
             out$crit[i] <- mvtnorm::qmvt(1 - alpha, tail = "both.tails", df = dfi, corr = R)$quantile * se[i]
-        }
+        })
     }
     out$lower <- out$diff - out$crit
     out$upper <- out$diff + out$crit
@@ -417,6 +430,8 @@ metodyAnovaWspolne <- function(m, o, factorsAll, residPlot = FALSE, method = o$p
             if (method %in% c("dunnett", "dunnettWelch")) "; kontrola = pierwszy poziom czynnika" else "")
         m$addIf(separate, "Post-hoc", "Stopnie swobody Welcha-Satterthwaite’a osobno dla każdej pary%s.",
                 if (method == "dunnettWelch") " (zaokrąglone w dół do liczby całkowitej)" else "")
+        m$addIf(method %in% c("dunnett", "dunnettWelch"), "Post-hoc",
+                "Wielowymiarowy rozkład t liczony numerycznie (mvtnorm) ze stałym ziarnem generatora (1).")
         m$add("Post-hoc", "Różnica graniczna (%s) w tabeli średnich; przedział ufności pary = różnica ± wartość graniczna (poziom %g%%).",
               phCritLabel(method), 100 * (1 - alpha))
         m$addIf(o$phInter, "Post-hoc", "Porównywane także komórki interakcji dwóch czynników.")

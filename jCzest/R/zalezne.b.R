@@ -33,15 +33,10 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
 
         #' Kodowanie 0/1: PIERWSZY poziom = 1 („wystąpiło"), pozostałe = 0.
         #' Konwencja spójna z testem zgodności, gdzie też testujemy pierwszy poziom.
-        .binary = function(vars) {
-            d <- lapply(vars, function(v) {
-                x <- self$data[[v]]
-                if (!is.factor(x)) x <- factor(x)
-                lv <- levels(x)
-                if (length(lv) != 2) return(NULL)
-                as.integer(x == lv[1])
-            })
-            if (any(vapply(d, is.null, logical(1)))) return(NULL)
+        #' lv = wspólne kategorie wszystkich pomiarów; muszą być dokładnie dwie.
+        .binary = function(vars, lv) {
+            if (length(lv) != 2) return(NULL)
+            d <- lapply(vars, function(v) as.integer(as.character(self$data[[v]]) == lv[1]))
             m <- do.call(cbind, d)
             colnames(m) <- vars
             m
@@ -130,9 +125,10 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
         .runCochran = function(vars) {
             o <- self$options
             t <- self$results$tests
-            m <- private$.binary(vars)
+            lv <- measurementLevels(lapply(vars, function(v) self$data[[v]]))
+            m <- private$.binary(vars, lv)
             if (is.null(m)) {
-                t$setNote("b", "Q Cochrana wymaga, żeby każdy pomiar miał dokładnie 2 kategorie.")
+                t$setNote("b", "Q Cochrana wymaga pomiarów o tych samych dwóch kategoriach.")
                 return()
             }
             if (optNonEmpty(o$counts))
@@ -141,7 +137,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
             q <- cochranQ(m)
             if (is.null(q)) { t$setNote("n", "Brak kompletnych obserwacji."); return() }
             md <- private$.metody
-            lv1 <- levels(factor(self$data[[vars[1]]]))[1]
+            lv1 <- lv[1]
             md$add("Dane", "Liczba pomiarów: %d — %s; te same jednostki, jednostka = wiersz arkusza; N = %d (jednostki bez braków).",
                    length(vars), jmvcore::metodyCyt(vars), q$n)
             md$add("Dane", "Kategoria traktowana jako „wystąpiło”: „%s” (pierwsza alfabetycznie w pierwszym pomiarze) — jej dotyczą udziały i wykres.",
@@ -168,7 +164,7 @@ zalezneClass <- if (requireNamespace('jmvcore', quietly = TRUE)) R6::R6Class(
 
             if (isTRUE(o$posthoc)) {
                 # stable codes 1 = the first level (.binary), so pairs level 1 -> level 2 are 1 -> 0
-                lvAll <- levels(factor(self$data[[vars[1]]]))
+                lvAll <- lv
                 pw <- pairwiseMcnemar(m, vars, level = o$ciWidth / 100, eventIsSecond = FALSE)
                 ph <- self$results$posthoc
                 if (!is.null(pw)) {

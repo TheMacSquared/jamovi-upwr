@@ -4,6 +4,21 @@ Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modu
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
 ## Niewydane
+Poprawki błędnych wyników z audytu kodu (przeniesione z linii latest):
+- Eksploracja, test Andersona-Darlinga: statystyka A była zaniżona, gdy
+  w danych była obserwacja odległa od średniej o więcej niż około 8 odchyleń
+  standardowych. Dla pozostałych danych wynik bez zmian.
+- Przedziały ufności, metoda Wilsona: dolna granica przy 0 sukcesach to
+  dokładnie 0, a górna przy samych sukcesach dokładnie 1 (także w metodzie
+  Newcombe'a dla różnicy proporcji).
+- Częstości, próby zależne: Q Cochrana liczy się także wtedy, gdy w którymś
+  pomiarze wystąpiła tylko jedna z dwóch kategorii; pomiary muszą mieć te
+  same dwie kategorie.
+- ANOVA, test Dunnetta (także z osobnymi wariancjami): te same dane dają
+  zawsze te same p i różnice graniczne (stałe ziarno generatora 1 dla
+  obliczenia numerycznego, odnotowane w opisie metod).
+
+Wersje modułów: jANOVA 0.5.1.2, jCzest 0.2.3.2, jCI 0.3.4.2, jEksplor 0.1.4.2.
 
 ## 1.0.10 — 2026-11-05
 Poprawki błędnych wyników z audytu kodu (przeniesione z 1.4.0): ANOVA

@@ -143,3 +143,10 @@ test_that("OR w porównaniach parami ma kierunek McNemara przy dwóch pomiarach 
     # „wystąpiło” = poziom 1: ta sama definicja po poziomach
     expect_equal(pairwiseMcnemar(1 - m, c("p1", "p2", "p3"), eventIsSecond = FALSE)$or[1], 3)
 })
+
+test_that("measurementLevels laczy kategorie pomiarow w kolejnosci wystapienia", {
+    a <- factor(c("nie", "tak")); b <- factor(c("tak", "tak")); d <- factor(character(0))
+    expect_equal(measurementLevels(list(a, b)), c("nie", "tak"))
+    expect_equal(measurementLevels(list(b, a)), c("tak", "nie"))
+    expect_equal(measurementLevels(list(b, d)), "tak")
+})

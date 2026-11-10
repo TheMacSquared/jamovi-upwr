@@ -208,3 +208,21 @@ test_that("RM pairwise comparisons use the df of each contrast (audit 2026-11-05
     dn <- compareTerm(r$fit, "time", "dunnett", 0.05)
     expect_equal(dn$pairs$df, rep(18, 3))
 })
+
+test_that("Dunnett results repeat exactly and leave the RNG state untouched", {
+    skip_if_not_installed("emmeans")
+    set.seed(3)
+    d <- data.frame(g = factor(rep(c("K", "A", "B", "C"), each = 9), levels = c("K", "A", "B", "C")),
+                    y = rnorm(36, rep(c(10, 11, 12, 13), each = 9), rep(c(1, 2, 3, 1.5), each = 9)))
+    w1 <- compareWelch(d$y, d$g, "dunnettWelch", 0.05, control = "K")
+    w2 <- compareWelch(d$y, d$g, "dunnettWelch", 0.05, control = "K")
+    expect_identical(w1$pairs$p, w2$pairs$p); expect_identical(w1$pairs$crit, w2$pairs$crit)
+    r <- fitAnova(d, "y", "g")
+    e1 <- compareTerm(r$fit, "g", "dunnett", 0.05, control = "K", mse = r$mse)
+    e2 <- compareTerm(r$fit, "g", "dunnett", 0.05, control = "K", mse = r$mse)
+    expect_identical(e1$pairs$p, e2$pairs$p); expect_identical(e1$pairs$crit, e2$pairs$crit)
+
+    set.seed(99); expected <- runif(3)
+    set.seed(99); compareWelch(d$y, d$g, "dunnettWelch", 0.05, control = "K")
+    expect_identical(runif(3), expected)
+})

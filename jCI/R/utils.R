@@ -129,7 +129,10 @@ ciProportion <- function(x, n, ciWidth, method) {
         z2 <- z^2; denom <- 1 + z2 / n
         centre <- (phat + z2 / (2 * n)) / denom
         margin <- z * sqrt((phat * (1 - phat) / n + z2 / (4 * n^2))) / denom
-        lower <- max(0, centre - margin); upper <- min(1, centre + margin)
+        # The limits at x = 0 and x = n are exactly 0 and 1; the formula
+        # leaves rounding residue (about 1e-17) there.
+        lower <- if (x == 0) 0 else max(0, centre - margin)
+        upper <- if (x == n) 1 else min(1, centre + margin)
     } else if (method == "clopperPearson") {
         lower <- if (x == 0) 0 else stats::qbeta(alpha / 2, x, n - x + 1)
         upper <- if (x == n) 1 else stats::qbeta(1 - alpha / 2, x + 1, n - x)

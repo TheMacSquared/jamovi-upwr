@@ -138,3 +138,19 @@ test_that("przypadki brzegowe nie wywalaja analizy", {
     braki <- trzy; braki$p1[1:5] <- NA
     expect_error(jCzest:::zalezne(data = braki, vars = c("p1", "p2", "p3")), NA)
 })
+
+test_that("Q Cochrana przyjmuje pomiar, w ktorym wystapila jedna kategoria", {
+    stale <- trzy
+    stale$p3 <- factor(rep("tak", nrow(stale)))          # jeden poziom
+    res <- jCzest:::zalezne(data = stale, vars = c("p1", "p2", "p3"), props = TRUE)
+    # stable: „wystąpiło” = pierwszy poziom („nie”)
+    m <- cbind(as.integer(stale$p1 == "nie"), as.integer(stale$p2 == "nie"), 0L)
+    expect_equal(res$tests$asDF$stat[1], cochranQ(m)$stat)
+    expect_equal(res$marg$asDF$prop[3], 0)
+
+    # trzecia kategoria w ktoryms pomiarze nadal wyklucza test
+    trzyKat <- trzy
+    trzyKat$p3 <- factor(rep(c("tak", "nie", "moze"), length.out = nrow(trzyKat)))
+    out <- jCzest:::zalezne(data = trzyKat, vars = c("p1", "p2", "p3"))
+    expect_equal(nrow(out$tests$asDF), 0)
+})
