@@ -1,20 +1,20 @@
 # Run against freshly compiled modules, including their integration tests.
 args <- commandArgs(trailingOnly = TRUE)
 root <- args[1]; work <- args[2]
-modules <- c("jperm", "jCI", "jRegr", "distrACTION", "jEksplor", "jTestyT", "jCzest", "scatr")
+# Remaining arguments are module directories; two differ from the package name.
+dirs <- args[-(1:2)]
+packageNames <- c(jdistrACTION = "distrACTION", plots = "scatr")
+modules <- ifelse(dirs %in% names(packageNames), packageNames[dirs], dirs)
 .libPaths(c(file.path(work, "library"), file.path(work, "modules", modules, "R"), .libPaths()))
 library(testthat)
 test_file(file.path(root, "jmvcore", "tests", "testthat", "test-vector-fallback.R"),
           env = new.env(parent = asNamespace("jmvcore")), reporter = "summary", stop_on_failure = TRUE)
-# Nemenyi's numerical helper has no dependency on the native ANOVA runtime.
-nemenyiEnv <- new.env()
-source(file.path(root, "jANOVA", "R", "utils.R"), local = nemenyiEnv)
-test_file(file.path(root, "jANOVA", "tests", "testthat", "test-nemenyi.R"),
-          env = nemenyiEnv, reporter = "summary", stop_on_failure = TRUE)
 for (module in modules) {
     loadNamespace(module) # Missing packages are errors, never silently skipped.
-    env <- new.env(parent = asNamespace(module))
-    sourceDir <- switch(module, distrACTION = "jdistrACTION", scatr = "plots", module)
+    # jANOVA's wrapper anova() would mask stats::anova in the reference
+    # computations; its tests reach internals through helper-source.R instead.
+    env <- new.env(parent = if (module == "jANOVA") globalenv() else asNamespace(module))
+    sourceDir <- dirs[match(module, modules)]
     # The older syntax-equivalence snapshots have separate, known palette
     # differences. Gate the new vector output and the numerical audit here.
     testPath <- file.path(root, sourceDir, "tests", "testthat")

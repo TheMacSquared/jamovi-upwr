@@ -11,12 +11,14 @@ cp "$ROOT/platform/jamovi" "$WORK/app/bin/jamovi"
 R CMD INSTALL --library="$WORK/library" "$ROOT/jmvcore"
 RHOME="$(R RHOME)"
 RLIBS="$(Rscript -e 'cat(paste(.libPaths(), collapse=.Platform$path.sep))')"
-for module in jperm jCI jRegr jdistrACTION jEksplor jTestyT jCzest plots; do
+# JUPWR_TEST_MODULES narrows the run to chosen module directories.
+MODULES="${JUPWR_TEST_MODULES:-jperm jCI jRegr jdistrACTION jEksplor jTestyT jCzest jANOVA jRISK plots}"
+for module in $MODULES; do
     mkdir -p "$WORK/source/$module"
     # Only sources; stale generated headers/build directories must not affect CI.
     cp "$ROOT/$module/DESCRIPTION" "$WORK/source/$module/"
     cp -R "$ROOT/$module/R" "$ROOT/$module/jamovi" "$WORK/source/$module/"
-    for extra in NAMESPACE inst; do
+    for extra in NAMESPACE inst data; do
         if [ -e "$ROOT/$module/$extra" ]; then
             cp -R "$ROOT/$module/$extra" "$WORK/source/$module/"
         fi
@@ -26,4 +28,5 @@ for module in jperm jCI jRegr jdistrACTION jEksplor jTestyT jCzest plots; do
         --to "$WORK/modules" --home "$WORK/app" --rhome "$RHOME" --rlibs "$WORK/library:$RLIBS" \
         --assume-app-version "$(cat "$ROOT/version")" --skip-deps
 done
-Rscript "$ROOT/packaging/scripts/test-statistics.R" "$ROOT" "$WORK"
+# shellcheck disable=SC2086
+Rscript "$ROOT/packaging/scripts/test-statistics.R" "$ROOT" "$WORK" $MODULES
