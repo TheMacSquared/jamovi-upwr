@@ -336,6 +336,22 @@
     isolation: isolate;
 }
 
+/* The cards are grid items of the work area. With the default min-height
+   (auto) the data card cannot be lower than its content, so in a low window
+   (a small screen or a high zoom) the open variable editor made it reach
+   below the work area. Focus moving to a spreadsheet cell down there then
+   made the browser scroll the work area up, cutting off the top of the
+   cards with no way to scroll back. */
+[data-ui-style="a"] #main-view > * {
+    min-height: 0;
+}
+
+/* the window itself must not be scrolled by focus either: its hidden ribbon
+   menus reach below it ("hidden" can be scrolled by focus, "clip" cannot) */
+[data-ui-style="a"] #main-window {
+    overflow: clip;
+}
+
 [data-ui-style="a"] #main-table,
 [data-ui-style="a"] #main-options,
 [data-ui-style="a"] #results {
@@ -440,12 +456,20 @@
     border-bottom: none;
 }
 
+/* a card lower than the editor (a very low window): the editor takes what
+   is left under the header and its content scrolls instead of being cut */
+[data-ui-style="a"] #main-table > .jmv-variable-editor:not(.hidden) {
+    max-height: calc(100% - var(--jupwr-card-header));
+}
+
 [data-ui-style="a"] #main-table > .jmv-variable-editor.sub-editor-open {
     background-color: var(--jupwr-surface-alt);
 }
 
 [data-ui-style="a"] #main-table > .jmv-variable-editor .jmv-variable-editor-main {
     width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 [data-ui-style="a"] #main-table > .jmv-variable-editor .jmv-variable-editor-widget {

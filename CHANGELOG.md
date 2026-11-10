@@ -69,6 +69,12 @@ Naprawione:
 - Rozkłady: χ² z dużym parametrem niecentralności λ pokazuje cały rozkład
   i kilkanaście etykiet osi zamiast kilkuset; w rozkładzie dwumianowym kwantyl
   poza zakresem osi nie jest już rysowany.
+- Wygląd lekki, niskie okno (mały ekran albo duże powiększenie, np. 133% na
+  rzutniku): po otwarciu zmiennej wyliczonej, przekształconej albo filtrów
+  okno nie przesuwa się już w górę, ucinając nagłówki kart bez możliwości
+  powrotu. Karta danych mieści się teraz w oknie razem z paskiem stanu
+  arkusza, a w bardzo niskim oknie edytor zmiennej przewija się w środku.
+  Wygląd klasyczny bez zmian.
 - Opis zastosowanych metod (jmvcore): zdanie z listą wartości (np. kilka
   zmiennych albo pusta zmienna opcjonalna) nie powoduje błędu.
 
