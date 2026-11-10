@@ -4,6 +4,11 @@ Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modu
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
 ## Niewydane
+
+## 1.0.11 — 2026-11-10
+Stan buildów (2026-11-10): obraz Dockera, binarki Windows i macOS oraz pliki
+`.jmo` jRISK 0.4.1 i jSpace 0.3.2.1 — do zbudowania.
+
 Poprawki błędnych wyników z audytu kodu (przeniesione z linii latest):
 - Eksploracja, test Andersona-Darlinga: statystyka A była zaniżona, gdy
   w danych była obserwacja odległa od średniej o więcej niż około 8 odchyleń
