@@ -6,9 +6,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 ## Niewydane
 
 ## 1.0.11 — 2026-11-10
-Stan buildów: Windows — aplikacja oraz pliki `.jmo` jRISK 0.4.1 i jSpace 0.3.2.1
-zbudowane 2026-11-10 (potwierdzenie użytkownika z 2026-11-11); obraz Dockera,
-aplikacja macOS i jej `.jmo` — do zbudowania.
+Stan buildów: aplikacja oraz pliki `.jmo` jRISK 0.4.1 i jSpace 0.3.2.1 zbudowane
+na Windows 2026-11-10 i na macOS 2026-11-11 (potwierdzenia użytkownika
+z 2026-11-11); obraz Dockera — do zbudowania.
 
 Poprawki błędnych wyników z audytu kodu (przeniesione z linii latest):
 - Eksploracja, test Andersona-Darlinga: statystyka A była zaniżona, gdy
