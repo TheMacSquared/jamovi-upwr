@@ -5,8 +5,9 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## 1.4.2 — 2026-11-10 (linia latest, jamovi 28.17)
 
-Stan buildów (2026-11-10): obraz Dockera, binarki Windows i macOS oraz pliki
-`.jmo` jRISK 0.4.6 i jSpace 0.3.4 — do zbudowania. Testy automatyczne (R,
+Stan buildów: Windows — aplikacja oraz pliki `.jmo` jRISK 0.4.6 i jSpace 0.3.4
+zbudowane 2026-11-10 (potwierdzenie użytkownika z 2026-11-11); obraz Dockera,
+aplikacja macOS i jej `.jmo` — do zbudowania. Testy automatyczne (R,
 klient, serwer) przechodzą w CI; poprawki wyglądu lekkiego sprawdzone
 w przeglądarce na kliencie 1.4.1 z wstrzykniętymi stylami, nie na
 przebudowanym kliencie.
