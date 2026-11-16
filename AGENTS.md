@@ -308,6 +308,7 @@ wskazane dla niego w spisie. Nowe zadania i zmiany statusu wpisuj w
 | 28 | Dane empiryczne obok rozkładu | distrACTION | zrobione |
 | 29 | Stabilizacja przed 1.4.1 | wiele | zrobione |
 | 30 | Audyt zmiennej przekształconej 2026-11-10 | klient, serwer | zrobione (2 poprawki; 2 punkty świadomie bez zmian; lista słabszych otwarta) |
+| 31 | Zmiana nazwy jUPWR → jDelta | klient, Electron, packaging, moduły | OTWARTE: plan gotowy, decyzje (logo, wersja) przed wdrożeniem |
 
 ### Spis zadań technicznych
 

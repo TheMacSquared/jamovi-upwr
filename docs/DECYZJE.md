@@ -974,6 +974,91 @@ Sondy były skryptami tymczasowymi; wzorzec pełnej ścieżki RECODED + Transfor
 na modelu: `append_transform`, `column.transform = t.id`, `set_needs_parse`,
 `parse_formula`, `_recalc_all`.
 
+### Zadanie 31: zmiana nazwy jUPWR → jDelta — PLAN (decyzja o nazwie 2026-11-16)
+Powód: „jUPWR” trudno wymówić, a na zajęciach nazwa pada wiele razy. jDelta
+łączy deltę rzeki (hydrologia, inżynieria środowiska) z Δ jako różnicą, błędem
+i efektem. „j” zostaje jak w jamovi i w nazwach modułów. Na zajęciach mówimy
+„Delta”. W sieci (2026-11-15) nie ma programu statystycznego „jDelta”;
+najbliżej jest DeltaS (Getynga, 2008). Przed wydaniem trzeba jeszcze sprawdzić
+znaki towarowe (UPRP, EUIPO) i domeny.
+
+ZASADA: zmienia się tylko nazwa widoczna. Identyfikatory wewnętrzne zostają:
+`jupwr.ts`, `JUPWR_*`, `--jupwr-*`, klasy `jupwr-*`, `theme_jupwr_*` w jmvcore,
+nazwy plików i testów. Klucze palet i motywów `jupwrJasny`/`jupwrCiemny`
+NIE MOGĄ się zmienić, bo trafiają do opcji `theme`/`palette` analiz zapisanych
+w .omv (`instance.py`) i do ustawień użytkownika (`settings.ts`). Zmieniają się
+tylko ich etykiety („jDelta — jasny”).
+
+Decyzje do podjęcia przed wdrożeniem:
+- logo i ikony (Δ z rozlewiskiem albo z krzywą rozkładu); czy logo UPWr
+  zostaje na ekranie startowym i w ustawieniach obok nowego znaku. Brief dla
+  agenta projektowego: `docs/redesign/handoff-jdelta-logo.md`;
+- numer wersji: 1.5.0 (MINOR, nowa nazwa bez zmian niezgodnych) albo 2.0.0;
+- czy zmieniamy nazwę repozytorium GitHub (`jamovi-upwr`; GitHub przekierowuje
+  stary adres, ale cytowanie w `references.ts` podaje URL);
+- czy zmieniamy obraz Dockera `jupwr/jupwr` (wewnętrzny; zmiana wymaga
+  poprawek w `release-check.sh` i `release.ps1`). Propozycja: zostaje.
+
+Linie wydań: tylko latest (`main`). Stable `release/1.0` zostaje jUPWR 1.0.x
+(to nie jest poprawka krytyczna), podobnie zamrożona linia `legacy/win81`.
+W pracowniach przez jakiś czas będą obie nazwy; w CHANGELOG i na ekranie
+startowym przez jedno wydanie dopisać „dawniej jUPWR”.
+
+Etap 1 — klient i Electron (widoczna nazwa):
+- `client/common/jupwr.ts`: nowa stała `APP_NAME = 'jDelta'` jako jedyne
+  źródło nazwy w kliencie; literały „jUPWR” w kodzie zastąpić tą stałą;
+- `client/index.html`: `<title>`, `aria-label`, napis „uruchamianie …”,
+  `#header-text`;
+- `client/main/jupwrsplash.ts` i `ribbon/appmenu.ts`: tekst wersji
+  („jDelta 1.5.0 (jamovi …)”); etykiety palet w `appmenu.ts` i `i18n/src/pl.po`
+  („jUPWR — jasny/ciemny”) — tylko etykiety, nie klucze;
+- `client/main/main.ts`: `document.title`;
+- `client/main/references.ts`: cytowanie (`name`, `title`: „jDelta: dystrybucja
+  jamovi do dydaktyki statystyki”), klucz `jupwr` zostaje;
+- `client/main/datasetinfo.ts`: sekcja „Zmiany w jUPWR”;
+- `electron/app/main.js`: `app.setName('jDelta')`, ale ścieżka `userData`
+  ZOSTAJE `…/jUPWR`, żeby nie stracić preferencji (komentarz w kodzie dlaczego);
+  `preload.js` `APP_NAME`; `splash.html` napis; `package.json` `productName`.
+  Kopie odzyskiwania idą do `Dirs.app_data_dir()` silnika, nie do katalogu
+  nazwanego po produkcie — sprawdzić przy wdrożeniu, że po zmianie nadal się
+  odnajdują.
+
+Etap 2 — instalatory (najwięcej pułapek):
+- Windows: `jUPWR.nsi` → `jDelta.nsi`, `APPNAME "jDelta"`. Klucz deinstalacji
+  `…\Uninstall\${APPNAME}` zmienia się razem z nazwą, więc nowy instalator nie
+  zobaczy starej instalacji i zostałyby dwie aplikacje i dwa skróty. Dlatego
+  `.onInit` sprawdza też `…\Uninstall\jUPWR` (stała `LEGACY_APPNAME`)
+  i proponuje odinstalowanie starej wersji tą samą ścieżką co dziś.
+  Katalog instalacji zmienia się na `$LOCALAPPDATA\Programs\jDelta`.
+  `build.ps1`: `$AppName = "jDelta"` (plik `bin\jDelta.exe`, katalog dist,
+  nazwa ZIP); `release.ps1` i `release-check.sh`: ścieżka do `.nsi` i wzorce
+  nazw artefaktów; AGENTS.md i `packaging/*.md` wymieniają `jUPWR.nsi`.
+- macOS: `lib.sh` `APP_NAME="jDelta"` (aplikacja `jDelta.app`, DMG,
+  `CFBundleName`/`CFBundleDisplayName`). `CFBundleIdentifier pl.upwr.jupwr`
+  ZOSTAJE, bo jest niewidoczny, a jego zmiana robi z programu nową aplikację
+  dla systemu. Stary `jUPWR.app` w Programach nie zniknie sam: instrukcja
+  instalacji mówi, żeby go usunąć. Weryfikacja tylko na macOS.
+- Test aktualizacji na Windows: zainstalowany jUPWR 1.4.x → instalator jDelta
+  → jedna aplikacja, jeden skrót, preferencje (paleta, styl interfejsu,
+  interwał odzyskiwania) zachowane, stare .omv otwierają się z tą samą paletą.
+
+Etap 3 — moduły (osobno, z podbiciem wersji każdego zmienionego modułu):
+tytuły w `jamovi/0000.yaml` i `DESCRIPTION` („Eksploracja jUPWR”, „… jUPWR
+dla jamovi”) oraz autor „jUPWR Team”. Widać je w menedżerze modułów, więc
+zmiana jest widoczna, ale niepilna; można ją połączyć z najbliższymi zmianami
+modułów.
+
+Etap 4 — dokumentacja: README, `packaging/*.md` (z MODULES.md: „jUPWR <wersja>”
+w macierzy zgodności — `release-check.sh` szuka wiersza z wersją, nie z nazwą),
+handouty, AGENTS.md (nazwa dystrybucji, nie identyfikatory), wpis w CHANGELOG.
+Historycznych wpisów CHANGELOG i DECYZJE nie przepisujemy.
+
+Gotowe, gdy: w aplikacji, oknie, ekranie startowym, ustawieniach, cytowaniu,
+instalatorze, skrótach i „Dodaj/usuń programy” widać „jDelta”; `grep -i jupwr`
+w tekstach widocznych dla użytkownika (index.html, pl.po, splash, napisy
+w .ts) nic nie zwraca; aktualizacja z jUPWR na Windows przechodzi test
+z etapu 2; `release-check.sh` bez ostrzeżeń.
+
 ## Zadania techniczne
 
 ### Zadanie techniczne 8: Niezawodność obsługi analiz po merge 28.17
