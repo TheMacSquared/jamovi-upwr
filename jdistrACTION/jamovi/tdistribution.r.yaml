@@ -28,11 +28,15 @@ items:
       columns:
         - name: DistributionResultColumn
           title: Prawdopodobieństwo
-          type: text
+          type: number
           visible: (DistributionFunction)
+        - name: QuantileLabelColumn
+          title: ''
+          type: text
+          visible: (QuantileFunction)
         - name: QuantileResultColumn
           title: Kwantyl(e)
-          type: text
+          type: number
           visible: (QuantileFunction)
           
     - name: MomentsTable
@@ -48,7 +52,7 @@ items:
           type: text
         - name: ValueColumn
           title: Wartość
-          type: text
+          type: number
 
     - name: plot
       title: ""

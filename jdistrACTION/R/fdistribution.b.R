@@ -133,26 +133,16 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         
         
         ##### 1.2.2) Output Table #####
-        # Outputlabels are created empty...
-        OutputLabel11 <- ""
-        OutputLabel12 <- ""
-        OutputLabel21 <- ""
-        OutputLabel22 <- ""
-        # ... and filled by conditions. 
-        if(DistributionFunction=="TRUE"){
-          if(DistributionFunctionType=="higher"){
-            DistributionResult <- 1-DistributionResult}
-          DistributionResult <- round(DistributionResult, digits = 3)
-          OutputLabel11 <- paste("P = ", DistributionResult, sep = "")}
-        if(QuantileFunction=="TRUE"){
-          QuantileResult <- round(QuantileResult, digits = 3)
-            OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")}
-        OutputSummary <- matrix(c(OutputLabel11, OutputLabel21, OutputLabel12, OutputLabel22), ncol=2, nrow=2)
-        # The Output-Matrix is written to the according Result-Frame
+        # The results are written as numbers (see outputs.R), so the number
+        # format and the decimal symbol set in the app apply to them
+        if (DistributionFunction == "TRUE") {
+          if (DistributionFunctionType == "higher")
+            DistributionResult <- 1 - DistributionResult
+        }
         Outputs <- self$results$Outputs
-        Outputs$setRow(rowNo=1, values=list(
-          DistributionResultColumn=OutputSummary[1,1],
-          QuantileResultColumn=OutputSummary[1,2]))    
+        fillOutputs(Outputs,
+          prob = if (DistributionFunction == "TRUE") DistributionResult,
+          q1 = if (QuantileFunction == "TRUE") QuantileResult)
 
         
         ###### 1.X) Moments ######
@@ -163,7 +153,7 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           MomentsTable$setVisible(visible = TRUE)
           if (ShowMean) {
             MeanVal <- if (DP2 > 2) {
-              as.character(round(DP2 * (DP1 + DP3) / (DP1 * (DP2 - 2)), 4))
+              DP2 * (DP1 + DP3) / (DP1 * (DP2 - 2))
             } else "nieokreślone (df₂ ≤ 2)"
             MomentsTable$addRow(rowKey = "mean", values = list(
               MomentColumn = "E[X]",
@@ -173,9 +163,7 @@ FDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           }
           if (ShowVariance) {
             VarVal <- if (DP2 > 4) {
-              as.character(round(
-                2 * (DP2/DP1)^2 * ((DP1+DP3)^2 + (DP1+2*DP3)*(DP2-2)) / ((DP2-2)^2*(DP2-4)),
-                4))
+              2 * (DP2/DP1)^2 * ((DP1+DP3)^2 + (DP1+2*DP3)*(DP2-2)) / ((DP2-2)^2*(DP2-4))
             } else "nieokreślone (df₂ ≤ 4)"
             MomentsTable$addRow(rowKey = "var", values = list(
               MomentColumn = "Var[X]",

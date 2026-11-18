@@ -150,39 +150,25 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         
         
         ##### 1.2.2) Output Table #####
-        # Outputlabels are created empty...
-        OutputLabel11 <- ""
-        OutputLabel12 <- ""
-        OutputLabel21 <- ""
-        OutputLabel22 <- ""
-        # ... and filled by conditions. 
-        if(DistributionFunction=="TRUE"){
-          if(DistributionFunctionType=="higher"){
-            DistributionResult <- 1-DistributionResult}
-          if(DistributionFunctionType=="is"){
-            DistributionResult <- dbinom(XValue, DP1, DP2)}
-          DistributionResult <- round(DistributionResult, digits = 3)
-          OutputLabel11 <- paste("P = ", DistributionResult, sep = "")}
-        if(QuantileFunction=="TRUE"){
-          if (QuantileFunctionType=="cumulative") {
-            QuantileResult <- round(QuantileResult, digits = 3)
-            OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")}
-          if (QuantileFunctionType=="central") {
-            QuantileResult <- round(QuantileResult, digits = 3)
-            OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")
-            QuantileResult2 <- round(QuantileResult2, digits = 3)
-            OutputLabel22 <- paste("x2 = ", QuantileResult2, sep = "")}}
-        OutputSummary <- matrix(c(OutputLabel11, OutputLabel21, OutputLabel12, OutputLabel22), ncol=2, nrow=2)
-        # The Output-Matrix is written to the according Result-Frame
+        # The results are written as numbers (see outputs.R), so the number
+        # format and the decimal symbol set in the app apply to them
+        if (DistributionFunction == "TRUE") {
+          if (DistributionFunctionType == "higher")
+            DistributionResult <- 1 - DistributionResult
+          if (DistributionFunctionType == "is")
+            DistributionResult <- dbinom(XValue, DP1, DP2)
+        }
         Outputs <- self$results$Outputs
-        Outputs$setRow(rowNo=1, values=list(
-          DistributionResultColumn=OutputSummary[1,1],
-          QuantileResultColumn=OutputSummary[1,2]))
+        fillOutputs(Outputs,
+          prob = if (DistributionFunction == "TRUE") DistributionResult,
+          q1 = if (QuantileFunction == "TRUE") QuantileResult,
+          q2 = if (QuantileFunction == "TRUE" && QuantileFunctionType == "central") QuantileResult2,
+          discrete = TRUE)
         if (!is.null(EmpX) && DistributionFunction == "TRUE") {
-          Outputs$setRow(rowNo=1, values=list(
-            EmpiricalResultColumn=empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2)))
+          fillOutputsEmpirical(Outputs,
+            empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2))
         } else if (!is.null(EmpBin) && DistributionFunction == "TRUE") {
-          # the same event under Bin(n, p̂)
+          # the same event under Bin(n, p̂): a probability, so there is no count
           ph <- EmpBin$phat
           EmpEventP <- switch(DistributionFunctionType,
             is       = dbinom(XValue, DP1, ph),
@@ -190,15 +176,11 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             higher   = pbinom(ceiling(XValue) - 1, DP1, ph, lower.tail = FALSE),
             interval = pbinom(floor(XValue2), DP1, ph) - pbinom(ceiling(XValue) - 1, DP1, ph))
           Outputs$getColumn("EmpiricalResultColumn")$setTitle("Przy p̂ z danych")
-          Outputs$setRow(rowNo=1, values=list(
-            EmpiricalResultColumn=paste0("P = ", round(EmpEventP, digits = 3))))
+          Outputs$getColumn("EmpiricalCountColumn")$setVisible(FALSE)
+          Outputs$setRow(rowNo = 1, values = list(EmpiricalResultColumn = EmpEventP))
         } else {
-          Outputs$getColumn("EmpiricalResultColumn")$setVisible(FALSE)
+          fillOutputsEmpirical(Outputs, NULL)
         }
-        if((QuantileFunction=="TRUE")&(QuantileFunctionType=="central")){
-          Outputs$addRow(rowKey=2, values=list(
-            DistributionResultColumn=OutputSummary[2,1],
-            QuantileResultColumn=OutputSummary[2,2]))}
         
         
         ###### 1.X) Moments ######
@@ -211,14 +193,14 @@ BinomialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             MomentsTable$addRow(rowKey = "mean", values = list(
               MomentColumn = "E[X]",
               FormulaColumn = "E[X] = n · p",
-              ValueColumn = as.character(round(DP1 * DP2, 4))
+              ValueColumn = DP1 * DP2
             ))
           }
           if (ShowVariance) {
             MomentsTable$addRow(rowKey = "var", values = list(
               MomentColumn = "Var[X]",
               FormulaColumn = "Var[X] = n · p · (1 − p)",
-              ValueColumn = as.character(round(DP1 * DP2 * (1 - DP2), 4))
+              ValueColumn = DP1 * DP2 * (1 - DP2)
             ))
           }
         } else {

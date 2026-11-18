@@ -28,14 +28,22 @@ items:
       columns:
         - name: DistributionResultColumn
           title: Prawdopodobieństwo
-          type: text
+          type: number
           visible: (DistributionFunction)
+        - name: QuantileLabelColumn
+          title: ''
+          type: text
+          visible: (QuantileFunction)
         - name: QuantileResultColumn
           title: Kwantyl(e)
-          type: text
+          type: number
           visible: (QuantileFunction)
         - name: EmpiricalResultColumn
           title: Częstość w danych
+          type: number
+          visible: (empVar)
+        - name: EmpiricalCountColumn
+          title: Liczba przypadków
           type: text
           visible: (empVar)
 
@@ -52,7 +60,7 @@ items:
           type: text
         - name: ValueColumn
           title: Wartość
-          type: text
+          type: number
 
     - name: empTableNotice
       title: Tabela liczności

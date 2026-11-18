@@ -61,8 +61,8 @@ test_that("observed / expected table reproduces the task 4.3 key", {
   expect_equal(round(tab$exp[1:7], 1), c(21.3, 45.2, 43.9, 25.8, 10.2, 2.9, 0.7))
   expect_equal(tab$exp[8], 150, tolerance = 1e-9)
   # empirical frequency of the selected event next to the model probability
-  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value,
-               "0.127 (19 z 150)")
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, 19 / 150)
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalCountColumn")$value, "19 z 150")
   mom <- res$EmpMoments$asDF
   expect_equal(mom$data, c(mean(bananpol$kontrole), var(bananpol$kontrole)))
   expect_equal(mom$model, c(1.8, 12 * 0.15 * 0.85))
@@ -82,9 +82,10 @@ test_that("a 0/1 variable gives Bin(n, p-hat) next to Bin(n, p) from the paramet
   expect_equal(mom$model, c(0.15, 1.8, 12 * 0.15 * 0.85))
   # the parameters still drive the main result; the data column uses p-hat
   expect_equal(res$Outputs$getCell(rowNo = 1, "DistributionResultColumn")$value,
-               paste0("P = ", round(pbinom(2, 12, 0.15), 3)))
+               pbinom(2, 12, 0.15))
   expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value,
-               paste0("P = ", round(pbinom(2, 12, ph), 3)))
+               pbinom(2, 12, ph))
+  expect_false(res$Outputs$getColumn("EmpiricalCountColumn")$visible)
   # numeric 0/1 column: default success = second category ("1")
   num <- distrACTION::BinomialDistribution(
     data = d, empVar = "kod", empType = "binary", dp1 = 12, dp2 = 0.15)
@@ -109,7 +110,7 @@ test_that("invalid data give a clear error and no variable keeps the calculator"
                                            dp1 = 12, dp2 = 0.15)
   expect_false(res$EmpTable$visible)
   expect_equal(res$Outputs$getCell(rowNo = 1, "DistributionResultColumn")$value,
-               "P = 0.142")
+               dbinom(0, 12, 0.15))
 })
 
 test_that("a variable of the wrong content tells which option to choose", {
@@ -139,8 +140,8 @@ test_that("normal: moments and event frequency of a continuous variable", {
   expect_equal(mom$data, c(mean(d$masa), var(d$masa), sd(d$masa)))
   expect_equal(mom$model, c(250, 100, 10))
   # no rounding of x1 for a continuous distribution: 240, 245, 248
-  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value,
-               "0.375 (3 z 8)")
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, 3 / 8)
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalCountColumn")$value, "3 z 8")
   expect_error(distrACTION::Normaldistribution(data = d, empVar = "tekst", x1 = 0, dp1 = 0, dp2 = 1),
                "Nieprawidłowy format zmiennej")
   # without a variable the calculator is unchanged
@@ -174,8 +175,8 @@ test_that("poisson: observed / expected table, moments and event frequency", {
   mom <- res$EmpMoments$asDF
   expect_equal(mom$data, c(mean(d$zgl), var(d$zgl)))
   expect_equal(mom$model, c(2.5, 2.5))
-  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value,
-               "0.3 (30 z 100)")
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, 30 / 100)
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalCountColumn")$value, "30 z 100")
   expect_error(distrACTION::PoissonDistribution(data = d, empVar = "tekst", dp1 = 2.5),
                "Nieprawidłowy format zmiennej")
   # the axis reaches the largest observation
@@ -202,7 +203,8 @@ test_that("geometric: data in the trials convention next to the model", {
   mom <- res$EmpMoments$asDF
   expect_equal(mom$data, c(mean(d$rzuty), var(d$rzuty)))
   expect_equal(mom$model, c(1 / 0.25, 0.75 / 0.25^2))
-  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, "0.4 (4 z 10)")
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, 4 / 10)
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalCountColumn")$value, "4 z 10")
   tab <- res$EmpTable$asDF
   expect_equal(tail(tab$exp, 1), 10, tolerance = 1e-9)
   expect_equal(tab$exp[tab$x == "1"], 10 * 0.25, tolerance = 1e-9)
@@ -223,7 +225,8 @@ test_that("negative binomial: data in the trials convention next to the model", 
   mom <- res$EmpMoments$asDF
   expect_equal(mom$data, c(mean(d$tel), var(d$tel)))
   expect_equal(mom$model, c(3 / 0.2, 3 * 0.8 / 0.2^2))
-  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, "0.6 (6 z 10)")
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, 6 / 10)
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalCountColumn")$value, "6 z 10")
   tab <- res$EmpTable$asDF
   expect_equal(tail(tab$exp, 1), 10, tolerance = 1e-9)
   expect_equal(tab$exp[tab$x == "3"], 10 * dnbinom(0, 3, 0.2), tolerance = 1e-9)
@@ -245,7 +248,8 @@ test_that("exponential: moments, event frequency and the support check", {
   mom <- res$EmpMoments$asDF
   expect_equal(mom$data, c(mean(d$czas), var(d$czas), sd(d$czas)))
   expect_equal(mom$model, c(2, 4, 2))
-  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, "0.3 (3 z 10)")
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, 3 / 10)
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalCountColumn")$value, "3 z 10")
   expect_error(distrACTION::ExponentialDistribution(data = d, empVar = "ujemne", dp1 = 0.5),
                "mniejsze niż 0")
   # the curve reaches the largest observation
@@ -264,7 +268,8 @@ test_that("gamma: moments next to alpha / lambda", {
   mom <- res$EmpMoments$asDF
   expect_equal(mom$data, c(mean(d$czas), var(d$czas), sd(d$czas)))
   expect_equal(mom$model, c(4, 8, sqrt(8)))
-  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, "0.5 (5 z 10)")
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalResultColumn")$value, 5 / 10)
+  expect_equal(res$Outputs$getCell(rowNo = 1, "EmpiricalCountColumn")$value, "5 z 10")
   expect_error(distrACTION::GammaDistribution(data = d, empVar = "ujemne", dp1 = 2, dp2 = 0.5),
                "mniejsze niż 0")
 })

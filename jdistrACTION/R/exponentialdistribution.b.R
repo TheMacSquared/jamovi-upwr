@@ -70,41 +70,20 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           QuantileResult <- qexp(LowerQuantile, DP1)
           QuantileResult2 <- qexp(HigherQuantile, DP1)}}
 
-      OutputLabel11 <- ""
-      OutputLabel12 <- ""
-      OutputLabel22 <- ""
-
-      if(DistributionFunction == "TRUE"){
-        if(DistributionFunctionType == "higher")
+      # The results are written as numbers (see outputs.R), so the number
+      # format and the decimal symbol set in the app apply to them
+      if (DistributionFunction == "TRUE") {
+        if (DistributionFunctionType == "higher")
           DistributionResult <- 1 - DistributionResult
-        DistributionResult <- round(DistributionResult, digits = 3)
-        OutputLabel11 <- paste("P = ", DistributionResult, sep = "")}
-
-      if(QuantileFunction == "TRUE"){
-        if (QuantileFunctionType == "cumulative") {
-          QuantileResult <- round(QuantileResult, digits = 3)
-          OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")}
-        if (QuantileFunctionType == "central") {
-          QuantileResult <- round(QuantileResult, digits = 3)
-          OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")
-          QuantileResult2 <- round(QuantileResult2, digits = 3)
-          OutputLabel22 <- paste("x2 = ", QuantileResult2, sep = "")}}
-
-      Outputs <- self$results$Outputs
-      Outputs$setRow(rowNo = 1, values = list(
-        DistributionResultColumn = OutputLabel11,
-        QuantileResultColumn = OutputLabel12))
-      if (!is.null(EmpX) && DistributionFunction == "TRUE") {
-        Outputs$setRow(rowNo = 1, values = list(
-          EmpiricalResultColumn = empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2,
-                                               discrete = FALSE)))
-      } else {
-        Outputs$getColumn("EmpiricalResultColumn")$setVisible(FALSE)
       }
-      if((QuantileFunction == "TRUE") & (QuantileFunctionType == "central"))
-        Outputs$addRow(rowKey = 2, values = list(
-          DistributionResultColumn = "",
-          QuantileResultColumn = OutputLabel22))
+      Outputs <- self$results$Outputs
+      fillOutputs(Outputs,
+        prob = if (DistributionFunction == "TRUE") DistributionResult,
+        q1 = if (QuantileFunction == "TRUE") QuantileResult,
+        q2 = if (QuantileFunction == "TRUE" && QuantileFunctionType == "central") QuantileResult2)
+      fillOutputsEmpirical(Outputs,
+        if (!is.null(EmpX) && DistributionFunction == "TRUE")
+          empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2, discrete = FALSE))
 
       ShowMean <- self$options$showMean
       ShowVariance <- self$options$showVariance
@@ -115,14 +94,14 @@ ExponentialDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           MomentsTable$addRow(rowKey = "mean", values = list(
             MomentColumn = "E[X]",
             FormulaColumn = "E[X] = 1/λ",
-            ValueColumn = as.character(round(1/DP1, 4))
+            ValueColumn = 1/DP1
           ))
         }
         if (ShowVariance) {
           MomentsTable$addRow(rowKey = "var", values = list(
             MomentColumn = "Var[X]",
             FormulaColumn = "Var[X] = 1/λ²",
-            ValueColumn = as.character(round(1/DP1^2, 4))
+            ValueColumn = 1/DP1^2
           ))
         }
       } else {

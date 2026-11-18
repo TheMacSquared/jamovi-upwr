@@ -126,36 +126,17 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         
         
         ##### 1.2.2) Output Table #####
-        # Outputlabels are created empty...
-        OutputLabel11 <- ""
-        OutputLabel12 <- ""
-        OutputLabel21 <- ""
-        OutputLabel22 <- ""
-        # ... and filled by conditions. 
-        if(DistributionFunction=="TRUE"){
-          if(DistributionFunctionType=="higher"){
-            DistributionResult <- 1-DistributionResult}
-          DistributionResult <- round(DistributionResult, digits = 3)
-          OutputLabel11 <- paste("P = ", DistributionResult, sep = "")}
-        if(QuantileFunction=="TRUE"){
-          if (QuantileFunctionType=="cumulative") {
-            QuantileResult <- round(QuantileResult, digits = 3)
-            OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")}
-          if (QuantileFunctionType=="central") {
-            QuantileResult <- round(QuantileResult, digits = 3)
-            OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")
-            QuantileResult2 <- round(QuantileResult2, digits = 3)
-            OutputLabel22 <- paste("x2 = ", QuantileResult2, sep = "")}}
-        OutputSummary <- matrix(c(OutputLabel11, OutputLabel21, OutputLabel12, OutputLabel22), ncol=2, nrow=2)
-        # The Output-Matrix is written to the according Result-Frame
+        # The results are written as numbers (see outputs.R), so the number
+        # format and the decimal symbol set in the app apply to them
+        if (DistributionFunction == "TRUE") {
+          if (DistributionFunctionType == "higher")
+            DistributionResult <- 1 - DistributionResult
+        }
         Outputs <- self$results$Outputs
-        Outputs$setRow(rowNo=1, values=list(
-          DistributionResultColumn=OutputSummary[1,1],
-          QuantileResultColumn=OutputSummary[1,2]))    
-        if((QuantileFunction=="TRUE")&(QuantileFunctionType=="central")){
-          Outputs$addRow(rowKey=2, values=list(
-            DistributionResultColumn=OutputSummary[2,1],
-            QuantileResultColumn=OutputSummary[2,2]))}
+        fillOutputs(Outputs,
+          prob = if (DistributionFunction == "TRUE") DistributionResult,
+          q1 = if (QuantileFunction == "TRUE") QuantileResult,
+          q2 = if (QuantileFunction == "TRUE" && QuantileFunctionType == "central") QuantileResult2)
         
         
         ###### 1.X) Moments ######
@@ -168,12 +149,12 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             if (DP2 == 0) {
               # the mean exists only for df > 1 (df = 1 is the Cauchy distribution)
               MeanFormula <- "E[X] = 0"
-              MeanVal <- if (DP1 > 1) "0" else "nieokreślone (df ≤ 1)"
+              MeanVal <- if (DP1 > 1) 0 else "nieokreślone (df ≤ 1)"
             } else {
               MeanFormula <- "E[X] = λ√(df/2)·Γ((df−1)/2)/Γ(df/2)"
               MeanVal <- if (DP1 > 1) {
                 # Γ via lgamma: gamma() overflows for df > ~343
-                as.character(round(DP2 * sqrt(DP1/2) * exp(lgamma((DP1-1)/2) - lgamma(DP1/2)), 4))
+                DP2 * sqrt(DP1/2) * exp(lgamma((DP1-1)/2) - lgamma(DP1/2))
               } else "nieokreślone (df ≤ 1)"
             }
             MomentsTable$addRow(rowKey = "mean", values = list(
@@ -185,12 +166,12 @@ TDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           if (ShowVariance) {
             if (DP2 == 0) {
               VarFormula <- "Var[X] = df / (df − 2)"
-              VarVal <- if (DP1 > 2) as.character(round(DP1 / (DP1 - 2), 4)) else "nieokreślone (df ≤ 2)"
+              VarVal <- if (DP1 > 2) DP1 / (DP1 - 2) else "nieokreślone (df ≤ 2)"
             } else {
               VarFormula <- "Var[X] = df(1+λ²)/(df−2) − [E[X]]²"
               VarVal <- if (DP1 > 2) {
                 EX <- if (DP1 > 1) DP2 * sqrt(DP1/2) * exp(lgamma((DP1-1)/2) - lgamma(DP1/2)) else 0
-                as.character(round(DP1 * (1 + DP2^2) / (DP1 - 2) - EX^2, 4))
+                DP1 * (1 + DP2^2) / (DP1 - 2) - EX^2
               } else "nieokreślone (df ≤ 2)"
             }
             MomentsTable$addRow(rowKey = "var", values = list(

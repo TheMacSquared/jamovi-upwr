@@ -179,7 +179,8 @@ empDiscreteClasses <- function(x, range, density, cdf, lower = 0, upper = Inf, m
 
 # Observed relative frequency of the event selected in the distribution
 # function, using the same rounding of x1 / x2 as the model probability
-# (no rounding for a continuous distribution).
+# (no rounding for a continuous distribution). Returns the frequency as a
+# number and the count as text ("12 z 30"); see fillOutputsEmpirical().
 empEventFreq <- function(x, type, x1, x2, discrete = TRUE) {
     if (!discrete) {
         hit <- switch(type,
@@ -191,7 +192,7 @@ empEventFreq <- function(x, type, x1, x2, discrete = TRUE) {
         lower    = x <= floor(x1),
         higher   = x >= ceiling(x1),
         interval = x >= ceiling(x1) & x <= floor(x2))
-    sprintf("%s (%d z %d)", round(mean(hit), 3), sum(hit), length(x))
+    list(freq = mean(hit), count = sprintf("%d z %d", sum(hit), length(x)))
 }
 
 # Fills the observed / expected table and the moments table; returns the

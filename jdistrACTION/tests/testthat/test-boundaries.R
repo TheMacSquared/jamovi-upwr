@@ -5,7 +5,7 @@ test_that("F endpoint quantiles render without replacing their probability area"
     for (p in c(0, 1)) {
         res <- distrACTION::FDistribution(QuantileFunction = TRUE, p = p, dp1 = 1, dp2 = 10)
         expect_equal(res$Outputs$getCell(rowNo = 1, "QuantileResultColumn")$value,
-                     paste0("x1 = ", qf(p, 1, 10, 0)))
+                     qf(p, 1, 10, 0))
         st <- res$plot$state
         expect_true(all(is.finite(st[[1]])))
         expect_true(all(is.finite(st[[2]])))
@@ -34,10 +34,11 @@ test_that("extreme Weibull shapes retain results and explain unrepresentable plo
         res <- distrACTION::WeibullDistribution(dp1 = shape, dp2 = 1,
             DistributionFunction = TRUE, x1 = 1, QuantileFunction = TRUE,
             QuantileFunctionType = "cumulative", showMean = TRUE, showVariance = TRUE)
-        expect_equal(res$Outputs$getCell(rowNo = 1, "DistributionResultColumn")$value, "P = 0.632")
+        expect_equal(res$Outputs$getCell(rowNo = 1, "DistributionResultColumn")$value,
+                     pweibull(1, shape, 1))
         expect_null(res$plot$state)
         expect_match(res$plot$asProtoBuf()$error$message, "możliwości liczbowe")
-        expect_false(any(grepl("NaN", res$MomentsTable$asDF$ValueColumn)))
+        expect_false(any(is.nan(res$MomentsTable$asDF$ValueColumn)))
     }
     moments <- distrACTION:::weibullMoments(1.5, 3)
     expect_equal(moments$mean, 3 * gamma(1 + 1 / 1.5))

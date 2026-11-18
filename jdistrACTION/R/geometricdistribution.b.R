@@ -100,35 +100,17 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           QuantileResult <- qGeom(LowerQuantile)
           QuantileResult2 <- qGeom(HigherQuantile)}}
 
-      OutputLabel11 <- ""
-      OutputLabel12 <- ""
-      OutputLabel22 <- ""
-
-      if(DistributionFunction == "TRUE"){
-        DistributionResult <- round(DistributionResult, digits = 3)
-        OutputLabel11 <- paste("P = ", DistributionResult, sep = "")}
-
-      if(QuantileFunction == "TRUE"){
-        if (QuantileFunctionType == "cumulative") {
-          OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")}
-        if (QuantileFunctionType == "central") {
-          OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")
-          OutputLabel22 <- paste("x2 = ", QuantileResult2, sep = "")}}
-
+      # The results are written as numbers (see outputs.R), so the number
+      # format and the decimal symbol set in the app apply to them
       Outputs <- self$results$Outputs
-      Outputs$setRow(rowNo = 1, values = list(
-        DistributionResultColumn = OutputLabel11,
-        QuantileResultColumn = OutputLabel12))
-      if (!is.null(EmpX) && DistributionFunction == "TRUE") {
-        Outputs$setRow(rowNo = 1, values = list(
-          EmpiricalResultColumn = empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2)))
-      } else {
-        Outputs$getColumn("EmpiricalResultColumn")$setVisible(FALSE)
-      }
-      if((QuantileFunction == "TRUE") & (QuantileFunctionType == "central"))
-        Outputs$addRow(rowKey = 2, values = list(
-          DistributionResultColumn = "",
-          QuantileResultColumn = OutputLabel22))
+      fillOutputs(Outputs,
+        prob = if (DistributionFunction == "TRUE") DistributionResult,
+        q1 = if (QuantileFunction == "TRUE") QuantileResult,
+        q2 = if (QuantileFunction == "TRUE" && QuantileFunctionType == "central") QuantileResult2,
+        discrete = TRUE)
+      fillOutputsEmpirical(Outputs,
+        if (!is.null(EmpX) && DistributionFunction == "TRUE")
+          empEventFreq(EmpX, DistributionFunctionType, XValue, XValue2))
 
       ShowMean <- self$options$showMean
       ShowVariance <- self$options$showVariance
@@ -146,14 +128,14 @@ GeometricDistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
           MomentsTable$addRow(rowKey = "mean", values = list(
             MomentColumn = "E[X]",
             FormulaColumn = MeanFormula,
-            ValueColumn = as.character(round(MeanValue, 4))
+            ValueColumn = MeanValue
           ))
         }
         if (ShowVariance) {
           MomentsTable$addRow(rowKey = "var", values = list(
             MomentColumn = "Var[X]",
             FormulaColumn = "Var[X] = (1 − p) / p²",
-            ValueColumn = as.character(round((1 - DP1) / DP1^2, 4))
+            ValueColumn = (1 - DP1) / DP1^2
           ))
         }
       } else {

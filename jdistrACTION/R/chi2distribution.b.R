@@ -108,26 +108,16 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         
         
         ##### 1.2.2) Output Table #####
-        # Outputlabels are created empty...
-        OutputLabel11 <- ""
-        OutputLabel12 <- ""
-        OutputLabel21 <- ""
-        OutputLabel22 <- ""
-        # ... and filled by conditions. 
-        if(DistributionFunction=="TRUE"){
-          if(DistributionFunctionType=="higher"){
-            DistributionResult <- 1-DistributionResult}
-          DistributionResult <- round(DistributionResult, digits = 3)
-          OutputLabel11 <- paste("P = ", DistributionResult, sep = "")}
-        if(QuantileFunction=="TRUE"){
-          QuantileResult <- round(QuantileResult, digits = 3)
-            OutputLabel12 <- paste("x1 = ", QuantileResult, sep = "")}
-        OutputSummary <- matrix(c(OutputLabel11, OutputLabel21, OutputLabel12, OutputLabel22), ncol=2, nrow=2)
-        # The Output-Matrix is written to the according Result-Frame
+        # The results are written as numbers (see outputs.R), so the number
+        # format and the decimal symbol set in the app apply to them
+        if (DistributionFunction == "TRUE") {
+          if (DistributionFunctionType == "higher")
+            DistributionResult <- 1 - DistributionResult
+        }
         Outputs <- self$results$Outputs
-        Outputs$setRow(rowNo=1, values=list(
-          DistributionResultColumn=OutputSummary[1,1],
-          QuantileResultColumn=OutputSummary[1,2]))    
+        fillOutputs(Outputs,
+          prob = if (DistributionFunction == "TRUE") DistributionResult,
+          q1 = if (QuantileFunction == "TRUE") QuantileResult)
         
         
         ###### 1.X) Moments ######
@@ -140,14 +130,14 @@ Chi2DistributionClass <- if (requireNamespace('jmvcore')) R6::R6Class(
             MomentsTable$addRow(rowKey = "mean", values = list(
               MomentColumn = "E[X]",
               FormulaColumn = "E[X] = df + λ",
-              ValueColumn = as.character(round(DP1 + DP2, 4))
+              ValueColumn = DP1 + DP2
             ))
           }
           if (ShowVariance) {
             MomentsTable$addRow(rowKey = "var", values = list(
               MomentColumn = "Var[X]",
               FormulaColumn = "Var[X] = 2 · (df + 2λ)",
-              ValueColumn = as.character(round(2 * (DP1 + 2 * DP2), 4))
+              ValueColumn = 2 * (DP1 + 2 * DP2)
             ))
           }
         } else {

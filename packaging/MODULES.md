@@ -23,7 +23,7 @@ Wersji modułów nie podnosimy z powodu samej przebudowy.
 | `jmvcore/` | jmvcore | wspólny runtime analiz, motywy i palety | wbudowany runtime | 28.3.5 |
 | `jmv/` (submoduł) | jmv | rdzeń analiz jamovi z modyfikacjami forka | wbudowany | 2.8.5 |
 | `plots/` (submoduł) | scatr | wykresy (jmvplots; kategorie dydaktyczne, 30 wykresów, w tym 17 wektorowych i 2 ukryte) | wbudowany | 2.9.15 |
-| `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.5.2 |
+| `jdistrACTION/` | distrACTION | rozkłady prawdopodobieństwa (fork, PL, 11 rozkładów) | wbudowany | 1.5.3 |
 | `jCI/` | jCI | przedziały ufności: klasyczne (t, Student/Welch, Wilson, Clopper-Pearson, Newcombe, Fisher z) i bootstrapowe (percentylowy, BCa) dla średnich, proporcji, korelacji, regresji; d Cohena z przedziałem; „Jak działa bootstrap”; wchłonął dawny jboot | wbudowany | 0.3.10 |
 | `jperm/` | jperm | testy permutacyjne | wbudowany | 0.2.10 |
 | `jDane/` | jDane | zbiory danych do zajęć (Biblioteka, bez analiz) | wbudowany | 0.8.2 |

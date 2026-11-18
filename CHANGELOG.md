@@ -3,6 +3,26 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## distrACTION 1.5.3 — 2026-11-18 (niewydane; jUPWR bez zmiany: 1.4.2)
+
+Stan buildów: testy modułu przechodzą lokalnie na macOS (bez testów renderowania
+wykresów i pliku `test-boundaries.R`, które wymagają urządzenia graficznego
+i RProtoBuf); obraz Dockera i paczki natywne — do zbudowania.
+
+Naprawione:
+- Rozkłady: prawdopodobieństwo, kwantyle, momenty i częstość w danych są liczbami,
+  więc stosują się do nich „Format liczb” i „Symbol dziesiętny” z ustawień.
+  Wcześniej były tekstem zaokrąglonym na sztywno („P = 0.632”), przez co
+  ustawienia nie działały, a małe prawdopodobieństwa wyświetlały się jako „P = 0”.
+- Rozkład normalny i pozostałe ciągłe: linia kwantyla na wykresie używa pełnej
+  wartości, nie zaokrąglonej do 3 miejsc.
+
+Zmienione:
+- Tabela „Wyniki”: etykiety „x1”, „x2” są w osobnej kolumnie obok wartości
+  kwantyla; „Częstość w danych” to liczba, a liczność („12 z 30”) ma własną
+  kolumnę „Liczba przypadków”. Kwantyle rozkładów dyskretnych są liczbami
+  całkowitymi bez miejsc po przecinku.
+
 ## jRISK 0.4.7 — 2026-11-18 (moduł opcjonalny, jUPWR bez zmiany: 1.4.2)
 
 Stan buildów: `.jmo` zbudowany na macOS arm64 2026-11-18 (niesprawdzony jeszcze

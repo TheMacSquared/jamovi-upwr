@@ -1059,6 +1059,23 @@ w tekstach widocznych dla użytkownika (index.html, pl.po, splash, napisy
 w .ts) nic nie zwraca; aktualizacja z jUPWR na Windows przechodzi test
 z etapu 2; `release-check.sh` bez ostrzeżeń.
 
+### Zadanie 32: wyniki rozkładów jako liczby — ZROBIONE (distrACTION 1.5.3, 2026-11-18)
+- Problem: „Format liczb” i „Symbol dziesiętny” nie działały w rozkładach, bo
+  wyniki były tekstem (`round(..., 3)` + `paste("P = ", ...)`), a klient
+  formatuje tylko komórki liczbowe (`client/resultsview/table.ts`); format nie
+  jest wysyłany do R.
+- Decyzja (wariant A): komórki liczbowe zamiast przekazywania formatu do R.
+  W R nic nie zaokrąglamy. Zapis tabeli „Wyniki” wyłącznie przez
+  `fillOutputs()` / `fillOutputsEmpirical()` w `jdistrACTION/R/outputs.R`.
+- Układ: `QuantileLabelColumn` („x1”/„x2”) obok `QuantileResultColumn`
+  (χ² i F mają jeden kwantyl, bez kolumny etykiety); `EmpiricalResultColumn`
+  liczbowa + `EmpiricalCountColumn` („12 z 30”); przy danych binarnych
+  w dwumianowym („Przy p̂ z danych”) kolumna liczności jest ukryta.
+  Kwantyle rozkładów dyskretnych jako integer. Momenty nieokreślone (t, F)
+  zostają tekstem w kolumnie liczbowej.
+- Pułapka: nie wracać do tekstu z prefiksem „P = ” — testy sprawdzają wartości
+  liczbowe (`test-analyses.R`, ostatni test).
+
 ## Zadania techniczne
 
 ### Zadanie techniczne 8: Niezawodność obsługi analiz po merge 28.17
