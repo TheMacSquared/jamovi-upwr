@@ -12,7 +12,8 @@ Obraz Dockera — do zbudowania. Buildy natywne na R 4.6.0 (nie 4.6.2:
 biblioteka modułów jamovi istnieje tylko dla R 4.6.0). Poprzednie wydanie
 1.4.1 (2026-11-08) było zbudowane w całości; protokół jego testów:
 `tests/manual/release-1.4.1.md`.
-jRISK 0.4.7 (2026-11-18, poprawka modułu bez zmiany wersji jUPWR): `.jmo` do zbudowania.
+jRISK 0.4.7 (2026-11-18, poprawka modułu bez zmiany wersji jUPWR): `.jmo` zbudowany na macOS
+2026-11-18, na Windows do zbudowania.
 Wersji modułów nie podnosimy z powodu samej przebudowy.
 
 ## Moduły
@@ -93,7 +94,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
-| 1.4.2 | 28.17 | 0.4.7 | ⬜ do zbudowania | ⬜ do zbudowania |
+| 1.4.2 | 28.17 | 0.4.7 | ✅ 2026-11-18 | ⬜ do zbudowania |
 | 1.4.2 | 28.17 | 0.4.6 | ✅ 2026-11-11 | ✅ 2026-11-10 |
 | 1.4.1 | 28.17 | 0.4.5 | ✅ 2026-11-08 | ✅ 2026-11-08 |
 | 1.4.0 | 28.17 | 0.4.5 | ✅ 2026-11-05 | ✅ 2026-11-05 |

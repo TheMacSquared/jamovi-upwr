@@ -5,7 +5,8 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 
 ## jRISK 0.4.7 — 2026-11-18 (moduł opcjonalny, jUPWR bez zmiany: 1.4.2)
 
-Stan buildów: `.jmo` do zbudowania (macOS, Windows). Nowy test przechodzi
+Stan buildów: `.jmo` zbudowany na macOS arm64 2026-11-18 (niesprawdzony jeszcze
+w aplikacji), na Windows do zbudowania. Nowy test przechodzi
 lokalnie na macOS; pełny zestaw testów jRISK w CI.
 
 Zmienione:
