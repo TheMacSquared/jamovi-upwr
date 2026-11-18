@@ -19,11 +19,11 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       levB <- self$options$levelB
       if (is.null(levB)) levB <- levels(fb)[1]
 
-      if (!is.null(self$options$levelA) && !(levA %in% levels(fa)))
-        stop(sprintf("Nie można wykonać obliczenia: poziom «%s» zmiennej «%s» nie istnieje.", levA, varA), call. = FALSE)
-
-      if (!is.null(self$options$levelB) && !(levB %in% levels(fb)))
-        stop(sprintf("Nie można wykonać obliczenia: poziom «%s» zmiennej «%s» nie istnieje.", levB, varB), call. = FALSE)
+      # a level chosen in the UI can vanish from the data once a filter
+      # removes every row that carried it; the event then simply has zero
+      # cases, which is a valid table (P = 0), not an error
+      absentA <- !(levA %in% levels(fa))
+      absentB <- !(levB %in% levels(fb))
 
       # each row counts once, or as many times as the count variable / the
       # jamovi data weights say (aggregated table: one row per cell)
@@ -48,6 +48,15 @@ eventtablesClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       if (any(w != round(w)))
         countsTable$setNote("round",
           "Liczności niecałkowite: tabela pokazuje wartości zaokrąglone, prawdopodobieństwa liczone są dokładnie.")
+
+      if (absentA)
+        countsTable$setNote("absentA", sprintf(
+          "Poziom «%s» zmiennej «%s» nie występuje w analizowanych danych (np. po filtrze) — zdarzenie A ma liczność 0.",
+          levA, varA))
+      if (absentB)
+        countsTable$setNote("absentB", sprintf(
+          "Poziom «%s» zmiennej «%s» nie występuje w analizowanych danych (np. po filtrze) — zdarzenie B ma liczność 0.",
+          levB, varB))
 
       labA <- paste("A: ", varA, " = ", levA, sep = "")
       labNotA <- "Aᶜ"

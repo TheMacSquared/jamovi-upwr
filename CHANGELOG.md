@@ -3,6 +3,20 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
+## jRISK 0.4.7 — 2026-11-18 (moduł opcjonalny, jUPWR bez zmiany: 1.4.2)
+
+Stan buildów: `.jmo` do zbudowania (macOS, Windows). Nowy test przechodzi
+lokalnie na macOS; pełny zestaw testów jRISK w CI.
+
+Zmienione:
+- Schemat Bernoulliego oraz Zdarzenia i warunkowanie: poziom wybrany w panelu,
+  którego nie ma już w danych po filtrze (np. „nie” w zmiennej alarm, gdy czujnik
+  nie przeoczył żadnego przegrzania), oznacza zero przypadków, a nie błąd
+  „poziom … nie istnieje”. Schemat Bernoulliego podaje wtedy 0 sukcesów i górną
+  granicę 1 − 0,05^(1/n); pod tabelą jest nota o brakującym poziomie. Błąd
+  ujawniał się tylko w aplikacji, bo jUPWR usuwa z przefiltrowanych danych
+  nieużywane poziomy.
+
 ## 1.4.2 — 2026-11-10 (linia latest, jamovi 28.17)
 
 Stan buildów: aplikacja oraz pliki `.jmo` jRISK 0.4.6 i jSpace 0.3.4 zbudowane

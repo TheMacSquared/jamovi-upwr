@@ -12,6 +12,7 @@ Obraz Dockera — do zbudowania. Buildy natywne na R 4.6.0 (nie 4.6.2:
 biblioteka modułów jamovi istnieje tylko dla R 4.6.0). Poprzednie wydanie
 1.4.1 (2026-11-08) było zbudowane w całości; protokół jego testów:
 `tests/manual/release-1.4.1.md`.
+jRISK 0.4.7 (2026-11-18, poprawka modułu bez zmiany wersji jUPWR): `.jmo` do zbudowania.
 Wersji modułów nie podnosimy z powodu samej przebudowy.
 
 ## Moduły
@@ -30,7 +31,7 @@ Wersji modułów nie podnosimy z powodu samej przebudowy.
 | `jRegr/` | jRegr | regresja jUPWR: korelacja (para = jeden wiersz, więcej = macierz), regresja liniowa, logistyczna dwumianowa; zastępuje w menu Regresja jmv::simpleCorr, corrMatrix, linReg, logRegBin (ukryte w kliencie) | wbudowany | 0.1.10 |
 | `jANOVA/` | jANOVA | ANOVA jUPWR: ANOVA z blokami i kowariantami, ANOVA powtórzonych pomiarów (format długi), litery (Tukey, Games-Howell, Dunnett); zastępuje w menu ANOVĘ jmv (ukrytą w kliencie) | wbudowany | 0.5.8 |
 | `jTestyT/` | jTestyT | testy t (jedna próba, dwie grupy, sparowane) z prostym panelem — tylko testowanie: statystyka, p, różnica i d Cohena jako punkty (przedziały ufności i wykres estymacyjny są w jCI); zastępuje w menu testy t jmv (ukryte w kliencie) | wbudowany | 0.4.8 |
-| `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.4.6 |
+| `jRISK/` | jRISK | ryzyko i niezawodność (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.4.7 |
 | `jSpace/` | jSpace | statystyka danych kosmicznych: orbity TLE/SGP4, mapy sf, rastry terra, klasyfikacja (jeden kurs) | **opcjonalny — `.jmo` (sideload)** | 0.3.4 |
 | `jRol/` | jRol | doświadczalnictwo rolnicze: układy CRD/RCBD/kwadrat łaciński/split-plot, porównania wielokrotne z literami i NIR, plan doświadczenia, 2 zbiory danych (jeden kurs) | wewnętrzny — poza wydaniem (zamrożony) | 0.1.3 |
 | `jPomiar/` | jPomiar | powtarzane pomiary, budżet niepewności, propagacja z korelacją, kowariancja i elipsy 2D; pilotaż międzykierunkowy | wewnętrzny — poza wydaniem (zamrożony) | 0.3.0 |
@@ -92,6 +93,7 @@ Od jUPWR 1.1.0 (jamovi 28.11) `jmc` odrzuca jamovi 28.0–28.3: `.jmo` zbudowany
 
 | jUPWR | jamovi | jRISK | `.jmo` macOS | `.jmo` Windows |
 |---|---|---|---|---|
+| 1.4.2 | 28.17 | 0.4.7 | ⬜ do zbudowania | ⬜ do zbudowania |
 | 1.4.2 | 28.17 | 0.4.6 | ✅ 2026-11-11 | ✅ 2026-11-10 |
 | 1.4.1 | 28.17 | 0.4.5 | ✅ 2026-11-08 | ✅ 2026-11-08 |
 | 1.4.0 | 28.17 | 0.4.5 | ✅ 2026-11-05 | ✅ 2026-11-05 |

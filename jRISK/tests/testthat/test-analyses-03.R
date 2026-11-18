@@ -289,3 +289,27 @@ test_that("Bananpol keys of the exercise lists (2026-10 data)", {
                     branchVar = "podsystem", innerGate = "and", topGate = "or")
   expect_equal(round(res$topTable$asDF$ptop, 5), 0.04489)
 })
+
+test_that("a level removed by a filter means zero cases, not an error", {
+  a <- readSet("bananpol_alarmy")
+  # jamovi hands the analysis filtered data with unused levels dropped
+  ov <- droplevels(a[a$przegrzanie == "tak" & a$czujnik == "nowy", ])
+  ov$alarm <- factor(ov$alarm)
+  expect_false("nie" %in% levels(ov$alarm))
+  res <- jRISK::bernoulli(data = ov, outcomeVar = "alarm",
+                          successLevel = "nie", showUpperBound = TRUE)
+  sm <- res$summaryTable$asDF
+  expect_equal(c(sm$n, sm$successes), c(42, 0))
+  expect_equal(sm$upperOne, 1 - 0.05^(1 / 42), tolerance = 1e-12)
+
+  w <- readSet("bananpol_wypadki")
+  z <- droplevels(w[w$skorki_tydzien == 0, ])
+  z$poslizgniecie <- factor(z$poslizgniecie)
+  z$buty_antyposlizgowe <- factor(z$buty_antyposlizgowe)
+  expect_false("tak" %in% levels(z$poslizgniecie))
+  res <- jRISK::eventtables(data = z, varA = "buty_antyposlizgowe", levelA = "tak",
+                            varB = "poslizgniecie", levelB = "tak")
+  pt <- res$probTable$asDF
+  expect_equal(pt$value[pt$quantity == "P(B)"], 0)
+  expect_equal(pt$value[pt$quantity == "P(A ∩ B)"], 0)
+})

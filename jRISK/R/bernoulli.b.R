@@ -17,8 +17,11 @@ bernoulliClass <- if (requireNamespace('jmvcore')) R6::R6Class(
       # second level (0/1, nie/tak)
       if (is.null(lev)) lev <- levels(fo)[min(2, nlevels(fo))]
 
-      if (!is.null(self$options$successLevel) && !(lev %in% levels(fo)))
-        stop(sprintf("Nie można wykonać obliczenia: poziom «%s» zmiennej «%s» nie istnieje.", lev, outcomeVar), call. = FALSE)
+      # a level chosen in the UI can vanish from the data once a filter
+      # removes every row that carried it (e.g. no missed alarms among the
+      # filtered trials); that is a legitimate series with zero successes,
+      # not an error
+      levelAbsent <- !(lev %in% levels(fo))
 
       # aggregated data (count variable or jamovi weights): totals only,
       # the order of individual trials is unknown
@@ -75,6 +78,11 @@ bernoulliClass <- if (requireNamespace('jmvcore')) R6::R6Class(
         summaryTable$setNote("upperOne", if (k == 0)
           "Górna granica jednostronna (Clopper–Pearson); przy zerze sukcesów równa 1 − 0,05^(1/n)."
           else "Górna granica jednostronna (Clopper–Pearson).")
+
+      if (levelAbsent)
+        summaryTable$setNote("level", sprintf(
+          "Poziom «%s» zmiennej «%s» nie występuje w analizowanych danych (np. po filtrze) — liczba sukcesów wynosi 0.",
+          lev, outcomeVar))
 
       if (is.null(x)) {
         self$results$runPlot$setVisible(FALSE)
