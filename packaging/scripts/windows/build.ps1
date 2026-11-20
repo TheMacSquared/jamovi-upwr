@@ -402,6 +402,20 @@ $cmd = "set NoDefaultCurrentDirectoryInExePath=&& call `"$Vcvars`" && cd /d `"$R
 if (-not (Get-ChildItem "$srv\jamovi\core*.pyd" -EA SilentlyContinue)) { throw "core nieudany" }
 Info "OK core+server"
 
+# Runtime MSVC obok python.exe: jamovi.core jest linkowany dynamicznie (/MD) i wymaga
+# msvcp140.dll, ktorego PBS nie dostarcza. Bez tego na swiezym Windows (bez VC++
+# Redistributable) serwer pada: "ImportError: DLL load failed while importing core".
+# Kopiujemy caly zestaw z toolsetu, ktorym zbudowano core (nadpisuje starsze
+# vcruntime140*.dll z PBS - runtime jest zgodny wstecz).
+$VcRedistRoot = Join-Path (Split-Path (Split-Path (Split-Path $Vcvars))) "Redist\MSVC"
+$VcCrt = Get-ChildItem $VcRedistRoot -Directory -EA SilentlyContinue |
+    Where-Object { $_.Name -match '^\d+(\.\d+)+$' -and (Test-Path "$($_.FullName)\x64\Microsoft.VC143.CRT\msvcp140.dll") } |
+    Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
+if (-not $VcCrt) { throw "BRAK runtime MSVC (Microsoft.VC143.CRT) w $VcRedistRoot - doinstaluj skladnik 'C++ redistributable' w VS Build Tools" }
+Copy-Item "$($VcCrt.FullName)\x64\Microsoft.VC143.CRT\*.dll" "$Payload\python\" -Force
+if (-not (Test-Path "$Payload\python\msvcp140.dll")) { throw "runtime MSVC: msvcp140.dll nie trafil do bundla" }
+Info "OK runtime MSVC $($VcCrt.Name)"
+
 # nanomsg python binding (ctypes) ZE ZRODLA PyPI -> server, z patchami:
 #   * bind/connect: str->bytes (inaczej kazda analiza WISI: nn_bind TypeError)
 #   * _nanomsg_ctypes: nanoconfig opcjonalny (except OSError -> except (OSError, AttributeError))
