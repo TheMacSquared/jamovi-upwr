@@ -8,8 +8,10 @@ zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md
 Moduły: distrACTION 1.5.3 (wbudowany), jRISK 0.4.7 (opcjonalny `.jmo`); jSpace
 bez zmian (0.3.4, `.jmo` przebudowany pod 1.4.3).
 
-Stan buildów (2026-11-26): obraz Dockera, binarki Windows i macOS oraz pliki
-`.jmo` jRISK 0.4.7 i jSpace 0.3.4 — do zbudowania. Testy distrACTION i nowy test
+Stan buildów: obraz Dockera oraz Windows — aplikacja i pliki `.jmo` jRISK 0.4.7
+i jSpace 0.3.4 — zbudowane 2026-11-26 (`release.ps1 -Docker`, Windows native),
+bez uruchomienia paczki; start na Windows bez VC++ Redistributable jeszcze
+niesprawdzony. Aplikacja macOS i jej `.jmo` — do zbudowania. Testy distrACTION i nowy test
 jRISK przechodzą lokalnie na macOS (bez testów renderowania wykresów i pliku
 `test-boundaries.R` distrACTION, które wymagają urządzenia graficznego
 i RProtoBuf); `.jmo` jRISK 0.4.7 dla 1.4.2 zbudowany na macOS 2026-11-18.
