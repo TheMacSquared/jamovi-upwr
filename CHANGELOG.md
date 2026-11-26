@@ -3,39 +3,42 @@
 Numeracja jUPWR jest niezależna od wersji jamovi (plik `version`). Rejestr modułów i macierz
 zgodności modułów opcjonalnych: [`packaging/MODULES.md`](packaging/MODULES.md).
 
-## distrACTION 1.5.3 — 2026-11-18 (niewydane; jUPWR bez zmiany: 1.4.2)
+## 1.4.3 — 2026-11-26 (linia latest, jamovi 28.17)
 
-Stan buildów: testy modułu przechodzą lokalnie na macOS (bez testów renderowania
-wykresów i pliku `test-boundaries.R`, które wymagają urządzenia graficznego
-i RProtoBuf); obraz Dockera i paczki natywne — do zbudowania.
+Moduły: distrACTION 1.5.3 (wbudowany), jRISK 0.4.7 (opcjonalny `.jmo`); jSpace
+bez zmian (0.3.4, `.jmo` przebudowany pod 1.4.3).
+
+Stan buildów (2026-11-26): obraz Dockera, binarki Windows i macOS oraz pliki
+`.jmo` jRISK 0.4.7 i jSpace 0.3.4 — do zbudowania. Testy distrACTION i nowy test
+jRISK przechodzą lokalnie na macOS (bez testów renderowania wykresów i pliku
+`test-boundaries.R` distrACTION, które wymagają urządzenia graficznego
+i RProtoBuf); `.jmo` jRISK 0.4.7 dla 1.4.2 zbudowany na macOS 2026-11-18.
 
 Naprawione:
-- Rozkłady: prawdopodobieństwo, kwantyle, momenty i częstość w danych są liczbami,
-  więc stosują się do nich „Format liczb” i „Symbol dziesiętny” z ustawień.
-  Wcześniej były tekstem zaokrąglonym na sztywno („P = 0.632”), przez co
-  ustawienia nie działały, a małe prawdopodobieństwa wyświetlały się jako „P = 0”.
+- Windows: aplikacja uruchamia się na świeżym systemie bez zainstalowanego
+  Microsoft Visual C++ Redistributable. Wcześniej serwer padał przy starcie
+  („ImportError: DLL load failed while importing core”), bo w paczce brakowało
+  bibliotek runtime MSVC (`msvcp140.dll`); instalator dołącza je teraz obok
+  Pythona.
+- Rozkłady (distrACTION): prawdopodobieństwo, kwantyle, momenty i częstość
+  w danych są liczbami, więc stosują się do nich „Format liczb” i „Symbol
+  dziesiętny” z ustawień. Wcześniej były tekstem zaokrąglonym na sztywno
+  („P = 0.632”), przez co ustawienia nie działały, a małe prawdopodobieństwa
+  wyświetlały się jako „P = 0”.
 - Rozkład normalny i pozostałe ciągłe: linia kwantyla na wykresie używa pełnej
   wartości, nie zaokrąglonej do 3 miejsc.
 
 Zmienione:
-- Tabela „Wyniki”: etykiety „x1”, „x2” są w osobnej kolumnie obok wartości
-  kwantyla; „Częstość w danych” to liczba, a liczność („12 z 30”) ma własną
-  kolumnę „Liczba przypadków”. Kwantyle rozkładów dyskretnych są liczbami
+- Rozkłady, tabela „Wyniki”: etykiety „x1”, „x2” są w osobnej kolumnie obok
+  wartości kwantyla; „Częstość w danych” to liczba, a liczność („12 z 30”) ma
+  własną kolumnę „Liczba przypadków”. Kwantyle rozkładów dyskretnych są liczbami
   całkowitymi bez miejsc po przecinku.
-
-## jRISK 0.4.7 — 2026-11-18 (moduł opcjonalny, jUPWR bez zmiany: 1.4.2)
-
-Stan buildów: `.jmo` zbudowany na macOS arm64 2026-11-18 (niesprawdzony jeszcze
-w aplikacji), na Windows do zbudowania. Nowy test przechodzi
-lokalnie na macOS; pełny zestaw testów jRISK w CI.
-
-Zmienione:
-- Schemat Bernoulliego oraz Zdarzenia i warunkowanie: poziom wybrany w panelu,
-  którego nie ma już w danych po filtrze (np. „nie” w zmiennej alarm, gdy czujnik
-  nie przeoczył żadnego przegrzania), oznacza zero przypadków, a nie błąd
-  „poziom … nie istnieje”. Schemat Bernoulliego podaje wtedy 0 sukcesów i górną
-  granicę 1 − 0,05^(1/n); pod tabelą jest nota o brakującym poziomie. Błąd
-  ujawniał się tylko w aplikacji, bo jUPWR usuwa z przefiltrowanych danych
+- jRISK, Schemat Bernoulliego oraz Zdarzenia i warunkowanie: poziom wybrany
+  w panelu, którego nie ma już w danych po filtrze (np. „nie” w zmiennej alarm,
+  gdy czujnik nie przeoczył żadnego przegrzania), oznacza zero przypadków, a nie
+  błąd „poziom … nie istnieje”. Schemat Bernoulliego podaje wtedy 0 sukcesów
+  i górną granicę 1 − 0,05^(1/n); pod tabelą jest nota o brakującym poziomie.
+  Błąd ujawniał się tylko w aplikacji, bo jUPWR usuwa z przefiltrowanych danych
   nieużywane poziomy.
 
 ## 1.4.2 — 2026-11-10 (linia latest, jamovi 28.17)
